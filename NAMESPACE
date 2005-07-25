@@ -1,0 +1,23 @@
+useDynLib(copula)
+
+importFrom(graphics, persp, contour)
+
+
+export(dcopula, pcopula, rcopula)
+export(dmvdc, pmvdc, rmvdc)
+
+
+exportClasses(mvdc)
+exportClasses(copula, ellipCopula, archmCopula)
+exportClasses(normalCopula, tCopula)
+exportClasses(claytonCopula, frankCopula, gumbelCopula)
+
+
+export(mvdc)
+export(ellipCopula, archmCopula)
+export(normalCopula, tCopula)
+export(claytonCopula, frankCopula, gumbelCopula)
+
+exportMethods(persp, contour, show)
+
+#S3method(print, copula)
