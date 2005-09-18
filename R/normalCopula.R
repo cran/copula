@@ -10,10 +10,10 @@ setClass("normalCopula",
          )
 
 
-normalCopula <- function(param, dim = 2, corstr = "ex") {
+normalCopula <- function(param, dim = 2, dispstr = "ex") {
   pdim <- length(param)
   val <- new("normalCopula",
-             corstr = corstr,
+             dispstr = dispstr,
              dimension = dim,
              parameters = param,
              param.names = paste("rho", 1:pdim, sep="."),
@@ -33,11 +33,12 @@ rnormalCopula <- function(copula, n) {
 
 
 pnormalCopula <- function(copula, u) {
-  dim <- copula@dimension
-  sigma <- getSigma(copula)
   mycdf.vector <- function(x) {
     pmvnorm(lower = rep(-Inf, dim), upper = qnorm(x), sigma = sigma)
   }
+
+  dim <- copula@dimension
+  sigma <- getSigma(copula)
   if (is.vector(u)) u <- matrix(u, ncol = dim)
   u[u <= 0] <- 0
   u[u >= 1] <- 1
@@ -58,7 +59,7 @@ dnormalCopula <- function(copula, u) {
 
 showNormalCopula <- function(object) {
   showCopula(object)
-  if (object@dimension > 2) cat("corstr: ", object@corstr, "\n")
+  if (object@dimension > 2) cat("dispstr: ", object@dispstr, "\n")
 }
 
 setMethod("rcopula", signature("normalCopula"), rnormalCopula)

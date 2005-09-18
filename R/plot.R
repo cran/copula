@@ -1,6 +1,7 @@
 perspCopula <- function(x, fun, n = 51, theta = -30, phi = 30, expand = 0.618, ...) {
-  xis <- seq(0, 1, len = n)
-  yis <- seq(0, 1, len = n)
+  eps <- (.Machine$double.eps)^(1/4)
+  eps <- 0
+  xis <- yis <- seq(0 + eps, 1 - eps, len = n)
   grids <- as.matrix(expand.grid(xis, yis))
   zmat <- matrix(fun(x, grids), n, n)
   persp(xis, yis, zmat, theta = theta, phi = phi, expand = expand, ...)
@@ -11,8 +12,9 @@ perspCopula <- function(x, fun, n = 51, theta = -30, phi = 30, expand = 0.618, .
 
 
 contourCopula <- function(x, fun, n = 51,...) {
-  xis <- seq(0, 1, len = n)
-  yis <- seq(0, 1, len = n)
+  eps <- (.Machine$double.eps)^(1/4)
+  eps <- 0
+  xis <- yis <- seq(0 + eps, 1 - eps, len = n)
   grids <- as.matrix(expand.grid(xis, yis))
   zmat <- matrix(fun(x, grids), n, n)
   contour(xis, yis, zmat, ...)

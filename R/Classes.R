@@ -81,22 +81,22 @@ validEllipCopula <- function(object) {
   dim <- object@dimension
   param <- object@parameters
   ##val <- validCopula(object)
-  if (is.na(match(object@corstr, c("ar1", "ex", "toep", "un"))))
-    return ("corstr not supported")
-  if (object@corstr == "ar1" || object@corstr == "ex")
-    if (length(param) != 1) return ("Param should have length 1 for corstr == ar1 or ex")
-  if (object@corstr == "un")
+  if (is.na(match(object@dispstr, c("ar1", "ex", "toep", "un"))))
+    return ("dispstr not supported")
+  if (object@dispstr == "ar1" || object@dispstr == "ex")
+    if (length(param) != 1) return ("Param should have length 1 for dispstr == ar1 or ex")
+  if (object@dispstr == "un")
     if (length(param) != dim * (dim - 1) / 2)
-      return("Param should have length dim * (dim - 1) / 2 for corstr == un")
-  if (object@corstr == "toep")
+      return("Param should have length dim * (dim - 1) / 2 for dispstr == un")
+  if (object@dispstr == "toep")
     if (length(param) != dim - 1)
-      return("Param should have length dim - 1 for corstr == toep")
+      return("Param should have length dim - 1 for dispstr == toep")
   return(TRUE)
 }
 
 setClass("ellipCopula",
          representation = representation("copula",
-           corstr = "character"),
+           dispstr = "character"),
          validity = validEllipCopula,
          contains = list("copula")
          )
@@ -105,32 +105,32 @@ getSigma <- function(copula) {
   dim <- copula@dimension
   param <- copula@parameters
   sigma <- diag(dim)
-  if (copula@corstr == "ex") {
+  if (copula@dispstr == "ex") {
     sigma[lower.tri(sigma)] <- param[1]
     sigma[upper.tri(sigma)] <- param[1]
   }
-  else if (copula@corstr == "ar1") {
+  else if (copula@dispstr == "ar1") {
     for (i in 1:dim)  for (j in 1:dim)  sigma[i,j] <- param ^ abs(i - j)
   }
-  else if (copula@corstr == "un") {
+  else if (copula@dispstr == "un") {
     sigma[lower.tri(sigma)] <- param
     sigma[upper.tri(sigma)] <- t(sigma)[upper.tri(sigma)]
   }
-  else if (copula@corstr == "toep") {
+  else if (copula@dispstr == "toep") {
     for (i in 1:dim) for (j in 1:dim)
       if (i != j) sigma[i,j] <- param[abs(i - j)]
   }
   sigma
 }
 
-ellipCopula <- function(family, param, dim = 2, corstr = "ex", df = 5, ...) {
+ellipCopula <- function(family, param, dim = 2, dispstr = "ex", df = 5, ...) {
   familiesImplemented <- c("normal", "t")
   fam <- pmatch(family, familiesImplemented, -1)
   if (fam == -1)
     stop(paste("Valid family names are", familiesImplemented))
   copula <- switch(fam,
-                   normalCopula(param, dim = dim, corstr = corstr),
-                   tCopula(param, dim = dim, corstr = corstr, df = df))
+                   normalCopula(param, dim = dim, dispstr = dispstr),
+                   tCopula(param, dim = dim, dispstr = dispstr, df = df))
   copula
 }
 

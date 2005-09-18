@@ -12,11 +12,11 @@ setClass("tCopula",
          )
 
 
-tCopula <- function(param, dim = 2, corstr = "ex", df = 5) {
+tCopula <- function(param, dim = 2, dispstr = "ex", df = 5) {
   pdim <- length(param)
   val <- new("tCopula",
              df = df,
-             corstr = corstr,
+             dispstr = dispstr,
              dimension = dim,
              parameters = param,
              param.names = paste("rho", 1:pdim, sep="."),
@@ -65,7 +65,7 @@ dtCopula <- function(copula, u) {
 
 showTCopula <- function(object) {
   showCopula(object)
-  if (object@dimension > 2) cat("corstr: ", object@corstr, "\n")
+  if (object@dimension > 2) cat("dispstr: ", object@dispstr, "\n")
   cat("df: ", object@df, "\n")
 }
 

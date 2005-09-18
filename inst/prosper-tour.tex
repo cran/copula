@@ -1,0 +1,242 @@
+\documentclass[ps,autumn,slideColor,colorBG]{prosper}
+
+\usepackage[latin1]{inputenc}
+\usepackage{pstricks,pst-node,pst-text,pst-3d}
+\usepackage{amsmath}
+% Definition of new colors
+\newrgbcolor{LemonChiffon}{1. 0.98 0.8}
+\newrgbcolor{LightBlue}{0.68 0.85 0.9}
+
+% > BEGIN OF OVERLAPPED COLORS
+% Code below devised by Denis Girou (CNRS/IDRIS - France, Denis.Girou@idris.fr)
+\newrgbcolor{LemonChiffon}{1. 0.98 0.8}
+\newrgbcolor{LightBlue}{0.68 0.85 0.9}
+\makeatletter
+\newdimen\pst@dimz
+
+% Draw two overlapped surfaces, with computation of the mixed color for
+% the intersection of the surfaces 
+% #1=first  surface, #2=color of first  surface,
+% #3=second surface, #4=color of second surface
+\def\ColoredOverlappedSurfaces#1#2#3#4{%
+\psset{fillstyle=solid}
+% Decode the three components of the first RGB color
+\DecodeRGBFirstColor{\csname color@#2\endcsname}%
+\psset{fillcolor=#2}
+% Draw first surface
+#1
+% Decode the three components of the second RGB color
+\DecodeRGBSecondColor{\csname color@#4\endcsname}%
+% Compute the mixed color
+\BuildMixedColor
+% Draw second surface
+\psclip{\psset{fillcolor=#4}#3}
+\psset{fillcolor=MixedColor}
+% Redraw overlapped surface in the mixed color
+#1
+\endpsclip}
+
+% Get the three components of the first color
+\def\DecodeRGBFirstColor#1{%
+\pst@expandafter\pst@getnumiii{#1} {} {} {} {}\@nil
+\edef\pst@FirstColorR{\pst@tempg}%
+\edef\pst@FirstColorG{\pst@temph}%
+\edef\pst@FirstColorB{\pst@tempi}%
+%\typeout{Color 1=\pst@tempg,\pst@temph,\pst@tempi}% Debug
+}
+
+% Get the three components of the second color
+\def\DecodeRGBSecondColor#1{%
+\pst@expandafter\pst@getnumiii{#1} {} {} {} {}\@nil
+\edef\pst@SecondColorR{\pst@tempg}%
+\edef\pst@SecondColorG{\pst@temph}%
+\edef\pst@SecondColorB{\pst@tempi}%
+%\typeout{Color 2=\pst@tempg,\pst@temph,\pst@tempi}% Debug
+}
+
+% Build the mixed RBG color (by means of each three components)
+\def\BuildMixedColor{%
+% Resulting R component
+\pst@dimz=\pst@FirstColorR pt
+\advance\pst@dimz\pst@SecondColorR pt
+\divide\pst@dimz\tw@
+\pst@dimtonum{\pst@dimz}{\pst@MixedColorR}%
+% Resulting G component
+\pst@dimz=\pst@FirstColorG pt
+\advance\pst@dimz\pst@SecondColorG pt
+\divide\pst@dimz\tw@
+\pst@dimtonum{\pst@dimz}{\pst@MixedColorG}%
+% Resulting B component
+\pst@dimz=\pst@FirstColorB pt
+\advance\pst@dimz\pst@SecondColorB pt
+\divide\pst@dimz\tw@
+\pst@dimtonum{\pst@dimz}{\pst@MixedColorB}%
+% Definition of the mixed color MixedColor
+\newrgbcolor{MixedColor}{%
+\pst@MixedColorR\space \pst@MixedColorG\space \pst@MixedColorB}
+%\typeout{Mixed color=\csname color@MixedColor\endcsname}% Debug
+}
+\makeatother
+% < END OF OVERLAPPED COLORS
+
+\title{A small tour of Prosper facilities}
+\subtitle{\LaTeX\ presentations made easy}
+\author{\href{http://prosper.sourceforge.net/}{{\green Frédéric Goualard}}}
+\institution{%
+  Centrum voor Wiskunde en Informatica\\
+  The Netherlands}
+
+
+
+\begin{document}
+\maketitle
+
+%---------------------------------------------------------------------- SLIDE -
+\begin{slide}{Introduction}
+\begin{itemize}
+\item If you click on my name in the previous page, you should be
+  directed to the Prosper homepage, provided your Acrobat Reader has been
+  properly configured.
+\item Press on \texttt{CTRL-L} to go to/leave full screen view.
+ 
+\item Curious? Want to go directly to the last page? Push
+  \hyperlink{LAST}{{\green here}}.\hypertarget{SECOND}{ }
+\end{itemize}
+\end{slide}
+%------------------------------------------------------------------------------
+
+%---------------------------------------------------------------------- SLIDE -
+\overlays{7}{%
+\begin{slide}{Transitions}
+\texttt{Prosper} offers seven transitions 
+between slides:
+\begin{itemstep}
+\item Split;
+\item Blinds;
+\item Box;
+\item Wipe;
+\item Dissolve;
+\item Glitter;
+\item Replace.
+\end{itemstep}
+\end{slide}
+}
+%------------------------------------------------------------------------------
+
+
+%---------------------------------------------------------------------- SLIDE -
+\overlays{2}{%
+\begin{slide}{Diagrams}
+A small diagram with some few lines of \LaTeX.
+\onlySlide{2}{%
+  Since the diagram and the text are at the same level, there is no
+  difficulty to add some link from one to \rnode{LIEN}{another}.}%
+
+\vspace{0.4cm}
+{\tiny
+\begin{equation*}
+\setlength{\arraycolsep}{1cm}
+\def\tX{\tilde{\tilde{X}}}
+\begin{array}{cc}
+        (X-A,N-A)\rnode{a}{} & \rnode{b}{}(\tX,a)\\[1.5cm]
+        (X,N)\rnode{c}{} & \rnode{d}{}(\tX,N)\\[1.5cm]
+\end{array}
+\psset{nodesep=5pt,arrows=->}
+\onlySlide*{2}{\nccurve[linecolor=white,angleA=270,angleB=180]{LIEN}{d}}%
+\ncline[linecolor=white]{a}{b}\Aput{a}
+\ncline[linecolor=white]{a}{c}\Bput{r}
+\ncline[linecolor=white,linestyle=dashed]{c}{d}\Bput{b}
+\ncline[linecolor=white]{b}{d}\Bput{s}
+\end{equation*}}
+\end{slide}
+}
+%------------------------------------------------------------------------------
+
+
+%---------------------------------------------------------------------- SLIDE -
+\overlays{2}{%
+\begin{slide}[Dissolve]{A small \emph{clipping} effect}
+\small
+Any practical use for this?
+
+\begin{psclip}{\psellipse[linestyle=none]%
+                (4.9,-1.7)(4,1.6)}
+\begin{center}
+\parbox{7cm}{%
+\green
+Ce n'était pas une petite gare de province, mais une porte dérobée.
+Elle donnait en apparence sur la campagne. Sous l'\oe{}il d'un 
+contr\^oleur paisible on gagnait une route blanche sans mystère,
+un ruisseau, des églantines. Le chef de gare soignait des roses, 
+l'homme d'équipe feignait de pousser un chariot vide. Sous ces 
+déguisements, veillaient trois gardiens d'un monde secret.}
+\end{center}
+\end{psclip}
+
+\vspace*{-2cm}
+\OnlySlide{2}%
+\pstextpath{\psccurve[linestyle=none](.5,0)(3.5,1)(3.5,0)(.5,1)}{\green And there are so many other funny effects\dots}
+\end{slide}
+}
+%------------------------------------------------------------------------------
+
+
+%---------------------------------------------------------------------- SLIDE -
+\overlays{3}{%
+\begin{slide}{Householder formula}
+\small
+The Householder formula below lets you compute $f^{-1}(x)$ for an arbitrary
+$f$.
+{\scriptsize
+\begin{equation}\label{Householder}
+x_{k+1}\mapsto \Phi_n(x_k)=x_k+(n-1)
+\frac{\bigl(\frac{1}{f(x_k)}\bigr)^{n-2}}{\bigl(\frac{1}{f(x_k)}\bigr)^{n-1}}+
+f(x_k)^{n+1}%
+\fromSlide*{2}{\rnode{NA}{\pscirclebox[linecolor=red]{\psi}}}
+\onlySlide*{1}{\rnode{NA}{\pscirclebox[linecolor=red,linestyle=none]{\psi}}}
+\end{equation}}
+
+\FromSlide{2}%
+where $n\geq 2$ and \rnode{NB}{$\psi$} is an arbitrary function.
+\fromSlide*{3}{\nccurve[linecolor=red,angleA=90,angleB=270]{->}{NB}{NA}}
+
+\OnlySlide{3}%
+Formula~\eqref{Householder} gives an iteration of order $n$ converging
+towards $x_*$ such that: $f(x_*)=0$.
+\end{slide}
+}
+%------------------------------------------------------------------------------
+
+%---------------------------------------------------------------------- SLIDE -
+\overlays{2}{%
+  \begin{slide}[Glitter]{Overlaps of colors}
+    Intersection of sets. First the yellow one\dots\onlySlide{2}{Then
+      the blue one.}%
+    \rput(4,-2){%
+      \onlySlide{1}{%
+        \psellipse[fillstyle=solid,fillcolor=LemonChiffon](0.3,-0.7)(1.5,1)}%
+      \onlySlide{2}{%
+        \ColoredOverlappedSurfaces{\pscircle{1}}{LightBlue}%
+                         {\psellipse[fillstyle=solid,%
+                           fillcolor=LemonChiffon](0.3,-0.7)(1.5,1)}{%
+                           LemonChiffon}}}%
+    \OnlySlide{2}%
+    {\green Remember how to do that with MS PowerPoint?}
+  \end{slide}
+}
+%------------------------------------------------------------------------------
+
+%---------------------------------------------------------------------- SLIDE -
+\begin{slide}{Last slide}
+  This is the \hypertarget{LAST}{last} slide. Do you want to go to the 
+  \hyperlink{SECOND}{{\green second one}}?
+\end{slide}
+%---------------------------------------------------------------------- SLIDE -
+
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

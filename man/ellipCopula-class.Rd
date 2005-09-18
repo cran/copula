@@ -12,8 +12,8 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{corstr}:}{Object of class \code{"character"}, indicating
-    the type of the Sigma matrix such as 'ex', 'ar1', 'toep', or 'un'.}
+    \item{\code{dispstr}:}{Object of class \code{"character"}, indicating
+    the type of the dispersion matrix such as 'ex', 'ar1', 'toep', or 'un'.}
     \item{\code{dimension}:}{Object of class \code{"numeric"} ~~ }
     \item{\code{parameters}:}{Object of class \code{"numeric"} ~~ }
     \item{\code{param.names}:}{Object of class \code{"character"} ~~ }

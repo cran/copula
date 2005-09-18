@@ -1,0 +1,165 @@
+\documentclass[%
+ps,
+%pdf,
+%nocolorBG,
+%colorBG,
+%slideColor,
+%slideBW,
+%draft,
+%frames
+%azure
+%contemporain
+%nuancegris
+%troispoints
+%lignesbleues
+%darkblue
+%alienglow
+%autumn
+%blueline
+]{prosper}
+\usepackage{amsmath,alltt}
+
+\usepackage{/usr/lib/R/share/texmf/Sweave}
+
+\newcommand{\Ran}{\,\mathrm{Ran}\,}
+
+%%% Things which go on all slides:
+%% the caption. The default is the \title argument.
+%% \slideCaption{Copula Package}
+%% A logo. x and y coordinates measured in inches with
+%% zero point at the lower left corner.
+\Logo{\includegraphics{uilogo}}
+
+\title{R Package Copula}
+\author{Jun Yan}
+\institution{Department of Statistics and Actuarial Science,\\
+University of Iowa}
+\slideCaption{Copula Package}
+
+
+\begin{document}
+
+
+\maketitle
+
+\overlays{6}{
+\begin{slide}{Backgrounds}
+\begin{itemstep}
+\item Copulas have become a widely used tool for 
+modeling multivariate dependence in a variety of fields.
+
+\item Software implementation is important in promoting
+the application of copulas.
+
+\item \texttt{Splus} has a collection of functions for copulas
+modeling in the \texttt{finmetrics} module.
+
+\begin{itemize}
+\item Commercial
+\item Bivariate copulas only
+\end{itemize}
+
+\item Need a platform for the development of 
+copula methods and applications.
+
+%\item \texttt{R} package \texttt{copula}.
+\end{itemstep}
+\end{slide}
+}
+
+
+\begin{slide}{Copulas}
+\begin{itemize}
+\item A copula $C$ is a multivariate distribution
+whose margins are all uniform over $(0,1)$:
+$$C(u_1,\ldots, u_p) = \Pr(U_1 \le u1, \ldots, U_p \le u_p).$$
+
+\item Sklar's cannonical representaion theorem (1959): 
+A multivariate joint distribution can be represented 
+by its marginal distribution and a copula:
+$$F(x_1, \ldots, x_p) = C[F_1(x_1), \ldots, F_p(x_p)].$$
+The copula is unique if the margins are continuous.
+Otherwise, only the subcopulas is uniquely determined
+on $\Ran F_1 \times \cdots \times \Ran F_p$.
+
+\item Sklar's Theorem (1959)
+
+\end{itemize}
+  
+\end{slide}
+
+\overlays{7}{
+\begin{slide}{Why R}
+\begin{itemstep}
+\item Quote from \texttt{http://www.r-project.org}:
+  ``\texttt{R} is a free software environment for 
+  statistical computing and graphics.'' 
+
+\item Open source.
+
+\item Compiles and runs on a wide variety of UNIX platforms, 
+Windows and MacOS. 
+
+\item Cutting-edge development;
+hundreds of contributed packages.
+
+\item Excellent graphics.
+
+\item Easy interface with lower level compiled code (C/C++, Fortran)
+
+\item Active developer-user interaction.
+\end{itemstep}
+  
+\end{slide}
+}
+
+\overlays{10}{
+\begin{slide}{Features of the Copula Package}
+\begin{itemstep}
+\item Classes (S4) of commonly used copula families
+\begin{itemize}
+\item Elliptical copulas: normal, t, Clayton, Frank, and Gumbel
+\item Archimedian copulas
+\item Extreme value copulas (to be implemented)
+\end{itemize}
+
+\item Dimension can be greater than 2.
+\item Methods
+\begin{itemize}
+\item density
+\item distribution
+\item random number generator
+\end{itemize}
+\item Graphics: perspective plot, contour plot.
+\end{itemstep}
+
+\end{slide}
+}
+
+\begin{slide}{Load the Package}
+The package \texttt{copula} depends on contributed
+packages \texttt{mvtnorm}, \texttt{scatterplot3d},
+and package \texttt{sn}.
+
+\begin{Schunk}
+\begin{Sinput}
+> library(copula)
+\end{Sinput}
+\end{Schunk}
+  
+\end{slide}
+
+\begin{slide}{Copula Objects}
+  
+\end{slide}
+
+\begin{slide}{Density Contour}
+  
+\end{slide}
+
+\begin{slide}{Density Perspective}
+  
+\end{slide}
+
+
+\end{document}
