@@ -36,7 +36,7 @@ gumbelCopula(param, dim = 2)
 \seealso{ \code{\link{ellipCopula}} }
 \examples{
 clayton.cop <- claytonCopula(2, dim = 3)
-scatterplot3d(rcopula(clayton.cop, 1000))
+##scatterplot3d(rcopula(clayton.cop, 1000))
 frank.cop <- frankCopula(3)
 persp(frank.cop, dcopula)
 gumbel.cop <- archmCopula("gumbel", 5)

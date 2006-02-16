@@ -43,8 +43,8 @@ t.cop <- tCopula(c(0.5, 0.3), dim = 3, dispstr = "toep", df = 2)
 norm.cop <- ellipCopula("normal", param = c(0.5, 0.6, 0.7),
                         dim = 3, dispstr = "un")
 ## 3d scatter plot of 1000 random observations
-scatterplot3d(rcopula(norm.cop, 1000))
-scatterplot3d(rcopula(t.cop, 1000))
+##scatterplot3d(rcopula(norm.cop, 1000))
+##scatterplot3d(rcopula(t.cop, 1000))
 }
 \keyword{ distribution }% at least one, from doc/KEYWORDS
 \keyword{ multivariate }% __ONLY ONE__ keyword per line

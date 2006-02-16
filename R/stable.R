@@ -1,0 +1,24 @@
+rstable <- function(n, alpha, beta, scale = 1, location = 0, iparam = 1) {
+  if (alpha > 2) stop ("alpha must be <= 2")
+  if (beta < -1 | beta > 1) stop("beta must be <= 1 and >= -1")
+  if (scale <= 0) stop("scale must be > 0")
+  val <- double(n)
+  n2 <- n * 2
+  uu <- runif(n2)
+  err <- 0
+  foo <- .Fortran("sgen", as.integer(n), val=as.double(val),
+                  as.double(alpha), as.double(beta),
+                  as.double(scale), as.double(location),
+                  as.integer(n2), as.double(uu),
+                  as.integer(iparam), err=as.integer(err))
+  if (foo$err > 0) stop ("Error in the Frotran code.")
+  foo$val
+}
+
+rPosStable <- function(n, alpha) {
+  if (alpha >= 1) stop("alpha must be > 1")
+  theta <- runif(n, 0, pi)
+  w <- rexp(n)
+  a <- sin((1 - alpha) *theta) * (sin(alpha * theta))^(alpha / (1 - alpha)) / (sin(theta))^(1/(1 - alpha))
+  (a / w)^((1 - alpha)/alpha)
+}

@@ -70,10 +70,10 @@ persp(norm.cop, dcopula)
 contour(norm.cop, pcopula)
 ## a 3-dimensional normal copula
 u <- rcopula(normalCopula(0.5, dim = 3), 1000)
-scatterplot3d(u)
+## scatterplot3d(u)
 ## a 3-dimensional clayton copula
 v <- rcopula(claytonCopula(2, dim = 3), 1000)
-scatterplot3d(v)
+## scatterplot3d(v)
 }
 \keyword{ distribution }% at least one, from doc/KEYWORDS
 \keyword{ multivariate }% __ONLY ONE__ keyword per line

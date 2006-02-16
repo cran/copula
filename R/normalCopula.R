@@ -19,7 +19,9 @@ normalCopula <- function(param, dim = 2, dispstr = "ex") {
              param.names = paste("rho", 1:pdim, sep="."),
              param.lowbnd = rep(-1, pdim),
              param.upbnd = rep(1, pdim),
-             message = "Normal copula family")
+             message = "Normal copula family",
+             getRho = function(obj) {obj@parameters}
+             )
   val
 }
 

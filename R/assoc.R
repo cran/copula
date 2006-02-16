@@ -1,9 +1,20 @@
 ##### kendall's tau
 
+
+tau2paramClaytonCopula <- function(tau) {
+  2 * tau / (1 - tau)
+}
+
 kendallsTau <- function(copula, ...) {
   ## bivariate association measurement
 
 }
+
+kendallsTauEllipCopula <- function(copula) {
+  rho <- copula@parameters[1]
+  2 * asin(rho) /pi
+}
+  
 
 kendallsTauClaytonCopula <- function(copula) {
   alpha <- copula@parameters[1]

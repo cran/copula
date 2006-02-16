@@ -70,15 +70,6 @@ rfrankCopula <- function(copula, n) {
   genInv(copula, - log(val) / fr)
 }
 
-# pfrankCopula <- function(copula, u) {
-#   dim <- copula@dimension
-#   if (is.vector(u)) u <- matrix(u, ncol = dim)
-#   alpha <- copula@parameters[1]
-#   myfun.vector <- function(x) {
-#     prod(exp(-alpha * x) - 1)
-#   }
-#   -1 / alpha * log(1 + apply(u, 1, myfun.vector) / (exp(-alpha) - 1)^(dim - 1))
-# }
 
 pfrankCopula <- function(copula, u) {
   if (is.vector(u)) u <- matrix(u, ncol = dim)
@@ -88,17 +79,6 @@ pfrankCopula <- function(copula, u) {
   alpha <- copula@parameters[1]
   eval(cdf)
 }
-
-# dfrankCopula <- function(copula, u) {
-#   if (copula@dimension > 2) stop("Dim > 2 is not supported yet")
-#   if (is.vector(u)) u <- matrix(u, nrow = 1)
-#   param <- as.vector(copula@parameters[1])
-#   v <- u[,2]; u <- u[,1]
-#   eta <- 1 - exp( - param)
-#   (param * eta * exp( - param * (u + v)))/(eta -
-#                                            (1 - exp( - param * u)) *
-#                                            (1 - exp( - param * v)))^2
-# }
 
 dfrankCopula <- function(copula, u) {
   if (is.vector(u)) u <- matrix(u, nrow = 1)

@@ -77,26 +77,30 @@ rcopula <- function(copula, n) {
 ###############################################################
 #### elliptical copulas, contains normalCopula and tCopula
 ###############################################################
-validEllipCopula <- function(object) {
-  dim <- object@dimension
-  param <- object@parameters
-  ##val <- validCopula(object)
-  if (is.na(match(object@dispstr, c("ar1", "ex", "toep", "un"))))
-    return ("dispstr not supported")
-  if (object@dispstr == "ar1" || object@dispstr == "ex")
-    if (length(param) != 1) return ("Param should have length 1 for dispstr == ar1 or ex")
-  if (object@dispstr == "un")
-    if (length(param) != dim * (dim - 1) / 2)
+validRho <- function(dispstr, dim, lenRho) {
+  if (dispstr == "ar1" || dispstr == "ex")
+    if (lenRho != 1) return ("Param should have length 1 for dispstr == ar1 or ex")
+  if (dispstr == "un")
+    if (lenRho != dim * (dim - 1) / 2)
       return("Param should have length dim * (dim - 1) / 2 for dispstr == un")
-  if (object@dispstr == "toep")
-    if (length(param) != dim - 1)
+  if (dispstr == "toep")
+    if (lenRho != dim - 1)
       return("Param should have length dim - 1 for dispstr == toep")
   return(TRUE)
 }
 
+validEllipCopula <- function(object) {
+  dispstr <- object@dispstr
+  if (is.na(match(dispstr, c("ar1", "ex", "toep", "un"))))
+    return ("dispstr not supported")
+  dim <- object@dimension
+  rho <- object@getRho(object)
+  validRho(dispstr, dim, length(rho))
+}
+
 setClass("ellipCopula",
          representation = representation("copula",
-           dispstr = "character"),
+           dispstr = "character", getRho="function"),
          validity = validEllipCopula,
          contains = list("copula")
          )
@@ -168,6 +172,15 @@ genDer1 <- function(copula, u) {
 
 genDer2 <- function(copula, u) {
   UseMethod("genDer2")
+}
+##### copula constructor
+copula <- function(family, param, dim = 2, ...) {
+  familiesImplemented <- c("normal", "t", "clayton", "frank", "gumbel")
+  fam <- pmatch(family, familiesImplemented, -1)
+  if (fam == -1)
+    stop(paste("Valid family names are", familiesImplemented))
+  if (fam <= 2) ellipCopula(family, param, dim, ...)
+  else archmCopula(family, param, dim, ...)
 }
 
 # #### extreme value copulas

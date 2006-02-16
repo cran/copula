@@ -11,7 +11,6 @@ getExpr<- function(fun, param) {
   ##eval(expr)
   expr
 }
-  
 
 dmvdc <- function(mvdc, x) {
   dim <- mvdc@copula@dimension

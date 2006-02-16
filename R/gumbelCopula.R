@@ -66,24 +66,12 @@ rgumbelCopula <- function(copula, n) {
   alpha <- copula@parameters[1]
   b <- 1/alpha
   ## stable (b, 1), 0 < b < 1, Chambers, Mallows, and Stuck 1976, JASA, p.341
-  v <- runif(n, 0, pi)
-  w <- rexp(n, 1)
-  ## fr <- sin(b * v) / (cos(v)) ^(1/b) * ( cos((1 - b) * v) / xi)^(1/b - 1)
-  fr <- (sin((1 - b) * v))^((1 - b) / b) *
-    sin(b * b) / sin(v)^(1/b) / w^((1 - b) / b)
-  fr <- matrix(abs(fr), nrow = n, ncol = dim) ## abs needed to make positive
+  fr <- rPosStable(n, b)
+  fr <- matrix(fr, nrow=n, ncol=dim)
   ## now gumbel copula
   val <- matrix(runif(dim * n), nrow = n)
   genInv(copula, - log(val) / fr)
 }
-
-
-# pgumbelCopula <- function(copula, u) {
-#   dim <- copula@dimension
-#   if (is.vector(u)) u <- matrix(u, ncol = dim)
-#   alpha <- copula@parameters[1]
-#   genInv(copula, apply(u, 1, function(x) sum(genFun(copula, x))))
-# }
 
 
 pgumbelCopula <- function(copula, u) {
@@ -94,19 +82,6 @@ pgumbelCopula <- function(copula, u) {
   alpha <- copula@parameters[1]
   eval(cdf)
 }
-
-# dgumbelBivCopula <- function(copula, u) {
-#   alpha <- copula@parameters[1]
-#   if (is.vector(u)) u <- matrix(u, nrow = 1)
-#   p <- pgumbelCopula(copula, u)
-#   - genDer2(copula, p) * genDer1(copula, u[,1]) * genDer1(copula, u[,2]) / genDer1(copula, p) ^ 3
-# }
-
-############ 
-# dgumbelCopula <- function(copula, u) {
-#   if (copula@dimension > 2) stop("Dim > 2 is not supported yet")
-#   dgumbelBivCopula(copula, u)
-# }
 
 dgumbelCopula <- function(copula, u) {
   if (is.vector(u)) u <- matrix(u, nrow = 1)

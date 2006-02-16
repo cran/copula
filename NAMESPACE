@@ -20,4 +20,6 @@ export(claytonCopula, frankCopula, gumbelCopula)
 
 exportMethods(persp, contour, show)
 
-#S3method(print, copula)
+export(loglikCopula, loglikMvdc)
+export(fitCopula, fitMvdc)
+

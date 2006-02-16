@@ -7,7 +7,7 @@
 .onLoad <- function(lib, pkg) {
   require(mvtnorm)
   require(sn)
-  require(scatterplot3d)
+  ##require(scatterplot3d)
   require(methods)
-  #library.dynam("copula", pkg, lib)
+  ##library.dynam("copula", pkg, lib)
 }
