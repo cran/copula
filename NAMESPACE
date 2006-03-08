@@ -5,7 +5,7 @@ importFrom(graphics, persp, contour)
 
 export(dcopula, pcopula, rcopula)
 export(dmvdc, pmvdc, rmvdc)
-
+export(kendallsTau, spearmansRho)
 
 exportClasses(mvdc)
 exportClasses(copula, ellipCopula, archmCopula)
@@ -18,8 +18,11 @@ export(ellipCopula, archmCopula)
 export(normalCopula, tCopula)
 export(claytonCopula, frankCopula, gumbelCopula)
 
-exportMethods(persp, contour, show)
+exportMethods(persp, contour)
 
 export(loglikCopula, loglikMvdc)
 export(fitCopula, fitMvdc)
+exportClasses(fitCopula, fitMvdc)
+exportClasses(summaryFitCopula, summaryFitMvdc)
 
+exportMethods(show, summary)

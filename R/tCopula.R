@@ -84,3 +84,4 @@ setMethod("dcopula", signature("tCopula"), dtCopula)
 
 setMethod("show", signature("tCopula"), showTCopula)
 
+setMethod("kendallsTau", signature("tCopula"), kendallsTauEllipCopula)

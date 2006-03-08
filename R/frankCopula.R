@@ -92,10 +92,26 @@ dfrankCopula <- function(copula, u) {
   val
 }
 
+
+kendallsTauFrankCopula <- function(copula, ...) {
+  alpha <- copula@parameters[1]
+  if (alpha == 0) return (0)
+  - 1 + 4 / alpha * (debye(-alpha, 1) - 1)
+}
+
+spearmansRhoFrankCopula <- function(copula, ...) {
+  alpha <- copula@parameters[1]
+  if (alpha == 0) return (0)
+  -1 + 12/alpha * (debye(-alpha, 2) - debye(-alpha, 1))
+}
+
 setMethod("rcopula", signature("frankCopula"), rfrankCopula)
 setMethod("pcopula", signature("frankCopula"), pfrankCopula)
 setMethod("dcopula", signature("frankCopula"), dfrankCopula)
 
 setMethod("genFun", signature("frankCopula"), genFunFrank)
 setMethod("genInv", signature("frankCopula"), genInvFrank)
+
+setMethod("kendallsTau", signature("frankCopula"), kendallsTauFrankCopula)
+setMethod("spearmansRho", signature("frankCopula"), spearmansRhoFrankCopula)
 

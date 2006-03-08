@@ -69,3 +69,6 @@ setMethod("pcopula", signature("normalCopula"), pnormalCopula)
 setMethod("dcopula", signature("normalCopula"), dnormalCopula)
 
 setMethod("show", signature("normalCopula"), showNormalCopula)
+
+setMethod("kendallsTau", signature("normalCopula"), kendallsTauEllipCopula)
+setMethod("spearmansRho", signature("normalCopula"), spearmansRhoEllipCopula)

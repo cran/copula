@@ -62,7 +62,7 @@ x <- mvdc(normalCopula(0.75), c("norm", "exp"),
 x.samp <- rmvdc(x, 100)
 dmvdc(x, x.samp)
 pmvdc(x, x.samp)
-persp(x, dmvdc, xis = seq(-4, 4, len = 51), yis = seq(0, 0.5, len = 51))
+persp(x, dmvdc, xlim = c(-4, 4), ylim=c(0, 1))
 }
 \keyword{ distribution }% at least one, from doc/KEYWORDS
 \keyword{ multivariate }% __ONLY ONE__ keyword per line

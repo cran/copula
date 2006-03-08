@@ -28,8 +28,8 @@ persp(frankCopula(-0.8), dcopula)
 persp(claytonCopula(2), pcopula)
 x <- mvdc(gumbelCopula(3), c("norm", "norm"),
           list(list(mean = 0, sd =1), list(mean = 1)))
-persp(x, dmvdc, xis = seq(-2, 2, len = 51), yis = seq(-1, 3, len = 51))
-persp(x, pmvdc, xis = seq(-2, 2, len = 51), yis = seq(-1, 3, len = 51))
+persp(x, dmvdc, xlim=c(-2, 2), ylim=c(-1, 3))
+persp(x, pmvdc, xlim=c(-2, 2), ylim=c(-1, 3))
 }
 \keyword{methods}
 \keyword{hplot}

@@ -1,6 +1,5 @@
 setClass("gumbelCopula",
          representation = representation("archmCopula"),
-#         validity = validCopula,
          contains = list("copula", "archmCopula")
          )
 
@@ -92,6 +91,12 @@ dgumbelCopula <- function(copula, u) {
   eval(pdf)
 }
 
+
+kendallsTauGumbelCopula <- function(copula) {
+  alpha <- copula@parameters[1]
+  1 - 1/alpha
+}
+
 setMethod("rcopula", signature("gumbelCopula"), rgumbelCopula)
 setMethod("pcopula", signature("gumbelCopula"), pgumbelCopula)
 setMethod("dcopula", signature("gumbelCopula"), dgumbelCopula)
@@ -101,3 +106,6 @@ setMethod("genInv", signature("gumbelCopula"), genInvGumbel)
 
 setMethod("genDer1", signature("gumbelCopula"), genDer1Gumbel)
 setMethod("genDer2", signature("gumbelCopula"), genDer2Gumbel)
+
+setMethod("kendallsTau", signature("gumbelCopula"), kendallsTauGumbelCopula)
+

@@ -19,18 +19,20 @@
   n = 51: the number of points to do the plotting.
   theta = -30, phi = 30, expand = 0.618: arguments for \code{"contour"}
 
-  when x is of class \code{"mvdc"}, two more arguments are expected to
+  when x is of class \code{"mvdc"}, these arguments are expected to
   replace the effect of n = 51:
-  xis: the values of the x variable.
-  yis: the values of the y variable.
+  xlim: the range of the x variable.
+  ylim: the range of the y variable.
+  nx: the number of points for x to expand.
+  ny: the number of points for y to expand.
 }
 \examples{
 contour(frankCopula(-0.8), dcopula)
 contour(claytonCopula(2), pcopula)
 x <- mvdc(gumbelCopula(3), c("norm", "norm"),
           list(list(mean = 0, sd =1), list(mean = 1)))
-contour(x, dmvdc, xis = seq(-2, 2, len = 51), yis = seq(-1, 3, len = 51))
-contour(x, pmvdc, xis = seq(-2, 2, len = 51), yis = seq(-1, 3, len = 51))
+contour(x, dmvdc, xlim=c(-2, 2), ylim=c(-1, 3))
+contour(x, pmvdc, xlim=c(-2, 2), ylim=c(-1, 3))
 }
 \keyword{methods}
 \keyword{hplot}

@@ -1,6 +1,6 @@
 Package: copula
-Version: 0.3-1
-Date: 2006/02/16
+Version: 0.3-4
+Date: 2006/03/08
 Title: Multivariate Dependence with Copula
 Author: Jun Yan <jyan@stat.uiowa.edu>
 Maintainer: Jun Yan <jyan@stat.uiowa.edu>
@@ -9,6 +9,6 @@ Description: Classes (S4) of commonly used copulas including
 	elliptical, and Archimidean copulas. Implemented copulas
 	include normal, t, Clayton, Frank, and Gumbel.
 	Methods for density, distribution, random number generators,
-	persp, and contour.
+	persp, and contour. Functions for fitting copula models.
 License: GPL version 2 or later.
-Packaged: Fri Feb 17 11:48:29 2006; jyan
+Packaged: Thu Mar  9 09:59:26 2006; jyan

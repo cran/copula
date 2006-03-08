@@ -1,6 +1,5 @@
 setClass("claytonCopula",
          representation = representation("archmCopula"),
-#         validity =  validCopula,
          contains = list("copula", "archmCopula")
          )
 
@@ -72,18 +71,6 @@ rclaytonCopula <- function(copula, n) {
 }
 
 
-# pclaytonCopula <- function(copula, u) {
-#   dim <- copula@dimension
-#   if (is.vector(u)) u <- matrix(u, ncol = dim)
-#   alpha <- copula@parameters[1]
-#   if (abs(alpha) <= 100 * .Machine$double.eps) return (apply(u, 1, prod))
-#   myfun.vector <- function(x) {
-#     sum(x^(-alpha) - 1)
-#   }
-#   (1 + apply(u, 1, myfun.vector))^(-1/alpha)
-# }
-
-
 pclaytonCopula <- function(copula, u) {
   dim <- copula@dimension
   if (is.vector(u)) u <- matrix(u, ncol = dim)
@@ -116,6 +103,12 @@ dclaytonCopula <- function(copula, u) {
   val
 }
 
+
+kendallsTauClaytonCopula <- function(copula) {
+  alpha <- copula@parameters[1]
+  alpha / (alpha + 2)
+}
+
 setMethod("rcopula", signature("claytonCopula"), rclaytonCopula)
 setMethod("pcopula", signature("claytonCopula"), pclaytonCopula)
 setMethod("dcopula", signature("claytonCopula"), dclaytonCopula)
@@ -123,3 +116,4 @@ setMethod("dcopula", signature("claytonCopula"), dclaytonCopula)
 setMethod("genFun", signature("claytonCopula"), genFunClayton)
 setMethod("genInv", signature("claytonCopula"), genInvClayton)
 
+setMethod("kendallsTau", signature("claytonCopula"), kendallsTauClaytonCopula)
