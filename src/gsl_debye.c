@@ -27,11 +27,11 @@
 /* #include "error.h" */
 /* #include "check.h" */
 
+#include "mygsl.h"
 #include <math.h>
 #include <stdio.h>
 #include <float.h>
 
-#include "mygsl.h"
 #include "chebyshev.h"
 #include "cheb_eval.c"
 

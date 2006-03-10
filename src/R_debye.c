@@ -5,7 +5,7 @@
    of the name and _e from the end.  Thus gsl_sf_debye_1_e  goes to
    debye_1. */
 
-#include <math.h>
+/*#include <math.h> */
 
 #include "mygsl.h"
 
