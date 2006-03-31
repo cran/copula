@@ -107,22 +107,22 @@ setClass("ellipCopula",
 
 getSigma <- function(copula) {
   dim <- copula@dimension
-  param <- copula@parameters
+  rho <- copula@getRho(copula)
   sigma <- diag(dim)
   if (copula@dispstr == "ex") {
-    sigma[lower.tri(sigma)] <- param[1]
-    sigma[upper.tri(sigma)] <- param[1]
+    sigma[lower.tri(sigma)] <- rho[1]
+    sigma[upper.tri(sigma)] <- rho[1]
   }
   else if (copula@dispstr == "ar1") {
-    for (i in 1:dim)  for (j in 1:dim)  sigma[i,j] <- param ^ abs(i - j)
+    for (i in 1:dim)  for (j in 1:dim)  sigma[i,j] <- rho ^ abs(i - j)
   }
   else if (copula@dispstr == "un") {
-    sigma[lower.tri(sigma)] <- param
+    sigma[lower.tri(sigma)] <- rho
     sigma[upper.tri(sigma)] <- t(sigma)[upper.tri(sigma)]
   }
   else if (copula@dispstr == "toep") {
     for (i in 1:dim) for (j in 1:dim)
-      if (i != j) sigma[i,j] <- param[abs(i - j)]
+      if (i != j) sigma[i,j] <- rho[abs(i - j)]
   }
   sigma
 }

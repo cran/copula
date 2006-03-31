@@ -20,8 +20,8 @@
 
   when x is of class \code{"mvdc"}, two more arguments are expected to
   replace the effect of n = 51:
-  xis: the values of the x variable.
-  yis: the values of the y variable.
+  xlim: the range of the x variable.
+  ylim: the range of the y variable.
 }
 \examples{
 persp(frankCopula(-0.8), dcopula)
