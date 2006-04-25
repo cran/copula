@@ -22,13 +22,13 @@ fitCopula <- function(data, copula, start,
     stop("The length of start and copula parameters not match.\n")
 
   control <- c(optim.control, fnscale=-1)
-  fit <- optim(start, loglikCopula, copula = copula, x = data, control=control)
+  fit <- optim(start, loglikCopula,  method=method, copula = copula, x = data, control=control)
   if (fit$convergence > 0)
     warning("possible convergence problem: optim gave code=", fit$convergence)
   copula@parameters <- fit$par
   loglik <- fit$val
 
-  fit.last <- optim(copula@parameters, loglikCopula, copula=copula, x =data, control=c(control, maxit=1), hess=TRUE)
+  fit.last <- optim(copula@parameters, loglikCopula, method=method, copula=copula, x =data, control=c(control, maxit=1), hess=TRUE)
     
   ans <- new("fitCopula",
              est = fit$par,
@@ -83,12 +83,12 @@ fitMvdc <- function(data, mvdc, start,
     stop("The length of start and mvdc parameters not match.\n")
 
   control <- c(optim.control, fnscale=-1)
-  fit <- optim(start, loglikMvdc, mvdc=mvdc, x = data, control=control)
+  fit <- optim(start, loglikMvdc,  method=method, mvdc=mvdc, x = data, control=control)
   if (fit$convergence > 0)
     warning("possible convergence problem: optim gave code=", fit$convergence)
   loglik <- fit$val
 
-  fit.last <- optim(fit$par, loglikMvdc, mvdc=mvdc, x =data, control=c(control, maxit=1), hess=TRUE)
+  fit.last <- optim(fit$par, loglikMvdc, method=method, mvdc=mvdc, x =data, control=c(control, maxit=1), hess=TRUE)
     
   ans <- new("fitMvdc",
              est = fit$par,

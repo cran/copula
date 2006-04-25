@@ -30,7 +30,8 @@ fitMvdc(data, mvdc, start, optim.control = list(NULL), method = "BFGS")
   The return values of 'loglikCopula' and 'loglikMvdc' are the
   loglikelihood evaluated at the given value of 'param'.
   
-  The return values of 'fitCopula' and 'fitMvdc' are a list of:
+  The return values of 'fitCopula' and 'fitMvdc' are an object of
+  class 'fitCopula' and 'fitMvdc', respectively, containing slots:
   \item{est}{ the estimate of the parameters }
   \item{var.est}{ variance matrix of the estimate }
   \item{loglik}{ loglikelihood at est }
