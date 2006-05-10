@@ -31,6 +31,10 @@ gumbelCopula(param, dim = 2)
 \note{
   \code{"archmCopula"} is a wrapper for \code{"claytonCopula"},
   \code{"frankCopula"}, and \code{"gumbelCopula"}.
+
+  For dim > 6, the expression of pdf is not available due to intensive
+  compting involved in symbolically differentiating the cdf. Therefore,
+  for dim > 6, likelihood estimation cannot be done yet.
 }
 \author{ Jun Yan <jyan@stat.uiowa.edu> }
 \seealso{ \code{\link{ellipCopula}} }

@@ -46,7 +46,8 @@ gumbelCopula <- function(param, dim = 2) {
   }
 
   cdf <- cdfExpr(dim)
-  pdf <- pdfExpr(cdf, dim)
+  if (dim <= 6)  pdf <- pdfExpr(cdf, dim)
+  else pdf <- NULL
   val <- new("gumbelCopula",
              dimension = dim,
              parameters = param[1],

@@ -37,7 +37,8 @@ claytonCopula <- function(param, dim = 2) {
   if (dim > 2 && param[1] < 0)
     stop("param can be negative only for dim = 2")
   cdf <- cdfExpr(dim)
-  pdf <- pdfExpr(cdf, dim)
+  if (dim <= 6)  pdf <- pdfExpr(cdf, dim)
+  else pdf <- NULL
   val <- new("claytonCopula",
              dimension = dim,
              parameters = param[1],
