@@ -1,6 +1,6 @@
 Package: copula
-Version: 0.3-8
-Date: 2006/05/10
+Version: 0.3-9
+Date: 2006/10/10
 Title: Multivariate Dependence with Copula
 Author: Jun Yan <jyan@stat.uiowa.edu>
 Maintainer: Jun Yan <jyan@stat.uiowa.edu>
@@ -11,4 +11,4 @@ Description: Classes (S4) of commonly used copulas including
 	Methods for density, distribution, random number generators,
 	persp, and contour. Functions for fitting copula models.
 License: GPL version 2 or later.
-Packaged: Wed May 10 13:39:53 2006; jyan
+Packaged: Mon Oct  9 22:23:24 2006; jyan

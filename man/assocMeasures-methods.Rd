@@ -1,11 +1,13 @@
 \name{AssocMeasures}
 \docType{methods}
+\alias{kendallsTau}
 \alias{kendallsTau-methods}
 \alias{kendallsTau,normalCopula-method}
 \alias{kendallsTau,tCopula-method}
 \alias{kendallsTau,claytonCopula-method}
 \alias{kendallsTau,frankCopula-method}
 \alias{kendallsTau,gumbelCopula-method}
+\alias{spearmansRho}
 \alias{spearmansRho-methods}
 \alias{spearmansRho,normalCopula-method}
 \alias{spearmansRho,tCopula-method}

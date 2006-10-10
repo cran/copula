@@ -17,7 +17,7 @@ gumbelCopula(param, dim = 2)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{family}{ a character string specifying the family of an
-    elliptical copula. Implemented families are "clayton", "frank", and
+    Archimedean copula. Implemented families are "clayton", "frank", and
     "gumbel".
   }
   \item{param}{ a numeric vector specifying the parameter values. }
