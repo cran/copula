@@ -53,6 +53,7 @@ gmb <- gumbelCopula(3, dim=2)
 myMvd <- mvdc(gmb, c("exp","exp"), list(list(rate=2),list(rate=4)))
 x <- rmvdc(myMvd, 1000)
 fit <- fitMvdc(x, myMvd, c(1,1,2))
+fit
 }
 \keyword{ models}% at least one, from doc/KEYWORDS
 \keyword{ multivariate }% __ONLY ONE__ keyword per line

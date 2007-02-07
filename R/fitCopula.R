@@ -146,7 +146,7 @@ summaryFitMvdc <- function(object) {
   se <- sqrt(diag(object@var.est))
   zvalue <- est / se
   pvalue <- (1 - pnorm(abs(zvalue))) * 2
-  ans <- object[c("loglik", "convergence")]
+  ##ans <- object[c("loglik", "convergence")]
   parameters <- data.frame(est, se, zvalue, pvalue)
   marNpar <- unlist(lapply(object@mvdc@paramMargins, length))
   p <- object@mvdc@copula@dimension
