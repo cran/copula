@@ -11,7 +11,8 @@
 \usage{
 loglikCopula(param, x, copula)
 loglikMvdc(param, x, mvdc)
-fitCopula(data, copula, start, optim.control = list(NULL), method = "BFGS")
+fitCopula(data, copula, start, lower=NULL, upper=NULL,
+          optim.control = list(NULL), method = "BFGS")
 fitMvdc(data, mvdc, start, optim.control = list(NULL), method = "BFGS")
 }
 %- maybe also 'usage' for other objects documented here.
@@ -23,6 +24,7 @@ fitMvdc(data, mvdc, start, optim.control = list(NULL), method = "BFGS")
 
   \item{data}{ a data matrix }
   \item{start}{ a vector of starting value for param }
+  \item{lower, upper}{ bounds on the variables for the '"L-BFGS-B"' method.}
   \item{optim.control}{ a list of control to be passed to optim }
   \item{method}{ the method for optim }
 }

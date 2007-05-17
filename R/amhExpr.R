@@ -1,0 +1,53 @@
+`amhCopula.pdf.expr` <-
+expression(1, -((1 + alpha^2 * (-1 + u1) * (-1 + u2) + alpha * 
+    (-2 + u1 + u2 + u1 * u2))/(-1 + alpha * (-1 + u1) * (-1 + 
+    u2))^3))
+`amhCopula.pdf.algr` <-
+expression({
+    .value <- 1
+    .grad <- array(0, c(length(.value), 1), list(NULL, c("s")))
+    .grad[, "s"] <- 0
+    attr(.value, "gradient") <- .grad
+    .value
+}, {
+    .expr2 <- -1
+    .expr3 <- .expr2 + u1
+    .expr5 <- .expr2 + u2
+    .value <- -((1 + alpha^2 * .expr3 * .expr5 + alpha * (-2 + 
+        u1 + u2 + u1 * u2))/(.expr2 + alpha * .expr3 * .expr5)^3)
+    .grad <- array(0, c(length(.value), 1), list(NULL, c("s")))
+    .grad[, "s"] <- 0
+    attr(.value, "gradient") <- .grad
+    .value
+})
+`amhCopula.genfun.expr` <-
+expression((-1 + alpha)/((1 + alpha * (-1 + u)) * u), -(((-1 + 
+    alpha) * (1 + alpha * (-1 + 2 * u)))/((1 + alpha * (-1 + 
+    u))^2 * u^2)))
+`amhCopula.genfun.algr` <-
+expression({
+    .expr1 <- -1
+    .expr2 <- .expr1 + alpha
+    .expr5 <- 1 + alpha * (.expr1 + u)
+    .expr6 <- .expr5 * u
+    .value <- .expr2/.expr6
+    .grad <- array(0, c(length(.value), 1), list(NULL, c("u")))
+    .grad[, "u"] <- -(.expr2 * (alpha * u + .expr5)/.expr6^2)
+    attr(.value, "gradient") <- .grad
+    .value
+}, {
+    .expr1 <- -1
+    .expr2 <- .expr1 + alpha
+    .expr3 <- 2 * u
+    .expr7 <- .expr2 * (1 + alpha * (.expr1 + .expr3))
+    .expr10 <- 1 + alpha * (.expr1 + u)
+    .expr11 <- .expr10^2
+    .expr12 <- u^2
+    .expr13 <- .expr11 * .expr12
+    .value <- -(.expr7/.expr13)
+    .grad <- array(0, c(length(.value), 1), list(NULL, c("u")))
+    .grad[, "u"] <- -(.expr2 * (alpha * 2)/.expr13 - .expr7 * 
+        (2 * (alpha * .expr10) * .expr12 + .expr11 * .expr3)/.expr13^2)
+    attr(.value, "gradient") <- .grad
+    .value
+})

@@ -59,9 +59,29 @@ dnormalCopula <- function(copula, u) {
   val
 }
 
+
 showNormalCopula <- function(object) {
   showCopula(object)
   if (object@dimension > 2) cat("dispstr: ", object@dispstr, "\n")
+}
+
+
+
+tailIndexNormalCopula <- function(copula) {
+  rho <- copula@parameters
+  upper <- lower <- ifelse(rho == 1, 1, 0)
+  c(lower=lower, upper=upper)
+}
+
+
+kendallsTauNormalCopula <- function(copula) {
+  rho <- copula@parameters
+  2 * asin(rho) /pi
+}
+
+spearmansRhoNormalCopula <- function(copula) {
+  rho <- copula@parameters
+  asin(rho / 2) * 6 / pi
 }
 
 setMethod("rcopula", signature("normalCopula"), rnormalCopula)
@@ -70,5 +90,10 @@ setMethod("dcopula", signature("normalCopula"), dnormalCopula)
 
 setMethod("show", signature("normalCopula"), showNormalCopula)
 
-setMethod("kendallsTau", signature("normalCopula"), kendallsTauEllipCopula)
-setMethod("spearmansRho", signature("normalCopula"), spearmansRhoEllipCopula)
+setMethod("kendallsTau", signature("normalCopula"), kendallsTauNormalCopula)
+setMethod("spearmansRho", signature("normalCopula"), spearmansRhoNormalCopula)
+setMethod("tailIndex", signature("normalCopula"), tailIndexNormalCopula)
+
+setMethod("calibKendallsTau", signature("normalCopula"), calibKendallsTauEllipCopula)
+setMethod("calibSpearmansRho", signature("normalCopula"), calibSpearmansRhoEllipCopula)
+

@@ -46,6 +46,17 @@ setClass("copula",
          contains = list()
          )
 
+
+copula <- function(family, param, dim = 2, ...) {
+  familiesImplemented <- c("normal", "t", "clayton", "frank", "gumbel")
+  fam <- pmatch(family, familiesImplemented, -1)
+  if (fam == -1)
+    stop(paste("Valid family names are", familiesImplemented))
+  if (fam <= 2) ellipCopula(family, param, dim, ...)
+  else archmCopula(family, param, dim, ...)
+}
+
+
 #####################################################
 #### show, plot, methods
 #####################################################
@@ -60,7 +71,7 @@ showCopula <- function(object) {
 setMethod("show", signature("copula"), showCopula)
 
 #####################################################
-####### new general methods for all copulas 
+####### general methods for all copulas 
 #####################################################
 dcopula <- function(copula, u) {
   UseMethod("dcopula")
@@ -73,6 +84,94 @@ pcopula <- function(copula, u) {
 rcopula <- function(copula, n) {
   UseMethod("rcopula")
 }
+
+kendallsTau <- function(copula, ...) {
+  ## bivariate association measurement
+  UseMethod("kendallsTau")
+}
+
+spearmansRho <- function(copula, ...) {
+  ## bivariate association measurement
+  UseMethod("spearmansRho")
+}
+
+tailIndex <- function(copula, ...) {
+  ## bivariate association measurement
+  UseMethod("tailIndex")
+}
+
+calibKendallsTau <- function(copula, tau) {
+  UseMethod("calibKendallsTau")
+}
+
+calibSpearmansRho <- function(copula, rho) {
+  UseMethod("calibSpearmansRho")
+}
+
+#### numerical computation of association measures
+kendallsTauCopula <- function(copula, ...) {
+  integrand <- function(u) pcopula(copula, u) * dcopula(copula, u)
+  .eps <- .Machine$double.eps^0.9
+  lower <- c(.eps, .eps)
+  upper <- c(1 - .eps, 1 - .eps)
+  integ <- adapt(ndim=2, lower=lower, upper=upper, functn=integrand, ...)$value
+  4 * integ - 1
+}
+
+spearmansRhoCopula <- function(copula, ...) {
+  integrand <- function(u) pcopula(copula, u)
+  .eps <- .Machine$double.eps^0.9
+  lower <- c(.eps, .eps)
+  upper <- c(1 - .eps, 1 - .eps)
+  integ <- adapt(ndim=2, lower=lower, upper=upper, functn=integrand, ...)$value
+  12 * integ - 3                 
+}
+
+
+#### numerical tail index, not accurate
+tailIndexCopula <- function(copula, eps = .Machine$double.eps^0.5) {
+  u <- eps
+  v <- 1 - u
+  lower <- pcopula(copula, c(u, u))/u
+  upper <- (1 - 2 * v + pcopula(copula, c(v, v)))/ (1 - v)
+  c(lower=lower, upper=upper)
+}
+
+setMethod("kendallsTau", signature("copula"), kendallsTauCopula)
+setMethod("spearmansRho", signature("copula"), spearmansRhoCopula)
+setMethod("tailIndex", signature("copula"), tailIndexCopula)
+
+#### numerical calibration
+calibKendallsTauCopula <- function(copula, tau) {
+  myfun <- function(theta) {
+    copula@parameters <- theta
+    kendallsTau(copula) - tau
+  }
+  .eps <- .Machine$double.eps^.5
+  lower <- copula@param.lowbnd + .eps
+  upper <- copula@param.upbnd - .eps
+  lower <- ifelse(lower == -Inf, -.Machine$double.xmax^.5, lower)
+  upper <- ifelse(upper == Inf, .Machine$double.xmax^.5, upper)
+  sol <- uniroot(myfun, interval=c(lower, upper))$root
+  sol
+}
+
+calibSpearmansRhoCopula <- function(copula, rho) {
+  myfun <- function(theta) {
+    copula@parameters <- theta
+    spearmansRho(copula) - rho
+  }
+  .eps <- .Machine$double.eps^.5
+  lower <- copula@param.lowbnd
+  upper <- copula@param.upbnd
+  lower <- ifelse(lower == -Inf, -.Machine$double.xmax^.5, lower)
+  upper <- ifelse(upper == Inf, .Machine$double.xmax^.5, upper)
+  sol <- uniroot(myfun, interval=c(lower, upper))$root
+  sol
+}
+
+setMethod("calibKendallsTau", signature("copula"), calibKendallsTauCopula)
+setMethod("calibSpearmansRho", signature("copula"), calibSpearmansRhoCopula)
 
 ###############################################################
 #### elliptical copulas, contains normalCopula and tCopula
@@ -134,11 +233,25 @@ ellipCopula <- function(family, param, dim = 2, dispstr = "ex", df = 5, ...) {
     stop(paste("Valid family names are", familiesImplemented))
   copula <- switch(fam,
                    normalCopula(param, dim = dim, dispstr = dispstr),
-                   tCopula(param, dim = dim, dispstr = dispstr, df = df))
+                   tCopula(param, dim = dim, dispstr = dispstr, df = df)
+                   )
   copula
 }
 
+calibKendallsTauEllipCopula <- function(copula, tau) {
+  sin((tau * pi) / 2)
+}
+
+calibSpearmansRhoEllipCopula <- function(copula, rho) {
+  sin (pi * rho / 6) * 2
+}
+
+setMethod("calibKendallsTau", signature("ellipCopula"), calibKendallsTauEllipCopula)
+setMethod("calibSpearmansRho", signature("ellipCopula"), calibSpearmansRhoEllipCopula)
+
+############################################################
 ##### archimedean copulas, contains gumbel, frank, ...
+############################################################
 setClass("archmCopula",
          representation = representation("copula",
            exprdist = "expression"),
@@ -146,14 +259,16 @@ setClass("archmCopula",
          )
 
 archmCopula <- function(family, param, dim = 2, ...) {
-  familiesImplemented <- c("clayton", "frank", "gumbel")
+  familiesImplemented <- c("clayton", "frank", "gumbel", "amh")
   fam <- pmatch(family, familiesImplemented, -1)
   if (fam == -1)
     stop(paste("Valid family names are", familiesImplemented))
   copula <- switch(fam,
                    claytonCopula(param, dim = dim),
                    frankCopula(param, dim = dim),
-                   gumbelCopula(param, dim = dim))
+                   gumbelCopula(param, dim = dim),
+                   amhCopula(param, dim = 2)
+                   )
   copula
 }
 
@@ -166,32 +281,62 @@ genInv <- function(copula, s) {
 }
 
 
-genDer1 <- function(copula, u) {
-  UseMethod("genDer1")
+genFunDer1 <- function(copula, u) {
+  UseMethod("genFunDer1")
 }
 
-genDer2 <- function(copula, u) {
-  UseMethod("genDer2")
+genFunDer2 <- function(copula, u) {
+  UseMethod("genFunDer2")
 }
-##### copula constructor
-copula <- function(family, param, dim = 2, ...) {
-  familiesImplemented <- c("normal", "t", "clayton", "frank", "gumbel")
+
+## genFunDer <- function(copula, u, n) {## nth derivative
+##   UseMethod("genFunDer")
+## }
+## genInvDer <- function(copula, s, n) {## nth derivative
+##   UseMethod("genInvDer")
+## }
+
+kendallsTauArchmCopula <- function(copula) {
+  integrand <- function(x) genFun(copula, x) / genFunDer1(copula, x)
+  1 + 4 * integrate(integrand, 0, 1)$value
+}
+
+setMethod("kendallsTau", signature("archmCopula"), kendallsTauArchmCopula)
+
+#######################################################
+#### extreme value copulas
+#######################################################
+
+setClass("evCopula",
+         representation = representation("copula"),
+         contains = list("copula")
+         )
+
+evCopula <- function(family, param, dim = 2, ...) {
+  familiesImplemented <- c("galambos", "gumbel", "huslerReiss")
   fam <- pmatch(family, familiesImplemented, -1)
   if (fam == -1)
     stop(paste("Valid family names are", familiesImplemented))
-  if (fam <= 2) ellipCopula(family, param, dim, ...)
-  else archmCopula(family, param, dim, ...)
+  copula <- switch(fam,
+                   galambosCopula(param),
+                   gumbelCopula(param),
+                   huslerReissCopula(param)
+                   )
+  copula
+}
+  
+
+Afun <- function(copula, w) {
+  UseMethod("Afun")
 }
 
-# #### extreme value copulas
-# # setClass("EVCopula",
-# #          representation = representation("copula"),
-# #          contains = list("copula")
-# #          )
+tailIndexEvCopula <- function(copula) {
+  lower <- 0
+  upper <- 2 - 2 * Afun(copula, 0.5)
+  c(lower=lower, upper=upper)
+}
 
-# # Afun <- function(copula, u) {
-# #   UseMethod("Afun")
-# # }
+setMethod("tailIndex", signature("evCopula"), tailIndexEvCopula)
 
 #######################################################
 #### multivariate distibution via copula

@@ -4,6 +4,7 @@
 \alias{claytonCopula-class}
 \alias{frankCopula-class}
 \alias{gumbelCopula-class}
+\alias{amhCopula-class}
 \title{Class "archmCopula" }
 \description{ Archemedean copula }
 \section{Objects from the Class}{
@@ -34,17 +35,23 @@
     \item{dcopula}{\code{signature(copula = "gumbelCopula")}: ... }
     \item{pcopula}{\code{signature(copula = "gumbelCopula")}: ... }
     \item{rcopula}{\code{signature(copula = "gumbelCopula")}: ... }
+    \item{dcopula}{\code{signature(copula = "amhCopula")}: ... }
+    \item{pcopula}{\code{signature(copula = "amhCopula")}: ... }
+    \item{rcopula}{\code{signature(copula = "amhCopula")}: ... }
   }
 }
 \section{Extends}{
   Class \code{"archmCopula"} extends class \code{"copula"} directly.
-  Class \code{"claytonCopula"}, \code{"frankCopula"}, and
-  \code{"gumbelCopula"} extends class \code{"archmCopula"} directly.
+  Class \code{"claytonCopula"}, \code{"frankCopula"},
+  \code{"gumbelCopula"} and \code{"amhCopula"} extends class
+  \code{"archmCopula"} directly.
 }
 \author{ Jun Yan <jyan@stat.uiowa.edu> }
 \note{
   The expressions of pdf are obtained by differentiating the cdf
   expression using function 'D'.
+
+  \code{"gumbelCopula"} is also of class \code{"evCopula"}.
 }
 \seealso{
   \code{\link{archmCopula}}, 

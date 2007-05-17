@@ -15,31 +15,59 @@ loglikCopula <- function(param, x, copula) {
 }
 
 fitCopula <- function(data, copula, start,
-                      optim.control=list(NULL), method="BFGS") {
+                      lower=NULL, upper=NULL,
+                      optim.control=list(NULL),
+                      method="BFGS") {
   if (copula@dimension != ncol(data))
     stop("The dimention of the data and copual not match.\n")
   if (length(copula@parameters) != length(start))
     stop("The length of start and copula parameters not match.\n")
 
   control <- c(optim.control, fnscale=-1)
-  fit <- optim(start, loglikCopula,  method=method, copula = copula, x = data, control=control)
-  if (fit$convergence > 0)
-    warning("possible convergence problem: optim gave code=", fit$convergence)
-  copula@parameters <- fit$par
-  loglik <- fit$val
+  p <- length(copula@parameters)
+  eps <- .Machine$double.eps ^ 0.5
+  if (is.null(lower)) lower <- ifelse(method == "L-BFGS-B", copula@param.upbnd + eps, -Inf)
+  if (is.null(upper)) upper <- ifelse(method == "L-BFGS-B", copula@param.upbnd - eps, Inf)
+##  if (p >= 2) {
+  if (TRUE) {
+    fit <- optim(start, loglikCopula,
+                 lower=lower, upper=upper,
+                 method=method,
+                 copula = copula, x = data,
+                 control=control)
+    copula@parameters <- fit$par
+    loglik <- fit$val
+    convergence <- fit$convergence
+    if (fit$convergence > 0)
+      warning("possible convergence problem: optim gave code=", fit$convergence)
+  }
+##   else {
+##     fit <- optimize(loglikCopula, lower=lower, upper=upper, maximum=TRUE,
+##                     x=data, copula=copula)
+##     copula@parameters <- fit$maximum
+##     loglik <- fit$objective
+##     convergence <- 0
+##   }
 
-  fit.last <- optim(copula@parameters, loglikCopula, method=method, copula=copula, x =data, control=c(control, maxit=1), hess=TRUE)
-    
+
+  fit.last <- optim(copula@parameters, loglikCopula,
+                    lower=lower, upper=upper,
+                    method=method,
+                    copula=copula, x =data,
+                    control=c(control, maxit=0), hessian=TRUE)
+  var.est <- try(solve(-fit.last$hessian))
+  if (inherits(var.est, "try-error"))
+    warning("Hessian matrix not invertible")
   ans <- new("fitCopula",
-             est = fit$par,
-             var.est = solve(-fit.last$hess),
+             est = fit.last$par,
+             var.est = var.est,
              loglik = loglik,
-             convergence = fit$convergence,
+             convergence = as.integer(convergence),
              nsample = nrow(data),
              copula = copula)
   ans
 }
-        
+      
   
 
 setClass("fitMvdc",
@@ -88,11 +116,15 @@ fitMvdc <- function(data, mvdc, start,
     warning("possible convergence problem: optim gave code=", fit$convergence)
   loglik <- fit$val
 
-  fit.last <- optim(fit$par, loglikMvdc, method=method, mvdc=mvdc, x =data, control=c(control, maxit=1), hess=TRUE)
+  fit.last <- optim(fit$par, loglikMvdc, method=method, mvdc=mvdc, x =data, control=c(control, maxit=1), hessian=TRUE)
     
+  var.est <- try(solve(-fit.last$hessian))
+  if (inherits(var.est, "try-error"))
+    warning("Hessian matrix not invertible")
+
   ans <- new("fitMvdc",
              est = fit$par,
-             var.est = solve(-fit.last$hess),
+             var.est = var.est,
              loglik = loglik,
              convergence = fit$convergence,
              nsample = nrow(data),

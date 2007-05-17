@@ -1,7 +1,13 @@
 setClass("gumbelCopula",
          representation = representation("archmCopula"),
-         contains = list("copula", "archmCopula")
+         contains = list("copula", "archmCopula", "evCopula")
          )
+
+#### Afun
+AfunGumbel <- function(copula, w) {
+  alpha <- copula@parameters[1]
+  (w^alpha + (1 - w)^alpha)^(1/alpha)
+}
 
 #### genFun and related functions
 genFunGumbel <- function(copula, u) {
@@ -14,15 +20,13 @@ genInvGumbel <- function(copula, s) {
   exp( -s^(1 / alpha) )
 }
 
-genDer1Gumbel <- function(copula, u) {
-  alpha <- copula@parameters[1]
-  -((-log(u))^(alpha - 1) * (alpha * (1/u))) 
+genFunDer1Gumbel <- function(copula, u) {
+  eval(gumbelCopula.genfun.expr[1], list(u=u, alpha=copula@parameters[1]))
 }
 
 
-genDer2Gumbel <- function(copula, u) {
-  alpha <- copula@parameters[1]
-  (-log(u))^(alpha - 1) * (alpha * (1/u^2)) + (-log(u))^((alpha - 1) - 1) * ((alpha - 1) * (1/u)) * (alpha * (1/u))
+genFunDer2Gumbel <- function(copula, u) {
+  eval(gumbelCopula.genfun.expr[2], list(u=u, alpha=copula@parameters[1]))
 }
 
 gumbelCopula <- function(param, dim = 2) {
@@ -75,12 +79,14 @@ rgumbelCopula <- function(copula, n) {
 
 
 pgumbelCopula <- function(copula, u) {
+  dim <- copula@dimension
   if (is.vector(u)) u <- matrix(u, ncol = dim)
   cdf <- copula@exprdist$cdf
   dim <- copula@dimension
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
-  eval(cdf)
+  val <- eval(cdf)
+  pmax(val, 0)
 }
 
 dgumbelCopula <- function(copula, u) {
@@ -92,21 +98,38 @@ dgumbelCopula <- function(copula, u) {
   eval(pdf)
 }
 
+dgumbelCopula.pdf <- function(copula, u) {
+  dim <- copula@dimension
+  if (dim > 10) stop("Gumbel copula PDF not implemented for dimension > 10.")
+  if (is.vector(u)) u <- matrix(u, nrow = 1)
+  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  alpha <- copula@parameters[1]
+  eval(gumbelCopula.pdf.algr[dim])
+}
 
 kendallsTauGumbelCopula <- function(copula) {
   alpha <- copula@parameters[1]
   1 - 1/alpha
 }
 
+tailIndexGumbelCopula <- function(copula, ...) {
+  alpha <- copula@parameters
+  upper <- 2 - 2^(1/alpha)
+  c(lower=0, upper=upper)
+}
+
 setMethod("rcopula", signature("gumbelCopula"), rgumbelCopula)
 setMethod("pcopula", signature("gumbelCopula"), pgumbelCopula)
-setMethod("dcopula", signature("gumbelCopula"), dgumbelCopula)
+setMethod("dcopula", signature("gumbelCopula"), dgumbelCopula.pdf)
+
+setMethod("Afun", signature("gumbelCopula"), AfunGumbel)
 
 setMethod("genFun", signature("gumbelCopula"), genFunGumbel)
 setMethod("genInv", signature("gumbelCopula"), genInvGumbel)
 
-setMethod("genDer1", signature("gumbelCopula"), genDer1Gumbel)
-setMethod("genDer2", signature("gumbelCopula"), genDer2Gumbel)
+setMethod("genFunDer1", signature("gumbelCopula"), genFunDer1Gumbel)
+setMethod("genFunDer2", signature("gumbelCopula"), genFunDer2Gumbel)
 
 setMethod("kendallsTau", signature("gumbelCopula"), kendallsTauGumbelCopula)
+setMethod("tailIndex", signature("gumbelCopula"), tailIndexGumbelCopula)
 

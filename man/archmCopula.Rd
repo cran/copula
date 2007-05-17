@@ -3,6 +3,7 @@
 \alias{claytonCopula}
 \alias{frankCopula}
 \alias{gumbelCopula}
+\alias{amhCopula}
 \title{ Construction of Archimedean Copula Class Object }
 \description{
   Constructs an Archimedean copula class object with its corresponding
@@ -13,6 +14,7 @@ archmCopula(family, param, dim = 2, ...)
 claytonCopula(param, dim = 2)
 frankCopula(param, dim = 2)
 gumbelCopula(param, dim = 2)
+amhCopula(param, dim = 2)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -25,12 +27,12 @@ gumbelCopula(param, dim = 2)
   \item{\dots}{ currently nothing. }
 }
 \value{
-  An elliptical copula object of class \code{"claytonCopula"},
-  \code{"frankCopula"}, or \code{"gumbelCopula"}.
+  An Archimedean copula object of class \code{"claytonCopula"},
+  \code{"frankCopula"}, \code{"gumbelCopula"}, or \code{"amhCopula"}.
 }
 \note{
   \code{"archmCopula"} is a wrapper for \code{"claytonCopula"},
-  \code{"frankCopula"}, and \code{"gumbelCopula"}.
+  \code{"frankCopula"}, \code{"gumbelCopula"} and \code{"amhCopula"}.
 
   For dim > 6, the expression of pdf is not available due to intensive
   compting involved in symbolically differentiating the cdf. Therefore,

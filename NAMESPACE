@@ -5,18 +5,28 @@ importFrom(graphics, persp, contour)
 
 export(dcopula, pcopula, rcopula)
 export(dmvdc, pmvdc, rmvdc)
-export(kendallsTau, spearmansRho)
+export(kendallsTau, spearmansRho, tailIndex)
+export(calibKendallsTau, calibSpearmansRho)
+
+## archmCopula methods
+export(genFun, genInv, genFunDer1, genFunDer2)
+
+## evCopula methods
+export(Afun)
 
 exportClasses(mvdc)
-exportClasses(copula, ellipCopula, archmCopula)
+exportClasses(copula, ellipCopula, archmCopula, evCopula)
 exportClasses(normalCopula, tCopula)
-exportClasses(claytonCopula, frankCopula, gumbelCopula)
-
+exportClasses(claytonCopula, frankCopula, gumbelCopula, amhCopula)
+exportClasses(galambosCopula, huslerReissCopula)
+exportClasses(plackettCopula)
 
 export(mvdc)
-export(ellipCopula, archmCopula)
+export(ellipCopula, archmCopula, evCopula)
 export(normalCopula, tCopula)
-export(claytonCopula, frankCopula, gumbelCopula)
+export(claytonCopula, frankCopula, gumbelCopula, amhCopula)
+export(galambosCopula, huslerReissCopula)
+export(plackettCopula)
 
 exportMethods(persp, contour)
 

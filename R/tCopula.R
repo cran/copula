@@ -20,7 +20,7 @@ tCopula <- function(param, dim = 2, dispstr = "ex", df = 5) {
              dimension = dim,
              parameters = c(param, df),
              param.names = c(paste("rho", 1:pdim, sep="."), "df"),
-             param.lowbnd = c(rep(-1, pdim), 0),
+             param.lowbnd = c(rep(-1, pdim), 1), ## qt won't work for df < 1
              param.upbnd = c(rep(1, pdim), Inf),
              message = "t copula family",
              getRho = function(obj) {
@@ -77,6 +77,28 @@ showTCopula <- function(object) {
   if (object@dimension > 2) cat("dispstr: ", object@dispstr, "\n")
 }
 
+tailIndexTCopula <- function(copula) {
+#### McNeil, Frey, Embrechts (2005), p.211
+  param <- copula@parameters
+  pdim <- length(param)
+  df <- param[pdim]
+  rho <- param[-pdim]
+  upper <- lower <- 2 * pt(- sqrt((df + 1) * ( 1 - rho) / (1 + rho)), df=df + 1)
+  c(upper=upper, lower=lower)
+}
+
+
+kendallsTauTCopula <- function(copula) {
+  param <- copula@parameters
+  rho <- param[-length(param)]
+  2 * asin(rho) /pi
+}
+
+spearmansRhoTCopula <- function(copula) {
+  param <- copula@parameters
+  rho <- param[-length(param)]
+  asin(rho / 2) * 6 / pi
+}
 
 setMethod("rcopula", signature("tCopula"), rtCopula)
 setMethod("pcopula", signature("tCopula"), ptCopula)
@@ -84,4 +106,9 @@ setMethod("dcopula", signature("tCopula"), dtCopula)
 
 setMethod("show", signature("tCopula"), showTCopula)
 
-setMethod("kendallsTau", signature("tCopula"), kendallsTauEllipCopula)
+setMethod("kendallsTau", signature("tCopula"), kendallsTauTCopula)
+setMethod("spearmansRho", signature("tCopula"), spearmansRhoTCopula)
+setMethod("tailIndex", signature("tCopula"), tailIndexTCopula)
+
+setMethod("calibKendallsTau", signature("tCopula"), calibKendallsTauEllipCopula)
+setMethod("calibSpearmansRho", signature("tCopula"), calibSpearmansRhoEllipCopula)

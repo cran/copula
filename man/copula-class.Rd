@@ -1,6 +1,7 @@
 \name{copula-class}
 \docType{class}
 \alias{copula-class}
+\alias{plackettCopula-class}
 \title{Class "copula" }
 \description{ A class of multivariate distribution with uniform margins. }
 \section{Objects from the Class}{
@@ -24,9 +25,12 @@
 }
 \author{ Jun  Yan <jyan@stat.uiowa.edu> }
 \note{
-  The 'copula' class is extended by the 'archmCopula' and
+  The 'copula' class is extended by the 'evCopula', 'archmCopula' and
   'ellipCopula' classes. Objects of implemented copulas can be created
-  from functions 'archmCopula' and 'ellipcopula'.
+  from functions 'evCopula', 'archmCopula' and 'ellipcopula'.
+
+  \code{"plackettCopula"} is a special type of copula which does not
+  belong to either one of the three classes above.
 }
 \section{Warning }{ This implementation is still at the experimental
   stage and is subject to change during the development.
@@ -34,5 +38,6 @@
 \seealso{
   \code{\link{archmCopula-class}},
   \code{\link{ellipCopula-class}}
+  \code{\link{evCopula-class}}
 }
 \keyword{classes}

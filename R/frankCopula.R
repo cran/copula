@@ -15,10 +15,22 @@ genInvFrank <- function(copula, s) {
   -1/alpha * log(1 + exp(-s) * (exp(-alpha) - 1))
 }
 
+genFunDer1Frank <- function(copula, u) {
+  eval(frankCopula.genfun.expr[1], list(u=u, alpha=copula@parameters[1]))
+}
+genFunDer2Frank <- function(copula, u) {
+  eval(frankCopula.genfun.expr[2], list(u=u, alpha=copula@parameters[1]))
+}
+
+
+## genInvDerFrank <- function(copula, s, n) {
+##   eval(genInvDerFrank.expr[n + 1], list(s=s, alpha=copula@parameters[1]))
+## }
+
 frankCopula <- function(param, dim = 2) {
   ## get expressions of cdf and pdf
   cdfExpr <- function(n) {
-    expr <-   "- log( (exp(- alpha * u1) - 1) / (exp(- alpha) - 1))"
+    expr <-   "- log( (exp(- alpha * u1) - 1) / (exp(- alpha) - 1) )"
     for (i in 2:n) {
       cur <- paste("- log( (exp(- alpha * u", i, ") - 1) / (exp(- alpha) - 1))", sep="")
       expr <- paste(expr, cur, sep=" + ")
@@ -54,14 +66,15 @@ frankCopula <- function(param, dim = 2) {
 rfrankBivCopula <- function(copula, n) {
   val <- cbind(runif(n), runif(n))
   alpha <- copula@parameters[1]
-  val[,2] <- -1/alpha * log(1 + val[,2] * (1 - exp(-alpha)) / (exp(-alpha * val[,1]) * (val[,2] - 1) - val[,2]))
+  val[,2] <- -1/alpha * log(1 + val[,2] * (1 - exp(-alpha)) / (exp(-alpha * val[,1]) * (val[,2] - 1) - val[,2])) ## reference: Joe (1997, p.147)
   val
 }
+
 
 rfrankCopula <- function(copula, n) {
   dim <- copula@dimension
   alpha <- copula@parameters[1]
-  if (abs(alpha) <= 100 * .Machine$double.eps)
+  if (abs(alpha) <= .Machine$double.eps^.9)
     return (matrix(runif(n * dim), nrow = n))
   if (dim == 2) return (rfrankBivCopula(copula, n))
   ## the frailty is a log series distribution with a = 1 - exp(-alpha)
@@ -73,11 +86,13 @@ rfrankCopula <- function(copula, n) {
 
 
 pfrankCopula <- function(copula, u) {
+  dim <- copula@dimension
   if (is.vector(u)) u <- matrix(u, ncol = dim)
   cdf <- copula@exprdist$cdf
   dim <- copula@dimension
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
+  if (abs(alpha) <= .Machine$double.eps^.9) return (apply(u, 1, prod))
+  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   eval(cdf)
 }
 
@@ -87,32 +102,59 @@ dfrankCopula <- function(copula, u) {
   dim <- copula@dimension
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
+  if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
   val <- eval(pdf)
-  val[apply(u, 1, function(v) any(v <= 0))] <- 0
-  val[apply(u, 1, function(v) any(v >= 1))] <- 0
+#  val[apply(u, 1, function(v) any(v <= 0))] <- 0
+#  val[apply(u, 1, function(v) any(v >= 1))] <- 0
   val
 }
 
-
-kendallsTauFrankCopula <- function(copula, ...) {
-  alpha <- copula@parameters[1]
-  if (alpha == 0) return (0)
-  - 1 + 4 / alpha * (debye(-alpha, 1) - 1)
+dfrankCopula.expr <- function(copula, u) {
+  if (is.vector(u)) u <- matrix(u, nrow = 1)
+  s <- apply(genFunFrank(copula, u), 1, sum)
+  pdf <- genInvDerFrank(copula, s, copula@dimension) *
+    apply(genFunDerFrank(copula, u, 1), 1, prod)
+  pdf
 }
 
-spearmansRhoFrankCopula <- function(copula, ...) {
+dfrankCopula.pdf <- function(copula, u) {
+  dim <- copula@dimension
+  if (dim > 6) stop("Frank copula PDF not implemented for dimension > 6.")
+  if (is.vector(u)) u <- matrix(u, nrow = 1)
+  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  alpha <- copula@parameters[1]
+  eval(frankCopula.pdf.expr[dim])
+}
+
+kendallsTauFrankCopula <- function(copula) {
   alpha <- copula@parameters[1]
   if (alpha == 0) return (0)
-  -1 + 12/alpha * (debye(-alpha, 2) - debye(-alpha, 1))
+  1 - 4 / alpha * (1 - debye1(alpha))
+}
+
+spearmansRhoFrankCopula <- function(copula) {
+  alpha <- copula@parameters[1]
+  if (alpha == 0) return (0)
+    1 - 12/alpha * (debye1(alpha) - debye2(alpha))
+}
+
+tailIndexFrankCopula <- function(copula, ...) {
+  c(lower=0, upper=0)
 }
 
 setMethod("rcopula", signature("frankCopula"), rfrankCopula)
 setMethod("pcopula", signature("frankCopula"), pfrankCopula)
-setMethod("dcopula", signature("frankCopula"), dfrankCopula)
+setMethod("dcopula", signature("frankCopula"), dfrankCopula.pdf)
 
 setMethod("genFun", signature("frankCopula"), genFunFrank)
 setMethod("genInv", signature("frankCopula"), genInvFrank)
+setMethod("genFunDer1", signature("frankCopula"), genFunDer1Frank)
+setMethod("genFunDer2", signature("frankCopula"), genFunDer2Frank)
+#setMethod("genInvDer", signature("frankCopula"), genInvDerFrank)
+
 
 setMethod("kendallsTau", signature("frankCopula"), kendallsTauFrankCopula)
 setMethod("spearmansRho", signature("frankCopula"), spearmansRhoFrankCopula)
+setMethod("tailIndex", signature("frankCopula"), tailIndexFrankCopula)
 
+#setMethod("calibKendallsTau", signature("frankCopula"), calibKendallsTauFrankCopula)

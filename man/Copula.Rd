@@ -8,16 +8,30 @@
 \alias{dcopula,gumbelCopula-method}
 \alias{dcopula,normalCopula-method}
 \alias{dcopula,tCopula-method}
+\alias{dcopula,galambosCopula-method}
+\alias{dcopula,amhCopula-method}
+\alias{dcopula,huslerReissCopula-method}
+\alias{dcopula,plackettCopula-method}
+
 \alias{pcopula,claytonCopula-method}
 \alias{pcopula,frankCopula-method}
 \alias{pcopula,gumbelCopula-method}
 \alias{pcopula,normalCopula-method}
 \alias{pcopula,tCopula-method}
+\alias{pcopula,galambosCopula-method}
+\alias{pcopula,amhCopula-method}
+\alias{pcopula,huslerReissCopula-method}
+\alias{pcopula,plackettCopula-method}
+
 \alias{rcopula,claytonCopula-method}
 \alias{rcopula,frankCopula-method}
 \alias{rcopula,gumbelCopula-method}
 \alias{rcopula,normalCopula-method}
 \alias{rcopula,tCopula-method}
+\alias{rcopula,galambosCopula-method}
+\alias{rcopula,amhCopula-method}
+\alias{rcopula,huslerReissCopula-method}
+\alias{rcopula,plackettCopula-method}
 
 \title{ The Copula Distribution }
 \description{
