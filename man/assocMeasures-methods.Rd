@@ -16,6 +16,7 @@
 \alias{kendallsTau,gumbelCopula-method}
 \alias{kendallsTau,normalCopula-method}
 \alias{kendallsTau,tCopula-method}
+\alias{kendallsTau,fgmCopula-method} 
 
 \alias{spearmansRho-methods}
 \alias{spearmansRho,ANY-method}
@@ -23,6 +24,7 @@
 \alias{spearmansRho,frankCopula-method}
 \alias{spearmansRho,normalCopula-method}
 \alias{spearmansRho,tCopula-method}
+\alias{spearmansRho,fgmCopula-method} 
 
 \alias{tailIndex-methods}
 \alias{tailIndex,ANY-method}

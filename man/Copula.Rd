@@ -12,6 +12,7 @@
 \alias{dcopula,amhCopula-method}
 \alias{dcopula,huslerReissCopula-method}
 \alias{dcopula,plackettCopula-method}
+\alias{dcopula,fgmCopula-method} 
 
 \alias{pcopula,claytonCopula-method}
 \alias{pcopula,frankCopula-method}
@@ -22,6 +23,7 @@
 \alias{pcopula,amhCopula-method}
 \alias{pcopula,huslerReissCopula-method}
 \alias{pcopula,plackettCopula-method}
+\alias{pcopula,fgmCopula-method} 
 
 \alias{rcopula,claytonCopula-method}
 \alias{rcopula,frankCopula-method}
@@ -32,6 +34,7 @@
 \alias{rcopula,amhCopula-method}
 \alias{rcopula,huslerReissCopula-method}
 \alias{rcopula,plackettCopula-method}
+\alias{rcopula,fgmCopula-method} 
 
 \title{ The Copula Distribution }
 \description{
@@ -68,11 +71,13 @@ rcopula(copula, n)
   function, and 'rcopula' generates random variates.
 }
 \references{
-  Joe (1997)
-  Nelsen (1999)
+  Joe (1997), \emph{Multivariate Models and Dependence Concepts},
+  Chapman and Hall, London.
+  
+  Nelsen (1999), \emph{An introduction to Copulas}, Springer, New York.
 }
 \author{ Jun Yan <jyan@stat.uiowa.edu> }
-\seealso{ copulaObject, ellipCopula, archmCopula }
+\seealso{ \code{\link{copula-class}}, \code{\link{ellipCopula}}, \code{\link{archmCopula}}, \code{\link{fgmCopula}}. }
 \examples{
 norm.cop <- normalCopula(0.5)
 norm.cop

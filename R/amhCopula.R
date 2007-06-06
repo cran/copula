@@ -1,3 +1,22 @@
+#################################################################
+##   Copula R package by Jun Yan Copyright (C) 2007
+##
+##   This program is free software; you can redistribute it and/or modify
+##   it under the terms of the GNU General Public License as published by
+##   the Free Software Foundation; either version 2 of the License, or
+##   (at your option) any later version.
+##
+##   This program is distributed in the hope that it will be useful,
+##   but WITHOUT ANY WARRANTY; without even the implied warranty of
+##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##   GNU General Public License for more details.
+##
+##   You should have received a copy of the GNU General Public License along
+##   with this program; if not, write to the Free Software Foundation, Inc.,
+##   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+##
+#################################################################
+
 setClass("amhCopula",
          representation = representation("archmCopula"),
          contains = list("copula", "archmCopula")
@@ -82,21 +101,23 @@ damhCopula <- function(copula, u) {
 
 
 ramhCopula <- function(copula, n) {
-  warning("This function for amhCopula needs to be fixed")
-  return(NULL)
   dim <- copula@dimension
   alpha <- copula@parameters[1]
   val <- matrix(runif(n * dim), nrow = n)
   if (abs(alpha) <= 100 * .Machine$double.eps)
     return (val)  ## the limit is independence
   ## Johnson (1987, p.362). Typo V_2 and p?
-  u1 <- runif(n)
-  u2 <- runif(n)
-  b <- 1 - u1
-  A <- -alpha * (2 * b * u2 + 1) + 2 * alpha^2 * b^2 * u2 + 1
-  B <- alpha^2 * (4 * b^2 * u2 - 4 * b * u2 + 1) + alpha * (4 * b * u2 - 4 * b + 2) + 1
-  v <- 2 * u2 * (alpha * b - 1)^2 / (A + sqrt(B))
-  cbind(u1, b)
+  ## solve quadratic equation anyway
+  u <- runif(n)
+  w <- runif(n)
+  b <- 1 - u
+  A <- w * (alpha * b)^2 - alpha
+  B <- (alpha + 1) - 2 * alpha * b * w
+  C <- w - 1
+  v <- (- B + sqrt(B^2 - 4 * A * C)) / 2 / A
+  ## v <- cbind(v, (- B - sqrt(B^2 - 4 * A * C)) / 2 / A) ## this root is not good
+  v <- 1 - v
+  cbind(u, v)
 }
 
 kendallsTauAmhCopula <- function(copula, ...) {

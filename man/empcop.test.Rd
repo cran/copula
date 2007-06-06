@@ -1,0 +1,144 @@
+\name{empcop.test}
+\alias{empcop.test}
+\alias{empcop.simulate}
+\alias{dependogram}
+
+\title{Multivariate independence test based on the empirical copula process}
+
+\description{
+  Multivariate independence test  based on the empirical 
+  copula process as proposed by Christian Genest and Bruno 
+  Rémillard. The test can be seen as composed of
+  three steps: (i) a simulation step, which consists in simulating the
+  distribution of the test statistics under independence for the sample
+  size under consideration; (ii) the test itself, which consists in
+  computing the approximate p-values of the test statistics with respect
+  to the empirical distributions obtained in step (i); and (iii) the
+  display of a graphic, called a \emph{dependogram}, enabling to
+  understand the type of departure from independence, if any. More details can
+  be found in the articles cited in the reference section.
+}
+
+\usage{
+empcop.simulate(n, p, m, N = 2000)
+empcop.test(x, d, m, alpha = 0.05)
+dependogram(test, pvalues = FALSE)
+}
+
+\arguments{
+  \item{n}{Sample size when simulating the distribution of the test
+    statistics under independence.}
+  \item{p}{Dimension of the data when simulating the distribution of the test
+    statistics under independence.}
+  \item{m}{Maximum cardinality of the subsets for which a test statistic
+  is to be computed. It makes sense to consider \code{m << p} especially when
+  \code{p} is large. In this case, the null hypothesis corresponds to the
+  independence of all sub-random vectors composed of at most \code{m} variables.}
+  \item{N}{Number of repetitions when simulating under independence.}
+  \item{x}{Data frame or data matrix containing realizations (one per
+    line) of the random vector whose independence is to be tested.}
+  \item{d}{Object of class \code{ empcop.distribution} as returned by
+  the function \code{empcop.simulate}. It can be regarded as the empirical distribution
+  of the test statistics under independence.}
+  \item{alpha}{Significance level used in the computation of the critical values for
+    the test statistics.}
+  \item{test}{Object of class \code{empcop.test} as return by he function \code{empcop.test}.}
+  \item{pvalues}{Logical indicating whether the dependogram should be
+    drawn from test statistics or the corresponding p-values.}
+}
+\details{See the references below for more details, especially the third
+  one.
+}
+
+\value{The function \code{empcop.simulate} returns an object of class
+  \code{empcop.distribution} whose attributes are: \code{sample.size},
+  \code{data.dimension}, \code{max.card.subsets},
+  \code{number.repetitons}, \code{subsets} (list of the subsets for
+  which test statistics have been computed), \code{subsets.binary}
+  (subsets in binary 'integer' notation) and
+  \code{dist.statistics.independence} (a \code{N} line matrix containing
+  the values of the test statistics for each subset and each repetition).
+
+  The function \code{empcop.test} returns an object of class
+  \code{empcop.test} whose attributes are: \code{subsets},
+  \code{statistics}, \code{critical.values}, \code{pvalues},
+  \code{fisher.pvalue} (a p-value resulting from a combination \emph{à la}
+    Fisher of the previous p-values), \code{tippett.pvalue} (a p-value
+  resulting from a combination \emph{à la} Tippett of the previous
+  p-values), \code{alpha} (global significance level of the test) and \code{beta}
+  (1 - \code{beta} is the significance level per statistic).
+}
+
+\references{
+  P. Deheuvels (1979), La fonction de dépendance empirique et ses
+  propriétés: un test non paramétrique d'indépendance, Acad. Roy.
+  Belg. Bull. Cl. Sci. 5th Ser. 65, 274-292.
+  
+  P. Deheuvels (1981), \emph{A non parametric test for independence},
+  Publ. Inst. Statist. Univ. Paris 26, 29-50.
+  
+  C. Genest and B. Rémillard (2004). \emph{Tests of independence and
+    randomness based on the empirical copula process.} Test, 13, 335-369.
+  
+  C. Genest, J.-F. Quessy and B. Rémillard (2006).  \emph{Local
+    efficiency of a Cramer-von Mises test of independence.}
+  Journal of Multivariate Analysis, 97, 274-294.
+  
+  C. Genest, J.-F. Quessy and B. Rémillard (2007). \emph{Asymptotic
+    local efficiency of Cramer-von Mises tests for multivariate
+    independence.} The Annals of Statistics, 35, in press.
+}
+
+\author{Ivan Kojadinovic, \code{ivan.kojadinovic@univ-nantes.fr}}
+
+%\seealso{}
+
+\examples{
+## Consider the following example taken from
+## Genest and Remillard (2004), p 352:
+
+x <- matrix(rnorm(500),100,5)
+x[,1] <- abs(x[,1]) * sign(x[,2] * x[,3])
+x[,5] <- x[,4]/2 + sqrt(3) * x[,5]/2
+
+## In order to test for independence "within" x, the first step consists
+## in simulating the distribution of the test statistics under
+## independence for the same sample size and dimension,
+## i.e. n=100 and p=5. As we are going to consider all the subsets of
+## {1,...,5} whose cardinality is between 2 and 5, we set m=5.
+## This may take a while...
+
+d <- empcop.simulate(100,5,5)
+
+## The next step consists in performing the test itself:
+
+test <- empcop.test(x,d,5)
+
+## Let us see the results:
+
+test
+
+## Display the dependogram:
+
+dependogram(test)
+
+## We could have tested for a weaker form of independence, for instance,
+## by only computing statistics for subsets whose cardinality is between 2
+## and 3:
+
+test <- empcop.test(x,d,3)
+test
+dependogram(test)
+
+## Consider now the following data:
+y <- matrix(runif(500),100,5)
+## and perform the test:
+test <- empcop.test(y,d,3)
+test
+dependogram(test)
+
+
+## NB: In order to save d for future use, the save function can be used.
+}
+
+\keyword{htest}

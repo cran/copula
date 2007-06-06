@@ -37,7 +37,8 @@
 } 
 \seealso{
   \code{\link{archmCopula-class}},
-  \code{\link{ellipCopula-class}}
-  \code{\link{evCopula-class}}
+  \code{\link{ellipCopula-class}},
+  \code{\link{evCopula-class}},
+  \code{\link{fgmCopula-class}}
 }
 \keyword{classes}

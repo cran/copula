@@ -40,8 +40,8 @@ fitMvdc(data, mvdc, start, optim.control = list(NULL), method = "BFGS")
   \item{fit}{ the result of optim }
 }
 \references{
-  Yan (2006) Multivariate Modeling with Copulas and Engineering
-  Applications. In Handbook of Engineering Statistics, Ed. Pham, Springer. 
+  Yan (2006), \emph{Multivariate Modeling with Copulas and Engineering
+  Applications. In Handbook of Engineering Statistics}, Ed. Pham, Springer. 
   }
 \author{ Jun Yan <jyan@stat.uiowa.edu>}
 \note{

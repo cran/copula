@@ -6,7 +6,7 @@
 \alias{gumbelCopula-class}
 \alias{amhCopula-class}
 \title{Class "archmCopula" }
-\description{ Archemedean copula }
+\description{ Archimedean copula }
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("archmCopula",
     ...)} or by function 'archmCopula'.

@@ -1,3 +1,23 @@
+2007-06-06  Jun Yan  <jyan@p-lnx401.stat.uiowa.edu>
+
+	* Fixed random number generator of amhCopula.
+	The formula in Johnson (1988) has undefined quantities.
+
+2007-06-02  Ivan Kojadinovic  <ivan.kojadinovic@univ-nantes.fr>
+
+	* Farlie-Gumbel-Morgenstern class implemented with
+	distribution, density and random number generation. 
+	Class needs to be properly tested, especially random 
+	number generation.
+
+2007-06-01  Jun Yan  <jyan@p-lnx401.stat.uiowa.edu>
+
+	* Merged with package copulab by Ivan Kojadinovic 
+	<ivan.kojadinovic@.univ-nantes.fr>, who
+	provides the multivariate independence test of 
+	Genest and Rémillard (2004).
+	
+
 2007-05-18  Jun Yan  <jyan@p-lnx401.stat.uiowa.edu>
 
 	* Association measures are exported into the namespace:

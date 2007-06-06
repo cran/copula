@@ -20,6 +20,7 @@ exportClasses(normalCopula, tCopula)
 exportClasses(claytonCopula, frankCopula, gumbelCopula, amhCopula)
 exportClasses(galambosCopula, huslerReissCopula)
 exportClasses(plackettCopula)
+exportClasses(fgmCopula) #new in 0.5.2
 
 export(mvdc)
 export(ellipCopula, archmCopula, evCopula)
@@ -27,6 +28,7 @@ export(normalCopula, tCopula)
 export(claytonCopula, frankCopula, gumbelCopula, amhCopula)
 export(galambosCopula, huslerReissCopula)
 export(plackettCopula)
+export(fgmCopula) #new in 0.5.2
 
 exportMethods(persp, contour)
 
@@ -36,3 +38,7 @@ exportClasses(fitCopula, fitMvdc)
 exportClasses(summaryFitCopula, summaryFitMvdc)
 
 exportMethods(show, summary)
+
+export(empcop.simulate,empcop.test,dependogram) #independence test
+
+
