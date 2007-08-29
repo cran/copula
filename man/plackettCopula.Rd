@@ -15,7 +15,7 @@ plackettCopula(param)
 \value{
   A Plackett copula object of class \code{"plackettCopula"}.
 }
-\author{ Jun Yan <jyan@stat.uiowa.edu> }
+\author{ Jun Yan <jyan@stat.uconn.edu> }
 \seealso{ \code{\link{ellipCopula}}, \code{\link{archmCopula}}  }
 \examples{
 plackett.cop <- plackettCopula(param=2)

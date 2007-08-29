@@ -46,7 +46,7 @@ rmvdc(mvdc, n)
   'dmvdc' gives the density, 'pmvdc' gives the distribution
   function, and 'rmvdc' generates random variates.
 }
-\author{  Jun Yan <jyan@stat.uiowa.edu> }
+\author{  Jun Yan <jyan@stat.uconn.edu> }
 \seealso{
   \code{\link{ellipCopula}},
   \code{\link{archmCopula}},

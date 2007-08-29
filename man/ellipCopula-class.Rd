@@ -37,7 +37,7 @@
     \item{rcopula}{\code{signature(copula = "tCopula")}: ... }
   }
 }
-\author{ Jun Yan <jyan@stat.uiowa.edu> }
+\author{ Jun Yan <jyan@stat.uconn.edu> }
 \seealso{
   \code{\link{ellipCopula}}, 
   \code{\link{copula-class}}.

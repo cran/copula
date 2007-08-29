@@ -46,7 +46,7 @@
   \code{"gumbelCopula"} and \code{"amhCopula"} extends class
   \code{"archmCopula"} directly.
 }
-\author{ Jun Yan <jyan@stat.uiowa.edu> }
+\author{ Jun Yan <jyan@stat.uconn.edu> }
 \note{
   The expressions of pdf are obtained by differentiating the cdf
   expression using function 'D'.

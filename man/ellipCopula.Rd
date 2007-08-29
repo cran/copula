@@ -34,7 +34,7 @@ tCopula(param, dim = 2, dispstr = "ex", df = 5)
   \code{"ellipCopula"} is a wrapper for \code{"normalCopula"} and
   \code{"tCopula"}.
 }
-\author{ Jun Yan <jyan@stat.uiowa.edu> }
+\author{ Jun Yan <jyan@stat.uconn.edu> }
 \seealso{ \code{\link{archmCopula}} }
 \examples{
 norm.cop <- normalCopula(c(0.5, 0.6, 0.7), dim = 3, dispstr = "un")

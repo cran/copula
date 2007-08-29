@@ -23,7 +23,7 @@
       of the copula. }
   }
 }
-\author{ Jun  Yan <jyan@stat.uiowa.edu> }
+\author{ Jun  Yan <jyan@stat.uconn.edu> }
 \note{
   The 'copula' class is extended by the 'evCopula', 'archmCopula' and
   'ellipCopula' classes. Objects of implemented copulas can be created

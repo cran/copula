@@ -38,7 +38,7 @@ amhCopula(param, dim = 2)
   compting involved in symbolically differentiating the cdf. Therefore,
   for dim > 6, likelihood estimation cannot be done yet.
 }
-\author{ Jun Yan <jyan@stat.uiowa.edu> }
+\author{ Jun Yan <jyan@stat.uconn.edu> }
 \seealso{ \code{\link{ellipCopula}} }
 \examples{
 clayton.cop <- claytonCopula(2, dim = 3)

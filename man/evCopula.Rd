@@ -31,7 +31,7 @@ huslerReissCopula(param)
 \note{
   Gumbel copula is both Archimedean copula and extreme value copula.
 }
-\author{ Jun Yan <jyan@stat.uiowa.edu> }
+\author{ Jun Yan <jyan@stat.uconn.edu> }
 \seealso{ \code{\link{ellipCopula}}, \code{\link{archmCopula}}  }
 \examples{
 gumbel.cop <- evCopula("gumbel", param=2)

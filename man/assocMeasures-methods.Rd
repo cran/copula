@@ -43,6 +43,7 @@
 \alias{calibKendallsTau,normalCopula-method}
 \alias{calibKendallsTau,tCopula-method}
 \alias{calibKendallsTau,claytonCopula-method}
+\alias{calibKendallsTau,gumbelCopula-method}
 
 \alias{calibSpearmansRho-methods}
 \alias{calibSpearmansRho,ANY-method}

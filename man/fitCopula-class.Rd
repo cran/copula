@@ -10,5 +10,5 @@
   Objects can be created by calls of the form \code{fitCopula, fitMvdc}
   or their \code{summary} methods.
 }
-\author{ Jun Yan <jyan@stat.uiowa.edu> }
+\author{ Jun Yan <jyan@stat.uconn.edu> }
 \keyword{classes}

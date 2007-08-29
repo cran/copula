@@ -179,7 +179,7 @@ setMethod("genFunDer1", signature("claytonCopula"), genFunDer1Clayton)
 setMethod("genFunDer2", signature("claytonCopula"), genFunDer2Clayton)
 
 setMethod("kendallsTau", signature("claytonCopula"), kendallsTauClaytonCopula)
-#setMethod("spearmansRho", signature("claytonCopula"), spearmansRhoClaytonCopula)
+#setMethod("spearmansRho", signature("claytonCopula"), spearmansRhoCopula)
 setMethod("tailIndex", signature("claytonCopula"), tailIndexClaytonCopula)
 
 setMethod("calibKendallsTau", signature("claytonCopula"), calibKendallsTauClaytonCopula)

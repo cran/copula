@@ -176,4 +176,4 @@ setMethod("kendallsTau", signature("frankCopula"), kendallsTauFrankCopula)
 setMethod("spearmansRho", signature("frankCopula"), spearmansRhoFrankCopula)
 setMethod("tailIndex", signature("frankCopula"), tailIndexFrankCopula)
 
-#setMethod("calibKendallsTau", signature("frankCopula"), calibKendallsTauFrankCopula)
+#setMethod("calibKendallsTau", signature("frankCopula"), calibKendallsTauCopula)

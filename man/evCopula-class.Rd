@@ -34,7 +34,7 @@
   Class \code{"galambosCopula"} and \code{"huslerReissCopula"}
   extends class \code{"evCopula"} directly.
 }
-\author{ Jun Yan <jyan@stat.uiowa.edu> }
+\author{ Jun Yan <jyan@stat.uconn.edu> }
 \note{
   The expressions of pdf are obtained by differentiating the cdf
   expression using function 'deriv'.

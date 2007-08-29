@@ -43,7 +43,7 @@ fitMvdc(data, mvdc, start, optim.control = list(NULL), method = "BFGS")
   Yan (2006), \emph{Multivariate Modeling with Copulas and Engineering
   Applications. In Handbook of Engineering Statistics}, Ed. Pham, Springer. 
   }
-\author{ Jun Yan <jyan@stat.uiowa.edu>}
+\author{ Jun Yan <jyan@stat.uconn.edu>}
 \note{
   When covariates are available for marginal distributions or copula,
   one can construct loglikelihood function and feed it to optim to

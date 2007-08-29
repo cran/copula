@@ -76,7 +76,7 @@ rcopula(copula, n)
   
   Nelsen (1999), \emph{An introduction to Copulas}, Springer, New York.
 }
-\author{ Jun Yan <jyan@stat.uiowa.edu> }
+\author{ Jun Yan <jyan@stat.uconn.edu> }
 \seealso{ \code{\link{copula-class}}, \code{\link{ellipCopula}}, \code{\link{archmCopula}}, \code{\link{fgmCopula}}. }
 \examples{
 norm.cop <- normalCopula(0.5)

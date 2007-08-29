@@ -137,6 +137,12 @@ tailIndexGumbelCopula <- function(copula, ...) {
   c(lower=0, upper=upper)
 }
 
+
+calibKendallsTauGumbelCopula <- function(copula, tau) {
+  1/(1 - tau)
+}
+
+
 setMethod("rcopula", signature("gumbelCopula"), rgumbelCopula)
 setMethod("pcopula", signature("gumbelCopula"), pgumbelCopula)
 setMethod("dcopula", signature("gumbelCopula"), dgumbelCopula.pdf)
@@ -150,5 +156,8 @@ setMethod("genFunDer1", signature("gumbelCopula"), genFunDer1Gumbel)
 setMethod("genFunDer2", signature("gumbelCopula"), genFunDer2Gumbel)
 
 setMethod("kendallsTau", signature("gumbelCopula"), kendallsTauGumbelCopula)
+#setMethod("spearmansRho", signature("gumbelCopula"), spearmansRhoCopula)
 setMethod("tailIndex", signature("gumbelCopula"), tailIndexGumbelCopula)
 
+setMethod("calibKendallsTau", signature("gumbelCopula"), calibKendallsTauGumbelCopula)
+#setMethod("calibSpearmansRho", signature("gumbelCopula"), calibSpearmansRhoCopula)

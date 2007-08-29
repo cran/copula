@@ -17,19 +17,30 @@
 ##
 #################################################################
 
-getExpr<- function(fun, param) {
-  n <- length(param)
-  if (n == 0) {
-    expr <- parse(text = paste(fun, "(", "x", ")"))
-  }
-  else {
-    nm <- names(param)
-    expr <- paste(nm, "=", param, collapse=", ")
-    expr <- parse(text = paste(fun, "(", "x", ",", expr, ")"))
-  }
-  ##eval(expr)
-  expr
+
+## Functions asCall and P0 were kindly supplied by 
+## Martin Maechler <maechler@stat.math.ethz.ch>,
+## motivated by an application of nor1mix and copula
+## from Lei Liu <liulei@virginia.edu>.
+## They fixes the function getExpr in the old
+## version, which assumed that the parameters to
+## [rdpq]<distrib> were vectors.
+
+asCall <- function(fun, param)
+{
+    cc <-
+	if (length(param) == 0)
+	    quote(FUN(x))
+	else if(is.list(param)) {
+	    as.call(c(quote(FUN), c(quote(x), as.expression(param))))
+	} else { ## assume that [dpq]<distrib>(x, param) will work
+	    as.call(c(quote(FUN), c(quote(x), substitute(param))))
+	}
+    cc[[1]] <- as.name(fun)
+    cc
 }
+
+P0 <- function(...) paste(..., sep="")
 
 dmvdc <- function(mvdc, x) {
   dim <- mvdc@copula@dimension
@@ -37,11 +48,9 @@ dmvdc <- function(mvdc, x) {
   if (is.vector(x)) x <- matrix(x, nrow = 1)
   u <- x
   for (i in 1:dim) {
-    pmarg <- paste("p", mvdc@margins[i], sep = "")
-    dmarg <- paste("d", mvdc@margins[i], sep = "")
-    cdf.expr <- getExpr(pmarg, mvdc@paramMargins[[i]])
+    cdf.expr <- asCall(P0("p", mvdc@margins[i]), mvdc@paramMargins[[i]])
+    pdf.expr <- asCall(P0("d", mvdc@margins[i]), mvdc@paramMargins[[i]])
     u[,i] <- eval(cdf.expr, list(x = x[,i]))
-    pdf.expr <- getExpr(dmarg, mvdc@paramMargins[[i]])
     densmarg <- densmarg * eval(pdf.expr, list(x = x[,i]))
   }
   dcopula(mvdc@copula, u) * densmarg
@@ -53,8 +62,7 @@ pmvdc <- function(mvdc, x) {
   if (is.vector(x)) x <- matrix(x, nrow = 1)
   u <- x
   for (i in 1:dim) {
-    pmarg <- paste("p", mvdc@margins[i], sep = "")
-    cdf.expr <- getExpr(pmarg, mvdc@paramMargins[[i]])
+    cdf.expr <- asCall(P0("p", mvdc@margins[i]), mvdc@paramMargins[[i]])
     u[,i] <- eval(cdf.expr, list(x = x[,i]))
   }
   pcopula(mvdc@copula, u)
@@ -66,8 +74,7 @@ rmvdc <- function(mvdc, n) {
   u <- rcopula(mvdc@copula, n)
   x <- u
   for (i in 1:dim) {
-    qmarg <- paste("q", mvdc@margins[i], sep = "")
-    qdf.expr <- getExpr(qmarg, mvdc@paramMargins[[i]])
+    qdf.expr <- asCall(P0("q", mvdc@margins[i]), mvdc@paramMargins[[i]])
     x[,i] <- eval(qdf.expr, list(x = u[,i]))
   }
   x

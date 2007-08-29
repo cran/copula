@@ -89,7 +89,7 @@ dependogram(test, pvalues = FALSE)
     independence.} The Annals of Statistics, 35, in press.
 }
 
-\author{Ivan Kojadinovic, \code{ivan.kojadinovic@univ-nantes.fr}}
+\author{Ivan Kojadinovic, \email{ivan.kojadinovic@univ-nantes.fr}}
 
 %\seealso{}
 
@@ -101,6 +101,8 @@ x <- matrix(rnorm(500),100,5)
 x[,1] <- abs(x[,1]) * sign(x[,2] * x[,3])
 x[,5] <- x[,4]/2 + sqrt(3) * x[,5]/2
 
+
+\dontrun{
 ## In order to test for independence "within" x, the first step consists
 ## in simulating the distribution of the test statistics under
 ## independence for the same sample size and dimension,
@@ -136,7 +138,7 @@ y <- matrix(runif(500),100,5)
 test <- empcop.test(y,d,3)
 test
 dependogram(test)
-
+}
 
 ## NB: In order to save d for future use, the save function can be used.
 }

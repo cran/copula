@@ -1,3 +1,13 @@
+2007-08-26  Jun Yan  <jyan@stat.uconn.edu>
+
+	* Added try-error handler for loglikCopula and loglikMvdc.
+	This will allow the optimizer to keep searching when NaN is returned.
+
+	* Changed the way to generate function calls to evaluate 
+	[dpqr]<distrib> for each margin, thank to 
+	Martin Maechler <maechler@stat.math.ethz.ch>.
+	The package can interact now with package nor1mix.
+
 2007-06-06  Jun Yan  <jyan@p-lnx401.stat.uiowa.edu>
 
 	* Fixed random number generator of amhCopula.

@@ -30,7 +30,9 @@ setClass("fitCopula",
 
 loglikCopula <- function(param, x, copula) {
   copula@parameters <- param
-  sum(log(dcopula(copula, x)))
+  loglik <- try(sum(log(dcopula(copula, x))))
+  if (inherits(loglik, "try-error")) loglik <- NaN
+  loglik
 }
 
 fitCopula <- function(data, copula, start,
@@ -117,7 +119,9 @@ loglikMvdc <- function(param, x, mvdc) {
     }      
   }
   mvdc@copula@parameters <- param[- (1:rev(idx2)[1])]
-  sum(log(dmvdc(mvdc, x)))
+  loglik <- try(sum(log(dmvdc(mvdc, x))))
+  if (inherits(loglik, "try-error")) loglik <- NaN
+  loglik
 }
 
 fitMvdc <- function(data, mvdc, start,
