@@ -24,8 +24,8 @@ setClass("huslerReissCopula",
 
 AfunHuslerReiss <- function(copula, w) {
   alpha <- copula@parameters[1]
-  x * pnorm(1 / alpha + 0.5 * alpha * log(x /(1 - x))) +
-    (1 - x) * pnorm(1 / alpha - 0.5 * alpha * log(x / (1 - x))) 
+  w * pnorm(1 / alpha + 0.5 * alpha * log(w /(1 - w))) +
+    (1 - w) * pnorm(1 / alpha - 0.5 * alpha * log(w / (1 - w))) 
 }
 
 huslerReissCopula <- function(param) {
@@ -45,7 +45,9 @@ huslerReissCopula <- function(param) {
 phuslerReissCopula <- function(copula, u) {
   dim <- copula@dimension
   if (is.vector(u)) u <- matrix(u, nrow = 1)
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  u1 <- u[,1]
+  u2 <- u[,2]
   alpha <- copula@parameters[1]
   ## Joe (1997, p.142)
   u1p <- -log(u1); u2p <- -log(u2)
@@ -56,7 +58,9 @@ phuslerReissCopula <- function(copula, u) {
 dhuslerReissCopula <- function(copula, u) {
   dim <- copula@dimension
   if (is.vector(u)) u <- matrix(u, nrow = 1)
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  u1 <- u[,1]
+  u2 <- u[,2]
   alpha <- copula@parameters[1]
   ## Joe (1997, p.142)
   u1p <- -log(u1); u2p <- -log(u2); z <- u1p / u2p

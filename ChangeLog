@@ -1,3 +1,9 @@
+2007-10-16  Jun Yan  <jyan@stat.uconn.edu>
+
+	* Added \encoding{latin1} in emp.test.Rd.
+
+	* Fixed warnings and notes issued by R (2.6.0) CMD check.
+
 2007-08-26  Jun Yan  <jyan@stat.uconn.edu>
 
 	* Added try-error handler for loglikCopula and loglikMvdc.

@@ -85,7 +85,9 @@ pamhCopula <- function(copula, u) {
   if (is.vector(u)) u <- matrix(u, ncol = dim)
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (apply(u, 1, prod))
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  u1 <- u[,1]
+  u2 <- u[,2]
   u1 * u2 / (1 - alpha * (1 - u1) * (1 - u2))
 }
 
@@ -95,7 +97,10 @@ damhCopula <- function(copula, u) {
   if (is.vector(u)) u <- matrix(u, ncol = dim)
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  ## bivariate anyway
+  u1 <- u[,1]
+  u2 <- u[,2]
   (-1 + alpha^2*(-1 + u1 + u2 - u1*u2) - alpha*(-2 + u1 + u2 + u1*u2)) / (-1 + alpha*(-1 + u1)*(-1 + u2))^3 
 }
 

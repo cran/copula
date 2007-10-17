@@ -143,4 +143,5 @@ dependogram(test)
 ## NB: In order to save d for future use, the save function can be used.
 }
 
+\encoding{latin1}
 \keyword{htest}

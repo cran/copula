@@ -38,7 +38,9 @@ plackettCopula <- function(param) {
 pplackettCopula <- function(copula, u) {
   dim <- copula@dimension
   if (is.vector(u)) u <- matrix(u, nrow = 1)
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  u1 <- u[,1]
+  u2 <- u[,2]
   delta <- copula@parameters[1]
   eta <- delta - 1
   ## Joe (1997, p.141)
@@ -48,7 +50,9 @@ pplackettCopula <- function(copula, u) {
 dplackettCopula <- function(copula, u) {
   dim <- copula@dimension
   if (is.vector(u)) u <- matrix(u, nrow = 1)
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  u1 <- u[,1]
+  u2 <- u[,2]
   delta <- copula@parameters[1]
   eta <- delta - 1
   ## Joe (1997, p.141)

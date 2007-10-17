@@ -312,6 +312,7 @@ genFunDer2 <- function(copula, u) {
 ## genFunDer <- function(copula, u, n) {## nth derivative
 ##   UseMethod("genFunDer")
 ## }
+
 ## genInvDer <- function(copula, s, n) {## nth derivative
 ##   UseMethod("genInvDer")
 ## }

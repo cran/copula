@@ -37,10 +37,10 @@ genInvFrank <- function(copula, s) {
 genFunDer1Frank <- function(copula, u) {
   eval(frankCopula.genfun.expr[1], list(u=u, alpha=copula@parameters[1]))
 }
+
 genFunDer2Frank <- function(copula, u) {
   eval(frankCopula.genfun.expr[2], list(u=u, alpha=copula@parameters[1]))
 }
-
 
 ## genInvDerFrank <- function(copula, s, n) {
 ##   eval(genInvDerFrank.expr[n + 1], list(s=s, alpha=copula@parameters[1]))
@@ -128,13 +128,13 @@ dfrankCopula <- function(copula, u) {
   val
 }
 
-dfrankCopula.expr <- function(copula, u) {
-  if (is.vector(u)) u <- matrix(u, nrow = 1)
-  s <- apply(genFunFrank(copula, u), 1, sum)
-  pdf <- genInvDerFrank(copula, s, copula@dimension) *
-    apply(genFunDerFrank(copula, u, 1), 1, prod)
-  pdf
-}
+## dfrankCopula.expr <- function(copula, u) {
+##   if (is.vector(u)) u <- matrix(u, nrow = 1)
+##   s <- apply(genFunFrank(copula, u), 1, sum)
+##   pdf <- genInvDerFrank(copula, s, copula@dimension) *
+##     apply(genFunDerFrank(copula, u, 1), 1, prod)
+##   pdf
+## }
 
 dfrankCopula.pdf <- function(copula, u) {
   dim <- copula@dimension
@@ -169,11 +169,11 @@ setMethod("genFun", signature("frankCopula"), genFunFrank)
 setMethod("genInv", signature("frankCopula"), genInvFrank)
 setMethod("genFunDer1", signature("frankCopula"), genFunDer1Frank)
 setMethod("genFunDer2", signature("frankCopula"), genFunDer2Frank)
-#setMethod("genInvDer", signature("frankCopula"), genInvDerFrank)
+## setMethod("genInvDer", signature("frankCopula"), genInvDerFrank)
 
 
 setMethod("kendallsTau", signature("frankCopula"), kendallsTauFrankCopula)
 setMethod("spearmansRho", signature("frankCopula"), spearmansRhoFrankCopula)
 setMethod("tailIndex", signature("frankCopula"), tailIndexFrankCopula)
 
-#setMethod("calibKendallsTau", signature("frankCopula"), calibKendallsTauCopula)
+## setMethod("calibKendallsTau", signature("frankCopula"), calibKendallsTauCopula)
