@@ -1,0 +1,16 @@
+citHeader("To cite package copula in publications use:")
+
+
+citEntry(entry="Article",
+         title = "Enjoy the Joy of Copulas: with a Package copula",
+         author = personList(as.person("Jun Yan")),
+         year         = "2007",
+         journal      = "Journal of Statistical Software",
+         volume       = "21",
+         number       = "4",
+         pages        = "1--21",
+         textVersion = 
+         paste("Yan, J.",
+               "Enjoy the Joy of Copulas: with a Package copula",
+               "Journal of Statistical Software, 21(4), pp1--21.")
+)

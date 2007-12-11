@@ -1,3 +1,17 @@
+2007-12-11  Jun Yan <jyan@stat.uconn.edu>
+
+	* Fixed a bug in fitCopula (thank Rodrigo Dupleich
+	<rodrigo.dupleich@citi.com> for reporting).	
+
+2007-12-07  Ivan Kojadinovic  <ivan@stat.auckland.ac.nz>
+
+	* Added the function empcop.rv.test, a test of independence 
+	  among continuous random vectors based on the empirical copula.
+
+	* Improved empcop.test.
+	
+	* Fixed a bug in fgm.c.
+
 2007-10-16  Jun Yan  <jyan@stat.uconn.edu>
 
 	* Added \encoding{latin1} in emp.test.Rd.

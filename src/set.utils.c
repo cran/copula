@@ -1,8 +1,7 @@
 /*#################################################################
-##   Copula R package by Jun Yan Copyright (C) 2007
+##   Copula R package by Jun Yan and Ivan Kojadinovic Copyright (C) 2007
 ##
-##   Set function utilities
-##   Copyright (C) 2007 Ivan Kojadinovic <ivan.kojadinovic@univ-nantes.fr>
+##   Copyright (C) 2007 Ivan Kojadinovic <ivan@stat.auckland.ac.nz>
 ##
 ##   This program is free software; you can redistribute it and/or modify
 ##   it under the terms of the GNU General Public License as published by
@@ -18,8 +17,7 @@
 ##   with this program; if not, write to the Free Software Foundation, Inc.,
 ##   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##
-#################################################################
-*/
+#################################################################*/
 
 /*****************************************************************************
 

@@ -3,10 +3,11 @@
 \alias{empcop.simulate}
 \alias{dependogram}
 
-\title{Multivariate independence test based on the empirical copula process}
+\title{Independence test among continuous random variables based
+  on the empirical copula process}
 
 \description{
-  Multivariate independence test  based on the empirical 
+  Multivariate independence test based on the empirical 
   copula process as proposed by Christian Genest and Bruno 
   Rémillard. The test can be seen as composed of
   three steps: (i) a simulation step, which consists in simulating the
@@ -21,7 +22,7 @@
 
 \usage{
 empcop.simulate(n, p, m, N = 2000)
-empcop.test(x, d, m, alpha = 0.05)
+empcop.test(x, d, m=ncol(x), alpha = 0.05)
 dependogram(test, pvalues = FALSE)
 }
 
@@ -30,10 +31,9 @@ dependogram(test, pvalues = FALSE)
     statistics under independence.}
   \item{p}{Dimension of the data when simulating the distribution of the test
     statistics under independence.}
-  \item{m}{Maximum cardinality of the subsets for which a test statistic
+  \item{m}{Maximum cardinality of the subsets of variables for which a test statistic
   is to be computed. It makes sense to consider \code{m << p} especially when
-  \code{p} is large. In this case, the null hypothesis corresponds to the
-  independence of all sub-random vectors composed of at most \code{m} variables.}
+  \code{p} is large.}
   \item{N}{Number of repetitions when simulating under independence.}
   \item{x}{Data frame or data matrix containing realizations (one per
     line) of the random vector whose independence is to be tested.}
@@ -42,9 +42,9 @@ dependogram(test, pvalues = FALSE)
   of the test statistics under independence.}
   \item{alpha}{Significance level used in the computation of the critical values for
     the test statistics.}
-  \item{test}{Object of class \code{empcop.test} as return by he function \code{empcop.test}.}
+  \item{test}{Object of class \code{empcop.test} as return by the function \code{empcop.test}.}
   \item{pvalues}{Logical indicating whether the dependogram should be
-    drawn from test statistics or the corresponding p-values.}
+    drew from test statistics or the corresponding p-values.}
 }
 \details{See the references below for more details, especially the third
   one.
@@ -55,43 +55,50 @@ dependogram(test, pvalues = FALSE)
   \code{data.dimension}, \code{max.card.subsets},
   \code{number.repetitons}, \code{subsets} (list of the subsets for
   which test statistics have been computed), \code{subsets.binary}
-  (subsets in binary 'integer' notation) and
-  \code{dist.statistics.independence} (a \code{N} line matrix containing
-  the values of the test statistics for each subset and each repetition).
+  (subsets in binary 'integer' notation), \code{dist.statistics.independence} (a \code{N} line matrix containing
+  the values of the test statistics for each subset and each repetition)
+  and \code{dist.global.statistic.independence} (a vector a length \code{N} containing
+  the values of the global Cramér-von Mises test statistic for each repetition
+  - see last reference p 175).
 
   The function \code{empcop.test} returns an object of class
   \code{empcop.test} whose attributes are: \code{subsets},
   \code{statistics}, \code{critical.values}, \code{pvalues},
   \code{fisher.pvalue} (a p-value resulting from a combination \emph{à la}
-    Fisher of the previous p-values), \code{tippett.pvalue} (a p-value
-  resulting from a combination \emph{à la} Tippett of the previous
-  p-values), \code{alpha} (global significance level of the test) and \code{beta}
-  (1 - \code{beta} is the significance level per statistic).
+    Fisher of the subset statistic p-values), \code{tippett.pvalue} (a p-value
+    resulting from a combination \emph{à la} Tippett of the subset
+    statistic p-values),
+    \code{alpha} (global significance level of the test), \code{beta}
+  (1 - \code{beta} is the significance level per statistic),
+  \code{global.statistic} (value of the global Cramér-von Mises
+  statistic derived directly from
+  the independence empirical copula process - see last reference p 175) and
+  \code{global.statistic.pvalue} (corresponding p-value).
 }
 
 \references{
-  P. Deheuvels (1979), La fonction de dépendance empirique et ses
-  propriétés: un test non paramétrique d'indépendance, Acad. Roy.
+  P. Deheuvels (1979), \emph{La fonction de dépendance empirique et ses
+    propriétés: un test non paramétrique d'indépendance}, Acad. Roy.
   Belg. Bull. Cl. Sci. 5th Ser. 65, 274-292.
   
   P. Deheuvels (1981), \emph{A non parametric test for independence},
   Publ. Inst. Statist. Univ. Paris 26, 29-50.
   
-  C. Genest and B. Rémillard (2004). \emph{Tests of independence and
-    randomness based on the empirical copula process.} Test, 13, 335-369.
+  C. Genest and B. Rémillard (2004), \emph{Tests of independence and
+    randomness based on the empirical copula process}, Test 13, 335-369.
   
-  C. Genest, J.-F. Quessy and B. Rémillard (2006).  \emph{Local
-    efficiency of a Cramer-von Mises test of independence.}
-  Journal of Multivariate Analysis, 97, 274-294.
+  C. Genest, J.-F. Quessy and B. Rémillard (2006), \emph{Local
+    efficiency of a Cramer-von Mises test of independence},
+  Journal of Multivariate Analysis 97, 274-294.
   
-  C. Genest, J.-F. Quessy and B. Rémillard (2007). \emph{Asymptotic
-    local efficiency of Cramer-von Mises tests for multivariate
-    independence.} The Annals of Statistics, 35, in press.
+  C. Genest, J.-F. Quessy and B. Rémillard (2007), \emph{Asymptotic
+    local efficiency of Cramér-von Mises tests for multivariate
+    independence}, The Annals of Statistics 35, 166-191.
 }
 
-\author{Ivan Kojadinovic, \email{ivan.kojadinovic@univ-nantes.fr}}
+\author{Ivan Kojadinovic, \email{ivan@stat.auckland.ac.nz}}
 
-%\seealso{}
+\seealso{\code{\link{empcop.rv.test}}}
 
 \examples{
 ## Consider the following example taken from

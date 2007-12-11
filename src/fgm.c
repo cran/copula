@@ -1,8 +1,7 @@
 /*#################################################################
-##   Copula R package by Jun Yan Copyright (C) 2007
+##   Copula R package by Jun Yan and Ivan Kojadinovic Copyright (C) 2007
 ##
-##   Farlie-Gumbel-Morgenstern multivariate copula class 
-##   Copyright (C) 2007 Ivan Kojadinovic <ivan.kojadinovic@univ-nantes.fr>
+##   Copyright (C) 2007 Ivan Kojadinovic <ivan@stat.auckland.ac.nz>
 ##
 ##   This program is free software; you can redistribute it and/or modify
 ##   it under the terms of the GNU General Public License as published by
@@ -51,7 +50,7 @@ void validity_fgm(int *p, double *alpha, int *valid)
 	    prod = alpha_bin[i]; 
 	    for (j=0;j<*p;j++)
 	      if ((1<<j) & i)
-		prod *= 1.0 - 2.0 * ((1<<j) & k == (1<<j));
+		prod *= 1.0 - 2.0 * (((1<<j) & k) == (1<<j));
 	    val += prod;
 	  }
       if (val < 0)
@@ -77,7 +76,7 @@ double B(double *u, int p, int S, double *alpha)
   double prod, b = 1.0;
 
   for (i=1;i<(1<<p);i++)
-    if (card(i) > 1 && (S & i) == i) 
+    if (card(i) > 1 && ((S & i) == i)) 
       {
 	prod = alpha[i];
 	for (j=0;j<p;j++)

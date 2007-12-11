@@ -47,7 +47,7 @@ fitCopula <- function(data, copula, start,
   control <- c(optim.control, fnscale=-1)
   p <- length(copula@parameters)
   eps <- .Machine$double.eps ^ 0.5
-  if (is.null(lower)) lower <- ifelse(method == "L-BFGS-B", copula@param.upbnd + eps, -Inf)
+  if (is.null(lower)) lower <- ifelse(method == "L-BFGS-B", copula@param.lowbnd + eps, -Inf)
   if (is.null(upper)) upper <- ifelse(method == "L-BFGS-B", copula@param.upbnd - eps, Inf)
 ##  if (p >= 2) {
   if (TRUE) {

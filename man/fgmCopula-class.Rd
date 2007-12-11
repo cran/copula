@@ -37,7 +37,7 @@
   Nelsen (1999), \emph{An introduction to Copulas}, Springer, New York.
 }
 
-\author{Ivan Kojadinovic <ivan.kojadinovic@univ-nantes.fr> }
+\author{Ivan Kojadinovic, \email{ivan@stat.auckland.ac.nz}}
 
 \note{
   The verification of the validity of the parameter values is of high
