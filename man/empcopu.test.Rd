@@ -1,6 +1,6 @@
-\name{empcop.test}
-\alias{empcop.test}
-\alias{empcop.simulate}
+\name{empcopu.test}
+\alias{empcopu.test}
+\alias{empcopu.simulate}
 \alias{dependogram}
 
 \title{Independence test among continuous random variables based
@@ -21,8 +21,8 @@
 }
 
 \usage{
-empcop.simulate(n, p, m, N = 2000)
-empcop.test(x, d, m=ncol(x), alpha = 0.05)
+empcopu.simulate(n, p, m = p, N = 1000)
+empcopu.test(x, d, alpha=0.05)
 dependogram(test, pvalues = FALSE)
 }
 
@@ -37,12 +37,12 @@ dependogram(test, pvalues = FALSE)
   \item{N}{Number of repetitions when simulating under independence.}
   \item{x}{Data frame or data matrix containing realizations (one per
     line) of the random vector whose independence is to be tested.}
-  \item{d}{Object of class \code{ empcop.distribution} as returned by
-  the function \code{empcop.simulate}. It can be regarded as the empirical distribution
+  \item{d}{Object of class \code{empcopu.distribution} as returned by
+  the function \code{empcopu.simulate}. It can be regarded as the empirical distribution
   of the test statistics under independence.}
   \item{alpha}{Significance level used in the computation of the critical values for
     the test statistics.}
-  \item{test}{Object of class \code{empcop.test} as return by the function \code{empcop.test}.}
+  \item{test}{Object of class \code{empcop.test} as return by the function \code{empcopu.test}.}
   \item{pvalues}{Logical indicating whether the dependogram should be
     drew from test statistics or the corresponding p-values.}
 }
@@ -50,8 +50,8 @@ dependogram(test, pvalues = FALSE)
   one.
 }
 
-\value{The function \code{empcop.simulate} returns an object of class
-  \code{empcop.distribution} whose attributes are: \code{sample.size},
+\value{The function \code{empcopu.simulate} returns an object of class
+  \code{empcopu.distribution} whose attributes are: \code{sample.size},
   \code{data.dimension}, \code{max.card.subsets},
   \code{number.repetitons}, \code{subsets} (list of the subsets for
   which test statistics have been computed), \code{subsets.binary}
@@ -61,7 +61,7 @@ dependogram(test, pvalues = FALSE)
   the values of the global Cramér-von Mises test statistic for each repetition
   - see last reference p 175).
 
-  The function \code{empcop.test} returns an object of class
+  The function \code{empcopu.test} returns an object of class
   \code{empcop.test} whose attributes are: \code{subsets},
   \code{statistics}, \code{critical.values}, \code{pvalues},
   \code{fisher.pvalue} (a p-value resulting from a combination \emph{à la}
@@ -98,7 +98,7 @@ dependogram(test, pvalues = FALSE)
 
 \author{Ivan Kojadinovic, \email{ivan@stat.auckland.ac.nz}}
 
-\seealso{\code{\link{empcop.rv.test}}}
+\seealso{\code{\link{empcops.test}},\code{\link{empcopm.test}},\code{\link{empcopsm.test}}}
 
 \examples{
 ## Consider the following example taken from
@@ -108,20 +108,18 @@ x <- matrix(rnorm(500),100,5)
 x[,1] <- abs(x[,1]) * sign(x[,2] * x[,3])
 x[,5] <- x[,4]/2 + sqrt(3) * x[,5]/2
 
-
-\dontrun{
 ## In order to test for independence "within" x, the first step consists
 ## in simulating the distribution of the test statistics under
 ## independence for the same sample size and dimension,
 ## i.e. n=100 and p=5. As we are going to consider all the subsets of
-## {1,...,5} whose cardinality is between 2 and 5, we set m=5.
+## {1,...,5} whose cardinality is between 2 and 5, we set p=m=5.
 ## This may take a while...
 
-d <- empcop.simulate(100,5,5)
+d <- empcopu.simulate(100,5)
 
 ## The next step consists in performing the test itself:
 
-test <- empcop.test(x,d,5)
+test <- empcopu.test(x,d)
 
 ## Let us see the results:
 
@@ -133,19 +131,13 @@ dependogram(test)
 
 ## We could have tested for a weaker form of independence, for instance,
 ## by only computing statistics for subsets whose cardinality is between 2
-## and 3:
-
-test <- empcop.test(x,d,3)
-test
-dependogram(test)
-
-## Consider now the following data:
+## and 3. Consider for instance the following data:
 y <- matrix(runif(500),100,5)
 ## and perform the test:
-test <- empcop.test(y,d,3)
+d <- empcopu.simulate(100,5,3)
+test <- empcopu.test(y,d)
 test
 dependogram(test)
-}
 
 ## NB: In order to save d for future use, the save function can be used.
 }

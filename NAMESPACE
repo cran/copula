@@ -39,6 +39,10 @@ exportClasses(summaryFitCopula, summaryFitMvdc)
 
 exportMethods(show, summary)
 
-export(empcop.simulate,empcop.test,dependogram,empcop.rv.test) #independence test
+## independence tests
+export(empcopu.simulate, empcopu.test, empcopm.test,
+       empcops.simulate, empcops.test, empcopsm.test,
+##       empcopsm.test.jy, ## for testing purpose now
+       dependogram) 
 
 

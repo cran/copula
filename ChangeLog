@@ -1,6 +1,41 @@
+2008-01-22  Ivan Kojadinovic  <ivan@stat.auckland.ac.nz>
+
+	* The structure of the empcop*.test has been changed.
+	All the statistics are computed using the same code.
+	The only difference comes from the array J which changes 
+	according to whether * in {u,m,s,sm}. The computation 
+	is much faster.
+
+2009-01-14  Jun Yan <jyan@stat.uconn.edu>
+
+	* Restructured empcopsm for better performance. 
+	Arrays W, K, and L are stored for reference in each permutation.
+	The computation is about 3 times faster.
+	
+	* Fixed a bug in random permutation:
+	(i + 1) * runif() instead of i * runif().
+	The bug is seen for the case n = 2, where no permutation 
+	would happen.
+	
+	* When compute p-values of Tippett, use obs <= sim as oppose to 
+	obs < sim because this statistic is discrete.
+	
+2008-01-02  Ivan Kojadinovic  <ivan@stat.auckland.ac.nz>
+
+	* The tests of independence based on the empirical copula 
+	have been renamed to empcopu.test (univariate) and 
+	empcopm.test (multivariate).
+
+	* Some computations have been improved.
+
+	* Serial analogs of these tests have been implemented. They 
+	are called empcops.test and empcopsm.test and can be used to 
+	test serial independence in univariate and multivariate 
+	continuous time series.
+
 2007-12-11  Jun Yan <jyan@stat.uconn.edu>
 
-	* Fixed a bug in fitCopula (thank Rodrigo Dupleich
+	* Fixed a bug in fitCopula (thanks to Rodrigo Dupleich
 	<rodrigo.dupleich@citi.com> for reporting).	
 
 2007-12-07  Ivan Kojadinovic  <ivan@stat.auckland.ac.nz>
@@ -14,7 +49,7 @@
 
 2007-10-16  Jun Yan  <jyan@stat.uconn.edu>
 
-	* Added \encoding{latin1} in emp.test.Rd.
+	* Added \encoding{latin1} in empcop.test.Rd.
 
 	* Fixed warnings and notes issued by R (2.6.0) CMD check.
 

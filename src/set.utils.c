@@ -1,23 +1,24 @@
-/*#################################################################
-##   Copula R package by Jun Yan and Ivan Kojadinovic Copyright (C) 2007
+/*#################################################################################
 ##
-##   Copyright (C) 2007 Ivan Kojadinovic <ivan@stat.auckland.ac.nz>
+##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008
 ##
-##   This program is free software; you can redistribute it and/or modify
+##   This file is part of the R package copula.
+##
+##   The R package copula is free software: you can redistribute it and/or modify
 ##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation; either version 2 of the License, or
+##   the Free Software Foundation, either version 3 of the License, or
 ##   (at your option) any later version.
 ##
-##   This program is distributed in the hope that it will be useful,
+##   The R package copula is distributed in the hope that it will be useful,
 ##   but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##   GNU General Public License for more details.
 ##
-##   You should have received a copy of the GNU General Public License along
-##   with this program; if not, write to the Free Software Foundation, Inc.,
-##   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+##   You should have received a copy of the GNU General Public License
+##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
 ##
-#################################################################*/
+#################################################################################*/
+
 
 /*****************************************************************************
 
@@ -129,29 +130,33 @@ void binary2subset(int n, int b, int *x)
 
 *****************************************************************************/
 
-void k_power_set_char(int *n, int *k, int *k_power_set, char **subset) 
+#define SET_MAX 4
+
+void k_power_set_char(int *n, int *sb, int *k_power_set, char **subset) 
 {
   int i, j;
   int x[32];
   char string[255];
   
   sprintf(subset[0],"{}");
-
-  for(i=1; i<sum_binom(*n, *k); i++) {
-
+  
+  for(i=1; i<*sb; i++) {
+    
     for(j=0; j<*n; j++)
       x[j]=0;
 
     binary2subset(*n,k_power_set[i],x);
-      
+
+    subset[i] = (char *) R_alloc(SET_MAX * (*n), sizeof(char));
+    
     sprintf(subset[i],"{%d",x[0]+1);
-
+    
     for(j=1; j<card(k_power_set[i]); j++) {
-
+      
       sprintf(string,",%d", x[j]+1);
       strcat(subset[i],string);
     }
-
+    
     strcat(subset[i],"}");
   }
 }

@@ -1,23 +1,24 @@
-/*#################################################################
-##   Copula R package by Jun Yan and Ivan Kojadinovic Copyright (C) 2007
+/*#################################################################################
 ##
-##   Copyright (C) 2007 Ivan Kojadinovic <ivan@stat.auckland.ac.nz>
+##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008
 ##
-##   This program is free software; you can redistribute it and/or modify
+##   This file is part of the R package copula.
+##
+##   The R package copula is free software: you can redistribute it and/or modify
 ##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation; either version 2 of the License, or
+##   the Free Software Foundation, either version 3 of the License, or
 ##   (at your option) any later version.
 ##
-##   This program is distributed in the hope that it will be useful,
+##   The R package copula is distributed in the hope that it will be useful,
 ##   but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##   GNU General Public License for more details.
 ##
-##   You should have received a copy of the GNU General Public License along
-##   with this program; if not, write to the Free Software Foundation, Inc.,
-##   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+##   You should have received a copy of the GNU General Public License
+##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
 ##
-#################################################################*/
+#################################################################################*/
+
 
 #include <R.h>
 #include <Rmath.h>
@@ -34,8 +35,8 @@ void validity_fgm(int *p, double *alpha, int *valid)
 {
   int i, j, k;
   double prod, val;
-  double *alpha_bin = (double *)R_alloc(1<<*p, sizeof(double));
-  int *subset = (int *)R_alloc(1<<*p, sizeof(int));
+  double *alpha_bin = Calloc(1<<*p, double);
+  int *subset = Calloc(1<<*p, int);
   
   k_power_set(p, p, subset);
   natural2binary(p, alpha, subset, alpha_bin);
@@ -60,6 +61,9 @@ void validity_fgm(int *p, double *alpha, int *valid)
 	}
     }
   *valid = 1;
+
+  Free(alpha_bin);
+  Free(subset);
 }
 
 /*****************************************************************************
@@ -129,8 +133,8 @@ void rfgm(int *p, double *alpha, int *n, double *x)
 {
   int i,j, S;
   double a,b;
-  double *alpha_bin = (double *)R_alloc(1<<*p, sizeof(double));
-  int *subset = (int *)R_alloc(1<<*p, sizeof(int));
+  double *alpha_bin = Calloc(1<<*p, double);
+  int *subset = Calloc(1<<*p, int);
 
   k_power_set(p, p, subset);
   natural2binary(p, alpha, subset, alpha_bin);
@@ -154,6 +158,9 @@ void rfgm(int *p, double *alpha, int *n, double *x)
     }
   
   PutRNGstate();
+
+  Free(alpha_bin);
+  Free(subset);
 }
 
 

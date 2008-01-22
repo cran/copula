@@ -1,23 +1,23 @@
-#################################################################
-##   Copula R package by Jun Yan and Ivan Kojadinovic Copyright (C) 2007
+#################################################################################
 ##
-##   Copyright (C) 2007 Ivan Kojadinovic <ivan@stat.auckland.ac.nz>
+##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008
 ##
-##   This program is free software; you can redistribute it and/or modify
+##   This file is part of the R package copula.
+##
+##   The R package copula is free software: you can redistribute it and/or modify
 ##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation; either version 2 of the License, or
+##   the Free Software Foundation, either version 3 of the License, or
 ##   (at your option) any later version.
 ##
-##   This program is distributed in the hope that it will be useful,
+##   The R package copula is distributed in the hope that it will be useful,
 ##   but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##   GNU General Public License for more details.
 ##
-##   You should have received a copy of the GNU General Public License along
-##   with this program; if not, write to the Free Software Foundation, Inc.,
-##   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+##   You should have received a copy of the GNU General Public License
+##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
 ##
-##############################################################################
+#################################################################################
 
 ## Farlie-Gumbel-Morgenstern multivariate copula
 
@@ -63,7 +63,7 @@ fgmCopula <- function(param, dim = 2) {
     ## power set in character vector: {}, {1}, {2}, ..., {1,2}, ..., {1,...,dim}
     subsets.char <-  .C("k_power_set_char", 
                         as.integer(dim),
-                        as.integer(dim),
+                        as.integer(2^dim),
                         as.integer(subsets),
                         sc = character(2^dim),
                         PACKAGE="copula")$sc

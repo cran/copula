@@ -1,6 +1,6 @@
-#################################################################################
+/*#################################################################################
 ##
-##   R package Copula by Jun Yan Copyright (C) 2008
+##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008
 ##
 ##   This file is part of the R package copula.
 ##
@@ -17,5 +17,19 @@
 ##   You should have received a copy of the GNU General Public License
 ##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
 ##
-#################################################################################
+#################################################################################*/
 
+
+/*****************************************************************************
+
+  Multivariate serial independence test based on the empirical 
+  copula process 
+
+  Ivan Kojadinovic, December 2007
+
+*****************************************************************************/
+
+void K_array(int n, int p, double *J, double *K);
+void L_array(int n, int p, double *K, double *L);
+double I_n(int n, int p, double *J, double *K, double *L);
+double M_A_n(int n, int p, double *J, double *K, double *L, int A);

@@ -1,5 +1,5 @@
-\name{empcop.rv.test}
-\alias{empcop.rv.test}
+\name{empcopm.test}
+\alias{empcopm.test}
 
 \title{Independence test among continuous random vectors
   based on the empirical copula process}
@@ -7,14 +7,14 @@
 \description{
   Analog of the independence test based on the empirical 
   copula process proposed by Christian Genest and Bruno 
-  Rémillard (see \code{\link{empcop.test}}) for \emph{random vectors}.
+  Rémillard (see \code{\link{empcopu.test}}) for \emph{random vectors}.
   The main difference comes from the fact that critical values and
-  p-values are obtainted through the bootstrap methodology, since, here,
+  p-values are obtainted through the bootstrap/permutation methodology, since, here,
   test statistics are not distribution-free.
 }
 
 \usage{
-empcop.rv.test(x, d, m=length(d), N=1000, alpha=0.05)
+empcopm.test(x, d, m=length(d), N=1000, alpha=0.05)
 }
 
 \arguments{
@@ -25,7 +25,7 @@ empcop.rv.test(x, d, m=length(d), N=1000, alpha=0.05)
   \item{m}{Maximum cardinality of the subsets of random vectors for
     which a test statistic is to be computed. It makes sense to consider
     \code{m << p} especially when \code{p} is large.}
-  \item{N}{Number of bootstrap samples.}
+  \item{N}{Number of bootstrap/permutation samples.}
   \item{alpha}{Significance level used in the computation of the critical values for
     the test statistics.}
 }
@@ -34,7 +34,7 @@ empcop.rv.test(x, d, m=length(d), N=1000, alpha=0.05)
 }
 
 \value{
-  The function \code{empcop.rv.test} returns an object of class
+  The function \code{empcopm.test} returns an object of class
   \code{empcop.test} whose attributes are: \code{subsets},
   \code{statistics}, \code{critical.values}, \code{pvalues},
   \code{fisher.pvalue} (a p-value resulting from a combination \emph{à la}
@@ -66,17 +66,16 @@ empcop.rv.test(x, d, m=length(d), N=1000, alpha=0.05)
     local efficiency of Cramér-von Mises tests for multivariate
     independence}, The Annals of Statistics 35, 166-191.
   
-  I. Kojadinovic and M. Holmes (2007), \emph{Tests of independence among
+  I. Kojadinovic and M. Holmes (2008), \emph{Tests of independence among
     continuous random vectors based on Cramér-von Mises functionals
     of the empirical copula process}, submitted. 
 }
 
 \author{Ivan Kojadinovic, \email{ivan@stat.auckland.ac.nz}}
 
-\seealso{\code{\link{empcop.test}}}
+\seealso{\code{\link{empcopu.test}},\code{\link{empcops.test}},\code{\link{empcopsm.test}},\code{\link{dependogram}}}
 
 \examples{
-\dontrun{
 ## Consider the following example taken from
 ## Kojadinovic and Holmes (2007):
 
@@ -101,12 +100,11 @@ x[,9] <- x[,9] + x[,12]
 d <- c(2,2,2,3,3)
 
 ## Run the test
-test <- empcop.rv.test(x,d,N=2000)
+test <- empcopm.test(x,d)
 test
 
 ## Display the dependogram
 dependogram(test)
-}
 }
 
 \encoding{latin1}
