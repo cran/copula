@@ -21,6 +21,11 @@
 
 
 
+mvdc <- function(copula, margins, paramMargins) {
+  val <- new("mvdc", copula = copula, margins = margins, paramMargins = paramMargins)
+}
+
+
 ## Functions asCall and P0 were kindly supplied by 
 ## Martin Maechler <maechler@stat.math.ethz.ch>,
 ## motivated by an application of nor1mix and copula

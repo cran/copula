@@ -75,3 +75,69 @@ setMethod("contour", signature("copula"), contourCopula)
 
 setMethod("persp", signature("mvdc"), perspMvdc)
 setMethod("contour", signature("mvdc"), contourMvdc)
+
+
+####################################################################
+#### Graphical tools for detecting dependence
+#### Genest and Farve (2007, Journal of Hydrologic Engineering)
+####################################################################
+ChiPlot <- function(x, plot=TRUE, pval = 0.95, ...) {
+#### originally proposed by Fisher and Switzer (1985 Biometrika, 2001 Am. Stat.)
+  ## x is a n by 2 matrix
+  if (!is.matrix(x)) x <- as.matrix(x)
+  n <- nrow(x)
+  hfg <- sapply(1:n,
+                function(i) {
+                  H <- (sum(x[,1] <= x[i,1] & x[,2] <= x[i,2]) - 1) / (n - 1)
+                  F <- (sum(x[,1] <= x[i,1]) - 1) / (n - 1)
+                  G <- (sum(x[,2] <= x[i,2]) - 1) / (n - 1)
+                  c(H, F, G)
+                })
+  H <- hfg[1,]
+  F <- hfg[2,]
+  G <- hfg[3,]
+  chi <-(H - F * G) / sqrt(F * (1 - F) * G * (1 - G))
+  lambda <- 4 * sign( (F - 0.5) * (G - 0.5) ) * pmax( (F - 0.5)^2, (G - 0.5)^2 )
+  cp <- c(1.54, 1.78, 2.18)
+  idx <- pmatch(pval, c(0.9, 0.95, 0.99))
+  if (is.na(idx)) stop("pval must be one of 0.9, 0.95, 0.99.")
+  cp <- cp[idx]
+  ymax <- max(abs(na.omit(chi)), cp / sqrt(n))
+  if (plot) {
+    plot(lambda, chi, xlim=c(-1, 1), ylim=c(-ymax, ymax), ...)
+    abline(0, 0, lty = 3, col="gray")
+    abline(cp / sqrt(n), 0, lty = 3, col="blue")
+    abline(- cp / sqrt(n), 0, lty = 3, col="blue")
+    lines(c(0, 0), c(-2, 2), lty = 3, col="gray")
+  }
+  invisible(cbind(H, F, G, chi, lambda))
+}
+
+KPlot <- function(x, plot=TRUE, ...) {
+#### Genest and Boies (2003, American Statistician)
+  if (!is.matrix(x)) x <- as.matrix(x)
+  n <- nrow(x)
+  H <- sapply(1:n,
+              function(i) (sum(x[,1] <= x[i,1] & x[,2] <= x[i,2]) - 1) / (n - 1))
+  H <- sort(H)
+  K0 <- function(x) x - x * log(x)
+  k0 <- function(x) - log(x)
+  integrand <- function(w, i) w * k0(w) * K0(w)^(i - 1) * (1 - K0(w))^(n - i)
+  W <- sapply(1:n,
+              function(i) integrate(integrand, 0, 1, i = i,
+                                    rel.tol=.Machine$double.eps^0.25)$value)
+  W <- n * choose(n - 1, 1:n - 1) * W
+  
+  if (plot) {
+    plot(W, H, xlim=c(0, 1), ylim=c(0, 1))
+    curve(K0(x), add=TRUE, col="blue")
+    abline(0, 1, col="gray")
+  }
+  invisible(cbind(H, W))
+}
+
+## x <- c(-2.224, -1.538, -0.807, 0.024, 0.052, 1.324)
+## y <- c(0.431, 1.035, 0.586, 1.465, 1.115, -0.847)
+## ChiPlot(cbind(x, y))
+## KPlot(cbind(x, y))
+

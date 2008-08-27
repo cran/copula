@@ -1,0 +1,176 @@
+
+R version 2.7.1 (2008-06-23)
+Copyright (C) 2008 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> source("../../R/Classes.R")
+Creating a new generic function for "kendallsTau" in ".GlobalEnv"
+Creating a new generic function for "spearmansRho" in ".GlobalEnv"
+Creating a new generic function for "tailIndex" in ".GlobalEnv"
+Creating a new generic function for "calibKendallsTau" in ".GlobalEnv"
+Creating a new generic function for "calibSpearmansRho" in ".GlobalEnv"
+> source("../../R/claytonCopula.R")
+Creating a new generic function for "rcopula" in ".GlobalEnv"
+Creating a new generic function for "pcopula" in ".GlobalEnv"
+Creating a new generic function for "dcopula" in ".GlobalEnv"
+Creating a new generic function for "genFun" in ".GlobalEnv"
+Creating a new generic function for "genInv" in ".GlobalEnv"
+Creating a new generic function for "genFunDer1" in ".GlobalEnv"
+Creating a new generic function for "genFunDer2" in ".GlobalEnv"
+Creating a new generic function for "derCdfWrtArg" in ".GlobalEnv"
+Creating a new generic function for "derCdfWrtPar" in ".GlobalEnv"
+Creating a new generic function for "derPdfWrtArg" in ".GlobalEnv"
+Creating a new generic function for "derPdfWrtPar" in ".GlobalEnv"
+> source("../../R/claytonExpr.R")
+> source("../../R/gumbelCopula.R")
+Creating a new generic function for "Afun" in ".GlobalEnv"
+> source("../../R/gumbelExpr.R")
+> source("../../R/frankCopula.R")
+> source("../../R/frankExpr.R")
+> 
+> source("../../R/tests.gof.R")
+Creating a new generic function for "derCdfWrtArgs" in ".GlobalEnv"
+Creating a new generic function for "derCdfWrtParams" in ".GlobalEnv"
+Creating a new generic function for "derPdfWrtArgs" in ".GlobalEnv"
+Creating a new generic function for "derPdfWrtParams" in ".GlobalEnv"
+Creating a new generic function for "dcopwrap" in ".GlobalEnv"
+Warning messages:
+1: In matchSignature(signature, fdef, where) :
+  in the method signature for function "derCdfWrtArgs" no definition for class: “normalCopula”
+2: In matchSignature(signature, fdef, where) :
+  in the method signature for function "derCdfWrtArgs" no definition for class: “tCopula”
+3: In matchSignature(signature, fdef, where) :
+  in the method signature for function "derCdfWrtParams" no definition for class: “tCopula”
+4: In matchSignature(signature, fdef, where) :
+  in the method signature for function "derPdfWrtArgs" no definition for class: “normalCopula”
+5: In matchSignature(signature, fdef, where) :
+  in the method signature for function "derPdfWrtParams" no definition for class: “normalCopula”
+> 
+> #### clayton
+> cop <- claytonCopula(2, dim=5)
+> u <- rcopula(cop, 10)
+> ## Ivan
+> derCdfWrtParams(cop, u)
+            [,1]
+ [1,] 0.05675413
+ [2,] 0.04023070
+ [3,] 0.05853537
+ [4,] 0.05519788
+ [5,] 0.05425491
+ [6,] 0.01972488
+ [7,] 0.05078590
+ [8,] 0.06591232
+ [9,] 0.03541923
+[10,] 0.05583082
+> ## Jun
+> derCdfWrtPar(cop, u)
+            [,1]
+ [1,] 0.05675413
+ [2,] 0.04023070
+ [3,] 0.05853537
+ [4,] 0.05519788
+ [5,] 0.05425491
+ [6,] 0.01972488
+ [7,] 0.05078590
+ [8,] 0.06591232
+ [9,] 0.03541923
+[10,] 0.05583082
+> ## Ivan
+> derCdfWrtArgs(cop, u)
+            [,1]        [,2]        [,3]       [,4]        [,5]
+ [1,] 0.22574778 0.032207598 0.197834738 0.19828647 0.049570490
+ [2,] 0.10761827 0.209701977 0.114109288 0.10823359 0.005356132
+ [3,] 0.12633125 0.154949765 0.135475640 0.04465494 0.123483410
+ [4,] 0.27796275 0.108147955 0.073122837 0.02368003 0.189115148
+ [5,] 0.12070933 0.257575739 0.056293623 0.03196453 0.297696982
+ [6,] 0.01862644 0.003796901 0.025098438 0.07789755 0.543957497
+ [7,] 0.26915220 0.223860818 0.121168406 0.23652220 0.386350768
+ [8,] 0.20262865 0.130138958 0.145943311 0.08968973 0.201427380
+ [9,] 0.33543512 0.082054325 0.005436188 0.02069704 0.162672016
+[10,] 0.10180629 0.029993082 0.270256913 0.08831432 0.140974210
+> ## Jun
+> derCdfWrtArg(cop, u)
+            [,1]        [,2]        [,3]       [,4]        [,5]
+ [1,] 0.22574778 0.032207598 0.197834738 0.19828647 0.049570490
+ [2,] 0.10761827 0.209701977 0.114109288 0.10823359 0.005356132
+ [3,] 0.12633125 0.154949765 0.135475640 0.04465494 0.123483410
+ [4,] 0.27796275 0.108147955 0.073122837 0.02368003 0.189115148
+ [5,] 0.12070933 0.257575739 0.056293623 0.03196453 0.297696982
+ [6,] 0.01862644 0.003796901 0.025098438 0.07789755 0.543957497
+ [7,] 0.26915220 0.223860818 0.121168406 0.23652220 0.386350768
+ [8,] 0.20262865 0.130138958 0.145943311 0.08968973 0.201427380
+ [9,] 0.33543512 0.082054325 0.005436188 0.02069704 0.162672016
+[10,] 0.10180629 0.029993082 0.270256913 0.08831432 0.140974210
+> ## Ivan
+> derPdfWrtParams(cop, u)
+             [,1]
+ [1,]  0.56496177
+ [2,]  1.85557386
+ [3,]  6.62955828
+ [4,]  0.63142830
+ [5,] -0.04673231
+ [6,] -1.77013552
+ [7,]  3.61836195
+ [8,]  3.78818934
+ [9,] -0.52742450
+[10,]  1.95493071
+> ## Jun
+> derPdfWrtPar(cop, u)
+             [,1]
+ [1,]  0.56496177
+ [2,]  1.85557386
+ [3,]  6.62955828
+ [4,]  0.63142830
+ [5,] -0.04673231
+ [6,] -1.77013552
+ [7,]  3.61836195
+ [8,]  3.78818934
+ [9,] -0.52742450
+[10,]  1.95493071
+> ## Ivan
+> derPdfWrtArgs(cop, u)
+           [,1]       [,2]      [,3]       [,4]        [,5]
+ [1,]  6.389937  -5.841662  4.166802   4.202224  -5.4187586
+ [2,] -7.836537  16.898931 -6.442120  -7.705890 -15.0165349
+ [3,] -3.832635   3.085524 -1.675097 -18.991426  -4.4930086
+ [4,] 11.636642  -2.536218 -4.763271  -6.359514   3.7911072
+ [5,] -1.135749   6.781814 -3.891579  -4.404660   9.3269152
+ [6,] -9.306002  -6.719286 -9.493964  -6.689479  55.7179753
+ [7,] 23.895559  14.959733 -3.540092  17.423734  48.1982951
+ [8,]  8.435715  -1.603690  0.467810  -6.437893   8.2599910
+ [9,] 15.413113  -3.850395 -4.490442  -5.722386   1.4567388
+[10,] -4.773933 -10.232517 17.557115  -6.194105  -0.1807478
+> ## Jun
+> derPdfWrtArg(cop, u)
+           [,1]       [,2]      [,3]       [,4]        [,5]
+ [1,]  6.389937  -5.841662  4.166802   4.202224  -5.4187586
+ [2,] -7.836537  16.898931 -6.442120  -7.705890 -15.0165349
+ [3,] -3.832635   3.085524 -1.675097 -18.991426  -4.4930086
+ [4,] 11.636642  -2.536218 -4.763271  -6.359514   3.7911072
+ [5,] -1.135749   6.781814 -3.891579  -4.404660   9.3269152
+ [6,] -9.306002  -6.719286 -9.493964  -6.689479  55.7179753
+ [7,] 23.895559  14.959733 -3.540092  17.423734  48.1982951
+ [8,]  8.435715  -1.603690  0.467810  -6.437893   8.2599910
+ [9,] 15.413113  -3.850395 -4.490442  -5.722386   1.4567388
+[10,] -4.773933 -10.232517 17.557115  -6.194105  -0.1807478
+> 
+> #### gumbel
+> cop <- gumbelCopula(2, dim=5)
+> u <- rcopula(cop, 10)
+Error in rcopula(cop, 10) : could not find function "rPosStable"
+Calls: rcopula -> rcopula
+Execution halted

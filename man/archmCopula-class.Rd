@@ -6,22 +6,29 @@
 \alias{gumbelCopula-class}
 \alias{amhCopula-class}
 \title{Class "archmCopula" }
-\description{ Archimedean copula }
+\description{Archimedean copula class.}
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("archmCopula",
-    ...)} or by function 'archmCopula'.
+    ...)} or by function \code{"archmCopula"}. Implemented families are
+  Clayton, Gumbel, Frank, and Ali-Mikhail-Haq.
 }
 \section{Slots}{
   \describe{
-    \item{\code{exprdist}:}{Object of class \code{"expression"},
-      expressions for the cdf and pdf of the copula. These expressions
+    \item{\code{exprdist}:}{Object of class \code{"expression"}:
+      expressions of the cdf and pdf of the copula. These expressions
       are used in function 'pcopula' and 'dcopula'. }
-    \item{\code{dimension}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{parameters}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{param.names}:}{Object of class \code{"character"} ~~ }
-    \item{\code{param.lowbnd}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{param.upbnd}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{message}:}{Object of class \code{"character"} ~~ }
+    \item{\code{dimension}:}{Object of class \code{"numeric"}, dimension
+    of the copula. }
+    \item{\code{parameters}:}{Object of class \code{"numeric"},
+      parameter values. }
+    \item{\code{param.names}:}{Object of class \code{"character"},
+      parameter names. }
+    \item{\code{param.lowbnd}:}{Object of class \code{"numeric"},
+      parameter lower bounds. }
+    \item{\code{param.upbnd}:}{Object of class \code{"numeric"},
+      parameter upper bounds. }
+    \item{\code{message}:}{Object of class \code{"character"}, family names
+      of the copula. }
   }
 }
 \section{Methods}{
@@ -46,11 +53,7 @@
   \code{"gumbelCopula"} and \code{"amhCopula"} extends class
   \code{"archmCopula"} directly.
 }
-\author{ Jun Yan <jyan@stat.uconn.edu> }
 \note{
-  The expressions of pdf are obtained by differentiating the cdf
-  expression using function 'D'.
-
   \code{"gumbelCopula"} is also of class \code{"evCopula"}.
 }
 \seealso{

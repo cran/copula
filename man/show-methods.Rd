@@ -6,20 +6,20 @@
 \alias{show,copula-method}
 \alias{show,fitCopula-method}
 \alias{show,fitMvdc-method}
-\title{  Methods for Function show in Package `copula' }
+\title{  Methods for function `show' in package `copula' }
 \description{
   Methods for function \code{show} in package \pkg{copula}.
 }
 \section{Methods}{
   \describe{
-    \item{object = "copula"}{ ~~describe this method here }
+    \item{object = "copula"}{see \code{\link{Copula}}. }
     
-    \item{object = "fitCopula"}{ ~~describe this method here }
+    \item{object = "fitCopula"}{see \code{\link{fitCopula}}. }
     
-    \item{object = "fitMvdc"}{ ~~describe this method here }
+    \item{object = "fitMvdc"}{see \code{\link{fitCopula}}. }
 }}
-\examples{
+%\examples{
 
-}
+%}
 \keyword{methods}
 \keyword{print}

@@ -1,0 +1,90 @@
+
+R version 2.6.2 (2008-02-08)
+Copyright (C) 2008 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ########################################################################
+> ## This script generates a spline approximation to map back and forth
+> ## between a copula parameter and Kendall's tau for those copulas
+> ## for which a closed form Kendall's tau formula does not exist.
+> ########################################################################
+> 
+> library(copula)
+Loading required package: mvtnorm
+Loading required package: scatterplot3d
+Loading required package: sn
+Loading required package: mnormt
+Loading required package: adapt
+> source("genRcode.R")
+> 
+> ## Taken from ../../../R/Classes.R
+> ## numerical integration for Spearmans's rho
+> spearmansRhoCopula <- function(copula, eps = NULL, ...) {
++   integrand <- function(u) pcopula(copula, u)
++   if (is.null(eps)) .eps <- .Machine$double.eps^0.9
++   else .eps <- eps
++   lower <- c(.eps, .eps)
++   upper <- c(1 - .eps, 1 - .eps)
++   integ <- adapt(ndim=2, lower=lower, upper=upper, functn=integrand, ...)$value
++   12 * integ - 3
++ }
+> 
+> ## The derivative of Rho wrt alpha
+> spearmansRhoDerCopula <- function(copula, eps = NULL, ...) {
++   pcopula.der <- function(u) {
++     eval(D(copula@exprdist$cdf, "alpha"),
++          list(u1 = u[1], u2 = u[2], alpha = copula@parameters))
++   }
++     
++   integrand <- function(u) {
++     pcopula.der(u)
++   }
++   if (is.null(eps)) .eps <- .Machine$double.eps^0.9
++   else .eps <- eps
++   lower <- c(.eps, .eps)
++   upper <- c(1 - .eps, 1 - .eps)
++   integ <- adapt(ndim=2, lower=lower, upper=upper, functn=integrand, ...)$value
++   12 * integ 
++ }
+> 
+> ## BIG QUESTION: What is the best way to construct the grid?
+> 
+> ## clayton copula
+> theta.neg <- c(seq(-.20, -.001, by=.001))
+> theta.pos <- c(seq(.001, 1, by=.001), seq(1.01, 15, by=.01))
+> 
+> rho.neg <- sapply(theta.neg, function(x) spearmansRho(claytonCopula(x)))
+> rho.pos <- sapply(theta.pos, function(x) spearmansRho(claytonCopula(x)))
+> 
+> rhoDer.neg <- sapply(theta.neg, function(x) spearmansRhoDerCopula(claytonCopula(x)))
+> rhoDer.pos <- sapply(theta.pos, function(x) spearmansRhoDerCopula(claytonCopula(x)))
+> 
+> x <- c(theta.neg, 0, theta.pos)
+> y <- c(rho.neg, 0, rho.pos)
+> xp <- c(theta.neg, theta.pos)
+> z <- c(rhoDer.neg, rhoDer.pos)
+> 
+> write.table(cbind(x=x, y=y), row.names=FALSE, file="clayton.rho.xy")
+> write.table(cbind(x=xp, y=z), row.names=FALSE, file="clayton.rhoDer.xy")
+> 
+> genApproxFun("clayton.rho.xy", "claytonCopula.rho.R", "spearmansRhoClaytonCopula.tr", "calibSpearmansRhoClaytonCopula.tr")
+> genApproxFun("clayton.rhoDer.xy", "claytonCopula.rhoDer.R", "spearmansRhoDerClaytonCopula.tr", NULL)
+> 
+> ## gumbel copula
+> theta <- c(seq(1.001, 5, by=.001), seq(5.01, 15, by=.01))
+> rho <- sapply(theta, function(x) spearmansRho(gumbelCopula(x)))
+> rhoDer <- sapply(theta, function(x) spearmansRhoDerCopula(gumbelCopula(x)))

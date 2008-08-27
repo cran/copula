@@ -1,3 +1,28 @@
+2008-08-29  Jun Yan <jyan@stat.uconn.edu>
+
+	* Bug fixed in the random number generation for the 
+	Clayton copula.	
+
+	* empcop*.test functions renamed to *indepTest.
+	    
+	* Documentation improved.
+
+2008-07-17  Jun Yan <jyan@stat.uconn.edu>
+
+	* Ivan has implemented and tested multiplier CLT 
+	goodness-of-fit tests (bivariate and multivariate) for 
+	certain copulas.
+
+	* Restructured R files under directory R.
+
+	* Expressions for derivatives of cdf/pdf are now stored 
+	as opposed to computed on the fly.
+
+	* Numerical approximation functions for tau and rho
+	and its derivatives for special cases are now stored 
+	in sysdata.rda under directory R.
+
+
 2008-01-22  Ivan Kojadinovic  <ivan@stat.auckland.ac.nz>
 
 	* The structure of the empcop*.test has been changed.
@@ -6,7 +31,7 @@
 	according to whether * in {u,m,s,sm}. The computation 
 	is much faster.
 
-2009-01-14  Jun Yan <jyan@stat.uconn.edu>
+2008-01-14  Jun Yan <jyan@stat.uconn.edu>
 
 	* Restructured empcopsm for better performance. 
 	Arrays W, K, and L are stored for reference in each permutation.

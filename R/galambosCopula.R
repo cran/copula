@@ -20,11 +20,6 @@
 #################################################################################
 
 
-setClass("galambosCopula",
-         representation = representation("evCopula"),
-         contains = list("copula", "evCopula")
-         )
-
 AfunGalambos <- function(copula, w) {
   alpha <- copula@parameters[1]
   1 - (w^(-alpha) + (1 - w)^(-alpha))^(-1/alpha)

@@ -38,6 +38,59 @@ loglikCopula <- function(param, x, copula) {
   loglik
 }
 
+fitCopula.repar <- function(data, copula, start,
+                            optim.control = list(NULL),
+                            method = "BFGS",
+                            reparfuns) {
+  ## reparfuns contains forward and backward transformations
+  ## can be generalized to vector function later
+  loglikCopula.repar <- function(param, x, copula) {
+    ## param is on the transformed scale
+    param <- reparfuns$backward(param)
+    loglikCopula(param, x, copula)
+  }
+  
+  if (copula@dimension != ncol(data))
+    stop("The dimention of the data and copual not match.\n")
+  if (length(copula@parameters) != length(start))
+    stop("The length of start and copula parameters not match.\n")
+
+  control <- c(optim.control, fnscale=-1)
+  notgood <- unlist(lapply(control, is.null))
+  control <- control[!notgood]
+  
+  if (!is.null(optim.control[[1]])) control <- c(control, optim.control)
+  p <- length(copula@parameters)
+
+  start <- reparfuns$forward(start) ## transform starting value to the transformed scale
+  fit <- optim(start, loglikCopula.repar,
+               method=method,
+               copula = copula, x = data,
+               control = control)
+  copula@parameters <- reparfuns$backward(fit$par)
+  loglik <- fit$val
+  convergence <- fit$convergence
+  if (fit$convergence > 0)
+    warning("possible convergence problem: optim gave code=", fit$convergence)
+
+  fit.last <- optim(copula@parameters, loglikCopula, ## not loglikCopula.repar
+                    method=method,
+                    copula = copula, x =data,
+                    control = c(control, maxit=0), hessian=TRUE)
+  var.est <- try(solve(-fit.last$hessian))
+  if (inherits(var.est, "try-error"))
+    warning("Hessian matrix not invertible")
+  ans <- new("fitCopula",
+             est = copula@parameters,
+             var.est = var.est,
+             loglik = loglik,
+             convergence = as.integer(convergence),
+             nsample = nrow(data),
+             copula = copula)
+  ans
+}
+
+
 fitCopula <- function(data, copula, start,
                       lower=NULL, upper=NULL,
                       optim.control=list(NULL),
@@ -48,6 +101,10 @@ fitCopula <- function(data, copula, start,
     stop("The length of start and copula parameters not match.\n")
 
   control <- c(optim.control, fnscale=-1)
+  notgood <- unlist(lapply(control, is.null))
+  control <- control[!notgood]
+
+  if (!is.null(optim.control[[1]])) control <- c(control, optim.control)
   p <- length(copula@parameters)
   eps <- .Machine$double.eps ^ 0.5
   if (is.null(lower)) lower <- ifelse(method == "L-BFGS-B", copula@param.lowbnd + eps, -Inf)
@@ -137,6 +194,9 @@ fitMvdc <- function(data, mvdc, start,
     stop("The length of start and mvdc parameters not match.\n")
 
   control <- c(optim.control, fnscale=-1)
+  notgood <- unlist(lapply(control, is.null))
+  control <- control[!notgood]
+
   fit <- optim(start, loglikMvdc,  method=method, mvdc=mvdc, x = data, control=control)
   if (fit$convergence > 0)
     warning("possible convergence problem: optim gave code=", fit$convergence)

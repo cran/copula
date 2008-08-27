@@ -1,0 +1,7 @@
+genRCode.R: generate R code that defines the approx functions
+
+kendallsTau.R: defines approxfun for kendallsTau and calib
+
+spearmansRho.R: defines approxfun for spearmansRho and calib
+
+getSysdataImage.R: create 'sysdata.rda'

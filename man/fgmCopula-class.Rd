@@ -3,8 +3,8 @@
 \alias{fgmCopula-class}
 
 \title{Class "fgmCopula" }
-\description{Multivariate multi-parameter Farlie-Gumbel-Morgenstern
-  copula as defined in Nelsen (1999, p 87).}
+\description{Multivariate multiparameter Farlie-Gumbel-Morgenstern
+  copula.}
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("fgmCopula",
     ...)}.
@@ -13,13 +13,19 @@
   \describe{
     \item{\code{exprdist}:}{Object of class \code{"expression"},
       expressions for the cdf and pdf of the copula. These expressions
-      are used in function 'pcopula' and 'dcopula'. }
-    \item{\code{dimension}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{parameters}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{param.names}:}{Object of class \code{"character"} ~~ }
-    \item{\code{param.lowbnd}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{param.upbnd}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{message}:}{Object of class \code{"character"} ~~ }
+      are used in function \code{"pcopula"} and \code{"dcopula"}. }
+     \item{\code{dimension}:}{Object of class \code{"numeric"}, the
+      dimension of the copula. }
+    \item{\code{parameters}:}{Object of class \code{"numeric"},
+      parameter values. }
+    \item{\code{param.names}:}{Object of class \code{"character"},
+      parameter names. }
+    \item{\code{param.lowbnd}:}{Object of class \code{"numeric"},
+      parameter lower bound. }
+    \item{\code{param.upbnd}:}{Object of class \code{"numeric"},
+      parameter upper bound. }
+    \item{\code{message}:}{Object of class \code{"character"}, family names
+      of the copula. }
   }
 }
 \section{Methods}{
@@ -34,10 +40,8 @@
 }
 
 \references{
-  Nelsen (1999), \emph{An introduction to Copulas}, Springer, New York.
+  R.B. Nelsen (2006), \emph{An introduction to Copulas}, Springer, New York.
 }
-
-\author{Ivan Kojadinovic, \email{ivan@stat.auckland.ac.nz}}
 
 \note{
   The verification of the validity of the parameter values is of high

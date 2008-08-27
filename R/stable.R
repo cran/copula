@@ -38,6 +38,7 @@ rstable <- function(n, alpha, beta, scale = 1, location = 0, iparam = 1) {
 }
 
 rPosStable <- function(n, alpha) {
+  ## reference: Chambers, Mallows, and Stuck 1976, JASA, p.341
   if (alpha >= 1) stop("alpha must be > 1")
   theta <- runif(n, 0, pi)
   w <- rexp(n)

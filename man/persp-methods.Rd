@@ -3,25 +3,29 @@
 \alias{persp-methods}
 \alias{persp,copula-method}
 \alias{persp,mvdc-method}
-\title{ Methods for Function persp in Package `copula' }
+\title{ Methods for function `persp' in Package `copula' }
 \description{
  Methods for function \code{persp} in package \pkg{copula} 
 }
 \section{Methods}{
 \describe{
-  \item{x = "copula"}{ Perspective plot for a \code{"copula"} object. }
-  \item{x = "mvdc"}{ Perspective plot for a \code{"mvdc"} object. }
+  \item{x = "copula"}{perspective plot for a \code{"copula"} object. }
+  \item{x = "mvdc"}{perspective plot for a \code{"mvdc"} object. }
 }}
 \details{
-  When x is of class \code{"copula"}, these arguments can be supplied:
-  fun: the function to be plotted, \code{"dcopula"} or \code{"pcopula"}.
-  n = 51: the number of points to do the plotting.
-  theta = -30, phi = 30, expand = 0.618: arguments for \code{"persp"}
+  When \code{x} is of class \code{"copula"}, the following arguments can be supplied:
+  \describe{
+    \item{fun}{the function to be plotted, i.e., \code{"dcopula"} or \code{"pcopula"}.}
+    \item{n (= 51)}{the number of points to do the plotting.}
+    \item{arguments for \code{"persp"}}{theta = -30, phi = 30, expand = 0.618.} 
+  }
 
-  when x is of class \code{"mvdc"}, two more arguments are expected to
-  replace the effect of n = 51:
-  xlim: the range of the x variable.
-  ylim: the range of the y variable.
+  When \code{x} is of class \code{"mvdc"}, the following arguments
+  replace the effect of \code{n = 51}:
+  \describe{
+    \item{xlim}{the range of the x variable.}
+    \item{ylim}{the range of the y variable.}
+  }
 }
 \examples{
 persp(frankCopula(-0.8), dcopula)

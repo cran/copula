@@ -1,5 +1,5 @@
 \name{generator}
-\docType{methods}
+% \docType{methods}
 \alias{genFun}
 \alias{genFun-methods}
 \alias{genFun,claytonCopula-method}
@@ -34,16 +34,31 @@
 \alias{Afun,gumbelCopula-method}
 \alias{Afun,huslerReissCopula-method}
 
-\title{Generators for Archimedean and EV Copulas}
+\title{Generator functions for Archimedean and extreme value copulas}
 \description{
- Methods function to evaluate generator function, inverse generator
- function, and derivatives of generator function.
+ Methods to evaluate the generator function, the inverse generator
+ function, and derivatives of the generator function.
 }
-\section{Methods}{
-\describe{
-  \item{copula = "copula"}{ Association measure for a \code{"copula"}
-    object.}
+\usage{
+genFun(copula, u)
+genInv(copula, s)
+genFunDer1(copula, u)
+genFunDer2(copula, u)
+Afun(copula, w)
 }
+\arguments{
+  \item{copula}{an object of class \code{"copula"}. }
+  \item{u, s, w}{numerical vector at which these functions are to be
+    evaluated. }
+}
+\details{
+  \code{"genFun"} and \code{"genInv"} are, respectively, the generator
+  function and its inverse function for an Archimedean copula.
+
+  \code{"genFunDer1"} and \code{"genFunDer2"} are, respectively, the 1st
+  and 2nd derivatives of the generator function for an Archimedean copula.
+
+  \code{"Afun"} is the generator function of an extreme value copula.
 }
 \keyword{methods}
 \keyword{multivariate}

@@ -19,17 +19,19 @@
 ##
 #################################################################################
 
-setClass("plackettCopula",
-         representation = representation("copula"),
-         contains = list("copula")
-         )
 
 plackettCopula <- function(param) {
+    ## get expressions of cdf and pdf
+  cdfExpr <- parse(text = "0.5 / (alpha - 1) * (1 + (alpha - 1) * (u1 + u2) - ((1 + (alpha - 1) * (u1 + u2))^2 - 4 * alpha * (alpha - 1) * u1 * u2)^0.5)")
+  
+  pdfExpr <- parse(text = "((1 + (alpha - 1) * (u1 + u2))^2 - 4 * alpha * (alpha - 1) * u1 * u2)^(- 3/2) * alpha * (1 + (alpha - 1) * (u1 + u2 - 2 * u1 * u2))")
+
   ## dim = 2
   dim <- 2
   val <- new("plackettCopula",
              dimension = dim,
              parameters = param[1],
+             exprdist = c(cdf = cdfExpr, pdf = pdfExpr),
              param.names = "param",
              param.lowbnd = 0,
              param.upbnd = Inf,
@@ -43,10 +45,10 @@ pplackettCopula <- function(copula, u) {
   ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   u1 <- u[,1]
   u2 <- u[,2]
-  delta <- copula@parameters[1]
-  eta <- delta - 1
+  alpha <- copula@parameters[1]
+  eta <- alpha - 1
   ## Joe (1997, p.141)
-  0.5 / eta * (1 + eta * (u1 + u2) - ((1 + eta * (u1 + u2))^2 - 4 * delta * eta * u1 * u2)^0.5)
+  0.5 / eta * (1 + eta * (u1 + u2) - ((1 + eta * (u1 + u2))^2 - 4 * alpha * eta * u1 * u2)^0.5)
 }
 
 dplackettCopula <- function(copula, u) {
@@ -55,10 +57,10 @@ dplackettCopula <- function(copula, u) {
   ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   u1 <- u[,1]
   u2 <- u[,2]
-  delta <- copula@parameters[1]
-  eta <- delta - 1
+  alpha <- copula@parameters[1]
+  eta <- alpha - 1
   ## Joe (1997, p.141)
-  ((1 + eta * (u1 + u2))^2 - 4 * delta * eta * u1 * u2)^(- 3/2) * delta * (1 + eta * (u1 + u2 - 2 * u1 * u2))
+  ((1 + eta * (u1 + u2))^2 - 4 * alpha * eta * u1 * u2)^(- 3/2) * alpha * (1 + eta * (u1 + u2 - 2 * u1 * u2))
 }
 
 
@@ -75,7 +77,42 @@ rplackettCopula <- function(copula, n) {
   cbind(u1, v)
 }
 
+kendallsTauPlackettCopula <- function(copula) {
+  theta <- copula@parameters[1]
+##  kendallsTauPlackettCopula.tr(tanh(log(theta)))
+  kendallsTauPlackettCopula.tr(theta)
+}
+
+calibKendallsTauPlackettCopula <- function(copula, tau) {
+ ## exp(atanh(calibKendallsTauPlackettCopula.tr(tau)))
+  calibKendallsTauPlackettCopula.tr(tau)
+}
+
+tauDerPlackettCopula <- function(copula) {
+  alpha <- copula@parameters[1]
+  if (alpha < 1) stop("not yet implemented.")
+  kendallsTauDerPosLogAlpPlackettCopula.tr(alpha)
+}
+
+rhoDerPlackettCopula <- function(copula)
+  {
+    alpha <- copula@parameters
+    return( (2 * (2 - 2 * alpha + (1 + alpha) * log(alpha))) / (alpha - 1)^3 )
+  }
+
+spearmansRhoPlackettCopula <- function(copula) {
+  theta <- copula@parameters[1]
+  if (theta == 0) -1 else (theta + 1) / (theta - 1) - 2 * theta * log(theta) / (theta - 1)^2
+}
 
 setMethod("pcopula", signature("plackettCopula"), pplackettCopula)
 setMethod("dcopula", signature("plackettCopula"), dplackettCopula)
 setMethod("rcopula", signature("plackettCopula"), rplackettCopula)
+
+setMethod("kendallsTau", signature("plackettCopula"), kendallsTauPlackettCopula)
+setMethod("spearmansRho", signature("plackettCopula"), spearmansRhoPlackettCopula)
+
+setMethod("calibKendallsTau", signature("plackettCopula"), calibKendallsTauPlackettCopula)
+
+setMethod("tauDer", signature("plackettCopula"), tauDerPlackettCopula)
+setMethod("rhoDer", signature("plackettCopula"), rhoDerPlackettCopula)

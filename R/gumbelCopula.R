@@ -20,18 +20,11 @@
 #################################################################################
 
 
-setClass("gumbelCopula",
-         representation = representation("archmCopula"),
-         contains = list("copula", "archmCopula", "evCopula")
-         )
-
-#### Afun
 AfunGumbel <- function(copula, w) {
   alpha <- copula@parameters[1]
   (w^alpha + (1 - w)^alpha)^(1/alpha)
 }
 
-#### genFun and related functions
 genFunGumbel <- function(copula, u) {
   alpha <- copula@parameters[1]
   ( - log(u))^alpha
@@ -43,12 +36,12 @@ genInvGumbel <- function(copula, s) {
 }
 
 genFunDer1Gumbel <- function(copula, u) {
-  eval(gumbelCopula.genfun.expr[1], list(u=u, alpha=copula@parameters[1]))
+  eval(gumbelCopula.genfunDer.expr[1], list(u=u, alpha=copula@parameters[1]))
 }
 
 
 genFunDer2Gumbel <- function(copula, u) {
-  eval(gumbelCopula.genfun.expr[2], list(u=u, alpha=copula@parameters[1]))
+  eval(gumbelCopula.genfunDer.expr[2], list(u=u, alpha=copula@parameters[1]))
 }
 
 gumbelCopula <- function(param, dim = 2) {
@@ -85,6 +78,44 @@ gumbelCopula <- function(param, dim = 2) {
   val
 }
 
+## rgumbelBivCopula <- function(copula, n) {
+##   ## Taken from finmetrics for comparison purpose, but I don't understand it
+##   ## because it is not well-documented.
+##   ## generate z from distribution h
+##   ## using rejection method
+##   zrand <- vector(length = n, mode = "numeric")
+##   xgenerated <- vector(length = n, mode = "logical")
+##   lg <- n
+##   ##set c to 1/2 true for symmetric copula
+##   cc <- Hderiv(copula, 1/2)
+##   stopnow <- F
+##   while(!stopnow) {
+##     usamp <- runif(lg)
+##     ysamp <- runif(lg)
+##     ykeep <- (usamp <= Hderiv(copula, ysamp)/cc)
+##     ##indexes of xrand vector to store "good" generated values  
+##     toind <- (c(1:n)[!xgenerated])[ykeep]
+##     zrand[toind] <- ysamp[ykeep]
+##     xgenerated[toind] <- T
+##     ##number of rvs left to generate:
+##     lg <- n - sum(xgenerated)
+##     if(lg == 0)
+##       stopnow <- T
+##   }
+##   z <- zrand
+##   u <- runif(n)
+##   ## cat(length(z), length(AsecondDer(copula,z)))
+##   pz <- (z * (1 - z) * AsecondDer(copula, z))/Hderiv(copula, z)/A(copula, z)
+##   w <- NULL
+##   w[1:n] <- 0
+##   nn <- sum(u <= pz)
+##   w[u <= pz] <- runif(nn)
+##   w[u > pz] <- runif(n - nn) * runif(n - nn)
+##   xx <- exp((z * log(w))/A(copula, z))
+##   yy <- exp(((1 - z) * log(w))/A(copula, z))
+##   val <- list(x = xx, y = yy)
+##   val
+## } 
 
 rgumbelCopula <- function(copula, n) {
   ## frailty is stable(1,0,0) with 1/alpha
@@ -126,7 +157,7 @@ dgumbelCopula.pdf <- function(copula, u) {
   if (is.vector(u)) u <- matrix(u, nrow = 1)
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
-  eval(gumbelCopula.pdf.algr[dim])
+  c(eval(gumbelCopula.pdf.algr[dim]))
 }
 
 kendallsTauGumbelCopula <- function(copula) {
@@ -145,6 +176,27 @@ calibKendallsTauGumbelCopula <- function(copula, tau) {
   1/(1 - tau)
 }
 
+spearmansRhoGumbelCopula <- function(copula) {
+  alpha <- copula@parameters[1]
+  if (alpha > 15) spearmansRhoCopula(copula)
+  else spearmansRhoGumbelCopula.tr(alpha)
+}
+
+calibSpearmansRhoGumbelCopula <- function(copula, rho) {
+  if (rho > 0.96366) calibSpearmansRhoCopula(copula, rho)
+  else calibSpearmansRhoGumbelCopula.tr(rho)
+}
+
+tauDerGumbelCopula <- function(copula)
+  {
+    return( 1 / copula@parameters^2 )
+  }
+
+rhoDerGumbelCopula <- function(copula) {
+  alpha <- copula@parameters[1]
+  if (alpha > 15) stop("not implemented yet.")
+  else spearmansRhoDerGumbelCopula.tr(alpha)
+}
 
 setMethod("rcopula", signature("gumbelCopula"), rgumbelCopula)
 setMethod("pcopula", signature("gumbelCopula"), pgumbelCopula)
@@ -159,8 +211,11 @@ setMethod("genFunDer1", signature("gumbelCopula"), genFunDer1Gumbel)
 setMethod("genFunDer2", signature("gumbelCopula"), genFunDer2Gumbel)
 
 setMethod("kendallsTau", signature("gumbelCopula"), kendallsTauGumbelCopula)
-#setMethod("spearmansRho", signature("gumbelCopula"), spearmansRhoCopula)
+setMethod("spearmansRho", signature("gumbelCopula"), spearmansRhoGumbelCopula)
 setMethod("tailIndex", signature("gumbelCopula"), tailIndexGumbelCopula)
 
 setMethod("calibKendallsTau", signature("gumbelCopula"), calibKendallsTauGumbelCopula)
-#setMethod("calibSpearmansRho", signature("gumbelCopula"), calibSpearmansRhoCopula)
+setMethod("calibSpearmansRho", signature("gumbelCopula"), calibSpearmansRhoGumbelCopula)
+
+setMethod("rhoDer", signature("gumbelCopula"), rhoDerGumbelCopula)
+setMethod("tauDer", signature("gumbelCopula"), tauDerGumbelCopula)

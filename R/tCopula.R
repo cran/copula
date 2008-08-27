@@ -20,43 +20,41 @@
 #################################################################################
 
 
-validTCopula <- function(object) {
-  param <- object@parameters
-  df <- param[length(param)]
-  if (df <= 0) return ("df should be > 0")
-  validEllipCopula(object)
-}
-
-setClass("tCopula",
-         representation = representation("ellipCopula",
-           df = "numeric"),
-         validity = validTCopula,
-         contains = list("copula", "ellipCopula")
-         )
-
-
-tCopula <- function(param, dim = 2, dispstr = "ex", df = 5) {
+tCopula <- function(param, dim = 2, dispstr = "ex", df = 5, df.fixed = FALSE) {
   pdim <- length(param)
+  parameters <- param
+  param.names <- paste("rho", 1:pdim, sep=".")
+  param.lowbnd <- rep(-1, pdim)
+  param.upbnd <- rep(1, pdim)
+  if (!df.fixed) {
+    parameters <- c(parameters, df)
+    param.names <- c(param.names, "df")
+    param.lowbnd <- c(param.lowbnd, 1) ## qt won't work for df < 1
+    param.upbnd <- c(param.upbnd, Inf)
+  }
+  
   val <- new("tCopula",
              dispstr = dispstr,
              dimension = dim,
-             parameters = c(param, df),
-             param.names = c(paste("rho", 1:pdim, sep="."), "df"),
-             param.lowbnd = c(rep(-1, pdim), 1), ## qt won't work for df < 1
-             param.upbnd = c(rep(1, pdim), Inf),
-             message = "t copula family",
+             parameters = parameters,
+             df = df,
+             df.fixed = df.fixed,
+             param.names = param.names,
+             param.lowbnd = param.lowbnd,
+             param.upbnd = param.upbnd,
+             message = paste("t copula family",
+               if(df.fixed) paste("df fixed at", df) else NULL),
              getRho = function(obj) {
-               param <- obj@parameters
-               param[-length(param)]
+               if (df.fixed) obj@parameters
+               else obj@parameters[-length(obj@parameters)]
              }
              )
   val
 }
 
 getdf <- function(object) {
-  param <- object@parameters
-  df <- param[length(param)]
-  df
+  if (object@df.fixed) object@df
+  else object@parameters[length(object@parameters)]
 }
 
 rtCopula <- function(copula, n) {
@@ -97,28 +95,24 @@ dtCopula <- function(copula, u) {
 showTCopula <- function(object) {
   showCopula(object)
   if (object@dimension > 2) cat("dispstr: ", object@dispstr, "\n")
+  if (object@df.fixed) cat("df is fixed at", object@df, "\n")
 }
 
 tailIndexTCopula <- function(copula) {
 #### McNeil, Frey, Embrechts (2005), p.211
-  param <- copula@parameters
-  pdim <- length(param)
-  df <- param[pdim]
-  rho <- param[-pdim]
+  df <- getdf(copula)
+  rho <- copula@getRho(copula)
   upper <- lower <- 2 * pt(- sqrt((df + 1) * ( 1 - rho) / (1 + rho)), df=df + 1)
   c(upper=upper, lower=lower)
 }
 
-
 kendallsTauTCopula <- function(copula) {
-  param <- copula@parameters
-  rho <- param[-length(param)]
+  rho <- copula@getRho(copula)
   2 * asin(rho) /pi
 }
 
 spearmansRhoTCopula <- function(copula) {
-  param <- copula@parameters
-  rho <- param[-length(param)]
+  rho <- copula@getRho(copula)
   asin(rho / 2) * 6 / pi
 }
 

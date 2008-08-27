@@ -1,11 +1,11 @@
 Package: copula
-Version: 0.6-6
-Date: 2008/01/22
-Title: Multivariate Dependence with Copula
+Version: 0.7-5
+Date: 2008/08/27
+Title: Multivariate dependence with copulas
 Author: Jun Yan <jyan@stat.uconn.edu> and Ivan Kojadinovic <ivan@stat.auckland.ac.nz>.
 Maintainer: Jun Yan <jyan@stat.uconn.edu>
 Depends: methods, mvtnorm, scatterplot3d, sn, adapt
 Enhances: nor1mix
-Description: Classes (S4) of commonly used copulas including elliptical, Archimidean, extreme value and Farlie-Gumbel-Morgenstern families. Methods for density, distribution, random number generators, bivariate association measures, persp, and contour. Functions for fitting copula models. Independence tests among random variables and random vectors based on the empirical copula process. Serial independence tests for univariate and multivariate continuous time series based on the empirical copula process.
+Description: Classes (S4) of commonly used copulas including elliptical (normal and t), Archimedean (Clayton, Gumbel, Frank, and Ali-Mikhail-Haq), extreme value (Husler-Reiss and Galambos), and other families (Plackett and Farlie-Gumbel-Morgenstern). Methods for density, distribution, random number generation, bivariate dependence measures, perspective and contour plots. Functions for fitting copula models. Independence tests among random variables and random vectors. Serial independence tests for univariate and multivariate continuous time series. Goodness-of-fit tests for copulas based on multipliers and on the parametric bootstrap.
 License: GPL (>= 3)
-Packaged: Mon Jan 21 23:14:00 2008; jyan
+Packaged: Fri Aug 29 11:16:33 2008; ivan

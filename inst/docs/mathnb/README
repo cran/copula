@@ -1,0 +1,14 @@
+archmCPdf.m: Mathematica code that generates expressions of Archimedean copula
+             cdf, pdf, and genfun derivatives; the maximum dimension for Frank
+             is determined to be 4, otherwise, the system run out of memory.
+             In particular, derPdfWrtPar is the toughest one to get.
+
+evcopula.nb: Mathematica notebook that generates expressions of extreme value
+             copula cdf, pdf, and deriv1cdf
+
+exprPrep.R: R code that reads the expression files and generate R objects
+            into ../../R/.
+
+getDerExpr.m: Abandoned Mathematica code that generates derivative expressions.
+              Reason of abandoning: after reading pdf expressions back in,
+              they are not exactly the same as before. Why?

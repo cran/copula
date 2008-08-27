@@ -3,7 +3,7 @@
 \alias{galambosCopula}
 \alias{huslerReissCopula}
 %\alias{gumbelCopula}
-\title{ Construction of Extreme Value Copula Class Object }
+\title{ Construction of extreme value copula class objects }
 \description{
   Constructs an extreme value copula class object with its corresponding
   parameter.
@@ -25,14 +25,13 @@ huslerReissCopula(param)
   \item{\dots}{ currently nothing. }
 }
 \value{
-  An extreme value copula object of class \code{"galambosCopula"}
+  An object of class \code{"galambosCopula"},
   \code{"gumbelCopula"}, or \code{"huslerReissCopula"}.
 }
 \note{
-  Gumbel copula is both Archimedean copula and extreme value copula.
+  The Gumbel copula is both an Archimedean and an extreme value copula.
 }
-\author{ Jun Yan <jyan@stat.uconn.edu> }
-\seealso{ \code{\link{ellipCopula}}, \code{\link{archmCopula}}  }
+\seealso{ \code{\link{ellipCopula}}, \code{\link{archmCopula}}. }
 \examples{
 gumbel.cop <- evCopula("gumbel", param=2)
 contour(gumbel.cop, dcopula)

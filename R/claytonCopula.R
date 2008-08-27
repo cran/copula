@@ -20,12 +20,6 @@
 #################################################################################
 
 
-setClass("claytonCopula",
-         representation = representation("archmCopula"),
-         contains = list("copula", "archmCopula")
-         )
-
-
 genFunClayton <- function(copula, u) {
   alpha <- copula@parameters[1]
   (u^(-alpha) - 1) / alpha
@@ -38,14 +32,13 @@ genInvClayton <- function(copula, s) {
 
 genFunDer1Clayton <- function(copula, u) {
   alpha <- copula@parameters[1]
-  eval(claytonCopula.genfun.expr[1])
+  eval(claytonCopula.genfunDer.expr[1])
 }
 
 genFunDer2Clayton <- function(copula, u) {
   alpha <- copula@parameters[1]
-  eval(claytonCopula.genfun.expr[2])
+  eval(claytonCopula.genfunDer.expr[2])
 }
-
 
 claytonCopula <- function(param, dim = 2) {
   ## get expressions of cdf and pdf
@@ -86,6 +79,8 @@ claytonCopula <- function(param, dim = 2) {
 rclaytonBivCopula <- function(copula, n) {
   val <- cbind(runif(n), runif(n))
   alpha <- copula@parameters[1]
+  ## where does this come from? Unfortunately, I forgot.
+  ## please let me know if you find out.
   val[,2] <- (val[,1]^(-alpha) * (val[,2]^(-alpha/(alpha + 1)) - 1) + 1)^(-1/alpha)
   val
 }
@@ -99,7 +94,7 @@ rclaytonCopula <- function(copula, n) {
   val <- matrix(runif(n * dim), nrow = n)
   if (abs(alpha) <= 100 * .Machine$double.eps)
     return (val)  ## the limit is independence
-  gam <- rgamma(n, shape = 1/alpha , rate = 1)
+  gam <- rgamma(n, shape = 1/alpha, rate = 1/alpha) ## fixed from rate = 1
   gam <- matrix(gam, nrow = n, ncol = dim)
   genInv(copula, - log(val) / gam)
 }
@@ -124,7 +119,7 @@ dclaytonCopula <- function(copula, u) {
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
   pdf <- copula@exprdist$pdf
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
-  val <- eval(pdf)
+  val <- c(eval(pdf))
   val[apply(u, 1, function(v) any(v < 0))] <- 0
   val[apply(u, 1, function(v) any(v > 1))] <- 0
 ##   if (alpha < 0) {
@@ -142,7 +137,7 @@ dclaytonCopula.pdf <- function(copula, u) {
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
-  val <- eval(claytonCopula.pdf.algr[dim])
+  val <- c(eval(claytonCopula.pdf.algr[dim]))
   ## clean up
   val[apply(u, 1, function(v) any(v < 0))] <- 0
   val[apply(u, 1, function(v) any(v > 1))] <- 0
@@ -164,6 +159,23 @@ calibKendallsTauClaytonCopula <- function(copula, tau) {
   2 * tau / (1 - tau)
 }
 
+spearmansRhoClaytonCopula <- function(copula) {
+  alpha <- copula@parameters[1]
+  if (alpha < -.2 || alpha > 15) spearmansRhoCopula(copula)
+  else spearmansRhoClaytonCopula.tr(alpha)
+}
+
+calibSpearmansRhoClaytonCopula <- function(copula, rho) {
+  if (rho < -0.16521 || rho > 0.98683) calibSpearmansRhoCopula(copula, rho)
+  else calibSpearmansRhoClaytonCopula.tr(rho)
+}
+
+rhoDerClaytonCopula <- function(copula) {
+  alpha <- copula@parameters[1]
+  if (alpha < -0.2 || alpha > 15) stop("not yet implemented.")
+  spearmansRhoDerClaytonCopula.tr(alpha)
+}
+
 tailIndexClaytonCopula <- function(copula, ...) {
   upper <- 0
   alpha <- copula@parameters
@@ -171,10 +183,14 @@ tailIndexClaytonCopula <- function(copula, ...) {
   c(lower=lower, upper=upper)
 }
 
+tauDerClaytonCopula <- function(copula)
+  {
+    return( 2 / (copula@parameters+2)^2 )
+  }
 
 setMethod("rcopula", signature("claytonCopula"), rclaytonCopula)
 setMethod("pcopula", signature("claytonCopula"), pclaytonCopula)
-setMethod("dcopula", signature("claytonCopula"), dclaytonCopula)
+setMethod("dcopula", signature("claytonCopula"), dclaytonCopula.pdf)
 
 setMethod("genFun", signature("claytonCopula"), genFunClayton)
 setMethod("genInv", signature("claytonCopula"), genInvClayton)
@@ -182,8 +198,11 @@ setMethod("genFunDer1", signature("claytonCopula"), genFunDer1Clayton)
 setMethod("genFunDer2", signature("claytonCopula"), genFunDer2Clayton)
 
 setMethod("kendallsTau", signature("claytonCopula"), kendallsTauClaytonCopula)
-#setMethod("spearmansRho", signature("claytonCopula"), spearmansRhoCopula)
+setMethod("spearmansRho", signature("claytonCopula"), spearmansRhoClaytonCopula)
 setMethod("tailIndex", signature("claytonCopula"), tailIndexClaytonCopula)
 
 setMethod("calibKendallsTau", signature("claytonCopula"), calibKendallsTauClaytonCopula)
+setMethod("calibSpearmansRho", signature("claytonCopula"), calibSpearmansRhoClaytonCopula)
 
+setMethod("tauDer", signature("claytonCopula"), tauDerClaytonCopula)
+setMethod("rhoDer", signature("claytonCopula"), rhoDerClaytonCopula)

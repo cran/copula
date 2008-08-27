@@ -19,30 +19,6 @@
 ##
 #################################################################################
 
-## Farlie-Gumbel-Morgenstern multivariate copula
-
-setClass("fgmCopula",
-         representation = representation("copula",
-         exprdist = "expression"),
-         ## verify that the pdf is positive at each vertex of [0,1]^dim
-         validity = function(object) {
-             dim <- object@dimension
-             if (dim == 2)
-                 return(TRUE);
-             param <- object@parameters
-             valid <- .C("validity_fgm", 
-                         as.integer(dim),
-                         as.double(c(rep(0,dim+1),param)),
-                         valid = integer(1),
-                         PACKAGE="copula")$valid
-             if (valid == 0)
-                 return("Bad vector of parameters")
-             else
-                 return(TRUE)   
-         },
-         contains = list("copula")
-         )
-
 #########################################################
 
 ## constructor

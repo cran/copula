@@ -20,18 +20,6 @@
 #################################################################################
 
 
-validNormalCopula <- function(object) {
-  validEllipCopula(object)
-  ## can do more if needed here
-}
-
-setClass("normalCopula",
-         representation = representation("ellipCopula"),
-         validity = validNormalCopula,
-         contains = list("copula", "ellipCopula")
-         )
-
-
 normalCopula <- function(param, dim = 2, dispstr = "ex") {
   pdim <- length(param)
   val <- new("normalCopula",
@@ -46,7 +34,6 @@ normalCopula <- function(param, dim = 2, dispstr = "ex") {
              )
   val
 }
-
 
 
 rnormalCopula <- function(copula, n) {
@@ -88,7 +75,6 @@ showNormalCopula <- function(object) {
 }
 
 
-
 tailIndexNormalCopula <- function(copula) {
   rho <- copula@parameters
   upper <- lower <- ifelse(rho == 1, 1, 0)
@@ -118,4 +104,3 @@ setMethod("tailIndex", signature("normalCopula"), tailIndexNormalCopula)
 
 setMethod("calibKendallsTau", signature("normalCopula"), calibKendallsTauEllipCopula)
 setMethod("calibSpearmansRho", signature("normalCopula"), calibSpearmansRhoEllipCopula)
-

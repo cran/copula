@@ -19,11 +19,6 @@
 ##
 #################################################################################
 
-setClass("amhCopula",
-         representation = representation("archmCopula"),
-         contains = list("copula", "archmCopula")
-         )
-
 
 genFunAmh <- function(copula, u) {
   alpha <- copula@parameters[1]
@@ -36,10 +31,10 @@ genInvAmh <- function(copula, s) {
 }
 
 genFunDer1Amh <- function(copula, u) {
-  eval(amhCopula.genfun.expr[1], list(u=u, alpha=copula@parameters[1]))
+  eval(amhCopula.genfunDer.expr[1], list(u=u, alpha=copula@parameters[1]))
 }
 genFunDer2Amh <- function(copula, u) {
-  eval(amhCopula.genfun.expr[2], list(u=u, alpha=copula@parameters[1]))
+  eval(amhCopula.genfunDer.expr[2], list(u=u, alpha=copula@parameters[1]))
 }
 
 
@@ -64,8 +59,10 @@ amhCopula <- function(param, dim = 2) {
     val
   }
 
-  if (dim > 2 && param[1] < 0)
-    stop("param can be negative only for dim = 2")
+##   if (dim > 2 && param[1] < 0)
+##     stop("param can be negative only for dim = 2")
+  if (dim > 2) stop("dim can only be 2 for this copula")
+  
   cdf <- cdfExpr(dim)
   if (dim <= 6)  pdf <- pdfExpr(cdf, dim)
   else pdf <- NULL

@@ -20,13 +20,6 @@
 #################################################################################
 
 
-setClass("frankCopula",
-         representation = representation("archmCopula"),
-#         validity = validCopula,
-         contains = list("copula", "archmCopula")
-         )
-
-
 genFunFrank <- function(copula, u) {
   alpha <- copula@parameters[1]
   - log( (exp(- alpha * u) - 1) / (exp(- alpha) - 1))
@@ -38,11 +31,11 @@ genInvFrank <- function(copula, s) {
 }
 
 genFunDer1Frank <- function(copula, u) {
-  eval(frankCopula.genfun.expr[1], list(u=u, alpha=copula@parameters[1]))
+  eval(frankCopula.genfunDer.expr[1], list(u=u, alpha=copula@parameters[1]))
 }
 
 genFunDer2Frank <- function(copula, u) {
-  eval(frankCopula.genfun.expr[2], list(u=u, alpha=copula@parameters[1]))
+  eval(frankCopula.genfunDer.expr[2], list(u=u, alpha=copula@parameters[1]))
 }
 
 ## genInvDerFrank <- function(copula, s, n) {
@@ -145,7 +138,7 @@ dfrankCopula.pdf <- function(copula, u) {
   if (is.vector(u)) u <- matrix(u, nrow = 1)
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
-  eval(frankCopula.pdf.expr[dim])
+  c(eval(frankCopula.pdf.algr[dim]))
 }
 
 kendallsTauFrankCopula <- function(copula) {
@@ -164,6 +157,19 @@ tailIndexFrankCopula <- function(copula, ...) {
   c(lower=0, upper=0)
 }
 
+tauDerFrankCopula <- function(copula)
+  {
+    alpha <- copula@parameters
+    return( 4/alpha^2 + 4/(alpha * (exp(alpha) - 1)) - 8/alpha^2 * debye1(alpha) )
+  }
+
+rhoDerFrankCopula <- function(copula)
+  {
+    alpha <- copula@parameters
+    return( 12 / (alpha * (exp(alpha) - 1)) - 36 / alpha^2 * debye2(alpha) + 24 / alpha^2 * debye1(alpha) )
+  }
+
+
 setMethod("rcopula", signature("frankCopula"), rfrankCopula)
 setMethod("pcopula", signature("frankCopula"), pfrankCopula)
 setMethod("dcopula", signature("frankCopula"), dfrankCopula.pdf)
@@ -180,3 +186,6 @@ setMethod("spearmansRho", signature("frankCopula"), spearmansRhoFrankCopula)
 setMethod("tailIndex", signature("frankCopula"), tailIndexFrankCopula)
 
 ## setMethod("calibKendallsTau", signature("frankCopula"), calibKendallsTauCopula)
+
+setMethod("rhoDer", signature("frankCopula"), rhoDerFrankCopula)
+setMethod("tauDer", signature("frankCopula"), tauDerFrankCopula)

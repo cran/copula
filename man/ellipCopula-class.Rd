@@ -8,18 +8,24 @@
   distributions. }
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("ellipCopula",
-    ...)}, or by function 'ellipCopula'.
+    ...)}, or by function \code{"ellipCopula"}.
 }
 \section{Slots}{
   \describe{
     \item{\code{dispstr}:}{Object of class \code{"character"}, indicating
-    the type of the dispersion matrix such as 'ex', 'ar1', 'toep', or 'un'.}
-    \item{\code{dimension}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{parameters}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{param.names}:}{Object of class \code{"character"} ~~ }
-    \item{\code{param.lowbnd}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{param.upbnd}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{message}:}{Object of class \code{"character"} ~~ }
+    how the dispersion matrix is parameterized; can 'ex', 'ar1', 'toep', or 'un'.}
+    \item{\code{dimension}:}{Object of class \code{"numeric"}, dimension
+      of the copula. }
+    \item{\code{parameters}:}{Object of class \code{"numeric"},
+      parameter value.}
+    \item{\code{param.names}:}{Object of class \code{"character"},
+      parameter names. }
+    \item{\code{param.lowbnd}:}{Object of class \code{"numeric"},
+      parameter lower bound. }
+    \item{\code{param.upbnd}:}{Object of class \code{"numeric"},
+      parameter upper bound. }
+    \item{\code{message}:}{Object of class \code{"character"}, family names
+      of the copula.}
   }
 }
 \section{Extends}{
@@ -37,7 +43,6 @@
     \item{rcopula}{\code{signature(copula = "tCopula")}: ... }
   }
 }
-\author{ Jun Yan <jyan@stat.uconn.edu> }
 \seealso{
   \code{\link{ellipCopula}}, 
   \code{\link{copula-class}}.

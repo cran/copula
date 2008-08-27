@@ -20,11 +20,6 @@
 #################################################################################
 
 
-setClass("huslerReissCopula",
-         representation = representation("evCopula"),
-         contains = list("copula", "evCopula")
-         )
-
 AfunHuslerReiss <- function(copula, w) {
   alpha <- copula@parameters[1]
   w * pnorm(1 / alpha + 0.5 * alpha * log(w /(1 - w))) +

@@ -20,7 +20,7 @@ exportClasses(normalCopula, tCopula)
 exportClasses(claytonCopula, frankCopula, gumbelCopula, amhCopula)
 exportClasses(galambosCopula, huslerReissCopula)
 exportClasses(plackettCopula)
-exportClasses(fgmCopula) #new in 0.5.2
+exportClasses(fgmCopula) 
 
 export(mvdc)
 export(ellipCopula, archmCopula, evCopula)
@@ -28,7 +28,7 @@ export(normalCopula, tCopula)
 export(claytonCopula, frankCopula, gumbelCopula, amhCopula)
 export(galambosCopula, huslerReissCopula)
 export(plackettCopula)
-export(fgmCopula) #new in 0.5.2
+export(fgmCopula)
 
 exportMethods(persp, contour)
 
@@ -40,9 +40,17 @@ exportClasses(summaryFitCopula, summaryFitMvdc)
 exportMethods(show, summary)
 
 ## independence tests
-export(empcopu.simulate, empcopu.test, empcopm.test,
-       empcops.simulate, empcops.test, empcopsm.test,
-##       empcopsm.test.jy, ## for testing purpose now
-       dependogram) 
+export(indepTestSim, indepTest, multIndepTest,
+       serialIndepTestSim, serialIndepTest, multSerialIndepTest,
+       dependogram)
 
+## gof tests
+export(gofCopula) 
 
+## plackett; test purpose now
+## export(tauDerPlackettCopula, rhoDerClaytonCopula, rhoDerGumbelCopula)
+
+## graphical tools for testing independence
+## export(ChiPlot, KPlot)
+## testing purpose
+## export(fitCopula.repar)

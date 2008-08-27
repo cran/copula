@@ -2,7 +2,8 @@
 \docType{class}
 \alias{mvdc-class}
 \title{Class "mvdc" }
-\description{ A class of multivariate distribution via copula. }
+\description{ Class representing multivariate distributions constructed
+  using Sklar's theorem. }
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("mvdc", ...)}
   or by function \code{mvdc}.
@@ -13,8 +14,9 @@
       the copula. }
     \item{\code{margins}:}{Object of class \code{"character"},
       specifying the marginal distributions. }
-    \item{\code{paramMargins}:}{Object of class \code{"list"}, a list of
-    list, with eaching list giving the names parameter values of the margins.}
+    \item{\code{paramMargins}:}{Object of class \code{"list"}, whose
+      each component is a list of named components, giving the parameter values of the marginal
+    distributions. See \code{\link{mvdc}}.}
   }
 }
 \section{Methods}{
@@ -23,8 +25,7 @@
     \item{persp}{\code{signature(x = "mvdc")}: ... }
   }
 }
-\author{ Jun Yan <jyan@stat.uconn.edu> }
 \seealso{
-  \code{\link{mvdc}}
+  \code{\link{mvdc}}.
 }
 \keyword{classes}
