@@ -26,7 +26,7 @@
 ## copula is a copula of the desired family whose parameters, if necessary,
 ## will be used as starting values in fitCopula
 
-gofCopula <- function(copula, x, N=10000, estimation="likelihood", method="multiplier", M=2500)
+gofCopula <- function(copula, x, N=10000, estimation="likelihood", method="parametric.bootstrap", M=2500)
   {
     x <- as.matrix(x)
     

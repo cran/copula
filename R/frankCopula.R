@@ -80,8 +80,10 @@ frankCopula <- function(param, dim = 2) {
 
 rfrankBivCopula <- function(copula, n) {
   val <- cbind(runif(n), runif(n))
-  alpha <- copula@parameters[1]
+  ## to fix numerical rounding problems for alpha >35 but not for alpha < -35
+  alpha <- - abs(copula@parameters[1]) 
   val[,2] <- -1/alpha * log(1 + val[,2] * (1 - exp(-alpha)) / (exp(-alpha * val[,1]) * (val[,2] - 1) - val[,2])) ## reference: Joe (1997, p.147)
+  if (copula@parameters[1] > 0) val[,2] <- 1 - val[,2]
   val
 }
 
@@ -157,17 +159,15 @@ tailIndexFrankCopula <- function(copula, ...) {
   c(lower=0, upper=0)
 }
 
-tauDerFrankCopula <- function(copula)
-  {
-    alpha <- copula@parameters
-    return( 4/alpha^2 + 4/(alpha * (exp(alpha) - 1)) - 8/alpha^2 * debye1(alpha) )
-  }
+tauDerFrankCopula <- function(copula) {
+  alpha <- copula@parameters
+  return( 4/alpha^2 + 4/(alpha * (exp(alpha) - 1)) - 8/alpha^2 * debye1(alpha) )
+}
 
-rhoDerFrankCopula <- function(copula)
-  {
-    alpha <- copula@parameters
-    return( 12 / (alpha * (exp(alpha) - 1)) - 36 / alpha^2 * debye2(alpha) + 24 / alpha^2 * debye1(alpha) )
-  }
+rhoDerFrankCopula <- function(copula) {
+  alpha <- copula@parameters
+  return( 12 / (alpha * (exp(alpha) - 1)) - 36 / alpha^2 * debye2(alpha) + 24 / alpha^2 * debye1(alpha) )
+}
 
 
 setMethod("rcopula", signature("frankCopula"), rfrankCopula)

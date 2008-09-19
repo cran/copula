@@ -94,11 +94,10 @@ tauDerPlackettCopula <- function(copula) {
   kendallsTauDerPosLogAlpPlackettCopula.tr(alpha)
 }
 
-rhoDerPlackettCopula <- function(copula)
-  {
-    alpha <- copula@parameters
-    return( (2 * (2 - 2 * alpha + (1 + alpha) * log(alpha))) / (alpha - 1)^3 )
-  }
+rhoDerPlackettCopula <- function(copula) {
+  alpha <- copula@parameters
+  return( (2 * (2 - 2 * alpha + (1 + alpha) * log(alpha))) / (alpha - 1)^3 )
+}
 
 spearmansRhoPlackettCopula <- function(copula) {
   theta <- copula@parameters[1]

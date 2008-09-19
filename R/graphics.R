@@ -70,6 +70,9 @@ contourMvdc <- function(x, fun,
   invisible(val)
 }
 
+setMethod("persp", signature("indepCopula"), perspCopula)
+setMethod("contour", signature("indepCopula"), contourCopula)
+
 setMethod("persp", signature("copula"), perspCopula)
 setMethod("contour", signature("copula"), contourCopula)
 

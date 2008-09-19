@@ -16,6 +16,7 @@ export(Afun)
 
 exportClasses(mvdc)
 exportClasses(copula, ellipCopula, archmCopula, evCopula)
+exportClasses(indepCopula)
 exportClasses(normalCopula, tCopula)
 exportClasses(claytonCopula, frankCopula, gumbelCopula, amhCopula)
 exportClasses(galambosCopula, huslerReissCopula)
@@ -25,6 +26,7 @@ exportClasses(fgmCopula)
 export(mvdc)
 export(ellipCopula, archmCopula, evCopula)
 export(normalCopula, tCopula)
+export(indepCopula)
 export(claytonCopula, frankCopula, gumbelCopula, amhCopula)
 export(galambosCopula, huslerReissCopula)
 export(plackettCopula)
@@ -49,6 +51,9 @@ export(gofCopula)
 
 ## plackett; test purpose now
 ## export(tauDerPlackettCopula, rhoDerClaytonCopula, rhoDerGumbelCopula)
+## export(derCdfWrtParams, derPdfWrtParams,
+##        tauDer, rhoDer,
+##        kendallsTauApprox)
 
 ## graphical tools for testing independence
 ## export(ChiPlot, KPlot)

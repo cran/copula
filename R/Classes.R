@@ -1,4 +1,14 @@
 ###################################################
+#### independent copula class
+###################################################
+setClass("indepCopula",
+         representation(dimension = "numeric",
+                        message = "character"),
+         contains = list()
+         )
+
+
+###################################################
 ##### basic copula class
 ###################################################
 setClass("copula", 

@@ -1,3 +1,15 @@
+2008-09-17  Jun Yan <jyan@stat.uconn.edu>
+
+	* Fixed numerical rounding problem for rcopula method for 
+	bivariate Frank copula with alpha >= 35 using its symmetry, 
+	since it works for alpha <= -35.
+
+	* Added indepCopula class.
+
+	* Changed default method to "parametric.bootstrap" for 
+	gofCopula; the multiplier needs to be fixed for its 
+	considerable variation between replications.
+	
 2008-08-29  Jun Yan <jyan@stat.uconn.edu>
 
 	* Bug fixed in the random number generation for the 

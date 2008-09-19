@@ -13,7 +13,7 @@
 }
 \usage{
 gofCopula(copula, x, N = 10000, estimation = "likelihood",
-          method = "multiplier", M = 2500)
+          method = "parametric.bootstrap", M = 2500)
 }
 
 \arguments{
@@ -78,6 +78,8 @@ gofCopula(copula, x, N = 10000, estimation = "likelihood",
 ## A two-dimensional data example
 x <- rcopula(claytonCopula(3), 200)
 
+\dontrun{
+## Taking too long with method = "parametric.bootstrap"
 ## Does the Gumbel family seem to be a good choice? 
 gofCopula(gumbelCopula(1), x, estimation="kendall")
 ## What about the Clayton family? 
@@ -87,15 +89,18 @@ gofCopula(claytonCopula(1), x, estimation="kendall")
 clayton.cop <- claytonCopula(1)
 clayton.cop@parameters[1] <- calibKendallsTau(clayton.cop, cor(x, method="kendall")[1,2])
 gofCopula(clayton.cop, x)
-
+}
 ## A three-dimensional example
 x <- rcopula(normalCopula(c(0.5, 0.6, 0.7), dim = 3, dispstr = "un"),200)
 
+\dontrun{
+## Taking too long with method = "parametric.bootstrap"
 ## Does the Clayton family seem to be a good choice? 
 gofCopula(gumbelCopula(1, dim = 3), x)
 ## What about the normal copula?
 normal.copula <- normalCopula(rep(0, 3), dim = 3, dispstr = "un")
-gofCopula(normal.copula,x)
+gofCopula(normal.copula, x)
+}
 }
 
 \keyword{htest}

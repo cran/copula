@@ -1,6 +1,7 @@
 \name{contour-methods}
 \docType{methods}
 \alias{contour-methods}
+\alias{contour,indepCopula-method}
 \alias{contour,copula-method}
 \alias{contour,mvdc-method}
 \title{ Methods for function `contour' in package `copula' }
@@ -9,7 +10,8 @@
 }
 \section{Methods}{
 \describe{
-\item{x = "copula"}{ Contour plot for a \code{"copula"} object. }
+  \item{x = "copula"}{ Contour plot for a \code{"copula"} or
+    \code{"indepCopula"} object. }
 
 \item{x = "mvdc"}{ Contour plot for a \code{"mvdc"} object. }
 }}

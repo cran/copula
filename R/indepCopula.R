@@ -1,0 +1,76 @@
+#################################################################################
+##
+##   R package Copula by Jun Yan Copyright (C) 2008
+##
+##   This file is part of the R package copula.
+##
+##   The R package copula is free software: you can redistribute it and/or modify
+##   it under the terms of the GNU General Public License as published by
+##   the Free Software Foundation, either version 3 of the License, or
+##   (at your option) any later version.
+##
+##   The R package copula is distributed in the hope that it will be useful,
+##   but WITHOUT ANY WARRANTY; without even the implied warranty of
+##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##   GNU General Public License for more details.
+##
+##   You should have received a copy of the GNU General Public License
+##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
+##
+#################################################################################
+
+
+indepCopula <- function(dim = 2) {
+  val <- new("indepCopula",
+             dimension = dim,
+             message = "Independent copula")
+  val
+}
+
+rindepCopula <- function(copula, n) {
+  dim <- copula@dimension
+  matrix(runif(n * dim), nrow = n)
+}
+
+pindepCopula <- function(copula, u) {
+  if (is.vector(u)) u <- matrix(u, nrow = 1)
+  stopifnot (ncol(u) == copula@dimension)
+  apply(u, 1, prod)
+}
+
+dindepCopula <- function(copula, u) {
+  if (is.vector(u)) u <- matrix(u, nrow = 1)
+  stopifnot (ncol(u) == copula@dimension)
+  rep(1, nrow(u))
+}
+
+## kendallsTauIndepCopula <- function(copula) {
+##   0
+## }
+
+## calibKendallsTauIndepCopula <- function(copula, tau) {
+##   cat("No need to calibrate an independent copula.\n")
+## }
+
+## spearmansRhoIndepCopula <- function(copula) {
+##   0
+## }
+
+## calibSpearmansRhoIndepCopula <- function(copula, rho) {
+##   cat("No need to calibrate an independent copula.\n")
+## }
+
+
+setMethod("rcopula", signature("indepCopula"), rindepCopula)
+setMethod("pcopula", signature("indepCopula"), pindepCopula)
+setMethod("dcopula", signature("indepCopula"), dindepCopula)
+
+# setMethod("kendallsTau", signature("indepCopula"), kendallsTauIndepCopula)
+# setMethod("spearmansRho", signature("indepCopula"), spearmansRhoIndepCopula)
+# setMethod("tailIndex", signature("indepCopula"), tailIndexIndepCopula)
+
+# setMethod("calibKendallsTau", signature("indepCopula"), calibKendallsTauIndepCopula)
+# setMethod("calibSpearmansRho", signature("indepCopula"), calibSpearmansRhoIndepCopula)
+
+# setMethod("tauDer", signature("indepCopula"), tauDerIndepCopula)
+# setMethod("rhoDer", signature("indepCopula"), rhoDerIndepCopula)

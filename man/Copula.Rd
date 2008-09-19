@@ -3,6 +3,11 @@
 \alias{dcopula}
 \alias{pcopula}
 \alias{rcopula}
+
+\alias{dcopula,indepCopula-method}
+\alias{pcopula,indepCopula-method}
+\alias{rcopula,indepCopula-method}
+
 \alias{dcopula,claytonCopula-method}
 \alias{dcopula,frankCopula-method}
 \alias{dcopula,gumbelCopula-method}

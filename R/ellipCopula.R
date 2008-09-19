@@ -40,15 +40,13 @@ calibSpearmansRhoEllipCopula <- function(copula, rho) {
   sin (pi * rho / 6) * 2
 }
 
-tauDerEllipCopula <- function(copula)
-  {
-    return( 2 / (pi * sqrt(1 - copula@parameters^2)) )
-  }
+tauDerEllipCopula <- function(copula)  {
+  return( 2 / (pi * sqrt(1 - copula@parameters^2)) )
+}
 
-rhoDerEllipCopula <- function(copula)
-  {
-    return( 6 / (pi * sqrt(4 - copula@parameters^2)) )
-  }
+rhoDerEllipCopula <- function(copula) {
+  return( 6 / (pi * sqrt(4 - copula@parameters^2)) )
+}
 
 setMethod("calibKendallsTau", signature("ellipCopula"), calibKendallsTauEllipCopula)
 setMethod("calibSpearmansRho", signature("ellipCopula"), calibSpearmansRhoEllipCopula)

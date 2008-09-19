@@ -187,10 +187,9 @@ calibSpearmansRhoGumbelCopula <- function(copula, rho) {
   else calibSpearmansRhoGumbelCopula.tr(rho)
 }
 
-tauDerGumbelCopula <- function(copula)
-  {
-    return( 1 / copula@parameters^2 )
-  }
+tauDerGumbelCopula <- function(copula) {
+  return( 1 / copula@parameters^2 )
+}
 
 rhoDerGumbelCopula <- function(copula) {
   alpha <- copula@parameters[1]

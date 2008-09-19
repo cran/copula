@@ -1,6 +1,7 @@
 \name{persp-methods}
 \docType{methods}
 \alias{persp-methods}
+\alias{persp,indepCopula-method}
 \alias{persp,copula-method}
 \alias{persp,mvdc-method}
 \title{ Methods for function `persp' in Package `copula' }
@@ -9,7 +10,8 @@
 }
 \section{Methods}{
 \describe{
-  \item{x = "copula"}{perspective plot for a \code{"copula"} object. }
+  \item{x = "copula"}{perspective plot for a \code{"copula"} or
+    \code{"indepCopula"} object. }
   \item{x = "mvdc"}{perspective plot for a \code{"mvdc"} object. }
 }}
 \details{

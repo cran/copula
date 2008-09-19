@@ -183,10 +183,9 @@ tailIndexClaytonCopula <- function(copula, ...) {
   c(lower=lower, upper=upper)
 }
 
-tauDerClaytonCopula <- function(copula)
-  {
-    return( 2 / (copula@parameters+2)^2 )
-  }
+tauDerClaytonCopula <- function(copula) {
+  return( 2 / (copula@parameters+2)^2 )
+}
 
 setMethod("rcopula", signature("claytonCopula"), rclaytonCopula)
 setMethod("pcopula", signature("claytonCopula"), pclaytonCopula)
