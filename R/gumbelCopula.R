@@ -176,16 +176,41 @@ calibKendallsTauGumbelCopula <- function(copula, tau) {
   1/(1 - tau)
 }
 
-spearmansRhoGumbelCopula <- function(copula) {
-  alpha <- copula@parameters[1]
-  if (alpha > 15) spearmansRhoCopula(copula)
-  else spearmansRhoGumbelCopula.tr(alpha)
+
+gumbelRhoFun <- function(alpha) {
+  ss <- .gumbelRho$ss
+  forwardTransf <- .gumbelRho$trFuns$forwardTransf
+  valFun <- .gumbelRho$assoMeasFun$valFun
+  theta <- forwardTransf(alpha, ss)
+
+  c(valFun(theta))
 }
 
-calibSpearmansRhoGumbelCopula <- function(copula, rho) {
-  if (rho > 0.96366) calibSpearmansRhoCopula(copula, rho)
-  else calibSpearmansRhoGumbelCopula.tr(rho)
+gumbelRhoDer <- function(alpha) {
+  ss <- .gumbelRho$ss
+  forwardTransf <- .gumbelRho$trFuns$forwardTransf
+  forwardDer <- .gumbelRho$trFuns$forwardDer
+  valFun <- .gumbelRho$assoMeasFun$valFun
+  theta <- forwardTransf(alpha, ss)
+
+  c(valFun(theta, 1)) * forwardDer(alpha, ss)
 }
+
+spearmansRhoGumbelCopula <- function(copula) {
+  alpha <- copula@parameters[1]
+  gumbelRhoFun(alpha)
+}
+
+
+calibSpearmansRhoGumbelCopula <- function(copula, rho) {
+  gumbelRhoInv <- approxfun(x = .gumbelRho$assoMeasFun$fm$ysmth,
+                            y = .gumbelRho$assoMeasFun$fm$x)
+  
+  ss <- .gumbelRho$ss
+  theta <- gumbelRhoInv(rho)
+  .gumbelRho$trFuns$backwardTransf(theta, ss)
+}
+  
 
 tauDerGumbelCopula <- function(copula) {
   return( 1 / copula@parameters^2 )
@@ -193,8 +218,7 @@ tauDerGumbelCopula <- function(copula) {
 
 rhoDerGumbelCopula <- function(copula) {
   alpha <- copula@parameters[1]
-  if (alpha > 15) stop("not implemented yet.")
-  else spearmansRhoDerGumbelCopula.tr(alpha)
+  gumbelRhoDer(alpha)
 }
 
 setMethod("rcopula", signature("gumbelCopula"), rgumbelCopula)

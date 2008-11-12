@@ -1,10 +1,45 @@
+2008-11-18  Ivan Kojadinovic  <ivan@stat.auckland.ac.nz>
+
+	* Jun has modified the structure of "fitCopula". Inversion 
+	of Spearman's rho and Kendall's tau can now be used to estimate
+	the dependence parameters. The large-sample standard errors of 
+	the estimates can also be computed in almost all situations. 
+
+	* The argument list of function "fitCopula" has changed from 
+	the last version. A newly added "method" argument precedes 
+	the "start" argument, because "start" may not be needed for 
+	inverting Kendall's tau or Spearman's rho. The returned object 
+	of "fitCopula" also has component "est" renamed to "estimate" 
+	to be more informative.	
+
+	* The function "gofCopula" has been modified to reflect the 
+	changes in "fitCopula". The multiplier method has also been 
+	improved. 
+
+	* Warning messages from evaluating likelihood at invalid 
+	parameter values is suppressed when calling optim. It is not 
+	the optimal way, but let's experiment with it for a while.
+	
+	* Corresponding documentation improved.
+
+2008-10-16 Roger Koenker <rkoenker@uiuc.edu>
+
+	*  Added a logical variable to mvdc objects "marginsIdentical"
+	intended to permit the use to force identical marginals.  When
+	this is specified as TRUE, then fitMvdc and loglikMvdc take a
+	restricted vector of parameters and proceed accordingly.
+
+	*  Made a few minor alterations in the documentation to clarify
+	points that I thought were unclear, notably the ordering of the
+	parameter vector for mvdc fitting.
+
 2008-09-17  Jun Yan <jyan@stat.uconn.edu>
 
 	* Fixed numerical rounding problem for rcopula method for 
 	bivariate Frank copula with alpha >= 35 using its symmetry, 
 	since it works for alpha <= -35.
 
-	* Added indepCopula class.
+	* Added "indepCopula" class.
 
 	* Changed default method to "parametric.bootstrap" for 
 	gofCopula; the multiplier needs to be fixed for its 
@@ -146,5 +181,6 @@
 	
 	The symbolic expressions are processed in R with function deriv
 	to generate efficient algorithmic expressions.
+
 
 

@@ -21,8 +21,9 @@
 
 
 
-mvdc <- function(copula, margins, paramMargins) {
-  val <- new("mvdc", copula = copula, margins = margins, paramMargins = paramMargins)
+mvdc <- function(copula, margins, paramMargins, marginsIdentical = FALSE) {
+  new("mvdc", copula = copula, margins = margins, paramMargins = paramMargins,
+       marginsIdentical = marginsIdentical)
 }
 
 

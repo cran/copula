@@ -507,7 +507,7 @@ add.influ <- function(u, v, influ, q)
 ## cop is a copula of the desired family whose parameters, if necessary, will be used
 ## as starting values in fitCopula
 
-gofMCLT.PL <- function(cop,x,N=1000,M=2500)
+gofMCLT.PL <- function(cop, x, N, m, grid, G, R, M)
   {     
     n <- nrow(x)
     p <- ncol(x)
@@ -516,41 +516,58 @@ gofMCLT.PL <- function(cop,x,N=1000,M=2500)
     u <- apply(x,2,rank)/(n+1)
 
     ## fit the copula
-    ## use parameters as starting values in optim 
-    cop <- fitCopula(u,cop,cop@parameters)@copula
-    
-    ## grid points where to evaluate the process
-    g <- rcopula(cop,n)  
-    pcop <- pcopula(cop,g)
-    
-    ## compute the test statistic
-    s <- .C("cramer_vonMises_2",
-            as.integer(p),
-            as.double(u),
-            as.integer(n),
-            as.double(g),
-            as.integer(n),
-            as.double(pcop),
-            stat = double(1),
-            PACKAGE="copula")$stat
-   
-    ## generate realizations under H0
-    x0 <- rcopula(cop,n)
-    
-    s0 <- .C("multiplier",
-             as.integer(p),
-             as.double(x0),
-             as.integer(n),
-             as.double(g), 
-             as.integer(n), 
-             as.double(pcop), 
-             as.double(derCdfWrtArgs(cop,g)),
-             as.double(derCdfWrtParams(cop,g) %*% influCoef(cop,x0,M)),
-             as.integer(N),
-             s0 = double(N),
-             PACKAGE="copula")$s0
+    cop <- fitCopula(u,cop,method="mpl",estimate.variance=FALSE)@copula
 
-    return(list(statistic=s, pvalue=(sum(s0 >= s)+0.5)/(N+1), parameters=cop@parameters))
+    ## perform R replications
+    stat <- pval <- numeric(R)
+    for (i in 1:R)
+      { 
+        
+        ## grid points where to evaluate the process
+        if (grid == "h0")  ## from the H0 copula 
+          g <- rcopula(cop,G)
+        else if (grid == "po") ## pseudo-observations
+          {
+            g <- u
+            G <- n
+          }
+        else stop("Invalid grid")
+        
+        pcop <- pcopula(cop,g)
+        
+        ## compute the test statistic
+        stat[i] <- .C("cramer_vonMises_2",
+                      as.integer(p),
+                      as.double(u),
+                      as.integer(n),
+                      as.double(g),
+                      as.integer(G),
+                      as.double(pcop),
+                      stat = double(1),
+                      PACKAGE="copula")$stat
+        
+        ## generate realizations under H0
+        x0 <- rcopula(cop,m)
+        
+        s0 <- .C("multiplier",
+                 as.integer(p),
+                 as.double(x0),
+                 as.integer(m),
+                 as.double(g), 
+                 as.integer(G), 
+                 as.double(pcop), 
+                 as.double(derCdfWrtArgs(cop,g)),
+                 as.double(derCdfWrtParams(cop,g) %*% influCoef(cop,x0,M)),
+                 as.integer(N),
+                 s0 = double(N),
+                 PACKAGE="copula")$s0
+        
+        pval[i] <- (sum(s0 >= stat[i])+0.5)/(N+1)
+        
+      }
+    
+    return(list(statistic=median(stat), pvalue=median(pval),
+                sd.pvalues=sd(pval), parameters=cop@parameters))
   }
 
                       

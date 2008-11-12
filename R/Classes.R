@@ -82,6 +82,17 @@ rhoDer <- function(copula) {
 }
 
 
+## The following functions return functions for ease of vector computing
+## used in fitCopula for ar1; see fitCopula.R
+tauDerFun <- function(copula){
+  UseMethod("tauDerFun")
+}
+
+rhoDerFun <- function(copula){
+  UseMethod("rhoDerFun")
+}
+
+
 ###############################################################
 #### elliptical copulas, contains normalCopula and tCopula
 ###############################################################
@@ -274,7 +285,20 @@ setClass("plackettCopula",
 setClass("mvdc",
          representation(copula = "copula",
                         margins = "character",
-                        paramMargins = "list")
+                        paramMargins = "list",
+         		marginsIdentical = "logical"),
+         validity = function(object){
+           dim <- object@copula@dimension
+           if(object@marginsIdentical){
+             if(!all(object@margins[1] == object@margins[-1]))
+               return("margins are not identical")
+             for(i in 2:dim){
+               if(!identical( object@paramMargins[[1]], object@paramMargins[[i]]))
+                 return("margins are not identical")
+             }
+           }
+           TRUE
+         }
          )
 
 ## methods like {dpr}mvdc are defined in mvdc.R

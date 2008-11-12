@@ -1,0 +1,159 @@
+setClass("fitMvdc",
+         representation(estimate = "numeric",
+                        var.est = "matrix",
+                        loglik = "numeric",
+                        convergence = "integer",
+                        nsample = "integer",
+                        mvdc = "mvdc"),
+         validity = function(object) TRUE,
+         contains = list()         
+         )
+
+
+setClass("summaryFitMvdc",
+         representation(loglik = "numeric",
+                        convergence = "integer",
+                        parameters = "data.frame"),
+         validity = function(object) TRUE,
+         contains = list()
+         )
+
+showFitMvdc <- function(object) {
+  foo <- summaryFitMvdc(object)
+  cat("The Maximum Likelihood estimation is based on ", object@nsample, " observations.\n")
+  p <- object@mvdc@copula@dimension
+  marNpar <- unlist(lapply(object@mvdc@paramMargins, length))
+  idx2 <- cumsum(marNpar)
+  idx1 <- idx2 - marNpar + 1
+  margid <- object@mvdc@marginsIdentical
+  if(margid){
+      cat("Margins:\n")
+      print(foo@parameters[idx1[1]:idx2[1], 1:4, drop=FALSE])
+    }
+  else {
+    for (i in 1:p) {
+      cat("Margin ", i, ":\n")
+      print(foo@parameters[idx1[i]:idx2[i], 1:2, drop=FALSE])
+      }
+    }
+  cat("Copula:\n")
+  if(margid)
+    print(foo@parameters[- (1:idx2[1]), 1:4, drop=FALSE])
+  else
+    print(foo@parameters[- (1:rev(idx2)[1]), 1:2, drop=FALSE])
+  
+  cat("The maximized loglikelihood is ", foo@loglik, "\n")
+  cat("The convergence code is ", foo@convergence, "see ?optim.\n")
+}
+
+summaryFitMvdc <- function(object) {
+  estimate <- object@estimate
+  se <- sqrt(diag(object@var.est))
+  zvalue <- estimate / se
+  pvalue <- (1 - pnorm(abs(zvalue))) * 2
+  ##ans <- object[c("loglik", "convergence")]
+  parameters <- data.frame(estimate, se, zvalue, pvalue)
+  marNpar <- unlist(lapply(object@mvdc@paramMargins, length))
+  p <- object@mvdc@copula@dimension
+
+  if(object@mvdc@marginsIdentical){ 
+     pnames <- c(paste(paste("m", lapply(object@mvdc@paramMargins, names)[[1]], sep=".")),
+              object@mvdc@copula@param.names)
+     }
+  else{
+     pnames <- c(paste(paste("m", rep(1:p, marNpar), sep=""),
+                    unlist(lapply(object@mvdc@paramMargins, names)), sep="."),
+              object@mvdc@copula@param.names)
+       }
+  dimnames(parameters) <-
+    list(pnames,
+         c("Estimate", "Std. Error", "z value", "Pr(>|z|)"))
+  ret <- new("summaryFitMvdc",
+             loglik = object@loglik,
+             convergence = object@convergence,
+             parameters = parameters)
+  ret
+}
+
+
+setMethod("show", signature("fitMvdc"), showFitMvdc)
+setMethod("summary", signature("fitMvdc"), summaryFitMvdc)
+
+####################################################################
+
+loglikMvdc <- function(param, x, mvdc, suppressMessages=FALSE) {
+  p <- mvdc@copula@dimension
+  margid <- mvdc@marginsIdentical
+  marNpar <- unlist(lapply(mvdc@paramMargins, length))
+  idx2 <- cumsum(marNpar)
+  idx1 <- idx2 - marNpar + 1
+  for (i in 1:p) {
+    if (marNpar[i] > 0) {
+      ## parnames <- mvdc@paramMargins[[i]]
+      k <- ifelse(margid,1,i)
+      par <- param[idx1[k]: idx2[k]]
+      ## names(par) <- parnames
+      ## mvdc@paramMargins[i] <- as.list(par)
+      for (j in 1:marNpar[i]) mvdc@paramMargins[[i]][j] <- par[j]
+    }      
+  }
+  if(margid)
+      mvdc@copula@parameters <- param[- (1:idx2[1])]
+  else
+      mvdc@copula@parameters <- param[- (1:rev(idx2)[1])]
+
+  ## messageOut may be used for debugging
+  if (suppressMessages) {
+    messageOut <- textConnection("fitMessages", open="w", local=TRUE)
+    sink(messageOut); sink(messageOut, type="message")
+    options(warn = -1) ## ignore warnings; can be undesirable!
+  }
+
+  loglik <- try(sum(log(dmvdc(mvdc, x))))
+
+  if (suppressMessages) {
+    options(warn = 0)
+    sink(type="message"); sink(); close(messageOut)
+  }
+  if (inherits(loglik, "try-error")) loglik <- NaN
+  loglik
+}
+
+fitMvdc <- function(data, mvdc, start,
+                    optim.control=list(NULL), method="BFGS") {
+  copula <- mvdc@copula
+  if (copula@dimension != ncol(data))
+    stop("The dimension of the data and copula do not match.\n")
+  marNpar <- unlist(lapply(mvdc@paramMargins, length))
+  if(mvdc@marginsIdentical){
+    if(length(copula@parameters) + marNpar[1] != length(start))
+      stop("The length of start and mvdc parameters do not match.\n")
+      }
+  else{
+    if(length(copula@parameters) + sum(marNpar) != length(start))
+      stop("The length of start and mvdc parameters do not match.\n")
+    }
+  control <- c(optim.control, fnscale=-1)
+  notgood <- unlist(lapply(control, is.null))
+  control <- control[!notgood]
+
+  fit <- optim(start, loglikMvdc,  method=method, mvdc=mvdc, x = data, suppressMessages=TRUE, control=control)
+  if (fit$convergence > 0)
+    warning("possible convergence problem: optim gave code=", fit$convergence)
+  loglik <- fit$val
+
+  fit.last <- optim(fit$par, loglikMvdc, method=method, mvdc=mvdc, x =data, suppressMessages=TRUE, control=c(control, maxit=1), hessian=TRUE)
+    
+  var.est <- try(solve(-fit.last$hessian))
+  if (inherits(var.est, "try-error"))
+    warning("Hessian matrix not invertible")
+
+  ans <- new("fitMvdc",
+             estimate = fit$par,
+             var.est = var.est,
+             loglik = loglik,
+             convergence = fit$convergence,
+             nsample = nrow(data),
+             mvdc = mvdc)
+  ans
+}

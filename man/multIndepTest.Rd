@@ -69,7 +69,8 @@ multIndepTest(x, d, m=length(d), N=1000, alpha=0.05)
   
   I. Kojadinovic and M. Holmes (2008), Tests of independence among
   continuous random vectors based on Cramér-von Mises functionals
-  of the empirical copula process. submitted. 
+  of the empirical copula process. \emph{Journal of Multivariate
+    Analysis}, in press.
 }
 
 \seealso{

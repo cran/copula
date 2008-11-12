@@ -77,21 +77,58 @@ rplackettCopula <- function(copula, n) {
   cbind(u1, v)
 }
 
-kendallsTauPlackettCopula <- function(copula) {
-  theta <- copula@parameters[1]
-##  kendallsTauPlackettCopula.tr(tanh(log(theta)))
-  kendallsTauPlackettCopula.tr(theta)
+
+
+plackettTauFun <- function(alpha) {
+  ss <- .plackettTau$ss
+  forwardTransf <- .plackettTau$trFuns$forwardTransf
+  valFun <- .plackettTau$assoMeasFun$valFun
+  theta <- forwardTransf(alpha, ss)
+
+  idx <- theta <= 1
+  val <- alpha
+  val[idx] <- valFun(theta[idx])
+  val[!idx] <- - valFun(1 / theta[!idx])
+  val
+  ## c(ifelse(theta <= 1, valFun(theta), -valFun(1/theta)))
 }
 
+plackettTauDer <- function(alpha) {
+  ss <- .plackettTau$ss
+  forwardTransf <- .plackettTau$trFuns$forwardTransf
+  forwardDer <- .plackettTau$trFuns$forwardDer
+  valFun <- .plackettTau$assoMeasFun$valFun
+  theta <- forwardTransf(alpha, ss)
+
+  idx <- theta <= 1
+  val <- alpha
+  val[idx] <- valFun(theta[idx], 1) * forwardDer(alpha[idx], ss)
+  val[!idx] <-  valFun(1/theta[!idx], 1) * forwardDer(alpha[!idx], ss) / theta[!idx]^2
+  val
+  ## c(ifelse(alpha <= 1, valFun(theta, 1) * forwardDer(alpha, ss),
+  ##         valFun(1/theta, 1) * forwardDer(alpha, ss) / theta^2))
+}
+
+kendallsTauPlackettCopula <- function(copula) {
+  alpha <- copula@parameters[1]
+  plackettTauFun(alpha)
+}
+
+
+
+
 calibKendallsTauPlackettCopula <- function(copula, tau) {
- ## exp(atanh(calibKendallsTauPlackettCopula.tr(tau)))
-  calibKendallsTauPlackettCopula.tr(tau)
+  plackettTauInvLt1 <- approxfun(x = .plackettTau$assoMeasFun$fm$ysmth,
+                                 y = .plackettTau$assoMeasFun$fm$x)
+  
+  ss <- .plackettTau$ss
+  theta <- ifelse(tau <= 0, plackettTauInvLt1(tau), 1 / plackettTauInvLt1(-tau))
+  .plackettTau$trFuns$backwardTransf(theta, ss)
 }
 
 tauDerPlackettCopula <- function(copula) {
   alpha <- copula@parameters[1]
-  if (alpha < 1) stop("not yet implemented.")
-  kendallsTauDerPosLogAlpPlackettCopula.tr(alpha)
+  plackettTauDer(alpha)
 }
 
 rhoDerPlackettCopula <- function(copula) {

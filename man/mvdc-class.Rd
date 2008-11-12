@@ -15,8 +15,11 @@
     \item{\code{margins}:}{Object of class \code{"character"},
       specifying the marginal distributions. }
     \item{\code{paramMargins}:}{Object of class \code{"list"}, whose
-      each component is a list of named components, giving the parameter values of the marginal
-    distributions. See \code{\link{mvdc}}.}
+      each component is a list of named components, giving the parameter 
+      values of the marginal distributions. See \code{\link{mvdc}}. }
+    \item{\code{marginsIdentical}:}{Object of class \code{"logical"},
+      that, if TRUE, restricts the marginal distributions to be
+      identical, default is \code{FALSE}. }
   }
 }
 \section{Methods}{

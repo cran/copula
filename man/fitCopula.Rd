@@ -1,82 +1,190 @@
 \name{fitCopula}
 \alias{fitCopula}
-\alias{fitMvdc}
 \alias{loglikCopula}
-\alias{loglikMvdc}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{ Maximum likelihood estimation of copula models }
+\title{ Estimation of the dependence parameters in copula models }
 \description{
-  Fits a copula model to multivariate data.
+  Fits a copula model to multivariate data belonging to the unit
+  hypercube. The data can be pseudo-observations constructed from
+  empirical or parametric marginal c.d.f.s, or from true
+  observations from the copula. 
 }
 \usage{
-loglikCopula(param, x, copula)
-loglikMvdc(param, x, mvdc)
-fitCopula(data, copula, start, lower=NULL, upper=NULL,
-          optim.control = list(NULL), method = "BFGS")
-fitMvdc(data, mvdc, start, optim.control = list(NULL), method = "BFGS")
+loglikCopula(param, x, copula, suppressMessages=FALSE)
+fitCopula(data, copula, method="mpl", start=NULL, lower=NULL, upper=NULL,
+          optim.control = list(NULL), optim.method = "BFGS",
+          estimate.variance = TRUE)
 }
 \arguments{
   \item{param}{ a vector of parameter values. }
   \item{x}{ a data matrix. }
   \item{copula}{ a \code{"copula"} object. }
-  \item{mvdc}{ a \code{"mvdc"} object. }
-
+  \item{suppressMessages}{ logical, if TRUE, warnings messages from
+    evaluating loglikelihood at invalid parameter values are
+    suppressed. }
   \item{data}{ a data matrix. }
-  \item{start}{ a vector of starting value for \code{param}. }
+  \item{method}{ can be either \code{"ml"} (maximum likelihood), \code{"mpl"} (maximum
+    pseudo-likelihood), \code{"itau"} (inversion of Kendall's tau), and
+    \code{"irho"} (inversion of Spearman's rho). The last three methods
+    assume that the \code{"data"} are pseudo-observations (scaled
+    ranks), while the first method assumes that the \code{"data"} are
+    observations from the unknown copula. The default method is "mpl". }
+  \item{start}{ a vector of starting value for \code{"param"}.}
   \item{lower, upper}{ bounds on the variables for the \code{"L-BFGS-B"} method.}
   \item{optim.control}{ a list of controls to be passed to \code{"optim"}. }
-  \item{method}{ the method for optim. }
+  \item{optim.method}{ the method for \code{"optim"}. }
+  \item{estimate.variance}{ logical, if TRUE, the large-sample variance is
+    estimated. }    
 }
 \value{
-  The return value of \code{"loglikCopula"} and \code{"loglikMvdc"} is
-  the loglikelihood evaluated for the given value of \code{"param"}.
+  The return value of \code{"loglikCopula"} is
+  the loglikelihood evaluated at the given value of \code{"param"}.
     
-  The return values of \code{"fitCopula"} and \code{"fitMvdc"} are
-  objects of class \code{"fitCopula"} and \code{"fitMvdc"}, respectively,
-  containing slots:
-  \item{est}{ the estimate of the parameters. }
-  \item{var.est}{ variance matrix estimate of
-      the parameter estimator. See note below. }
+  The return values of \code{"fitCopula"} is an object of class
+  \code{"fitCopula"} ontaining slots:
+  \item{estimate}{ the estimate of the parameters. }
+  \item{var.est}{ large-sample variance estimate of the parameter estimator. }
+  \item{method}{ the estimation method. }
   \item{loglik}{ loglikelihood at \code{"est"}. }
-  \item{fit}{ the result of \code{"optim"}. }
+  \item{copula}{ the fitted copula. }
 }
 \references{
+  C. Genest (1987). Frank's family of bivariate
+  distributions. \emph{Biometrika} 74, 549-555.
+
+  C. Genest and L.-P. Rivest (1993). Statistical inference procedures
+  for bivariate Archimedean copulas.
+  \emph{Journal of the American Statistical Association}
+  88, 1034-1043.
+  
+  P. Rousseeuw and G. Molenberghs (1993). Transformation of nonpositive
+  semidefinite correlation matrices. \emph{Communications in Statistics: Theory
+    and Methods} 22, 965-984.
+  
   C. Genest, K. Ghoudi and L.-P. Rivest (1995). A semiparametric
   estimation procedure of dependence parameters in multivariate
-  families of distributions. \emph{Biometrika}, 82, 543-552. 
+  families of distributions. \emph{Biometrika}, 82, 543-552.
 
-  J. Yan (2006), Multivariate Modeling with Copulas and Engineering
-  Applications. In \emph{Handbook of Engineering Statistics}, Ed. Pham,
-  Springer.
-}
-\note{
-  The variance matrix of the estimate, \code{"var.est"}, in the returned
-  object is only valid for full likelihood maximization. When
-  pseudo-observations are used, they under-estimate the variation. See
-  Genest, Ghoudi, and Rivest (1995).
+  H. Joe (2005). Asymptotic efficiency of the two-stage estimation
+  method for copula-based models. \emph{Journal of Multivariate
+    Analysis} 94, 401-419.
   
-  When covariates are available for marginal distributions or for the copula,
-  one can construct the loglikelihood function and feed it to \code{"optim"}
-  to estimate all the parameters.
+  S. Demarta and A. McNeil (2005). The t copula and related copulas.
+  \emph{International Statistical Review} 73, 111-129.
+  
+  C. Genest and A.-C. Favre (2007). Everything you always wanted to know about
+  copula modeling but were afraid to ask. \emph{Journal of Hydrological Engineering}
+  12, 347-368.
+  
+  I. Kojadinovic and J. Yan (2008), Comparison of three semiparametric methods
+  for estimating dependence parameters in copula models, submitted.
 }
 
+\note{
+  In the multiparameter elliptical case and when the estimation is based
+  on Kendall's tau or Spearman's rho, the
+  estimated correlation matrix may not always be positive-definite. If
+  it is not, the correction proposed by Rousseeuw and Molenberghs (1993)
+  is applied and a warning message given.
+
+  If method \code{"mpl"} in \code{"fitCopula"} is used and if
+  \code{"start"} is not assigned a value, estimates obtained
+  from method \code{"itau"} are used as initial values in
+  the optimization.
+
+  For the t copula with \code{df.fixed=FALSE} (see \code{\link{ellipCopula}}),
+  the methods \code{"itau"} and \code{"irho"} in \code{"fitCopula"}
+  cannot be used. The methods \code{"ml"} and \code{"mpl"} can be
+  employed provided the parameter \code{"start"} is assigned a
+  value. See the example below. Also, the large-sample variance cannot be
+  estimated if method \code{"mpl"} is chosen.
+
+  To implement the \emph{inference functions for margins} method (see
+  e.g. Joe 2005), the \code{"data"} need to be pseudo-observations
+  obtained from fitted parametric marginal c.d.f.s and \code{"method"}
+  need to be set to \code{"ml"}. The returned large-sample variance
+  will then underestimate the true variance.
+  
+  Finally, note that the fitting functions generate error messages
+  because invalid parameter values are tried during the optimization
+  process (see \code{\link{optim}}).
+}
 \seealso{ \code{\link{Copula}}, \code{\link{mvdc}}, \code{\link{gofCopula}}. }
 
 \examples{
 gumbel.cop <- gumbelCopula(3, dim=2)
-myMvd <- mvdc(gumbel.cop, c("exp","exp"), list(list(rate=2),list(rate=4)))
-x <- rmvdc(myMvd, 1000)
-fit <- fitMvdc(x, myMvd, c(1,1,2))
-fit
 
 n <- 200
-u <- rcopula(gumbel.cop, n)              ## true observations
-r <- apply(u, 2, rank) / (n + 1)  ## pseudo-observations
-start <- calibKendallsTau(gumbel.cop, cor(u, method="kendall")[1,2])
-fit.u <- fitCopula(u, gumbel.cop, start)
-fit.u
-fit.r <- fitCopula(r, gumbel.cop, start)
-fit.r
+x <- rcopula(gumbel.cop, n)       ## true observations
+u <- apply(x, 2, rank) / (n + 1)  ## pseudo-observations
+## inverting Kendall's tau
+fit.tau <- fitCopula(u, gumbel.cop, method="itau")
+fit.tau
+## inverting Spearman's rho
+fit.rho <- fitCopula(u, gumbel.cop, method="irho")
+fit.rho
+## maximum pseudo-likelihood
+fit.mpl <- fitCopula(u, gumbel.cop, method="mpl")
+fit.mpl
+## maximum likelihood
+fit.ml <- fitCopula(x, gumbel.cop, method="ml")
+fit.ml
+
+## a multiparameter example
+normal.cop <- normalCopula(c(0.6,0.36, 0.6),dim=3,dispstr="un")
+x <- rcopula(normal.cop, n)     ## true observations
+u <- apply(x, 2, rank) / (n + 1)  ## pseudo-observations
+## inverting Kendall's tau
+fit.tau <- fitCopula(u, normal.cop, method="itau")
+fit.tau
+## inverting Spearman's rho
+fit.rho <- fitCopula(u, normal.cop, method="irho")
+fit.rho
+## maximum pseudo-likelihood
+fit.mpl <- fitCopula(u, normal.cop, method="mpl")
+fit.mpl
+## maximum likelihood
+fit.ml <- fitCopula(x, normal.cop, method="ml")
+fit.ml
+## with dispstr="toep"
+normal.cop.toep <- normalCopula(c(0, 0), dim=3, dispstr="toep")
+## inverting Kendall's tau
+fit.tau <- fitCopula(u, normal.cop.toep, method="itau")
+fit.tau
+## inverting Spearman's rho
+fit.rho <- fitCopula(u, normal.cop.toep, method="irho")
+fit.rho
+## maximum pseudo-likelihood
+fit.mpl <- fitCopula(u, normal.cop.toep, method="mpl")
+fit.mpl
+## maximum likelihood
+fit.ml <- fitCopula(x, normal.cop.toep, method="ml")
+fit.ml
+## with dispstr="ar1"
+normal.cop.ar1 <- normalCopula(c(0), dim=3, dispstr="ar1")
+## inverting Kendall's tau
+fit.tau <- fitCopula(u, normal.cop.ar1, method="itau")
+fit.tau
+## inverting Spearman's rho
+fit.rho <- fitCopula(u, normal.cop.ar1, method="irho")
+fit.rho
+## maximum pseudo-likelihood
+fit.mpl <- fitCopula(u, normal.cop.ar1, method="mpl")
+fit.mpl
+## maximum likelihood
+fit.ml <- fitCopula(x, normal.cop.ar1, method="ml")
+fit.ml
+
+## a t copula with df.fixed=FALSE
+t.cop <- tCopula(c(0.2,0.4,0.6),dim=3,dispstr="un",df=5)
+x <- rcopula(t.cop, n)     ## true observations
+u <- apply(x, 2, rank) / (n + 1)  ## pseudo-observations
+## maximum likelihood
+fit.ml <- fitCopula(x, t.cop, method="ml", start=c(0,0,0,10))
+fit.ml
+## maximum pseudo-likelihood; the asymptotic variance cannot be estimated 
+fit.mpl <- fitCopula(u, t.cop, method="mpl", start=c(0,0,0,10),
+                     estimate.variance=FALSE)
+fit.mpl
 }
-\keyword{ models}% at least one, from doc/KEYWORDS
+\keyword{ models }% at least one, from doc/KEYWORDS
 \keyword{ multivariate }% __ONLY ONE__ keyword per line

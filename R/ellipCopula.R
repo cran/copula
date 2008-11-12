@@ -44,8 +44,16 @@ tauDerEllipCopula <- function(copula)  {
   return( 2 / (pi * sqrt(1 - copula@parameters^2)) )
 }
 
+tauDerFunEllipCopula <- function(copula)  {
+  function(x) return( 2 / (pi * sqrt(1 - x^2)) )
+}
+
 rhoDerEllipCopula <- function(copula) {
   return( 6 / (pi * sqrt(4 - copula@parameters^2)) )
+}
+
+rhoDerFunEllipCopula <- function(copula) {
+  function(x) return( 6 / (pi * sqrt(4 - x^2)) )
 }
 
 setMethod("calibKendallsTau", signature("ellipCopula"), calibKendallsTauEllipCopula)
@@ -53,3 +61,6 @@ setMethod("calibSpearmansRho", signature("ellipCopula"), calibSpearmansRhoEllipC
 
 setMethod("tauDer", signature("ellipCopula"), tauDerEllipCopula)
 setMethod("rhoDer", signature("ellipCopula"), rhoDerEllipCopula)
+
+setMethod("tauDerFun", signature("ellipCopula"), tauDerFunEllipCopula)
+setMethod("rhoDerFun", signature("ellipCopula"), rhoDerFunEllipCopula)

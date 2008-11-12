@@ -12,9 +12,10 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{est}:}{ \code{numeric}, parameter estimate. }
+    \item{\code{estimate}:}{ \code{numeric}, parameter estimate. }
     \item{\code{var.est}:}{ \code{numeric}, variance matrix estimate of
       the parameter estimator. See note below.  }
+    \item{\code{method}:}{ \code{character}, method of estimation. }
     \item{\code{loglik}:}{ \code{numeric}, loglikelihood evaluated at
       the maximizer. }
     \item{\code{convergence}:}{ \code{numeric}, convergence code from
@@ -25,21 +26,10 @@
   }
 }
 
-\note{
-  The variance matrix of the estimate, \code{"var.est"}, in the returned
-  object is only valid for full likelihood maximization. When
-  pseudo-observations are used, they under-estimate the variation. See
-  Genest, Ghoudi, and Rivest (1995).
-}
-
 \references{
   C. Genest, K. Ghoudi and L.-P. Rivest (1995). A semiparametric
   estimation procedure of dependence parameters in multivariate
   families of distributions. \emph{Biometrika}, 82, 543-552. 
-
-  J. Yan (2006), Multivariate Modeling with Copulas and Engineering
-  Applications. In \emph{Handbook of Engineering Statistics}, Ed. Pham,
-  Springer.
 }
 
 \keyword{classes}

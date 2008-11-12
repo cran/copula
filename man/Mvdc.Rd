@@ -10,7 +10,7 @@
   multivariate distribution via copula.
 }
 \usage{
-mvdc(copula, margins, paramMargins)
+mvdc(copula, margins, paramMargins, marginsIdentical = FALSE)
 dmvdc(mvdc, x)
 pmvdc(mvdc, x)
 rmvdc(mvdc, n)
@@ -22,6 +22,8 @@ rmvdc(mvdc, n)
   \item{paramMargins}{ a list whose each component is a list of named
     components, giving the parameter values of the marginal
     distributions. See details below.}
+  \item{marginsIdentical}{ logical variable restricting the marginal
+    distributions to be identical. }
   \item{mvdc}{ a \code{"mvdc"} object. }
   \item{x}{ a vector of the copula dimension or a matrix with number of
     rows being the copula dimension, giving the coordinates of the

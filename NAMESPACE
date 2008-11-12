@@ -49,11 +49,9 @@ export(indepTestSim, indepTest, multIndepTest,
 ## gof tests
 export(gofCopula) 
 
-## plackett; test purpose now
-## export(tauDerPlackettCopula, rhoDerClaytonCopula, rhoDerGumbelCopula)
-## export(derCdfWrtParams, derPdfWrtParams,
-##        tauDer, rhoDer,
-##        kendallsTauApprox)
+## derivatives; testing
+# export(derCdfWrtParams, derPdfWrtParams,
+#        tauDer, rhoDer)
 
 ## graphical tools for testing independence
 ## export(ChiPlot, KPlot)

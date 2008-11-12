@@ -159,21 +159,48 @@ calibKendallsTauClaytonCopula <- function(copula, tau) {
   2 * tau / (1 - tau)
 }
 
-spearmansRhoClaytonCopula <- function(copula) {
-  alpha <- copula@parameters[1]
-  if (alpha < -.2 || alpha > 15) spearmansRhoCopula(copula)
-  else spearmansRhoClaytonCopula.tr(alpha)
+claytonRhoFun <- function(alpha) {
+  ss <- .claytonRhoNeg$ss
+  forwardTransf <- .claytonRhoNeg$trFuns$forwardTransf
+  valFunNeg <- .claytonRhoNeg$assoMeasFun$valFun
+  valFunPos <- .claytonRhoPos$assoMeasFun$valFun
+  theta <- forwardTransf(alpha, ss)
+
+  c(ifelse(alpha <= 0, valFunNeg(theta), valFunPos(theta)))
 }
 
+claytonRhoDer <- function(alpha) {
+  ss <- .claytonRhoNeg$ss
+  forwardTransf <- .claytonRhoNeg$trFuns$forwardTransf
+  forwardDer <- .claytonRhoNeg$trFuns$forwardDer
+  valFunNeg <- .claytonRhoNeg$assoMeasFun$valFun
+  valFunPos <- .claytonRhoPos$assoMeasFun$valFun
+  theta <- forwardTransf(alpha, ss)
+
+  c(ifelse(alpha <= 0, valFunNeg(theta, 1), valFunPos(theta, 1))) * forwardDer(alpha, ss)
+}
+
+spearmansRhoClaytonCopula <- function(copula) {
+  alpha <- copula@parameters[1]
+  claytonRhoFun(alpha)
+}
+
+
 calibSpearmansRhoClaytonCopula <- function(copula, rho) {
-  if (rho < -0.16521 || rho > 0.98683) calibSpearmansRhoCopula(copula, rho)
-  else calibSpearmansRhoClaytonCopula.tr(rho)
+  claytonRhoInvNeg <- approxfun(x = .claytonRhoNeg$assoMeasFun$fm$ysmth,
+                                y = .claytonRhoNeg$assoMeasFun$fm$x)
+  
+  claytonRhoInvPos <- approxfun(x = .claytonRhoPos$assoMeasFun$fm$ysmth,
+                                y = .claytonRhoPos$assoMeasFun$fm$x)
+  
+  ss <- .claytonRhoNeg$ss
+  theta <- ifelse(rho <= 0, claytonRhoInvNeg(rho), claytonRhoInvPos(rho))
+  .claytonRhoPos$trFuns$backwardTransf(theta, ss)
 }
 
 rhoDerClaytonCopula <- function(copula) {
   alpha <- copula@parameters[1]
-  if (alpha < -0.2 || alpha > 15) stop("not yet implemented.")
-  spearmansRhoDerClaytonCopula.tr(alpha)
+  claytonRhoDer(alpha)
 }
 
 tailIndexClaytonCopula <- function(copula, ...) {

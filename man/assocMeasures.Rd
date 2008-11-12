@@ -80,16 +80,22 @@ calibSpearmansRho(copula, rho)
   \item{\dots}{ currently nothing. }
 }
 \details{
-  When there is no closed-form expression for Tau or Rho, numerical
-  integration from the \code{adapt} package is used. For closed-form
-  expressions, see Frees and Valdez (1998).
-
   The calibration function in fact returns a moment estimate of the
-  parameter for single-parameter copulas.
+  parameter for one-parameter copulas.
+  
+  When there are no closed-form expressions for Kendall's tau or
+  Spearman's rho, the calibration functions use numerical
+  approximation techniques (see the last reference). For closed-form
+  expressions, see Frees and Valdez (1998). For the t copula, the
+  calibration function based on Spearman's rho uses the corresponding
+  expression for the normal copula as an approximation.
 }
 \references{
   E.W. Frees and E.A. Valdez (1998).Understanding relationships using
   copulas.  \emph{North American Actuarial Journal}, 2:1--25.
+
+  I. Kojadinovic and J. Yan (2008), Comparison of three semiparametric methods
+  for estimating dependence parameters in copula models, submitted.
 }
 \examples{
 gumbel.cop <- gumbelCopula(3)
