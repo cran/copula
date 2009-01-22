@@ -19,15 +19,17 @@
 ##
 #################################################################################
 
+#################################################################################
 ## Goodness-of-fit test for copulas: wrapper function
 ## Calls either gofMCLT.PL, gofMCLT.KS or gofPB
-## See also the file mgofMclt.R
+#################################################################################
 
 ## copula is a copula of the desired family
 
 gofCopula <- function(copula, x, N = 1000, method = "mpl",
                       simulation = "pb", grid = "h0", R = 10,
-                      m = nrow(x), G = nrow(x), M = 2500)
+                      m = nrow(x), G = nrow(x), M = 2500,
+                      print.every = 100, optim.method = "Nelder-Mead")
   {
     x <- as.matrix(x)
     
@@ -45,11 +47,11 @@ gofCopula <- function(copula, x, N = 1000, method = "mpl",
 
 
     if (simulation == "pb") ## parametric bootstrap
-      gofPB(copula, x, N, method)
+      gofPB(copula, x, N, method, print.every, optim.method)
     else if (simulation == "mult") ## multiplier
       {
         if (method == "mpl")
-          gofMCLT.PL(copula, x, N, m, grid, G, R, M)
+          gofMCLT.PL(copula, x, N, m, grid, G, R, M, optim.method)
         else if (method %in% c("irho","itau"))
           {
             if (copula@dimension != 2)
@@ -62,14 +64,14 @@ gofCopula <- function(copula, x, N = 1000, method = "mpl",
   }
 
 ##############################################################################
-
 ## Goodness-of-fit test based on the parametric bootstrap
 ## as proposed by Genest et al. (2008)
+##############################################################################
 
 ## copula is a copula of the desired family whose parameters, if necessary,
 ## will be used as starting values in fitCopula
 
-gofPB <- function(copula, x, N, method, P=100)
+gofPB <- function(copula, x, N, method, print.every, optim.method)
   {
     n <- nrow(x)
     p <- ncol(x)
@@ -78,7 +80,8 @@ gofPB <- function(copula, x, N, method, P=100)
     u <- apply(x,2,rank)/(n+1)
 
     ## fit the copula
-    fcop <- fitCopula(u,copula,method,estimate.variance=FALSE)@copula
+    fcop <- fitCopula(copula, u, method, estimate.variance=FALSE,
+                      optim.method=optim.method)@copula
 
     ## compute the test statistic
     s <- .C("cramer_vonMises",
@@ -91,15 +94,16 @@ gofPB <- function(copula, x, N, method, P=100)
     
     ## simulation of the null distribution
     s0 <- numeric(N)
-    cat(paste("Progress will be displayed every",P,"iterations.\n"))
+    cat(paste("Progress will be displayed every", print.every, "iterations.\n"))
     for (i in 1:N)
       {
-        if (i %% P == 0)
+        if (i %% print.every == 0)
           cat(paste("Iteration",i,"\n"))
         u0 <- apply(rcopula(fcop,n),2,rank)/(n+1)
         
         ## fit the copula
-        fcop0 <-  fitCopula(u0,copula,method,estimate.variance=FALSE)@copula
+        fcop0 <-  fitCopula(copula, u0, method, estimate.variance=FALSE,
+                            optim.method=optim.method)@copula
         
         s0[i] <- .C("cramer_vonMises",
                     as.integer(n),
@@ -114,9 +118,15 @@ gofPB <- function(copula, x, N, method, P=100)
                 parameters=fcop@parameters))
   }
 
-##############################################################################
-## additional influence terms
 
+##############################################################################
+## Goodness-of-fit test based on the multiplier approach
+## and rank correlation coefficients
+##############################################################################
+
+############################################################################
+## additional influence terms
+############################################################################
 influ.add <- function(x0, y0, influ1, influ2)
 {
   M <- nrow(y0)
@@ -128,11 +138,6 @@ influ.add <- function(x0, y0, influ1, influ2)
          c(0,cumsum(influ2[o2]))[M + 1 - o2b] / M - mean(influ2 * y0[,2]))
 }
 
-##############################################################################
-
-## Goodness-of-fit test based on the multiplier approach
-## and rank correlation coefficients
-
 gofMCLT.KS <- function(cop, x, N, m, method, grid, G, R, M)
   {
     n <- nrow(x)
@@ -142,7 +147,7 @@ gofMCLT.KS <- function(cop, x, N, m, method, grid, G, R, M)
     u <- apply(x,2,rank)/(n+1)
 
     ## fit the copula
-    cop <- fitCopula(u,cop,method,estimate.variance=FALSE)@copula
+    cop <- fitCopula(cop,u,method,estimate.variance=FALSE)@copula
     
     ## perform R replications
     stat <- pval <- numeric(R)
@@ -173,7 +178,7 @@ gofMCLT.KS <- function(cop, x, N, m, method, grid, G, R, M)
                       PACKAGE="copula")$stat
         
         ## generate realizations under H0
-        x0 <- rcopula(cop,m) ## default
+        x0 <-  u # rcopula(cop,m) ## default
         
         ## prepare influence coefficients              
         if (method == "itau") ## kendall's tau
@@ -204,6 +209,136 @@ gofMCLT.KS <- function(cop, x, N, m, method, grid, G, R, M)
         
       }
 
-    return(list(statistic=median(stat), pvalue=median(pval),
+    return(list(statistic=mean(stat), pvalue=mean(pval),
                 sd.pvalues=sd(pval), parameters=cop@parameters))
   }
+
+###########################################################################
+## Multivariate multipler gof based on MPL
+###########################################################################
+
+#########################################################
+## influence coefficients
+#########################################################
+
+influCoef <- function(cop,u,M)
+  {
+    p <- cop@dimension
+
+    ## influence: second part
+    ## integrals computed from M realizations by Monte Carlo
+    v <- rcopula(cop,M)
+    dcop <- dcopwrap(cop,v) ## wrapper
+    influ0 <- derPdfWrtParams(cop,v)/dcop
+    derArg <- derPdfWrtArgs(cop,v)/dcop
+
+    influ <- vector("list",p)
+    for (i in 1:p)
+        influ[[i]] <- influ0 * derArg[,i]
+
+    ## expectation
+    q <- length(cop@parameters)
+    e <- crossprod(influ0)
+    e <- e/M
+    
+    return(solve(e) %*% t(derPdfWrtParams(cop,u)/dcopwrap(cop,u) - add.influ(u,v,influ,q)))
+  }
+
+#########################################################
+## second part of influence coefficients
+#########################################################
+
+add.influ <- function(u, v, influ, q)
+{
+  M <- nrow(v)
+  p <- ncol(v)
+  n <- nrow(u)
+  
+  o <- matrix(0,M,p)
+  ob <- matrix(0,n,p)
+  for (i in 1:p)
+    {
+      o[,i] <- order(v[,i], decreasing=TRUE)
+      ob[,i] <- ecdf(v[,i])(u[,i]) * M
+    }
+  
+  out <- matrix(0,n,q)
+  for (i in 1:p)
+      out <- out + rbind(rep(0,q),apply(influ[[i]][o[,i],,drop=FALSE],2,cumsum))[M + 1 - ob[,i],,drop=FALSE] / M -
+        #matrix(apply(influ[[i]] * v[,i],2,mean),n,q,byrow=TRUE)
+        matrix(colMeans(influ[[i]] * v[,i]),n,q,byrow=TRUE)
+  return(out)
+}
+
+#########################################################
+## goodness-of-fit test
+#########################################################
+
+## cop is a copula of the desired family whose parameters, if necessary, will be used
+## as starting values in fitCopula
+
+gofMCLT.PL <- function(cop, x, N, m, grid, G, R, M, optim.method)
+  {     
+    n <- nrow(x)
+    p <- ncol(x)
+
+    ## make pseudo-observations
+    u <- apply(x,2,rank)/(n+1)
+
+    ## fit the copula
+    cop <- fitCopula(cop, u, method="mpl", estimate.variance=FALSE,
+                     optim.method=optim.method)@copula
+
+    ## perform R replications
+    stat <- pval <- numeric(R)
+    for (i in 1:R)
+      { 
+        
+        ## grid points where to evaluate the process
+        if (grid == "h0")  ## from the H0 copula 
+          g <- rcopula(cop,G)
+        else if (grid == "po") ## pseudo-observations
+          {
+            g <- u
+            G <- n
+          }
+        else stop("Invalid grid")
+        
+        pcop <- pcopula(cop,g)
+        
+        ## compute the test statistic
+        stat[i] <- .C("cramer_vonMises_2",
+                      as.integer(p),
+                      as.double(u),
+                      as.integer(n),
+                      as.double(g),
+                      as.integer(G),
+                      as.double(pcop),
+                      stat = double(1),
+                      PACKAGE="copula")$stat
+        
+        ## generate realizations under H0
+        x0 <- u # rcopula(cop,m)
+        
+        s0 <- .C("multiplier",
+                 as.integer(p),
+                 as.double(x0),
+                 as.integer(m),
+                 as.double(g), 
+                 as.integer(G), 
+                 as.double(pcop), 
+                 as.double(derCdfWrtArgs(cop,g)),
+                 as.double(derCdfWrtParams(cop,g) %*% influCoef(cop,x0,M)),
+                 as.integer(N),
+                 s0 = double(N),
+                 PACKAGE="copula")$s0
+        
+        pval[i] <- (sum(s0 >= stat[i])+0.5)/(N+1)
+        
+      }
+    
+    return(list(statistic=mean(stat), pvalue=mean(pval),
+                sd.pvalues=sd(pval), parameters=cop@parameters))
+  }
+
+                      

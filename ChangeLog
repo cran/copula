@@ -1,3 +1,28 @@
+2009-01-22 Jun Yan <jyan@stat.uconn.edu> and Ivan Kojadinovic <ivan@stat.auckland.ac.nz>
+
+	* Fixed a bug in the random number generation for the 
+	Husler-Reiss family.
+
+	* Changed the default optimization method in fitCopula to 
+	"Nelder-Mead". 
+
+	* Added "optim.method" parameter to "gofCopula". 
+
+	* The functions "fitCopula" and "gofCopula" should now work 
+	for the Husler-Reiss and the Galambos families. The derivatives
+	w.r.t. parameters and arguments are also implemented.
+
+	* Added conditions in "fitCopula" so that the variance is not 
+	estimated if the appropriate functions are not defined.
+
+	* Switched order of argument "copula" and "data" in fitCopula 
+	to be consistent with gofCopula.
+
+	* Changed "UseMethod" to "setGeneric" for defining generic 
+	functions.
+
+	* Documention for "gofCopula" improved.
+
 2008-11-18  Ivan Kojadinovic  <ivan@stat.auckland.ac.nz>
 
 	* Jun has modified the structure of "fitCopula". Inversion 

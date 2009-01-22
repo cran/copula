@@ -12,7 +12,7 @@ export(calibKendallsTau, calibSpearmansRho)
 export(genFun, genInv, genFunDer1, genFunDer2)
 
 ## evCopula methods
-export(Afun)
+export(Afun, AfunDer)
 
 exportClasses(mvdc)
 exportClasses(copula, ellipCopula, archmCopula, evCopula)

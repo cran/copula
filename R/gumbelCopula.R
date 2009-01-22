@@ -25,6 +25,36 @@ AfunGumbel <- function(copula, w) {
   (w^alpha + (1 - w)^alpha)^(1/alpha)
 }
 
+AfunDerGumbel <- function(copula, w) {
+  alpha <- copula@parameters[1]
+  ## deriv(expression((w^alpha + (1 - w)^alpha)^(1/alpha)), "w", hessian=TRUE)
+  value <- eval(expression({
+    .expr2 <- 1 - w
+    .expr4 <- w^alpha + .expr2^alpha
+    .expr5 <- 1/alpha
+    .expr7 <- .expr5 - 1
+    .expr8 <- .expr4^.expr7
+    .expr9 <- alpha - 1
+    .expr14 <- w^.expr9 * alpha - .expr2^.expr9 * alpha
+    .expr15 <- .expr5 * .expr14
+    .expr22 <- .expr9 - 1
+    .value <- .expr4^.expr5
+    .grad <- array(0, c(length(.value), 1L), list(NULL, c("w")))
+    .hessian <- array(0, c(length(.value), 1L, 1L), list(NULL, 
+        c("w"), c("w")))
+    .grad[, "w"] <- .expr8 * .expr15
+    .hessian[, "w", "w"] <- .expr4^(.expr7 - 1) * (.expr7 * .expr14) * 
+        .expr15 + .expr8 * (.expr5 * (w^.expr22 * .expr9 * alpha + 
+        .expr2^.expr22 * .expr9 * alpha))
+    attr(.value, "gradient") <- .grad
+    attr(.value, "hessian") <- .hessian
+    .value
+  }), list(alpha=alpha, w=w))
+  der1 <- c(attr(value, "gradient"))
+  der2 <- c(attr(value, "hessian"))
+  data.frame(der1=der1, der2=der2)
+}
+
 genFunGumbel <- function(copula, u) {
   alpha <- copula@parameters[1]
   ( - log(u))^alpha
@@ -78,44 +108,6 @@ gumbelCopula <- function(param, dim = 2) {
   val
 }
 
-## rgumbelBivCopula <- function(copula, n) {
-##   ## Taken from finmetrics for comparison purpose, but I don't understand it
-##   ## because it is not well-documented.
-##   ## generate z from distribution h
-##   ## using rejection method
-##   zrand <- vector(length = n, mode = "numeric")
-##   xgenerated <- vector(length = n, mode = "logical")
-##   lg <- n
-##   ##set c to 1/2 true for symmetric copula
-##   cc <- Hderiv(copula, 1/2)
-##   stopnow <- F
-##   while(!stopnow) {
-##     usamp <- runif(lg)
-##     ysamp <- runif(lg)
-##     ykeep <- (usamp <= Hderiv(copula, ysamp)/cc)
-##     ##indexes of xrand vector to store "good" generated values  
-##     toind <- (c(1:n)[!xgenerated])[ykeep]
-##     zrand[toind] <- ysamp[ykeep]
-##     xgenerated[toind] <- T
-##     ##number of rvs left to generate:
-##     lg <- n - sum(xgenerated)
-##     if(lg == 0)
-##       stopnow <- T
-##   }
-##   z <- zrand
-##   u <- runif(n)
-##   ## cat(length(z), length(AsecondDer(copula,z)))
-##   pz <- (z * (1 - z) * AsecondDer(copula, z))/Hderiv(copula, z)/A(copula, z)
-##   w <- NULL
-##   w[1:n] <- 0
-##   nn <- sum(u <= pz)
-##   w[u <= pz] <- runif(nn)
-##   w[u > pz] <- runif(n - nn) * runif(n - nn)
-##   xx <- exp((z * log(w))/A(copula, z))
-##   yy <- exp(((1 - z) * log(w))/A(copula, z))
-##   val <- list(x = xx, y = yy)
-##   val
-## } 
 
 rgumbelCopula <- function(copula, n) {
   ## frailty is stable(1,0,0) with 1/alpha
@@ -173,7 +165,7 @@ tailIndexGumbelCopula <- function(copula, ...) {
 
 
 calibKendallsTauGumbelCopula <- function(copula, tau) {
-  1/(1 - tau)
+  ifelse(tau < 0, 1, 1/(1 - tau))
 }
 
 
@@ -226,6 +218,7 @@ setMethod("pcopula", signature("gumbelCopula"), pgumbelCopula)
 setMethod("dcopula", signature("gumbelCopula"), dgumbelCopula.pdf)
 
 setMethod("Afun", signature("gumbelCopula"), AfunGumbel)
+setMethod("AfunDer", signature("gumbelCopula"), AfunDerGumbel)
 
 setMethod("genFun", signature("gumbelCopula"), genFunGumbel)
 setMethod("genInv", signature("gumbelCopula"), genInvGumbel)

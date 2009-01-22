@@ -34,6 +34,12 @@
 \alias{Afun,gumbelCopula-method}
 \alias{Afun,huslerReissCopula-method}
 
+\alias{AfunDer}
+\alias{AfunDer-methods}
+\alias{AfunDer,galambosCopula-method}
+\alias{AfunDer,gumbelCopula-method}
+\alias{AfunDer,huslerReissCopula-method}
+
 \title{Generator functions for Archimedean and extreme value copulas}
 \description{
  Methods to evaluate the generator function, the inverse generator
@@ -45,6 +51,7 @@ genInv(copula, s)
 genFunDer1(copula, u)
 genFunDer2(copula, u)
 Afun(copula, w)
+AfunDer(copula, w)
 }
 \arguments{
   \item{copula}{an object of class \code{"copula"}. }
@@ -59,6 +66,9 @@ Afun(copula, w)
   and 2nd derivatives of the generator function for an Archimedean copula.
 
   \code{"Afun"} is the generator function of an extreme value copula.
+
+  \code{"AfunDer"} returns a data.frame containing the 1st and 2nd
+  derivative of \code{"Afun"}.
 }
 \keyword{methods}
 \keyword{multivariate}

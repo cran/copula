@@ -40,57 +40,19 @@ setClass("copula",
          )
 
 ## general methods for copula
-dcopula <- function(copula, u) {
-  UseMethod("dcopula")
-}
+setGeneric("dcopula", function(copula, u) standardGeneric("dcopula"))
+setGeneric("pcopula", function(copula, u) standardGeneric("pcopula"))
+setGeneric("rcopula", function(copula, n) standardGeneric("rcopula"))
+setGeneric("kendallsTau", function(copula, ...) standardGeneric("kendallsTau"))
+setGeneric("spearmansRho", function(copula, ...) standardGeneric("spearmansRho"))
+setGeneric("tailIndex", function(copula, ...) standardGeneric("tailIndex"))
+setGeneric("calibKendallsTau", function(copula, tau) standardGeneric("calibKendallsTau"))
+setGeneric("calibSpearmansRho", function(copula, rho) standardGeneric("calibSpearmansRho"))
+setGeneric("tauDer", function(copula, ...) standardGeneric("tauDer"))
+setGeneric("rhoDer", function(copula, ...) standardGeneric("rhoDer"))
 
-pcopula <- function(copula, u) {
-  UseMethod("pcopula")
-}
-
-rcopula <- function(copula, n) {
-  UseMethod("rcopula")
-}
-
-kendallsTau <- function(copula, ...) {
-  UseMethod("kendallsTau")
-}
-
-spearmansRho <- function(copula, ...) {
-  UseMethod("spearmansRho")
-}
-
-tailIndex <- function(copula, ...) {
-  ## bivariate association measurement
-  UseMethod("tailIndex")
-}
-
-calibKendallsTau <- function(copula, tau) {
-  UseMethod("calibKendallsTau")
-}
-
-calibSpearmansRho <- function(copula, rho) {
-  UseMethod("calibSpearmansRho")
-}
-
-tauDer <- function(copula) {
-  UseMethod("tauDer")
-}
-
-rhoDer <- function(copula) {
-  UseMethod("rhoDer")
-}
-
-
-## The following functions return functions for ease of vector computing
-## used in fitCopula for ar1; see fitCopula.R
-tauDerFun <- function(copula){
-  UseMethod("tauDerFun")
-}
-
-rhoDerFun <- function(copula){
-  UseMethod("rhoDerFun")
-}
+setGeneric("tauDerFun", function(copula) standardGeneric("tauDerFun"))
+setGeneric("rhoDerFun", function(copula) standardGeneric("rhoDerFun"))
 
 
 ###############################################################
@@ -186,29 +148,11 @@ setClass("amhCopula",
          )
 
 ## methods for archmCopulas
-genFun <- function(copula, u) {
-  UseMethod("genFun")
-}
 
-genInv <- function(copula, s) {
-  UseMethod("genInv")
-}
-
-genFunDer1 <- function(copula, u) {
-  UseMethod("genFunDer1")
-}
-
-genFunDer2 <- function(copula, u) {
-  UseMethod("genFunDer2")
-}
-
-## genFunDer <- function(copula, u, n) {## nth derivative
-##   UseMethod("genFunDer")
-## }
-
-## genInvDer <- function(copula, s, n) {## nth derivative
-##   UseMethod("genInvDer")
-## }
+setGeneric("genFun", function(copula, u) standardGeneric("genFun"))
+setGeneric("genInv", function(copula, s) standardGeneric("genInv"))
+setGeneric("genFunDer1", function(copula, u) standardGeneric("genFunDer1"))
+setGeneric("genFunDer2", function(copula, u) standardGeneric("genFunDer2"))
 
 #######################################################
 #### extreme value copulas, contains galambos, husler-reiss,
@@ -216,7 +160,8 @@ genFunDer2 <- function(copula, u) {
 #######################################################
 
 setClass("evCopula",
-         representation = representation("copula"),
+         representation = representation("copula",
+           exprdist = "expression"),
          contains = list("copula")
          )
 
@@ -238,13 +183,10 @@ setClass("huslerReissCopula",
          contains = list("copula", "evCopula")
          )
 
-
-## methods for evCopula
-Afun <- function(copula, w) {
-  UseMethod("Afun")
-}
-
-
+setGeneric("Afun", function(copula, w) standardGeneric("Afun"))
+setGeneric("AfunDer", function(copula, w) standardGeneric("AfunDer"))
+setGeneric("derAfunWrtParam", function(copula, w) standardGeneric("derAfunWrtParam"))
+           
 #######################################################
 #### other copulas
 #######################################################

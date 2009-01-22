@@ -85,5 +85,5 @@ calibSpearmansRhoCopula <- function(copula, rho) {
   sol
 }
 
-setMethod("calibKendallsTau", signature("copula"), calibKendallsTauCopula)
-setMethod("calibSpearmansRho", signature("copula"), calibSpearmansRhoCopula)
+## setMethod("calibKendallsTau", signature("copula"), calibKendallsTauCopula)
+## setMethod("calibSpearmansRho", signature("copula"), calibSpearmansRhoCopula)

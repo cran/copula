@@ -75,7 +75,7 @@ setMethod("summary", signature("fitCopula"), summaryFitCopula)
 ################################################################
 ## Wrapper function
 ################################################################
-fitCopula <- function(data, copula,
+fitCopula <- function(copula, data,
                       method = "mpl", 
                       start = NULL,
                       lower=NULL, upper=NULL,
@@ -100,10 +100,14 @@ fitCopula <- function(data, copula,
 fitCopula.mpl <- function(copula, data, start=NULL,
                           lower=NULL, upper=NULL,
                           optim.control=list(NULL),
-                          optim.method="BFGS",
+                          optim.method="Nelder-Mead",
                           estimate.variance = TRUE) {
   q <- length(copula@parameters)
-  if (is.null(start)) start <- fitCopula.itau(copula, data, FALSE)@estimate
+  if (is.null(start)) {
+    if (hasMethod("calibKendallsTau", class(copula))) start <- fitCopula.itau(copula, data, FALSE)@estimate
+    else start <- copula@parameters
+  }
+  
   fit <- fitCopula.ml(data, copula, start, lower, upper,
                       optim.control, optim.method, FALSE)
   var.est <- if(estimate.variance) varPL(fit@copula, data) / nrow(data) else matrix(NA, q, q)
@@ -344,12 +348,18 @@ influ.terms <- function(u, influ, q)
 
 varPL <- function(cop,u)
   {
+    ## check if variance can be computed
+    if (!hasMethod("dcopwrap", class(cop))) {
+      warning("The variance estimate cannot be computed for this copula.")
+      q <- length(cop@parameters)
+      return(matrix(NA, q, q))
+    }
+    
     p <- cop@dimension
     n <- nrow(u)
     
     ## influence: second part
     ## integrals computed from the original pseudo-obs u by Monte Carlo 
-
     dcop <- dcopwrap(cop,u) ## wrapper
     influ0 <- derPdfWrtParams(cop,u)/dcop
     derArg <- derPdfWrtArgs(cop,u)/dcop
@@ -447,6 +457,12 @@ varInfluAr1 <- function(cop, v, L, der) {
 }
 
 varKendall <- function(cop,u) {
+  ## check if variance can be computed
+  if (!hasMethod("tauDer", class(cop))) {
+    warning("The variance estimate cannot be computed for this copula.")
+    q <- length(cop@parameters)
+    return(matrix(NA, q, q))
+  }
   p <- cop@dimension
   n <- nrow(u)
   ec <- numeric(n)
@@ -481,6 +497,13 @@ varKendall <- function(cop,u) {
 ## u are the available pseudo-observations
 
 varSpearman <- function(cop,u)  {
+  ## check if variance can be computed
+  if (!hasMethod("rhoDer", class(cop))) {
+    warning("The variance estimate cannot be computed for this copula.")
+    q <- length(cop@parameters)
+    return(matrix(NA, q, q))
+  }
+
   p <- cop@dimension
   n <- nrow(u) 
   v <- matrix(0,n,p*(p-1)/2)

@@ -35,7 +35,7 @@ multIndepTest(x, d, m=length(d), N=1000, alpha=0.05)
 
 \value{
   The function \code{"multIndepTest"} returns an object of class
-  \\code{"indepTest"} whose attributes are: \code{subsets},
+  \code{"indepTest"} whose attributes are: \code{subsets},
   \code{statistics}, \code{critical.values}, \code{pvalues},
   \code{fisher.pvalue} (a p-value resulting from a combination \emph{à la}
   Fisher of the subset statistic p-values), \code{tippett.pvalue} (a p-value

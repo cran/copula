@@ -10,18 +10,18 @@
 }
 \usage{
 loglikCopula(param, x, copula, suppressMessages=FALSE)
-fitCopula(data, copula, method="mpl", start=NULL, lower=NULL, upper=NULL,
+fitCopula(copula, data, method="mpl", start=NULL, lower=NULL, upper=NULL,
           optim.control = list(NULL), optim.method = "BFGS",
           estimate.variance = TRUE)
 }
 \arguments{
   \item{param}{ a vector of parameter values. }
   \item{x}{ a data matrix. }
+  \item{data}{ a data matrix. }
   \item{copula}{ a \code{"copula"} object. }
   \item{suppressMessages}{ logical, if TRUE, warnings messages from
     evaluating loglikelihood at invalid parameter values are
     suppressed. }
-  \item{data}{ a data matrix. }
   \item{method}{ can be either \code{"ml"} (maximum likelihood), \code{"mpl"} (maximum
     pseudo-likelihood), \code{"itau"} (inversion of Kendall's tau), and
     \code{"irho"} (inversion of Spearman's rho). The last three methods
@@ -31,7 +31,7 @@ fitCopula(data, copula, method="mpl", start=NULL, lower=NULL, upper=NULL,
   \item{start}{ a vector of starting value for \code{"param"}.}
   \item{lower, upper}{ bounds on the variables for the \code{"L-BFGS-B"} method.}
   \item{optim.control}{ a list of controls to be passed to \code{"optim"}. }
-  \item{optim.method}{ the method for \code{"optim"}. }
+  \item{optim.method}{ the method for \code{"\link{optim}"}. }
   \item{estimate.variance}{ logical, if TRUE, the large-sample variance is
     estimated. }    
 }
@@ -117,16 +117,16 @@ n <- 200
 x <- rcopula(gumbel.cop, n)       ## true observations
 u <- apply(x, 2, rank) / (n + 1)  ## pseudo-observations
 ## inverting Kendall's tau
-fit.tau <- fitCopula(u, gumbel.cop, method="itau")
+fit.tau <- fitCopula(gumbel.cop, u, method="itau")
 fit.tau
 ## inverting Spearman's rho
-fit.rho <- fitCopula(u, gumbel.cop, method="irho")
+fit.rho <- fitCopula(gumbel.cop, u, method="irho")
 fit.rho
 ## maximum pseudo-likelihood
-fit.mpl <- fitCopula(u, gumbel.cop, method="mpl")
+fit.mpl <- fitCopula(gumbel.cop, u, method="mpl")
 fit.mpl
 ## maximum likelihood
-fit.ml <- fitCopula(x, gumbel.cop, method="ml")
+fit.ml <- fitCopula(gumbel.cop, x, method="ml")
 fit.ml
 
 ## a multiparameter example
@@ -134,44 +134,44 @@ normal.cop <- normalCopula(c(0.6,0.36, 0.6),dim=3,dispstr="un")
 x <- rcopula(normal.cop, n)     ## true observations
 u <- apply(x, 2, rank) / (n + 1)  ## pseudo-observations
 ## inverting Kendall's tau
-fit.tau <- fitCopula(u, normal.cop, method="itau")
+fit.tau <- fitCopula(normal.cop, u, method="itau")
 fit.tau
 ## inverting Spearman's rho
-fit.rho <- fitCopula(u, normal.cop, method="irho")
+fit.rho <- fitCopula(normal.cop, u, method="irho")
 fit.rho
 ## maximum pseudo-likelihood
-fit.mpl <- fitCopula(u, normal.cop, method="mpl")
+fit.mpl <- fitCopula(normal.cop, u, method="mpl")
 fit.mpl
 ## maximum likelihood
-fit.ml <- fitCopula(x, normal.cop, method="ml")
+fit.ml <- fitCopula(normal.cop, x, method="ml")
 fit.ml
 ## with dispstr="toep"
 normal.cop.toep <- normalCopula(c(0, 0), dim=3, dispstr="toep")
 ## inverting Kendall's tau
-fit.tau <- fitCopula(u, normal.cop.toep, method="itau")
+fit.tau <- fitCopula(normal.cop.toep, u, method="itau")
 fit.tau
 ## inverting Spearman's rho
-fit.rho <- fitCopula(u, normal.cop.toep, method="irho")
+fit.rho <- fitCopula(normal.cop.toep, u, method="irho")
 fit.rho
 ## maximum pseudo-likelihood
-fit.mpl <- fitCopula(u, normal.cop.toep, method="mpl")
+fit.mpl <- fitCopula(normal.cop.toep, u, method="mpl")
 fit.mpl
 ## maximum likelihood
-fit.ml <- fitCopula(x, normal.cop.toep, method="ml")
+fit.ml <- fitCopula(normal.cop.toep, x, method="ml")
 fit.ml
 ## with dispstr="ar1"
 normal.cop.ar1 <- normalCopula(c(0), dim=3, dispstr="ar1")
 ## inverting Kendall's tau
-fit.tau <- fitCopula(u, normal.cop.ar1, method="itau")
+fit.tau <- fitCopula(normal.cop.ar1, u, method="itau")
 fit.tau
 ## inverting Spearman's rho
-fit.rho <- fitCopula(u, normal.cop.ar1, method="irho")
+fit.rho <- fitCopula(normal.cop.ar1, u, method="irho")
 fit.rho
 ## maximum pseudo-likelihood
-fit.mpl <- fitCopula(u, normal.cop.ar1, method="mpl")
+fit.mpl <- fitCopula(normal.cop.ar1, u, method="mpl")
 fit.mpl
 ## maximum likelihood
-fit.ml <- fitCopula(x, normal.cop.ar1, method="ml")
+fit.ml <- fitCopula(normal.cop.ar1, x, method="ml")
 fit.ml
 
 ## a t copula with df.fixed=FALSE
@@ -179,10 +179,10 @@ t.cop <- tCopula(c(0.2,0.4,0.6),dim=3,dispstr="un",df=5)
 x <- rcopula(t.cop, n)     ## true observations
 u <- apply(x, 2, rank) / (n + 1)  ## pseudo-observations
 ## maximum likelihood
-fit.ml <- fitCopula(x, t.cop, method="ml", start=c(0,0,0,10))
+fit.ml <- fitCopula(t.cop, x, method="ml", start=c(0,0,0,10))
 fit.ml
 ## maximum pseudo-likelihood; the asymptotic variance cannot be estimated 
-fit.mpl <- fitCopula(u, t.cop, method="mpl", start=c(0,0,0,10),
+fit.mpl <- fitCopula(t.cop, u, method="mpl", start=c(0,0,0,10),
                      estimate.variance=FALSE)
 fit.mpl
 }

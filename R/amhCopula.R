@@ -126,10 +126,17 @@ ramhCopula <- function(copula, n) {
 
 kendallsTauAmhCopula <- function(copula, ...) {
   alpha <- copula@parameters[1]
-  ## Nelsen (1999, p.139)
+  ## Nelsen (2006, p.172)
+  ## range of tau: [(5 - 8 log 2) / 3, 1/3] ~= [-0.1817, 0.3333]
   (3 * alpha - 2) / 3 / alpha - 2 / 3 * (1 - 1/alpha)^2 * log(1 - alpha)
 }
 
+## spearmansRhoAmhCopula <- function(copula, ...) {
+##   alpha <- copula@parameters[1]
+##   ## Nelsen (2006, p.172); need dilog function
+##   ## range of rho: 33 - 48 log 2, 4 pi^2 - 39] ~= [-0.2711, 0.4784]
+##   12 * (1 + alpha) / alpha^2 * dilog(1 - alpha) - 24 * (1 - alpha) / alpha^2 * log(1 - alpha) - 3 * (alpha + 12) / alpha
+## }
 
 setMethod("rcopula", signature("amhCopula"), ramhCopula)
 setMethod("pcopula", signature("amhCopula"), pamhCopula)

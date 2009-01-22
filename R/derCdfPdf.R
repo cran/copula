@@ -24,11 +24,10 @@
 ## partial derivatives of the CDF wrt arguments
 #########################################################
 
-derCdfWrtArgs <- function(cop, u)
-  {
-    UseMethod("derCdfWrtArgs")
-  }
+setGeneric("derCdfWrtArgs", function(cop, u) standardGeneric("derCdfWrtArgs"))
 
+
+## Warning: This function assumes symmetry in u
 derCdfWrtArgsExplicitCopula <- function(cop, u)
   {
     p <- cop@dimension
@@ -47,7 +46,7 @@ derCdfWrtArgsExplicitCopula <- function(cop, u)
 
 setMethod("derCdfWrtArgs", signature("archmCopula"), derCdfWrtArgsExplicitCopula)
 setMethod("derCdfWrtArgs", signature("plackettCopula"), derCdfWrtArgsExplicitCopula)
-
+setMethod("derCdfWrtArgs", signature("evCopula"), derCdfWrtArgsExplicitCopula)
 
 derCdfWrtArgsEllipCopula <- function(cop, u)
   {
@@ -107,10 +106,7 @@ setMethod("derCdfWrtArgs", signature("ellipCopula"), derCdfWrtArgsEllipCopula)
 ## Plackett formula for elliptical copulas
 #########################################################
 
-plackettFormulaDim2 <- function(cop, x)
-  {
-    UseMethod("plackettFormulaDim2")
-  }
+setGeneric("plackettFormulaDim2", function(cop, x) standardGeneric("plackettFormulaDim2"))
 
 plackettFormulaDim2NormalCopula <- function(cop, x)
   {
@@ -131,10 +127,7 @@ plackettFormulaDim2TCopula <- function(cop, x)
 
 setMethod("plackettFormulaDim2", signature("tCopula"), plackettFormulaDim2TCopula)
 
-plackettFormula <- function(cop, p, rho, s, m, x, i, j)
-  {
-    UseMethod("plackettFormula")
-  }
+setGeneric("plackettFormula",  function(cop, p, rho, s, m, x, i, j) standardGeneric("plackettFormula"))
 
 plackettFormulaNormalCopula <- function(cop, p, rho, s, m, x, i, j)
   {
@@ -166,10 +159,8 @@ setMethod("plackettFormula", signature("tCopula"), plackettFormulaTCopula)
 ## partial derivatives of the CDF wrt parameters
 #########################################################
 
-derCdfWrtParams <- function(cop, u)
-  {
-    UseMethod("derCdfWrtParams")
-  }
+setGeneric("derCdfWrtParams", function(cop, u) standardGeneric("derCdfWrtParams"))
+
 
 derCdfWrtParamsExplicitCopula <- function(cop, u)
   {
@@ -180,8 +171,18 @@ derCdfWrtParamsExplicitCopula <- function(cop, u)
     return(as.matrix(eval(der.cdf.alpha, data.frame(u))))
   }
 
+derCdfWrtParamsEvCopula <- function(cop, u) {
+  alpha <- cop@parameters
+  loguv <- log(u[,1], u[,2])
+  w <- log(u[,2]) / loguv
+  der.cdf.alpha <- pcopula(cop, u) * loguv * derAfunWrtParam(cop, w)
+  return(as.matrix(der.cdf.alpha))
+}
+
 setMethod("derCdfWrtParams", signature("archmCopula"), derCdfWrtParamsExplicitCopula)
 setMethod("derCdfWrtParams", signature("plackettCopula"), derCdfWrtParamsExplicitCopula)
+## setMethod("derCdfWrtParams", signature("evCopula"), derCdfWrtParamsEvCopula)
+setMethod("derCdfWrtParams", signature("evCopula"), derCdfWrtParamsExplicitCopula)
 
 
 derCdfWrtParamsEllipCopula <- function(cop, u)
@@ -264,10 +265,7 @@ setMethod("derCdfWrtParams", signature("ellipCopula"), derCdfWrtParamsEllipCopul
 ## for ellipCopula: DIVIDED BY PDF 
 #########################################################
 
-derPdfWrtArgs <- function(cop, u)
-  {
-    UseMethod("derPdfWrtArgs")
-  }
+setGeneric("derPdfWrtArgs", function(cop, u) standardGeneric("derPdfWrtArgs"))
 
 derPdfWrtArgsExplicitCopula <- function(cop, u)
   {
@@ -287,6 +285,7 @@ derPdfWrtArgsExplicitCopula <- function(cop, u)
 
 setMethod("derPdfWrtArgs", signature("archmCopula"), derPdfWrtArgsExplicitCopula)
 setMethod("derPdfWrtArgs", signature("plackettCopula"), derPdfWrtArgsExplicitCopula)
+setMethod("derPdfWrtArgs", signature("evCopula"), derPdfWrtArgsExplicitCopula)
 
 derPdfWrtArgsNormalCopula <- function(cop, u)
   {
@@ -316,10 +315,7 @@ setMethod("derPdfWrtArgs", signature("tCopula"), derPdfWrtArgsTCopula)
 ## for ellipCopula: DIVIDED BY PDF 
 #########################################################
 
-derPdfWrtParams <- function(cop, u)
-  {
-    UseMethod("derPdfWrtParams")
-  }
+setGeneric("derPdfWrtParams", function(cop, u) standardGeneric("derPdfWrtParams"))
 
 derPdfWrtParamsExplicitCopula <- function(cop, u)
   {
@@ -332,6 +328,7 @@ derPdfWrtParamsExplicitCopula <- function(cop, u)
 
 setMethod("derPdfWrtParams", signature("archmCopula"), derPdfWrtParamsExplicitCopula)
 setMethod("derPdfWrtParams", signature("plackettCopula"), derPdfWrtParamsExplicitCopula)
+setMethod("derPdfWrtParams", signature("evCopula"), derPdfWrtParamsExplicitCopula)
 
 derPdfWrtParamsEllipCopula <- function(cop, u)
   {
@@ -426,10 +423,7 @@ setMethod("derPdfWrtParams", signature("ellipCopula"), derPdfWrtParamsEllipCopul
 ## dcopula wrapper for influence coefficients
 #########################################################
 
-dcopwrap <- function(cop, u)
-  {
-    UseMethod("dcopwrap")
-  }
+setGeneric("dcopwrap",  function(cop, u, ...) standardGeneric("dcopwrap"))
 
 dcopwrapExplicitCopula <- function(cop, u)
   {
@@ -438,6 +432,7 @@ dcopwrapExplicitCopula <- function(cop, u)
 
 setMethod("dcopwrap", signature("archmCopula"), dcopwrapExplicitCopula)
 setMethod("dcopwrap", signature("plackettCopula"), dcopwrapExplicitCopula)
+setMethod("dcopwrap", signature("evCopula"), dcopwrapExplicitCopula)
 
 dcopwrapEllipCopula <- function(cop, u)
   {
@@ -447,127 +442,3 @@ dcopwrapEllipCopula <- function(cop, u)
 setMethod("dcopwrap", signature("ellipCopula"), dcopwrapEllipCopula)
 
 
-#########################################################
-## influence coefficients
-#########################################################
-
-influCoef <- function(cop,u,M)
-  {
-    p <- cop@dimension
-
-    ## influence: second part
-    ## integrals computed from M realizations by Monte Carlo
-    v <- rcopula(cop,M)
-    dcop <- dcopwrap(cop,v) ## wrapper
-    influ0 <- derPdfWrtParams(cop,v)/dcop
-    derArg <- derPdfWrtArgs(cop,v)/dcop
-
-    influ <- vector("list",p)
-    for (i in 1:p)
-        influ[[i]] <- influ0 * derArg[,i]
-
-    ## expectation
-    q <- length(cop@parameters)
-    e <- crossprod(influ0)
-    e <- e/M
-    
-    return(solve(e) %*% t(derPdfWrtParams(cop,u)/dcopwrap(cop,u) - add.influ(u,v,influ,q)))
-  }
-
-#########################################################
-## second part of influence coefficients
-#########################################################
-
-add.influ <- function(u, v, influ, q)
-{
-  M <- nrow(v)
-  p <- ncol(v)
-  n <- nrow(u)
-  
-  o <- matrix(0,M,p)
-  ob <- matrix(0,n,p)
-  for (i in 1:p)
-    {
-      o[,i] <- order(v[,i], decreasing=TRUE)
-      ob[,i] <- ecdf(v[,i])(u[,i]) * M
-    }
-  
-  out <- matrix(0,n,q)
-  for (i in 1:p)
-      out <- out + rbind(rep(0,q),apply(influ[[i]][o[,i],,drop=FALSE],2,cumsum))[M + 1 - ob[,i],,drop=FALSE] / M -
-        #matrix(apply(influ[[i]] * v[,i],2,mean),n,q,byrow=TRUE)
-        matrix(colMeans(influ[[i]] * v[,i]),n,q,byrow=TRUE)
-  return(out)
-}
-
-#########################################################
-## goodness-of-fit test
-#########################################################
-
-## cop is a copula of the desired family whose parameters, if necessary, will be used
-## as starting values in fitCopula
-
-gofMCLT.PL <- function(cop, x, N, m, grid, G, R, M)
-  {     
-    n <- nrow(x)
-    p <- ncol(x)
-
-    ## make pseudo-observations
-    u <- apply(x,2,rank)/(n+1)
-
-    ## fit the copula
-    cop <- fitCopula(u,cop,method="mpl",estimate.variance=FALSE)@copula
-
-    ## perform R replications
-    stat <- pval <- numeric(R)
-    for (i in 1:R)
-      { 
-        
-        ## grid points where to evaluate the process
-        if (grid == "h0")  ## from the H0 copula 
-          g <- rcopula(cop,G)
-        else if (grid == "po") ## pseudo-observations
-          {
-            g <- u
-            G <- n
-          }
-        else stop("Invalid grid")
-        
-        pcop <- pcopula(cop,g)
-        
-        ## compute the test statistic
-        stat[i] <- .C("cramer_vonMises_2",
-                      as.integer(p),
-                      as.double(u),
-                      as.integer(n),
-                      as.double(g),
-                      as.integer(G),
-                      as.double(pcop),
-                      stat = double(1),
-                      PACKAGE="copula")$stat
-        
-        ## generate realizations under H0
-        x0 <- rcopula(cop,m)
-        
-        s0 <- .C("multiplier",
-                 as.integer(p),
-                 as.double(x0),
-                 as.integer(m),
-                 as.double(g), 
-                 as.integer(G), 
-                 as.double(pcop), 
-                 as.double(derCdfWrtArgs(cop,g)),
-                 as.double(derCdfWrtParams(cop,g) %*% influCoef(cop,x0,M)),
-                 as.integer(N),
-                 s0 = double(N),
-                 PACKAGE="copula")$s0
-        
-        pval[i] <- (sum(s0 >= stat[i])+0.5)/(N+1)
-        
-      }
-    
-    return(list(statistic=median(stat), pvalue=median(pval),
-                sd.pvalues=sd(pval), parameters=cop@parameters))
-  }
-
-                      

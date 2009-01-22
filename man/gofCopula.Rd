@@ -4,10 +4,10 @@
 \title{Goodness-of-fit tests for copulas}
 \description{
   Goodness-of-fit tests for copulas based on the empirical process
-  comparing the so-called \emph{empirical copula} with a
+  comparing the \emph{empirical copula} with a
   parametric estimate of the copula derived under the null hypothesis.
   Approximate p-values for the test statistic can be obtained either
-  using the so-called \emph{parametric bootstrap} (see the two first
+  using the \emph{parametric bootstrap} (see the two first
   references) or by means of a fast \emph{multiplier} approach that can
   be used when the parametric bootstrap is too slow (see the two
   last references).  
@@ -15,7 +15,8 @@
 \usage{
 gofCopula(copula, x, N = 1000, method = "mpl",
           simulation = "pb", grid = "h0", R = 10,
-          m = nrow(x), G = nrow(x), M = 2500)
+          m = nrow(x), G = nrow(x), M = 2500,
+          print.every = 100, optim.method = "Nelder-Mead")
 }
 
 \arguments{
@@ -46,6 +47,9 @@ gofCopula(copula, x, N = 1000, method = "mpl",
     if \code{"grid"} is set to \code{"h0"}; see the two last references. }
   \item{M}{ for simulation method \code{"mult"}, size of the Monte Carlo
     integration sample; see the two last references. }
+  \item{print.every}{ progress is printed every \code{"print.every"}
+    iterations. }
+  \item{optim.method}{ the method for \code{"\link{optim}"}. }
 }
 \details{
   
@@ -68,14 +72,21 @@ gofCopula(copula, x, N = 1000, method = "mpl",
   
   The parameter \code{"R"}, used when the simulation method is \code{"mult"},
   specifies the number of times that the multiplier test will be
-  repeated. Indeed, when the available sample is small, the multiplier
+  repeated. Indeed, when the available sample is smalle, the multiplier
   approach can show poor repeatability with respect to the returned p-value (see the last two
   references). As the sample size increases, the value of
   \code{"R"} can be decreased.
 
-  Although the multiplier test and the parametric bootstrap-based test
-  are asymptotically equivalent, their finite-sample behavior may differ
-  significantly.
+  The parameter \code{"grid"}, used when the simulation method is
+  \code{"mult"}, should be set as follows: if the sample size is smaller
+  than 500, \code{"grid"} should be set to \code{"h0"} (otherwise the
+  test will be too liberal); when the sample size is greater than 500,
+  \code{"grid"} should be set to \code{"po"}, as this decreases
+  repeatability problems. 
+  
+  Although the processes involved in the multiplier and the parametric
+  bootstrap-based test are asymptotically equivalent, the finite-sample
+  behavior of the two tests might differ significantly.
 }
 \value{
   Returns a list whose attributes are:
@@ -93,11 +104,11 @@ gofCopula(copula, x, N = 1000, method = "mpl",
   C. Genest and B. Remillard (2008). Validity of the parametric
   bootstrap for goodness-of-fit testing in semiparametric models.
   \emph{Annales de l'Institut Henri Poincare: Probabilites et Statistiques},
-  44, in press.
+  44, 1096-1127.
 
   C. Genest, B. Remillard and D. Beaudoin (2008). Goodness-of-fit tests
   for copulas: A review and a power study. \emph{Insurance: Mathematics and
-    Economics}, 42, in press.
+    Economics}, 44, in press.
   
   I. Kojadinovic and J. Yan (2008). Fast large-sample goodness-of-fit
   tests for copulas. Submitted.

@@ -39,7 +39,8 @@
 \alias{rcopula,amhCopula-method}
 \alias{rcopula,huslerReissCopula-method}
 \alias{rcopula,plackettCopula-method}
-\alias{rcopula,fgmCopula-method} 
+\alias{rcopula,fgmCopula-method}
+\alias{rcopula,evCopula-method} 
 
 \title{Copula distribution functions}
 \description{
