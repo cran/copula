@@ -79,7 +79,7 @@ frankCopula <- function(param, dim = 2) {
 }
 
 rfrankBivCopula <- function(copula, n) {
-  val <- cbind(runif(n), runif(n))
+  val <- cbind(runif(n), runif(n)) 
   ## to fix numerical rounding problems for alpha >35 but not for alpha < -35
   alpha <- - abs(copula@parameters[1]) 
   val[,2] <- -1/alpha * log(1 + val[,2] * (1 - exp(-alpha)) / (exp(-alpha * val[,1]) * (val[,2] - 1) - val[,2])) ## reference: Joe (1997, p.147)
@@ -91,8 +91,10 @@ rfrankBivCopula <- function(copula, n) {
 rfrankCopula <- function(copula, n) {
   dim <- copula@dimension
   alpha <- copula@parameters[1]
-  if (abs(alpha) <= .Machine$double.eps^.9)
-    return (matrix(runif(n * dim), nrow = n))
+  if (abs(alpha - 0 < .Machine$double.eps ^ (1/3)))
+    return(rcopula(indepCopula(dim), n))
+##   if (abs(alpha) <= .Machine$double.eps^.9)
+##     return (matrix(runif(n * dim), nrow = n))
   if (dim == 2) return (rfrankBivCopula(copula, n))
   ## the frailty is a log series distribution with a = 1 - exp(-alpha)
   fr <- rlogseries(n, 1 - exp(-alpha))
@@ -186,6 +188,7 @@ setMethod("spearmansRho", signature("frankCopula"), spearmansRhoFrankCopula)
 setMethod("tailIndex", signature("frankCopula"), tailIndexFrankCopula)
 
 setMethod("calibKendallsTau", signature("frankCopula"), calibKendallsTauCopula)
+setMethod("calibSpearmansRho", signature("frankCopula"), calibSpearmansRhoCopula)
 
 setMethod("rhoDer", signature("frankCopula"), rhoDerFrankCopula)
 setMethod("tauDer", signature("frankCopula"), tauDerFrankCopula)

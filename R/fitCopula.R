@@ -104,7 +104,11 @@ fitCopula.mpl <- function(copula, data, start=NULL,
                           estimate.variance = TRUE) {
   q <- length(copula@parameters)
   if (is.null(start)) {
-    if (hasMethod("calibKendallsTau", class(copula))) start <- fitCopula.itau(copula, data, FALSE)@estimate
+    if (hasMethod("calibKendallsTau", class(copula))) {
+      start <- fitCopula.itau(copula, data, FALSE)@estimate
+      if (is.na(loglikCopula(start, data, copula)))
+        start <- copula@parameters
+    }
     else start <- copula@parameters
   }
   
@@ -178,22 +182,33 @@ fitCopula.irho <- function(copula, data, estimate.variance=TRUE) {
 ## fitCopula using maximum pseudo-likelihood
 ###############################################################
 
+
+chkParamBounds <- function(copula) {
+  param <- copula@parameters
+  upper <- copula@param.upbnd
+  lower <- copula@param.lowbnd
+  if (any(is.na(param) | param > upper | param < lower)) return(FALSE)
+  ## ("Parameter value out of bound")
+  else return(TRUE)
+}
+
 loglikCopula <- function(param, x, copula, suppressMessages=FALSE) {
-  copula@parameters <- param
+  slot(copula, "parameters") <- param
+  if (!chkParamBounds(copula)) return(NaN)
+  
   ## messageOut may be used for debugging
   if (suppressMessages) {
     messageOut <- textConnection("fitMessages", open="w", local=TRUE)
     sink(messageOut); sink(messageOut, type="message")
     options(warn = -1) ## ignore warnings; can be undesirable!
   }
-  
   loglik <- try(sum(log(dcopula(copula, x))))
   
   if (suppressMessages) {
     options(warn = 0)
     sink(type="message"); sink(); close(messageOut)
   }
-  if (inherits(loglik, "try-error")) loglik <- NaN
+  if (inherits(loglik, "try-error")) return(NaN)
   loglik
 }
 

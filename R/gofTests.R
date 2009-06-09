@@ -27,12 +27,12 @@
 ## copula is a copula of the desired family
 
 gofCopula <- function(copula, x, N = 1000, method = "mpl",
-                      simulation = "pb", grid = "h0", R = 10,
-                      m = nrow(x), G = nrow(x), M = 2500,
-                      print.every = 100, optim.method = "Nelder-Mead")
+                      simulation = "pb", print.every = 100,
+                      optim.method = "BFGS")
   {
-    x <- as.matrix(x)
+    M <- -1 ## fixed!
     
+    x <- as.matrix(x)
     n <- nrow(x)
     p <- ncol(x)
     
@@ -51,12 +51,12 @@ gofCopula <- function(copula, x, N = 1000, method = "mpl",
     else if (simulation == "mult") ## multiplier
       {
         if (method == "mpl")
-          gofMCLT.PL(copula, x, N, m, grid, G, R, M, optim.method)
+          gofMCLT.PL(copula, x, N, M, optim.method)
         else if (method %in% c("irho","itau"))
           {
             if (copula@dimension != 2)
               stop("The simulation method 'mult' can be used in combination with the estimation methods 'irho' and 'itau' only in the bivariate case.") 
-            gofMCLT.KS(copula, x, N, m, method, grid, G, R, M)
+            gofMCLT.KS(copula, x, N, method, M)
           }
         else stop("Invalid estimation method")
       }
@@ -94,10 +94,11 @@ gofPB <- function(copula, x, N, method, print.every, optim.method)
     
     ## simulation of the null distribution
     s0 <- numeric(N)
-    cat(paste("Progress will be displayed every", print.every, "iterations.\n"))
+    if (print.every > 0)
+      cat(paste("Progress will be displayed every", print.every, "iterations.\n"))
     for (i in 1:N)
       {
-        if (i %% print.every == 0)
+        if (print.every > 0 && i %% print.every == 0)
           cat(paste("Iteration",i,"\n"))
         u0 <- apply(rcopula(fcop,n),2,rank)/(n+1)
         
@@ -138,9 +139,9 @@ influ.add <- function(x0, y0, influ1, influ2)
          c(0,cumsum(influ2[o2]))[M + 1 - o2b] / M - mean(influ2 * y0[,2]))
 }
 
-gofMCLT.KS <- function(cop, x, N, m, method, grid, G, R, M)
+gofMCLT.KS <- function(cop, x, N, method, M)
   {
-    n <- nrow(x)
+    n <- m <- nrow(x)
     p <- 2
   
     ## make pseudo-observations
@@ -149,68 +150,50 @@ gofMCLT.KS <- function(cop, x, N, m, method, grid, G, R, M)
     ## fit the copula
     cop <- fitCopula(cop,u,method,estimate.variance=FALSE)@copula
     
-    ## perform R replications
-    stat <- pval <- numeric(R)
-    for (i in 1:R)
-      { 
-        
-        ## grid points where to evaluate the process
-        if (grid == "h0")  ## from the H0 copula 
-          g <- rcopula(cop,G)
-        else if (grid == "po") ## pseudo-observations
-          {
-            g <- u
-            G <- n
-          }
-        else stop("Invalid grid")
-        
-        pcop <- pcopula(cop,g)
-        
-        ## compute the test statistic
-        stat[i] <- .C("cramer_vonMises_2",
-                      as.integer(p),
-                      as.double(u),
-                      as.integer(n),
-                      as.double(g),
-                      as.integer(G),
-                      as.double(pcop),
-                      stat = double(1),
-                      PACKAGE="copula")$stat
-        
-        ## generate realizations under H0
-        x0 <-  u # rcopula(cop,m) ## default
-        
-        ## prepare influence coefficients              
-        if (method == "itau") ## kendall's tau
-          influ <- 4 * (2 * pcopula(cop,x0) - x0[,1] - x0[,2] + (1 - kendallsTau(cop))/2) / tauDer(cop)
-        else if (method == "irho") ## Spearman's rho
-          {
-            ## integrals computed from M realizations by Monte Carlo
-            y0 <- rcopula(cop,M)
-            influ <- (12 * (x0[,1] * x0[,2] + influ.add(x0, y0, y0[,2],y0[,1])) -
-                      3 - spearmansRho(cop)) / rhoDer(cop)
-          }
-        
-        ## Simulate under H0
-        s0 <- .C("multiplier",
-                 as.integer(p),
-                 as.double(x0),
-                 as.integer(m),
-                 as.double(g), 
-                 as.integer(G), 
-                 as.double(pcop), 
-                 as.double(derCdfWrtArgs(cop,g)),
-                 as.double(derCdfWrtParams(cop,g) %*% influ),
-                 as.integer(N),
-                 s0 = double(N),
-                 PACKAGE="copula")$s0
+    ## grid points where to evaluate the process
+    g <- u # pseudo-observations
+    G <- n
     
-        pval[i] <- (sum(s0 >= stat[i])+0.5)/(N+1)
+    pcop <- pcopula(cop,g)
         
+    ## compute the test statistic
+    stat <- .C("cramer_vonMises_2",
+               as.integer(p),
+               as.double(u),
+               as.integer(n),
+               as.double(g),
+               as.integer(G),
+               as.double(pcop),
+               stat = double(1),
+               PACKAGE="copula")$stat
+        
+    x0 <-  u # rcopula(cop,m) 
+    
+    ## prepare influence coefficients              
+    if (method == "itau") ## kendall's tau
+      influ <- 4 * (2 * pcopula(cop,x0) - x0[,1] - x0[,2] + (1 - kendallsTau(cop))/2) / tauDer(cop)
+    else if (method == "irho") ## Spearman's rho
+      {
+        ## integrals computed from M realizations by Monte Carlo
+        y0 <- if (M > 0) rcopula(cop,M) else u
+        influ <- (12 * (x0[,1] * x0[,2] + influ.add(x0, y0, y0[,2],y0[,1])) -
+                  3 - spearmansRho(cop)) / rhoDer(cop)
       }
+        
+    ## Simulate under H0
+    s0 <- .C("multiplier",
+             as.integer(p),
+             as.double(x0),
+             as.integer(m),
+             as.double(g), 
+             as.integer(G), 
+             as.double(derCdfWrtParams(cop,g) %*% influ),
+             as.integer(N),
+             s0 = double(N),
+             PACKAGE="copula")$s0
 
-    return(list(statistic=mean(stat), pvalue=mean(pval),
-                sd.pvalues=sd(pval), parameters=cop@parameters))
+    return(list(statistic=stat, pvalue=(sum(s0 >= stat)+0.5)/(N+1),
+                parameters=cop@parameters))
   }
 
 ###########################################################################
@@ -221,13 +204,13 @@ gofMCLT.KS <- function(cop, x, N, m, method, grid, G, R, M)
 ## influence coefficients
 #########################################################
 
-influCoef <- function(cop,u,M)
+influCoef <- function(cop,u,v)
   {
     p <- cop@dimension
 
     ## influence: second part
     ## integrals computed from M realizations by Monte Carlo
-    v <- rcopula(cop,M)
+    M <- nrow(v)
     dcop <- dcopwrap(cop,v) ## wrapper
     influ0 <- derPdfWrtParams(cop,v)/dcop
     derArg <- derPdfWrtArgs(cop,v)/dcop
@@ -277,9 +260,9 @@ add.influ <- function(u, v, influ, q)
 ## cop is a copula of the desired family whose parameters, if necessary, will be used
 ## as starting values in fitCopula
 
-gofMCLT.PL <- function(cop, x, N, m, grid, G, R, M, optim.method)
+gofMCLT.PL <- function(cop, x, N, M, optim.method)
   {     
-    n <- nrow(x)
+    n <- m <- nrow(x)
     p <- ncol(x)
 
     ## make pseudo-observations
@@ -289,56 +272,41 @@ gofMCLT.PL <- function(cop, x, N, m, grid, G, R, M, optim.method)
     cop <- fitCopula(cop, u, method="mpl", estimate.variance=FALSE,
                      optim.method=optim.method)@copula
 
-    ## perform R replications
-    stat <- pval <- numeric(R)
-    for (i in 1:R)
-      { 
-        
-        ## grid points where to evaluate the process
-        if (grid == "h0")  ## from the H0 copula 
-          g <- rcopula(cop,G)
-        else if (grid == "po") ## pseudo-observations
-          {
-            g <- u
-            G <- n
-          }
-        else stop("Invalid grid")
-        
-        pcop <- pcopula(cop,g)
-        
-        ## compute the test statistic
-        stat[i] <- .C("cramer_vonMises_2",
-                      as.integer(p),
-                      as.double(u),
-                      as.integer(n),
-                      as.double(g),
-                      as.integer(G),
-                      as.double(pcop),
-                      stat = double(1),
-                      PACKAGE="copula")$stat
-        
-        ## generate realizations under H0
-        x0 <- u # rcopula(cop,m)
-        
-        s0 <- .C("multiplier",
-                 as.integer(p),
-                 as.double(x0),
-                 as.integer(m),
-                 as.double(g), 
-                 as.integer(G), 
-                 as.double(pcop), 
-                 as.double(derCdfWrtArgs(cop,g)),
-                 as.double(derCdfWrtParams(cop,g) %*% influCoef(cop,x0,M)),
-                 as.integer(N),
-                 s0 = double(N),
-                 PACKAGE="copula")$s0
-        
-        pval[i] <- (sum(s0 >= stat[i])+0.5)/(N+1)
-        
-      }
+    ## grid points where to evaluate the process
+    g <- u  ## pseudo-observations
+    G <- n
     
-    return(list(statistic=mean(stat), pvalue=mean(pval),
-                sd.pvalues=sd(pval), parameters=cop@parameters))
+    pcop <- pcopula(cop,g)
+        
+    ## compute the test statistic
+    stat <- .C("cramer_vonMises_2",
+               as.integer(p),
+               as.double(u),
+               as.integer(n),
+               as.double(g),
+               as.integer(G),
+               as.double(pcop),
+               stat = double(1),
+               PACKAGE="copula")$stat
+    
+    x0 <- u # rcopula(cop,m)
+
+    v <- if (M > 0) rcopula(cop,M) else u
+    
+    s0 <- .C("multiplier",
+             as.integer(p),
+             as.double(x0),
+             as.integer(m),
+             as.double(g), 
+             as.integer(G), 
+             as.double(derCdfWrtParams(cop,g) %*% influCoef(cop,x0,v)),
+             as.integer(N),
+             s0 = double(N),
+             PACKAGE="copula")$s0
+        
+    
+    return(list(statistic=stat, pvalue=(sum(s0 >= stat)+0.5)/(N+1),
+                parameters=cop@parameters))
   }
 
                       

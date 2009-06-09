@@ -8,9 +8,9 @@
   parameters and dimension.
 }
 \usage{
-ellipCopula(family, param, dim = 2, dispstr = "ex", df = 5, ...)
+ellipCopula(family, param, dim = 2, dispstr = "ex", df = 4, ...)
 normalCopula(param, dim = 2, dispstr = "ex")
-tCopula(param, dim = 2, dispstr = "ex", df = 5, df.fixed = FALSE)
+tCopula(param, dim = 2, dispstr = "ex", df = 4, df.fixed = FALSE)
 }
 \arguments{
   \item{family}{ a character string specifying the family of an

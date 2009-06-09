@@ -14,6 +14,13 @@ expr2R <- function(fname) {
   myexpr
 }
 
+getDExpr <- function(expr, name) {
+  ## expr is a vector of expression
+#### I was using sapply(expr, D, "u1), but somehow it returns a matrix
+  val <- rep(NA, length(expr))
+  for (i in 1:length(expr)) val[i] <- as.expression(D(expr[i], name))
+  val
+}
 
 
 ## Note:
@@ -44,19 +51,23 @@ expr2algr2dump <- function(cname) {
   assign(cdf.expr.name, cdf.expr <- expr2R(cdf.expr.name))
   assign(cdf.algr.name, sapply(cdf.expr, function(x) deriv(x, "s")))
   ## assign(cdfDerWrtArg, myExpr <- expr2R(cdfDerWrtArg))
-  assign(cdfDerWrtArg, myExpr <- as.expression(sapply(cdf.expr, D, "u1")))
+  ## assign(cdfDerWrtArg, myExpr <- as.expression(sapply(cdf.expr, D, "u1")))
+  assign(cdfDerWrtArg, myExpr <- getDExpr(cdf.expr, "u1"))
   assign(cdfDerWrtArg.algr, sapply(myExpr, function(x) deriv(x, "s")))
   ## assign(cdfDerWrtPar, myExpr <- expr2R(cdfDerWrtPar))
-  assign(cdfDerWrtPar, myExpr <- as.expression(sapply(cdf.expr, D, "alpha")))
+  ## assign(cdfDerWrtPar, myExpr <- as.expression(sapply(cdf.expr, D, "alpha")))
+  assign(cdfDerWrtPar, myExpr <- getDExpr(cdf.expr, "alpha"))
   assign(cdfDerWrtPar.algr, sapply(myExpr, function(x) deriv(x, "s")))
   
   assign(pdf.expr.name, pdf.expr <- expr2R(pdf.expr.name))
   assign(pdf.algr.name, sapply(pdf.expr, function(x) deriv(x, "s")))
   ## assign(pdfDerWrtArg, myExpr <- expr2R(pdfDerWrtArg))
-  assign(pdfDerWrtArg, myExpr <- as.expression(sapply(pdf.expr, D, "u1")))
+  ## assign(pdfDerWrtArg, myExpr <- as.expression(sapply(pdf.expr, D, "u1")))
+  assign(pdfDerWrtArg, myExpr <- getDExpr(pdf.expr, "u1"))
   assign(pdfDerWrtArg.algr, sapply(myExpr, function(x) deriv(x, "s")))
   ## assign(pdfDerWrtPar, myExpr <- expr2R(pdfDerWrtPar))
-  assign(pdfDerWrtPar, myExpr <- as.expression(sapply(pdf.expr, D, "alpha")))
+  ## assign(pdfDerWrtPar, myExpr <- as.expression(sapply(pdf.expr, D, "alpha")))
+  assign(pdfDerWrtPar, myExpr <- getDExpr(pdf.expr, "alpha"))
   assign(pdfDerWrtPar.algr, sapply(myExpr, function(x) deriv(x, "s")))
  
   assign(genfunDer.expr.name, genfunDer.expr <- expr2R(genfunDer.expr.name))
@@ -113,16 +124,20 @@ algr2dump <- function(copula) {
   
   assign(cdf.expr.name, cdf.expr <- as.expression(c(0, copula@exprdist$cdf)))
   assign(cdf.algr.name, sapply(cdf.expr, function(x) deriv(x, "s")))
-  assign(cdfDerWrtArg, myExpr <- as.expression(sapply(cdf.expr, D, "u1")))
+  ## assign(cdfDerWrtArg, myExpr <- as.expression(sapply(cdf.expr, D, "u1")))
+  assign(cdfDerWrtArg, myExpr <- getDExpr(cdf.expr, "u1"))
   assign(cdfDerWrtArg.algr, sapply(myExpr, function(x) deriv(x, "s")))
-  assign(cdfDerWrtPar, myExpr <- as.expression(sapply(cdf.expr, D, "alpha")))
+  ## assign(cdfDerWrtPar, myExpr <- as.expression(sapply(cdf.expr, D, "alpha")))
+  assign(cdfDerWrtPar, myExpr <- getDExpr(cdf.expr, "alpha"))
   assign(cdfDerWrtPar.algr, sapply(myExpr, function(x) deriv(x, "s")))
   
   assign(pdf.expr.name, pdf.expr <- as.expression(c(0, copula@exprdist$pdf)))
   assign(pdf.algr.name, sapply(pdf.expr, function(x) deriv(x, "s")))
-  assign(pdfDerWrtArg, myExpr <- as.expression(sapply(pdf.expr, D, "u1")))
+  ## assign(pdfDerWrtArg, myExpr <- as.expression(sapply(pdf.expr, D, "u1")))
+  assign(pdfDerWrtArg, myExpr <- getDExpr(pdf.expr, "u1"))
   assign(pdfDerWrtArg.algr, sapply(myExpr, function(x) deriv(x, "s")))
-  assign(pdfDerWrtPar, myExpr <- as.expression(sapply(pdf.expr, D, "alpha")))
+  ## assign(pdfDerWrtPar, myExpr <- as.expression(sapply(pdf.expr, D, "alpha")))
+  assign(pdfDerWrtPar, myExpr <- getDExpr(pdf.expr, "alpha"))
   assign(pdfDerWrtPar.algr, sapply(myExpr, function(x) deriv(x, "s")))
 
   ## dname <- paste("../../../R/", cname, "Expr.R", sep="")
@@ -143,3 +158,4 @@ library(copula)
 algr2dump(plackettCopula(1))      ## generates plackettExpr.R
 algr2dump(galambosCopula(1))      ## generates galambosExpr.R
 algr2dump(huslerReissCopula(1))   ## generates huslerReissExpr.R
+algr2dump(tawnCopula(0))          ## generates tawnExpr.R

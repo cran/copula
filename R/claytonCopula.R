@@ -22,12 +22,14 @@
 
 genFunClayton <- function(copula, u) {
   alpha <- copula@parameters[1]
-  (u^(-alpha) - 1) / alpha
+  ## (u^(-alpha) - 1) / alpha ## This is in Nelson Table 4.1; alpha in denom redundant
+  u^(-alpha) - 1 
 }
 
 genInvClayton <- function(copula, s) {
   alpha <- copula@parameters[1]
-  (1 + alpha * s)^(-1/alpha) 
+  ## (1 + alpha * s)^(-1/alpha) ## corresponding to the comment above
+  (1 + s)^(-1/alpha) 
 }
 
 genFunDer1Clayton <- function(copula, u) {
@@ -79,18 +81,23 @@ claytonCopula <- function(param, dim = 2) {
 rclaytonBivCopula <- function(copula, n) {
   val <- cbind(runif(n), runif(n))
   alpha <- copula@parameters[1]
-  ## where does this come from? Unfortunately, I forgot.
-  ## please let me know if you find out.
+  ## This implementation is confirmed by Splus module finmetrics
   val[,2] <- (val[,1]^(-alpha) * (val[,2]^(-alpha/(alpha + 1)) - 1) + 1)^(-1/alpha)
+  ## Frees and Valdez (1998, p.11): wrong! Can be checked by sample Kendall' tau.
+  ## Their general expression for $F_k$ is all right for $k > 2$.
+  ## But for dimension 2, they are missing $\phi'$ in the numerator and
+  ## the denominator should be 1. So their formula for $U_2$ on p.11 is incorrect.
   val
 }
 
 
 rclaytonCopula <- function(copula, n) {
   dim <- copula@dimension
+  alpha <- copula@parameters[1]
+  if (abs(alpha - 0 < .Machine$double.eps ^ (1/3)))
+    return(rcopula(indepCopula(dim), n))
   if (dim == 2) return (rclaytonBivCopula(copula, n))
   ## gamma frailty
-  alpha <- copula@parameters[1]
   val <- matrix(runif(n * dim), nrow = n)
   if (abs(alpha) <= 100 * .Machine$double.eps)
     return (val)  ## the limit is independence

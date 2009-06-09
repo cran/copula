@@ -1,12 +1,12 @@
-library(copula, lib.loc="../../../copula.Rcheck")
-source("../../R/claytonExpr.R")
-source("../../R/gumbelExpr.R")
-source("../../R/frankExpr.R")
-source("../../R/plackettExpr.R")
+library(copula, lib.loc="../../../../copula.Rcheck")
+source("../../../R/claytonExpr.R")
+source("../../../R/gumbelExpr.R")
+source("../../../R/frankExpr.R")
+source("../../../R/plackettExpr.R")
 
-source("../../R/E.R")
+source("../../../R/E.R")
 
-source("../../R/tests.gof.R")
+source("../../../R/derCdfPdf.R")
 
 
 set.seed(1234)

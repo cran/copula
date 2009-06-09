@@ -22,7 +22,8 @@
 
 AfunGumbel <- function(copula, w) {
   alpha <- copula@parameters[1]
-  (w^alpha + (1 - w)^alpha)^(1/alpha)
+  A <- (w^alpha + (1 - w)^alpha)^(1/alpha)
+  ifelse(w == 0 | w == 1, 1, A)
 }
 
 AfunDerGumbel <- function(copula, w) {
@@ -113,6 +114,8 @@ rgumbelCopula <- function(copula, n) {
   ## frailty is stable(1,0,0) with 1/alpha
   dim <- copula@dimension
   alpha <- copula@parameters[1]
+  ## reduce to indepCopula
+  if (alpha - 1 < .Machine$double.eps ^(1/3) ) return(rcopula(indepCopula(dim=dim), n))
   b <- 1/alpha
   ## stable (b, 1), 0 < b < 1, Chambers, Mallows, and Stuck 1976, JASA, p.341
   fr <- rPosStable(n, b)
@@ -165,6 +168,7 @@ tailIndexGumbelCopula <- function(copula, ...) {
 
 
 calibKendallsTauGumbelCopula <- function(copula, tau) {
+  if (any(tau < 0)) warning("tau is out of range (0, 1)")
   ifelse(tau < 0, 1, 1/(1 - tau))
 }
 
@@ -195,8 +199,9 @@ spearmansRhoGumbelCopula <- function(copula) {
 
 
 calibSpearmansRhoGumbelCopula <- function(copula, rho) {
+  if (any(rho < 0)) warning("rho is out of range (0, 1)")
   gumbelRhoInv <- approxfun(x = .gumbelRho$assoMeasFun$fm$ysmth,
-                            y = .gumbelRho$assoMeasFun$fm$x)
+                            y = .gumbelRho$assoMeasFun$fm$x, rule = 2)
   
   ss <- .gumbelRho$ss
   theta <- gumbelRhoInv(rho)

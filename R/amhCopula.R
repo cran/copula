@@ -151,5 +151,5 @@ setMethod("kendallsTau", signature("amhCopula"), kendallsTauAmhCopula)
 ## setMethod("spearmansRho", signature("amhCopula"), spearmansRhoAmhCopula)
 ## setMethod("tailIndex", signature("amhCopula"), tailIndexAmhCopula)
 
-## setMethod("calibKendallsTau", signature("amhCopula"), calibKendallsTauAmhCopula)
+setMethod("calibKendallsTau", signature("amhCopula"), calibKendallsTauCopula)
 

@@ -23,8 +23,17 @@
 indepCopula <- function(dim = 2) {
   val <- new("indepCopula",
              dimension = dim,
+             parameters = double(0),
+             param.names = character(0),
+             param.lowbnd = double(0),
+             param.upbnd = double(0),
              message = "Independent copula")
   val
+}
+
+
+AfunIndep <- function(copula, w) {
+  rep(1, length(w))
 }
 
 rindepCopula <- function(copula, n) {
@@ -65,6 +74,7 @@ setMethod("rcopula", signature("indepCopula"), rindepCopula)
 setMethod("pcopula", signature("indepCopula"), pindepCopula)
 setMethod("dcopula", signature("indepCopula"), dindepCopula)
 
+setMethod("Afun", signature("indepCopula"), AfunIndep)
 # setMethod("kendallsTau", signature("indepCopula"), kendallsTauIndepCopula)
 # setMethod("spearmansRho", signature("indepCopula"), spearmansRhoIndepCopula)
 # setMethod("tailIndex", signature("indepCopula"), tailIndexIndepCopula)

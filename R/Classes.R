@@ -1,14 +1,4 @@
 ###################################################
-#### independent copula class
-###################################################
-setClass("indepCopula",
-         representation(dimension = "numeric",
-                        message = "character"),
-         contains = list()
-         )
-
-
-###################################################
 ##### basic copula class
 ###################################################
 setClass("copula", 
@@ -54,6 +44,19 @@ setGeneric("rhoDer", function(copula, ...) standardGeneric("rhoDer"))
 setGeneric("tauDerFun", function(copula) standardGeneric("tauDerFun"))
 setGeneric("rhoDerFun", function(copula) standardGeneric("rhoDerFun"))
 
+###################################################
+#### independent copula class
+###################################################
+## setClass("indepCopula",
+##          representation(dimension = "numeric",
+##                         message = "character"),
+##          contains = list()
+##          )
+setClass("indepCopula",
+         representation("copula"),
+         contains = list("copula")
+         )
+
 
 ###############################################################
 #### elliptical copulas, contains normalCopula and tCopula
@@ -95,7 +98,7 @@ validNormalCopula <- function(object) {
 setClass("normalCopula",
          representation = representation("ellipCopula"),
          validity = validNormalCopula,
-         contains = list("copula", "ellipCopula")
+         contains = list("ellipCopula")
          )
 
 ## t copula
@@ -110,7 +113,7 @@ setClass("tCopula",
            df = "numeric",
            df.fixed = "logical"),
          validity = validTCopula,
-         contains = list("copula", "ellipCopula")
+         contains = list("ellipCopula")
          )
 
 
@@ -130,7 +133,7 @@ setClass("archmCopula",
 ## clayton copula
 setClass("claytonCopula",
          representation = representation("archmCopula"),
-         contains = list("copula", "archmCopula")
+         contains = list("archmCopula")
          )
 
 ## gumbel copula, also an ev copula
@@ -138,13 +141,13 @@ setClass("claytonCopula",
 ## frank copula
 setClass("frankCopula",
          representation = representation("archmCopula"),
-         contains = list("copula", "archmCopula")
+         contains = list("archmCopula")
          )
 
 ## amh copula
 setClass("amhCopula",
          representation = representation("archmCopula"),
-         contains = list("copula", "archmCopula")
+         contains = list("archmCopula")
          )
 
 ## methods for archmCopulas
@@ -160,27 +163,43 @@ setGeneric("genFunDer2", function(copula, u) standardGeneric("genFunDer2"))
 #######################################################
 
 setClass("evCopula",
-         representation = representation("copula",
-           exprdist = "expression"),
+         representation = representation("copula"),
          contains = list("copula")
          )
 
 ## galambos copula
 setClass("galambosCopula",
-         representation = representation("evCopula"),
-         contains = list("copula", "evCopula")
+         representation = representation("evCopula",
+           exprdist = "expression"),
+         contains = list("evCopula")
          )
 
-## gumbel copula, also an archm copula; how to clean this up?
+## gumbel copula, also an archm copula; 
 setClass("gumbelCopula",
          representation = representation("archmCopula"),
-         contains = list("copula", "archmCopula", "evCopula")
+         contains = list("archmCopula", "evCopula")
          )
 
 ## husler-reiss copula
 setClass("huslerReissCopula",
-         representation = representation("evCopula"),
-         contains = list("copula", "evCopula")
+         representation = representation("evCopula",
+           exprdist = "expression"),
+         contains = list("evCopula")
+         )
+
+## tawn copula; does not offer full range of dependence
+setClass("tawnCopula",
+         representation = representation("evCopula",
+           exprdist = "expression"),
+         contains = list("evCopula")
+         )
+
+## tEV copula
+setClass("tevCopula",
+         representation = representation("evCopula",
+           df = "numeric",
+           df.fixed = "logical"),
+         contains = list("evCopula")
          )
 
 setGeneric("Afun", function(copula, w) standardGeneric("Afun"))

@@ -149,6 +149,7 @@ setMethod("kendallsTau", signature("plackettCopula"), kendallsTauPlackettCopula)
 setMethod("spearmansRho", signature("plackettCopula"), spearmansRhoPlackettCopula)
 
 setMethod("calibKendallsTau", signature("plackettCopula"), calibKendallsTauPlackettCopula)
+setMethod("calibSpearmansRho", signature("plackettCopula"), calibSpearmansRhoCopula)
 
 setMethod("tauDer", signature("plackettCopula"), tauDerPlackettCopula)
 setMethod("rhoDer", signature("plackettCopula"), rhoDerPlackettCopula)

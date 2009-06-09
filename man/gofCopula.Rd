@@ -4,19 +4,18 @@
 \title{Goodness-of-fit tests for copulas}
 \description{
   Goodness-of-fit tests for copulas based on the empirical process
-  comparing the \emph{empirical copula} with a
+  comparing the empirical copula with a
   parametric estimate of the copula derived under the null hypothesis.
+  The test statistic is the Cramer-von Mises functional Sn defined
+  in equation (2) of Genest, Remillard and Beaudoin (2009).
   Approximate p-values for the test statistic can be obtained either
   using the \emph{parametric bootstrap} (see the two first
-  references) or by means of a fast \emph{multiplier} approach that can
-  be used when the parametric bootstrap is too slow (see the two
+  references) or by means of a fast \emph{multiplier} approach (see the two
   last references).  
 }
 \usage{
 gofCopula(copula, x, N = 1000, method = "mpl",
-          simulation = "pb", grid = "h0", R = 10,
-          m = nrow(x), G = nrow(x), M = 2500,
-          print.every = 100, optim.method = "Nelder-Mead")
+          simulation = "pb", print.every = 100, optim.method = "BFGS")
 }
 
 \arguments{
@@ -33,22 +32,8 @@ gofCopula(copula, x, N = 1000, method = "mpl",
   \item{simulation}{ simulation method for generating realizations
     of the test statistic under the null hypothesis; can be either
     \code{"pb"} (parametric bootstrap) or  \code{"mult"} (multiplier).}
-  \item{grid}{ for simulation method \code{"mult"}, grid points at which the
-    goodness-of-fit process is evaluated; can be either \code{"h0"} (the
-    goodness-of-fit process is evaluated at points randomly generated
-    from the hypothesized copula) or \code{"po"} (the
-    goodness-of-fit process is evaluated at the available
-    pseudo-observations); see the two last references. }
-  \item{R}{ for simulation method \code{"mult"}, number of replications of the
-    basic test; should be set to 1 for very large samples. }
-  \item{m}{ for simulation method \code{"mult"}, size of the sample
-    used to compute the influence functions; see the two last references. }
-  \item{G}{ for simulation method \code{"mult"}, size of the grid
-    if \code{"grid"} is set to \code{"h0"}; see the two last references. }
-  \item{M}{ for simulation method \code{"mult"}, size of the Monte Carlo
-    integration sample; see the two last references. }
   \item{print.every}{ progress is printed every \code{"print.every"}
-    iterations. }
+    iterations. No progress is printed if it is nonpositive.}
   \item{optim.method}{ the method for \code{"\link{optim}"}. }
 }
 \details{
@@ -70,50 +55,31 @@ gofCopula(copula, x, N = 1000, method = "mpl",
   Thus far, the multiplier approach is implemented for six copula
   families: the Clayton, Gumbel, Frank, Plackett, normal and t. 
   
-  The parameter \code{"R"}, used when the simulation method is \code{"mult"},
-  specifies the number of times that the multiplier test will be
-  repeated. Indeed, when the available sample is smalle, the multiplier
-  approach can show poor repeatability with respect to the returned p-value (see the last two
-  references). As the sample size increases, the value of
-  \code{"R"} can be decreased.
-
-  The parameter \code{"grid"}, used when the simulation method is
-  \code{"mult"}, should be set as follows: if the sample size is smaller
-  than 500, \code{"grid"} should be set to \code{"h0"} (otherwise the
-  test will be too liberal); when the sample size is greater than 500,
-  \code{"grid"} should be set to \code{"po"}, as this decreases
-  repeatability problems. 
-  
-  Although the processes involved in the multiplier and the parametric
-  bootstrap-based test are asymptotically equivalent, the finite-sample
-  behavior of the two tests might differ significantly.
+  %Although the processes involved in the multiplier and the parametric
+  %bootstrap-based test are asymptotically equivalent, the finite-sample
+  %behavior of the two tests might differ significantly.
 }
 \value{
   Returns a list whose attributes are:
-  \item{statistic}{ value of the test statistic, or median of the test
-    statistics if \code{"R"} multiplier replications are performed. }
-  \item{pvalue}{ corresponding approximate p-value, or median of the
-    p-values if \code{"R"} multiplier replications are performed. }
-  \item{sd.pvalue}{ standard deviation of the pvalues when
-   the multiplier test is replicated \code{"R"} times. }
+  \item{statistic}{ value of the test statistic. }
+  \item{pvalue}{ corresponding approximate p-value. }
   \item{parameters}{ estimates of the parameters for the hypothesized
     copula family. }
 }
 \references{
-
   C. Genest and B. Remillard (2008). Validity of the parametric
   bootstrap for goodness-of-fit testing in semiparametric models.
   \emph{Annales de l'Institut Henri Poincare: Probabilites et Statistiques},
   44, 1096-1127.
 
-  C. Genest, B. Remillard and D. Beaudoin (2008). Goodness-of-fit tests
+  C. Genest, B. Remillard and D. Beaudoin (2009). Goodness-of-fit tests
   for copulas: A review and a power study. \emph{Insurance: Mathematics and
-    Economics}, 44, in press.
+    Economics}, 44, 199-214.
   
-  I. Kojadinovic and J. Yan (2008). Fast large-sample goodness-of-fit
+  I. Kojadinovic and J. Yan (2009). Fast large-sample goodness-of-fit
   tests for copulas. Submitted.
 
-  I. Kojadinovic and J. Yan (2008). A goodness-of-fit test for
+  I. Kojadinovic and J. Yan (2009). A goodness-of-fit test for
   multivariate multiparameter copulas based on multiplier central limit
   theorems. Submitted.
 }

@@ -19,7 +19,7 @@ exportClasses(copula, ellipCopula, archmCopula, evCopula)
 exportClasses(indepCopula)
 exportClasses(normalCopula, tCopula)
 exportClasses(claytonCopula, frankCopula, gumbelCopula, amhCopula)
-exportClasses(galambosCopula, huslerReissCopula)
+exportClasses(galambosCopula, huslerReissCopula, tawnCopula, tevCopula)
 exportClasses(plackettCopula)
 exportClasses(fgmCopula) 
 
@@ -28,18 +28,18 @@ export(ellipCopula, archmCopula, evCopula)
 export(normalCopula, tCopula)
 export(indepCopula)
 export(claytonCopula, frankCopula, gumbelCopula, amhCopula)
-export(galambosCopula, huslerReissCopula)
+export(galambosCopula, huslerReissCopula, tawnCopula, tevCopula)
 export(plackettCopula)
 export(fgmCopula)
 
+exportMethods(show, summary)
 exportMethods(persp, contour)
 
+## fitting copula
 export(loglikCopula, loglikMvdc)
 export(fitCopula, fitMvdc)
 exportClasses(fitCopula, fitMvdc)
 exportClasses(summaryFitCopula, summaryFitMvdc)
-
-exportMethods(show, summary)
 
 ## independence tests
 export(indepTestSim, indepTest, multIndepTest,
@@ -47,7 +47,8 @@ export(indepTestSim, indepTest, multIndepTest,
        dependogram)
 
 ## gof tests
-export(gofCopula) 
+export(gofCopula)
+export(gofAfun, Anfun)
 
 ## derivatives; testing
 # export(derCdfWrtParams, derPdfWrtParams,
@@ -57,3 +58,11 @@ export(gofCopula)
 ## export(ChiPlot, KPlot)
 ## testing purpose
 ## export(fitCopula.repar)
+
+export(evTest, evTestA, exchEVTest, exchTest)
+
+## asymmetric copula class testing
+exportClasses(asymCopula)
+export(asymCopula)
+## gofEVCopula testing
+export(gofEVCopula)

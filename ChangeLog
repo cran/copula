@@ -1,3 +1,12 @@
+
+2009-06-04 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
+
+	* Significantly improved the multiplier version of gofCopula. 
+	There are no more repeatability problems and the test is slightly 
+	faster. Documentation updated.
+
+	* Fixed various warning messages. 
+
 2009-01-22 Jun Yan <jyan@stat.uconn.edu> and Ivan Kojadinovic <ivan@stat.auckland.ac.nz>
 
 	* Fixed a bug in the random number generation for the 

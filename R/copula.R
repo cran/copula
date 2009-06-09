@@ -13,9 +13,11 @@ copula <- function(family, param, dim = 2, ...) {
 showCopula <- function(object) {
   cat(object@message, "\n")
   cat("Dimension: ", object@dimension, "\n")
-  cat("Parameters:\n")
-  for (i in (1:length(object@parameters)))
-    cat("  ", object@param.names[i], " = ", object@parameters[i], "\n")
+  if (length(object@parameters) > 0) {
+    cat("Parameters:\n")
+    for (i in (1:length(object@parameters)))
+      cat("  ", object@param.names[i], " = ", object@parameters[i], "\n")
+  }
 }
 
 setMethod("show", signature("copula"), showCopula)
@@ -52,8 +54,8 @@ tailIndexCopula <- function(copula, eps = .Machine$double.eps^0.5) {
   c(lower=lower, upper=upper)
 }
 
-setMethod("kendallsTau", signature("copula"), kendallsTauCopula)
-setMethod("spearmansRho", signature("copula"), spearmansRhoCopula)
+# setMethod("kendallsTau", signature("copula"), kendallsTauCopula)
+# setMethod("spearmansRho", signature("copula"), spearmansRhoCopula)
 setMethod("tailIndex", signature("copula"), tailIndexCopula)
 
 #### numerical calibration
@@ -85,5 +87,5 @@ calibSpearmansRhoCopula <- function(copula, rho) {
   sol
 }
 
-## setMethod("calibKendallsTau", signature("copula"), calibKendallsTauCopula)
-## setMethod("calibSpearmansRho", signature("copula"), calibSpearmansRhoCopula)
+# setMethod("calibKendallsTau", signature("copula"), calibKendallsTauCopula)
+# setMethod("calibSpearmansRho", signature("copula"), calibSpearmansRhoCopula)

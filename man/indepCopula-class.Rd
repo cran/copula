@@ -2,7 +2,7 @@
 \docType{class}
 \alias{indepCopula-class}
 \title{Class "indepCopula" }
-\description{Archimedean copula class.}
+\description{Independent copula class.}
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("indepCopula",
     ...)} or by function \code{"indepCopula"}. Such objects can be
@@ -13,21 +13,30 @@
   \describe{
     \item{\code{dimension}:}{Object of class \code{"numeric"}, dimension
     of the copula. }
+    \item{\code{parameters}:}{Object of class \code{"numeric"},
+      parameter values. }
+    \item{\code{param.names}:}{Object of class \code{"character"},
+      parameter names. }
+    \item{\code{param.lowbnd}:}{Object of class \code{"numeric"},
+      parameter lower bounds. }
+    \item{\code{param.upbnd}:}{Object of class \code{"numeric"},
+      parameter upper bounds. }
     \item{\code{message}:}{Object of class \code{"character"}, family names
       of the copula. }
   }
 }
 \section{Methods}{
   \describe{
+    \item{Afun}{\code{signature(copula = "indepCopula")}: ... }
     \item{dcopula}{\code{signature(copula = "indepCopula")}: ... }
     \item{pcopula}{\code{signature(copula = "indepCopula")}: ... }
     \item{rcopula}{\code{signature(copula = "indepCopula")}: ... }
   }
 }
-\section{Extends}{
-  Class \code{"indepCopula"} does not extend class \code{"copula"}.
-  It is simpler than \code{"copula"}.
-}
+% \section{Extends}{
+%   Class \code{"indepCopula"} does not extend class \code{"copula"}.
+%   It is simpler than \code{"copula"}.
+% }
 \seealso{
   \code{\link{indepCopula}}, 
   \code{\link{copula-class}}.

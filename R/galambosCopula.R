@@ -22,7 +22,8 @@
 
 AfunGalambos <- function(copula, w) {
   alpha <- copula@parameters[1]
-  1 - (w^(-alpha) + (1 - w)^(-alpha))^(-1/alpha)
+  A <- 1 - (w^(-alpha) + (1 - w)^(-alpha))^(-1/alpha)
+  ifelse(w == 0 | w == 1, 1, A)
 }
 
 AfunDerGalambos <- function(copula, w) {
@@ -128,9 +129,10 @@ pgalambosCopula <- function(copula, u) {
 
 dgalambosCopula <- function(copula, u) {
   dim <- copula@dimension
+  alpha <- copula@parameters[1]
+  if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
   if (is.vector(u)) u <- matrix(u, nrow = 1)
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
-  alpha <- copula@parameters[1]
   c(eval(galambosCopula.algr$pdf))
 }
 
@@ -168,12 +170,14 @@ kendallsTauGalambosCopula <- function(copula) {
 }
 
 calibKendallsTauGalambosCopula <- function(copula, tau) {
+  if (any(tau < 0)) warning("tau is out of range (0, 1)")
   galambosTauInv <- approxfun(x = .galambosTau$assoMeasFun$fm$ysmth,
-                              y = .galambosTau$assoMeasFun$fm$x)
+                              y = .galambosTau$assoMeasFun$fm$x, rule = 2)
   
   ss <- .galambosTau$ss
   theta <- galambosTauInv(tau)
-  ifelse(tau <= 0, 0, .galambosTau$trFuns$backwardTransf(theta, ss))
+  ## 0.0001 is arbitrary
+  ifelse(tau <= 0, 0.0001, .galambosTau$trFuns$backwardTransf(theta, ss))
 }
 
 galambosTauDer <- function(alpha) {
@@ -206,8 +210,9 @@ spearmansRhoGalambosCopula <- function(copula) {
 }
 
 calibSpearmansRhoGalambosCopula <- function(copula, rho) {
+  if (any(rho < 0)) warning("rho is out of range (0, 1)")
   galambosRhoInv <- approxfun(x = .galambosRho$assoMeasFun$fm$ysmth,
-                              y = .galambosRho$assoMeasFun$fm$x)
+                              y = .galambosRho$assoMeasFun$fm$x, rule = 2)
   
   ss <- .galambosRho$ss
   theta <- galambosRhoInv(rho)

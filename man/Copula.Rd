@@ -16,8 +16,11 @@
 \alias{dcopula,galambosCopula-method}
 \alias{dcopula,amhCopula-method}
 \alias{dcopula,huslerReissCopula-method}
+\alias{dcopula,tawnCopula-method}
+\alias{dcopula,tevCopula-method}
 \alias{dcopula,plackettCopula-method}
-\alias{dcopula,fgmCopula-method} 
+\alias{dcopula,fgmCopula-method}
+\alias{dcopula,asymCopula-method}
 
 \alias{pcopula,claytonCopula-method}
 \alias{pcopula,frankCopula-method}
@@ -27,8 +30,12 @@
 \alias{pcopula,galambosCopula-method}
 \alias{pcopula,amhCopula-method}
 \alias{pcopula,huslerReissCopula-method}
+\alias{pcopula,tawnCopula-method}
+\alias{pcopula,tevCopula-method}
 \alias{pcopula,plackettCopula-method}
 \alias{pcopula,fgmCopula-method} 
+\alias{pcopula,asymCopula-method}
+
 
 \alias{rcopula,claytonCopula-method}
 \alias{rcopula,frankCopula-method}
@@ -41,6 +48,7 @@
 \alias{rcopula,plackettCopula-method}
 \alias{rcopula,fgmCopula-method}
 \alias{rcopula,evCopula-method} 
+\alias{rcopula,asymCopula-method}
 
 \title{Copula distribution functions}
 \description{

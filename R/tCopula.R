@@ -20,7 +20,7 @@
 #################################################################################
 
 
-tCopula <- function(param, dim = 2, dispstr = "ex", df = 5, df.fixed = FALSE) {
+tCopula <- function(param, dim = 2, dispstr = "ex", df = 4, df.fixed = FALSE) {
   pdim <- length(param)
   parameters <- param
   param.names <- paste("rho", 1:pdim, sep=".")

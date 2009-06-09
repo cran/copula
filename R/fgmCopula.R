@@ -24,7 +24,6 @@
 ## constructor
 
 fgmCopula <- function(param, dim = 2) {
-    
     if (!is.numeric(dim) || dim < 2)
         stop("dim should be a numeric greater than 2")    
     if (!is.numeric(param) && length(param) != 2^dim - dim - 1)
@@ -168,3 +167,5 @@ setMethod("pcopula", signature("fgmCopula"), pfgmCopula)
 setMethod("dcopula", signature("fgmCopula"), dfgmCopula)
 setMethod("kendallsTau", signature("fgmCopula"), kendallsTauFgmCopula)
 setMethod("spearmansRho", signature("fgmCopula"), spearmansRhoFgmCopula)
+# setMethod("calibKendallsTau", signature("fgmCopula"), calibKendallsTauCopula)
+# setMethod("calibSpearmansRho", signature("fgmCopula"), calibSpearmansRhoCopula)

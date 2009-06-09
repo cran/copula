@@ -1,0 +1,225 @@
+#################################################################################
+##
+##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
+##
+##   This file is part of the R package copula.
+##
+##   The R package copula is free software: you can redistribute it and/or modify
+##   it under the terms of the GNU General Public License as published by
+##   the Free Software Foundation, either version 3 of the License, or
+##   (at your option) any later version.
+##
+##   The R package copula is distributed in the hope that it will be useful,
+##   but WITHOUT ANY WARRANTY; without even the implied warranty of
+##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##   GNU General Public License for more details.
+##
+##   You should have received a copy of the GNU General Public License
+##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
+##
+#################################################################################
+
+
+AfunTev <- function(copula, w) {
+  rho <- copula@parameters[1]
+  ## nu <- getdf(copula) ## defined in tCopula.R
+  nu <- copula@df
+  wnu <- (w / (1 - w))^(1 / nu)
+  x <- (wnu - rho) / sqrt(1 - rho^2) * sqrt(nu + 1)
+  y <- (1 / wnu - rho) / sqrt(1 - rho^2) * sqrt(nu + 1)
+  A <- w * pt(x, nu + 1) + (1 - w) * pt(y, nu + 1)
+  ifelse(w == 0 | w == 1, 1, A)
+}
+
+AfunDerTev <- function(copula, w) {
+  rho <- copula@parameters[1]
+  ## nu <- getdf(copula) ## defined in tCopula.R
+  nu <- copula@df
+  ## prepare dx, dy
+  wnu <- (w / (1 - w))^(1 / nu)
+  x <- (wnu - rho) / sqrt(1 - rho^2) * sqrt(nu + 1)
+  y <- (1 / wnu - rho) / sqrt(1 - rho^2) * sqrt(nu + 1)
+  dx <- eval(deriv(~ (w / (1 - w))^(1 / nu) / sqrt(1 - rho^2) * sqrt(nu + 1), "w", hessian=TRUE), list(w = w))
+  dxdw <- c(attr(dx, "gradient"))
+  d2xdw2 <- c(attr(dx, "hessian"))
+  dy <- eval(deriv(~ (w / (1 - w))^( - 1 / nu) / sqrt(1 - rho^2) * sqrt(nu + 1), "w", hessian=TRUE), list(w = w))
+  dydw <- c(attr(dy, "gradient"))
+  d2ydw2 <- c(attr(dy, "hessian"))
+  ## prepare ddtx, ddty, derivative of the t-(nu) density
+  ## a <-  gamma(0.5 * (nu + 1)) / gamma(0.5 * nu) / sqrt(nu * pi) 
+  dens <- ~ gamma(0.5 * (nu + 1)) / gamma(0.5 * nu) / sqrt(nu * pi)  * (1 + u^2 / nu)^(-0.5 * (nu + 1))
+  ddens <- deriv(dens, "u")
+  ddtx <- c(attr(eval(ddens, list(u = x, nu = nu + 1)), "gradient"))
+  ddty <- c(attr(eval(ddens, list(u = y, nu = nu + 1)), "gradient"))
+  ## now collect the results
+  der1 <- pt(x, nu + 1) + w * dt(x, nu + 1) * dxdw - pt(y, nu + 1) + (1 - w) * dt(y, nu + 1) * dydw
+  der2 <- dt(x, nu + 1) * dxdw +
+    dt(x, nu + 1) * dxdw + w * ddtx * dxdw^2 + w * dt(x, nu + 1) * d2xdw2 +
+      (- dt(y, nu + 1) * dydw ) +
+        (- dt(y, nu + 1) * dydw) + (1 - w) * ddty * dydw^2 + (1 - w) * dt(y, nu + 1) * d2ydw2
+  data.frame(der1 = der1, der2 = der2)
+}
+
+tevCopula <- function(param, df = 4, df.fixed = FALSE) {
+  ## dim = 2
+  dim <- 2
+  pdim <- length(param)
+  parameters <- param
+  param.names <- paste("rho", 1:pdim, sep=".")
+  param.lowbnd <- rep(-1, pdim)
+  param.upbnd <- rep(1, pdim)
+  if (!df.fixed) {
+    parameters <- c(parameters, df)
+    param.names <- c(param.names, "df")
+    param.lowbnd <- c(param.lowbnd, 1) ## qt won't work for df < 1
+    param.upbnd <- c(param.upbnd, Inf)
+  }
+  val <- new("tevCopula",
+             dimension = dim,
+             parameters = parameters,
+             df = df,
+             df.fixed = df.fixed,
+             param.names = param.names,
+             param.lowbnd = param.lowbnd,
+             param.upbnd = param.upbnd,
+             message = paste("t-EV copula family",
+               if(df.fixed) paste("df fixed at", df) else NULL)
+             )
+  val
+}
+  
+ptevCopula <- function(copula, u) {
+  dim <- copula@dimension
+  if (is.vector(u)) u <- matrix(u, nrow = 1)
+  ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  u1 <- u[,1]; u2 <- u[,2]
+  logu <- log(u1 * u2)
+  exp(logu * AfunTev(copula, log(u2) / logu))
+}
+
+dtevCopula <- function(copula, u) {
+  dim <- copula@dimension
+  if (is.vector(u)) u <- matrix(u, nrow = 1)
+  ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  u1 <- u[,1]; u2 <- u[,2]
+
+  C <- ptevCopula(copula, u)
+  logu <- log(u1 * u2)
+  w <- log(u2) / logu
+  wexpr <- ~ log(u2) / log(u1 * u2)
+  dw <- eval(deriv(wexpr, c("u1", "u2"), hessian=TRUE), list(u1 = u1, u2 = u2))
+  dwdu1 <- c(attr(dw, "gradient")[,"u1"])
+  dwdu2 <- c(attr(dw, "gradient")[,"u2"])
+  d2wdu1du2 <- c(attr(dw, "hessian")[,"u1","u2"])
+  A <- AfunTev(copula, w)
+  Ader <- AfunDerTev(copula, w)
+  Ader1 <- Ader$der1; Ader2 <- Ader$der2
+  dCdu1 <- C * (1 / u1 * A + logu * Ader1 * dwdu1)
+  dCdu2 <- C * (1 / u2 * A + logu * Ader1 * dwdu2)
+  ## pdf = d2Cdu1du2
+  pdf <- dCdu2 * (1 / u1 * A + logu * Ader1 * dwdu1) +
+    C * (1 / u1 * Ader1 * dwdu2 + 1 / u2 * Ader1 * dwdu1 +
+         logu * Ader2 * dwdu2 * dwdu1 + logu * Ader1 * d2wdu1du2)
+  pdf
+}
+
+#######################################################################
+## This block is copied from ../../copulaUtils/assoc/
+
+## tau
+
+tevTauFun <- function(alpha) {
+  ss <- .tevTau$ss
+  forwardTransf <- .tevTau$trFuns$forwardTransf
+  valFun <- .tevTau$assoMeasFun$valFun
+  theta <- forwardTransf(alpha, ss)
+
+  valFun(theta)
+}
+
+kendallsTauTevCopula <- function(copula) {
+  alpha <- copula@parameters[1]
+  tevTauFun(alpha)
+}
+
+calibKendallsTauTevCopula <- function(copula, tau) {
+  if (any(tau < 0)) warning("tau is out of range (0, 1)")
+  tevTauInv <- approxfun(x = .tevTau$assoMeasFun$fm$ysmth,
+                         y = .tevTau$assoMeasFun$fm$x, rule=2)
+  
+  ss <- .tevTau$ss
+  theta <- tevTauInv(tau)
+  .tevTau$trFuns$backwardTransf(theta, ss)
+}
+
+tevTauDer <- function(alpha) {
+  ss <- .tevTau$ss
+  forwardTransf <- .tevTau$trFuns$forwardTransf
+  forwardDer <- .tevTau$trFuns$forwardDer
+  valFun <- .tevTau$assoMeasFun$valFun
+  theta <- forwardTransf(alpha, ss)
+
+  valFun(theta, 1) * forwardDer(alpha, ss)
+}
+
+tauDerTevCopula <- function(copula) {
+  alpha <- copula@parameters[1]
+  tevTauDer(alpha)
+}
+
+## rho
+
+tevRhoFun <- function(alpha) {
+  ss <- .tevRho$ss
+  forwardTransf <- .tevRho$trFuns$forwardTransf
+  valFun <- .tevRho$assoMeasFun$valFun
+  theta <- forwardTransf(alpha, ss)
+
+  valFun(theta)
+}
+
+spearmansRhoTevCopula <- function(copula) {
+  alpha <- copula@parameters[1]
+  tevRhoFun(alpha)
+}
+
+calibSpearmansRhoTevCopula <- function(copula, rho) {
+  if (any(rho < 0)) warning("rho is out of range (0, 1)")
+  tevRhoInv <- approxfun(x = .tevRho$assoMeasFun$fm$ysmth,
+                         y = .tevRho$assoMeasFun$fm$x, rule = 2)
+  
+  ss <- .tevRho$ss
+  theta <- tevRhoInv(rho)
+  .tevRho$trFuns$backwardTransf(theta, ss)
+}
+
+tevRhoDer <- function(alpha) {
+  ss <- .tevRho$ss
+  forwardTransf <- .tevRho$trFuns$forwardTransf
+  forwardDer <- .tevRho$trFuns$forwardDer
+  valFun <- .tevRho$assoMeasFun$valFun
+  theta <- forwardTransf(alpha, ss)
+
+  valFun(theta, 1) * forwardDer(alpha, ss)
+}
+
+rhoDerTevCopula <- function(copula) {
+  alpha <- copula@parameters[1]
+  tevRhoDer(alpha)
+}
+##############################################################################
+
+setMethod("pcopula", signature("tevCopula"), ptevCopula)
+setMethod("dcopula", signature("tevCopula"), dtevCopula)
+
+setMethod("Afun", signature("tevCopula"), AfunTev)
+setMethod("AfunDer", signature("tevCopula"), AfunDerTev)
+
+setMethod("kendallsTau", signature("tevCopula"), kendallsTauTevCopula)
+setMethod("spearmansRho", signature("tevCopula"), spearmansRhoTevCopula)
+
+setMethod("calibKendallsTau", signature("tevCopula"), calibKendallsTauTevCopula)
+setMethod("calibSpearmansRho", signature("tevCopula"), calibSpearmansRhoTevCopula)
+
+setMethod("tauDer", signature("tevCopula"), tauDerTevCopula)
+setMethod("rhoDer", signature("tevCopula"), rhoDerTevCopula)

@@ -1,11 +1,35 @@
 Package: copula
-Version: 0.8-3
-Date: 2009-01-22
+Version: 0.8-7
+Date: 2009-06-09
 Title: Multivariate dependence with copulas
-Author: Jun Yan <jyan@stat.uconn.edu> and Ivan Kojadinovic <ivan@stat.auckland.ac.nz>.
+Author: Jun Yan <jyan@stat.uconn.edu> and Ivan Kojadinovic
+        <ivan@stat.auckland.ac.nz>.
 Maintainer: Jun Yan <jyan@stat.uconn.edu>
 Depends: methods, mvtnorm, scatterplot3d, sn, adapt, pspline
 Enhances: nor1mix
-Description: Classes (S4) of commonly used copulas including elliptical (normal and t), Archimedean (Clayton, Gumbel, Frank, and Ali-Mikhail-Haq), extreme value (Husler-Reiss and Galambos), and other families (Plackett and Farlie-Gumbel-Morgenstern). Methods for density, distribution, random number generation, bivariate dependence measures, perspective and contour plots. Functions for fitting copula models with variance estimate. Independence tests among random variables and random vectors. Serial independence tests for univariate and multivariate continuous time series. Goodness-of-fit tests for copulas based on multipliers and on the parametric bootstrap.
+Description: Classes (S4) of commonly used copulas including elliptical
+        (normal and t), Archimedean (Clayton, Gumbel, Frank, and
+        Ali-Mikhail-Haq), extreme value (Gumbel, Husler-Reiss,
+        Galambos, and t-EV), and other families (Plackett and
+        Farlie-Gumbel-Morgenstern). Methods for density, distribution,
+        random number generation, bivariate dependence measures,
+        perspective and contour plots. Functions for fitting copula
+        models with variance estimate. Independence tests among random
+        variables and random vectors. Serial independence tests for
+        univariate and multivariate continuous time series.
+        Goodness-of-fit tests for copulas based on multipliers and on
+        the parametric bootstrap.
 License: GPL (>= 3)
-Packaged: Thu Jan 22 14:12:04 2009; jyan
+Collate: Classes.R Copula.R E.R amhCopula.R amhExpr.R archmCopula.R
+        asymCopula.R claytonCopula.R claytonExpr.R debye.R derCdfPdf.R
+        ellipCopula.R evCopula.R evTests.R exchTests.R fgmCopula.R
+        fitCopula.R fitMvdc.R frankCopula.R frankExpr.R
+        galambosCopula.R galambosExpr-math.R galambosExpr.R
+        gofEVTests.R gofTests.R graphics.R gumbelCopula.R gumbelExpr.R
+        huslerReissCopula.R huslerReissExpr.R indepCopula.R
+        indepTests.R logseries.R mvdc.R normalCopula.R plackettCopula.R
+        plackettExpr.R skewNormalCopula.R stable.R tCopula.R
+        tawnCopula.R tawnExpr.R tevCopula.R zzz.R
+Packaged: 2009-06-09 19:13:29 UTC; jyan
+Repository: CRAN
+Date/Publication: 2009-06-10 08:29:32

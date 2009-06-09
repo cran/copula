@@ -22,8 +22,9 @@
 
 AfunHuslerReiss <- function(copula, w) {
   alpha <- copula@parameters[1]
-  w * pnorm(1 / alpha + 0.5 * alpha * log(w /(1 - w))) +
-    (1 - w) * pnorm(1 / alpha - 0.5 * alpha * log(w / (1 - w))) 
+  A <- w * pnorm(1 / alpha + 0.5 * alpha * log(w /(1 - w))) +
+    (1 - w) * pnorm(1 / alpha - 0.5 * alpha * log(w / (1 - w)))
+  ifelse(w == 0 | w == 1, 1, A)
 }
 
 AfunDerHuslerReiss <- function(copula, w) {
@@ -154,12 +155,13 @@ kendallsTauHuslerReissCopula <- function(copula) {
 }
 
 calibKendallsTauHuslerReissCopula <- function(copula, tau) {
+  if (any(tau < 0)) warning("tau is out of range (0, 1)")
   huslerReissTauInv <- approxfun(x = .huslerReissTau$assoMeasFun$fm$ysmth,
-                              y = .huslerReissTau$assoMeasFun$fm$x)
+                                 y = .huslerReissTau$assoMeasFun$fm$x, rule = 2)
   
   ss <- .huslerReissTau$ss
   theta <- huslerReissTauInv(tau)
-  .huslerReissTau$trFuns$backwardTransf(theta, ss)
+  ifelse(tau <= 0, 0, .huslerReissTau$trFuns$backwardTransf(theta, ss))
 }
 
 huslerReissTauDer <- function(alpha) {
@@ -194,12 +196,13 @@ spearmansRhoHuslerReissCopula <- function(copula) {
 }
 
 calibSpearmansRhoHuslerReissCopula <- function(copula, rho) {
+  if (any(rho < 0)) warning("rho is out of range (0, 1)")
   huslerReissRhoInv <- approxfun(x = .huslerReissRho$assoMeasFun$fm$ysmth,
-                              y = .huslerReissRho$assoMeasFun$fm$x)
+                                 y = .huslerReissRho$assoMeasFun$fm$x, rule = 2)
   
   ss <- .huslerReissRho$ss
   theta <- huslerReissRhoInv(rho)
-  .huslerReissRho$trFuns$backwardTransf(theta, ss)
+  ifelse(rho <= 0, 0, .huslerReissRho$trFuns$backwardTransf(theta, ss))
 }
 
 huslerReissRhoDer <- function(alpha) {

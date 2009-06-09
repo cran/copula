@@ -44,9 +44,21 @@ derCdfWrtArgsExplicitCopula <- function(cop, u)
     return(mat)
   }
 
+## this function is used for Khoudraji's device
+derCdfWrtArgsIndepCopula <- function(cop, u) {
+  p <- cop@dimension
+  mat <- matrix(0, nrow(u), p)
+  for (j in 1:p) {
+    mat[,j] <- apply(u[, -j, drop=FALSE], 1, prod)
+  }
+  mat
+}
+
 setMethod("derCdfWrtArgs", signature("archmCopula"), derCdfWrtArgsExplicitCopula)
 setMethod("derCdfWrtArgs", signature("plackettCopula"), derCdfWrtArgsExplicitCopula)
 setMethod("derCdfWrtArgs", signature("evCopula"), derCdfWrtArgsExplicitCopula)
+setMethod("derCdfWrtArgs", signature("gumbelCopula"), derCdfWrtArgsExplicitCopula)
+setMethod("derCdfWrtArgs", signature("indepCopula"), derCdfWrtArgsIndepCopula)
 
 derCdfWrtArgsEllipCopula <- function(cop, u)
   {
@@ -181,9 +193,8 @@ derCdfWrtParamsEvCopula <- function(cop, u) {
 
 setMethod("derCdfWrtParams", signature("archmCopula"), derCdfWrtParamsExplicitCopula)
 setMethod("derCdfWrtParams", signature("plackettCopula"), derCdfWrtParamsExplicitCopula)
-## setMethod("derCdfWrtParams", signature("evCopula"), derCdfWrtParamsEvCopula)
 setMethod("derCdfWrtParams", signature("evCopula"), derCdfWrtParamsExplicitCopula)
-
+setMethod("derCdfWrtParams", signature("gumbelCopula"), derCdfWrtParamsExplicitCopula)
 
 derCdfWrtParamsEllipCopula <- function(cop, u)
   {
@@ -286,6 +297,7 @@ derPdfWrtArgsExplicitCopula <- function(cop, u)
 setMethod("derPdfWrtArgs", signature("archmCopula"), derPdfWrtArgsExplicitCopula)
 setMethod("derPdfWrtArgs", signature("plackettCopula"), derPdfWrtArgsExplicitCopula)
 setMethod("derPdfWrtArgs", signature("evCopula"), derPdfWrtArgsExplicitCopula)
+setMethod("derPdfWrtArgs", signature("gumbelCopula"), derPdfWrtArgsExplicitCopula)
 
 derPdfWrtArgsNormalCopula <- function(cop, u)
   {
@@ -329,6 +341,7 @@ derPdfWrtParamsExplicitCopula <- function(cop, u)
 setMethod("derPdfWrtParams", signature("archmCopula"), derPdfWrtParamsExplicitCopula)
 setMethod("derPdfWrtParams", signature("plackettCopula"), derPdfWrtParamsExplicitCopula)
 setMethod("derPdfWrtParams", signature("evCopula"), derPdfWrtParamsExplicitCopula)
+setMethod("derPdfWrtParams", signature("gumbelCopula"), derPdfWrtParamsExplicitCopula)
 
 derPdfWrtParamsEllipCopula <- function(cop, u)
   {
@@ -433,6 +446,7 @@ dcopwrapExplicitCopula <- function(cop, u)
 setMethod("dcopwrap", signature("archmCopula"), dcopwrapExplicitCopula)
 setMethod("dcopwrap", signature("plackettCopula"), dcopwrapExplicitCopula)
 setMethod("dcopwrap", signature("evCopula"), dcopwrapExplicitCopula)
+setMethod("dcopwrap", signature("gumbelCopula"), dcopwrapExplicitCopula)
 
 dcopwrapEllipCopula <- function(cop, u)
   {
@@ -440,5 +454,3 @@ dcopwrapEllipCopula <- function(cop, u)
   }
 
 setMethod("dcopwrap", signature("ellipCopula"), dcopwrapEllipCopula)
-
-

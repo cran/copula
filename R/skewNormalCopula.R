@@ -22,7 +22,7 @@
 setClass("skewNormalCopula",
          representation = representation("normalCopula",
            shape = "numeric"),
-         contains = list("copula", "ellipCopula", "normalCopula")
+         contains = list("normalCopula") #, "ellipCopula", "copula")
          )
 
 skewNormalCopula <- function(param, shape, dim = 2, dispstr = "ex") {

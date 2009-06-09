@@ -33,12 +33,21 @@
 \alias{Afun,galambosCopula-method}
 \alias{Afun,gumbelCopula-method}
 \alias{Afun,huslerReissCopula-method}
+\alias{Afun,tawnCopula-method}
+\alias{Afun,tevCopula-method}
+
+\alias{Afun,asymCopula-method}
+
+\alias{Afun,indepCopula-method}
 
 \alias{AfunDer}
 \alias{AfunDer-methods}
 \alias{AfunDer,galambosCopula-method}
 \alias{AfunDer,gumbelCopula-method}
 \alias{AfunDer,huslerReissCopula-method}
+\alias{AfunDer,tawnCopula-method}
+\alias{AfunDer,tevCopula-method}
+
 
 \title{Generator functions for Archimedean and extreme value copulas}
 \description{
