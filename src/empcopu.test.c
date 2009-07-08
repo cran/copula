@@ -1,6 +1,6 @@
 /*#################################################################################
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008
+##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008, 2009
 ##
 ##   This file is part of the R package copula.
 ##
@@ -71,7 +71,7 @@ void J_u(int n, int p, double *R, double *J)
 
 void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0, 
 			       double *G0, int *subset, char **subset_char,
-			       double *fisher0, double *tippett0)
+			       double *fisher0, double *tippett0, int *pe)
 {
   int i, j, k, index, sb[1], count;
   double *R = Calloc((*n) * (*p), double);
@@ -96,8 +96,7 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
   /* N repetitions */
   for (k=0;k<*N;k++) 
     { 
-      
-      if ((k+1) % 100 == 0)
+      if ((*pe > 0) && ((k+1) % (*pe) == 0))
 	Rprintf("Simulation iteration %d\n",k+1);
       
       /* generate data */

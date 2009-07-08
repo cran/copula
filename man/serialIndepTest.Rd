@@ -21,7 +21,7 @@
 }
 
 \usage{
-serialIndepTestSim(n, lag.max, m=lag.max+1, N=1000)
+serialIndepTestSim(n, lag.max, m=lag.max+1, N=1000, print.every = 100)
 serialIndepTest(x, d, alpha=0.05)
 }
 
@@ -32,7 +32,10 @@ serialIndepTest(x, d, alpha=0.05)
   \item{m}{Maximum cardinality of the subsets of 'lags' for which a test
     statistic is to be computed. It makes sense to consider \code{m <<
       lag.max+1} especially when \code{lag.max} is large.}
-  \item{N}{Number of repetitions when simulating under serial independence.}
+  \item{N}{Number of repetitions when simulating under serial
+    independence.}
+  \item{print.every}{Progress is printed every \code{"print.every"}
+    iterations. No progress is printed if it is nonpositive.}
   \item{x}{Numeric vector containing the time series whose serial
     independence is to be tested.}
   \item{d}{Object of class \code{serialIndepTestDist} as returned by the
@@ -127,7 +130,7 @@ test
 
 ## Display the dependogram:
 
-dependogram(test)
+dependogram(test,print=TRUE)
 
 ## NB: In order to save d for future use, the save function can be used.
 }

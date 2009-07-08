@@ -14,7 +14,7 @@
 }
 
 \usage{
-multIndepTest(x, d, m=length(d), N=1000, alpha=0.05)
+multIndepTest(x, d, m=length(d), N=1000, alpha=0.05, print.every = 100)
 }
 
 \arguments{
@@ -28,6 +28,8 @@ multIndepTest(x, d, m=length(d), N=1000, alpha=0.05)
   \item{N}{Number of bootstrap/permutation samples.}
   \item{alpha}{Significance level used in the computation of the
     critical values for the test statistics.}
+  \item{print.every}{Progress is printed every \code{"print.every"}
+    iterations. No progress is printed if it is nonpositive.}
 }
 \details{
   See the references below for more details, especially the last one.
@@ -67,10 +69,10 @@ multIndepTest(x, d, m=length(d), N=1000, alpha=0.05)
   local efficiency of Cramér-von Mises tests for multivariate
   independence. \emph{The Annals of Statistics}, 35:166--191.
   
-  I. Kojadinovic and M. Holmes (2008), Tests of independence among
+  I. Kojadinovic and M. Holmes (2009), Tests of independence among
   continuous random vectors based on Cramér-von Mises functionals
   of the empirical copula process. \emph{Journal of Multivariate
-    Analysis}, in press.
+    Analysis}, 100:1137--1154.
 }
 
 \seealso{
@@ -108,7 +110,7 @@ test <- multIndepTest(x,d)
 test
 
 ## Display the dependogram
-dependogram(test)
+dependogram(test,print=TRUE)
 }
 
 \encoding{latin1}

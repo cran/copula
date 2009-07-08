@@ -1,3 +1,24 @@
+#################################################################################
+##
+##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
+##
+##   This file is part of the R package copula.
+##
+##   The R package copula is free software: you can redistribute it and/or modify
+##   it under the terms of the GNU General Public License as published by
+##   the Free Software Foundation, either version 3 of the License, or
+##   (at your option) any later version.
+##
+##   The R package copula is distributed in the hope that it will be useful,
+##   but WITHOUT ANY WARRANTY; without even the implied warranty of
+##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##   GNU General Public License for more details.
+##
+##   You should have received a copy of the GNU General Public License
+##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
+##
+#################################################################################
+
 #######################################################
 #### asymmetric copulas
 #######################################################
@@ -64,14 +85,15 @@ AfunAsymCopula <- function(copula, w) {
   comps <- getCopulaComps(copula)
   a1 <- comps$shape[1];  a2 <- comps$shape[2]
   copula1 <- comps$copula1; copula2 <- comps$copula2
-  den1 <- (1 - a1) * w + (1 - a2) * (1 - w)
-  den2 <- a1 * w + a2 * (1 - w)
-  t1 <- (1 - a1) * w / den1; t1 <- ifelse(is.na(t1), 1, t1)
-  t2 <- a1 * w / den2; t2 <- ifelse(is.na(t2), 1, t2)
+  den1 <- (1 - a1) * (1 - w) + (1 - a2) * w
+  den2 <- a1 * (1 - w) + a2 * w
+  t1 <- (1 - a2) * w / den1; t1 <- ifelse(is.na(t1), 1, t1)
+  t2 <- a2 * w / den2; t2 <- ifelse(is.na(t2), 1, t2)
   den1 * Afun(copula1, t1) + den2 * Afun(copula2, t2)
 }
 
 pasymCopula <- function(copula, u) {
+  if (is.vector(u)) u <- matrix(u, ncol = 2)
   comps <- getCopulaComps(copula)
   a1 <- comps$shape[1];  a2 <- comps$shape[2]
   copula1 <- comps$copula1; copula2 <- comps$copula2
@@ -81,6 +103,10 @@ pasymCopula <- function(copula, u) {
 }
 
 dasymCopula <- function(copula, u) {
+  ## WARNING:
+  ## The following derivation assumes that both components are symmetric!
+  ## See dC1du and dC2du; they don't distinguish u1 or u2.
+  if (is.vector(u)) u <- matrix(u, ncol = 2)
   comps <- getCopulaComps(copula)
   a1 <- comps$shape[1];  a2 <- comps$shape[2]
   copula1 <- comps$copula1; copula2 <- comps$copula2

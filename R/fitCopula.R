@@ -1,6 +1,6 @@
 #################################################################################
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008
+##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
 ##
 ##   This file is part of the R package copula.
 ##
@@ -46,7 +46,7 @@ setClass("summaryFitCopula",
 
 showFitCopula <- function(object) {
   foo <- summaryFitCopula(object)
-  cat("The estimation method is ", object@method, " based on ", object@nsample, " observations.\n")
+  cat("The estimation is based on the ", object@method, "\nand a sample of size ", object@nsample, ".\n", sep="")
   print(foo@parameters)
   if (!is.na(foo@loglik)) cat("The maximized loglikelihood is ", foo@loglik, "\n")
   if (!is.na(foo@convergence)) cat("The convergence code is ", foo@convergence, "\n")
@@ -118,7 +118,7 @@ fitCopula.mpl <- function(copula, data, start=NULL,
   ans <- new("fitCopula",
              estimate = fit@estimate,
              var.est = var.est,
-             method = "Maximum Pseudo-Likelihood",
+             method = "maximum pseudo-likelihood",
              loglik = fit@loglik,
              convergence = fit@convergence,
              nsample = nrow(data),
@@ -144,7 +144,7 @@ fitCopula.itau <- function(copula, data, estimate.variance=TRUE) {
   ans <- new("fitCopula",
              estimate = estimate,
              var.est = var.est,
-             method = "Inversion of Kendall's Tau",
+             method = "inversion of Kendall's tau",
              loglik = as.numeric(NA), ## otherwise, class "fitCopula" complains.
              convergence = as.integer(NA),
              nsample = nrow(data),
@@ -170,7 +170,7 @@ fitCopula.irho <- function(copula, data, estimate.variance=TRUE) {
   ans <- new("fitCopula",
              estimate = estimate,
              var.est = var.est,
-             method = "Inversion of Spearman's Rho",
+             method = "inversion of Spearman's rho",
              loglik = as.numeric(NA),
              convergence = as.integer(NA),
              nsample = nrow(data),
@@ -268,7 +268,7 @@ fitCopula.ml <- function(data, copula, start=NULL,
   ans <- new("fitCopula",
              estimate = fit$par,
              var.est = var.est,
-             method = "Maximum Likelihood",
+             method = "maximum likelihood",
              loglik = loglik,
              convergence = as.integer(convergence),
              nsample = nrow(data),

@@ -1,6 +1,6 @@
 #################################################################################
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008
+##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
 ##
 ##   This file is part of the R package copula.
 ##
@@ -46,22 +46,33 @@ gofCopula <- function(copula, x, N = 1000, method = "mpl",
       stop("The copula and the data should be of the same dimension")
 
 
-    if (simulation == "pb") ## parametric bootstrap
-      gofPB(copula, x, N, method, print.every, optim.method)
-    else if (simulation == "mult") ## multiplier
-      {
-        if (method == "mpl")
-          gofMCLT.PL(copula, x, N, M, optim.method)
-        else if (method %in% c("irho","itau"))
-          {
-            if (copula@dimension != 2)
-              stop("The simulation method 'mult' can be used in combination with the estimation methods 'irho' and 'itau' only in the bivariate case.") 
-            gofMCLT.KS(copula, x, N, method, M)
-          }
-        else stop("Invalid estimation method")
-      }
-    else stop("Invalid simulation method")
+    gof <- {
+      if (simulation == "pb") ## parametric bootstrap
+        gofPB(copula, x, N, method, print.every, optim.method)
+      else if (simulation == "mult") ## multiplier
+        {
+          if (method == "mpl")
+            gofMCLT.PL(copula, x, N, M, optim.method)
+          else if (method %in% c("irho","itau"))
+            {
+              if (copula@dimension != 2)
+                stop("The simulation method 'mult' can be used in combination with the estimation methods 'irho' and 'itau' only in the bivariate case.") 
+              gofMCLT.KS(copula, x, N, method, M)
+            }
+          else stop("Invalid estimation method")
+        }
+      else stop("Invalid simulation method")
+    }
+    class(gof) <- "gofCopula"
+    gof
   }
+
+print.gofCopula <- function(x, ...)
+{
+  cat("\nParameter estimate(s):", x$parameters, "\n")
+  cat("Cramer-von Mises statistic:", x$statistic,
+      "with p-value", x$pvalue, "\n\n")
+}
 
 ##############################################################################
 ## Goodness-of-fit test based on the parametric bootstrap

@@ -135,7 +135,8 @@ void evtest(double *U, int *n, int *p, double *g, int *m,
 		  d += der[k] * (U[i + k * (*n)] <= u[k]);
 		  dt += dert[k] * (U[i + k * (*n)] <= ut[k]);
 		}
-	      influ[i + j * (*n) + c * (*n) * (*m)] = (indt - dt - ecterm * (ind - d)) * invsqrtn;
+	      influ[i + j * (*n) + c * (*n) * (*m)] 
+		= (indt - dt - ecterm * (ind - d)) * invsqrtn;
 	    }
 	}
       
@@ -145,10 +146,7 @@ void evtest(double *U, int *n, int *p, double *g, int *m,
   
   /* generate N approximate realizations */
   for (l = 0; l < *N; l++)
-    {
-      /*if ((l+1) % 100 == 0)
-	Rprintf("Simulation iteration %d\n",l+1);*/
-      
+    { 
       /* generate n variates */
       mean = 0.0;
       for (i=0;i<*n;i++)
@@ -159,7 +157,6 @@ void evtest(double *U, int *n, int *p, double *g, int *m,
       mean /= *n;
       
       /* realization number l */
-      // s0[l] = 0.0;
       for (c = 0; c < *nt; c++) 
 	{
 	  k = c + l * (*nt);
@@ -172,7 +169,6 @@ void evtest(double *U, int *n, int *p, double *g, int *m,
 
 	      s0[k] += process * process;
 	    }
-	  // s0[l] /= (*m) * (*nt); 
 	  s0[k] /= *m;
 	}
     }

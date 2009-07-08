@@ -1,6 +1,6 @@
 #################################################################################
 ##
-##   R package Copula by Jun Yan Copyright (C) 2008
+##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
 ##
 ##   This file is part of the R package copula.
 ##
@@ -18,7 +18,6 @@
 ##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
 ##
 #################################################################################
-
 
 AfunHuslerReiss <- function(copula, w) {
   alpha <- copula@parameters[1]
@@ -103,8 +102,8 @@ phuslerReissCopula <- function(copula, u) {
   alpha <- copula@parameters[1]
   ## Joe (1997, p.142)
   u1p <- -log(u1); u2p <- -log(u2)
-  exp(- u1p * pnorm(1/alpha + 0.5 * log(u1p / u2p))
-      - u2p * pnorm(1/alpha + 0.5 * log(u2p / u1p)))
+  exp(- u1p * pnorm(1/alpha + 0.5 * alpha * log(u1p / u2p))
+      - u2p * pnorm(1/alpha + 0.5 * alpha * log(u2p / u1p)))
 }
 
 dhuslerReissCopula <- function(copula, u) {
@@ -116,7 +115,7 @@ dhuslerReissCopula <- function(copula, u) {
   alpha <- copula@parameters[1]
   ## Joe (1997, p.142)
   u1p <- -log(u1); u2p <- -log(u2); z <- u1p / u2p
-  val <- 1/u1 / u2 * pcopula(copula, u) * 
+  val <- 1/ (u1 * u2) * pcopula(copula, u) * 
     (pnorm(1/alpha - 0.5 * alpha * log(z)) *
      pnorm(1/alpha + 0.5 * alpha * log(z)) +
      0.5 * alpha / u2p * dnorm(1/alpha + 0.5 * alpha * log(z)))

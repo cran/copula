@@ -1,6 +1,6 @@
 #################################################################################
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008
+##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
 ##
 ##   This file is part of the R package copula.
 ##

@@ -1,6 +1,6 @@
 #################################################################################
 ##
-##   R package Copula by Jun Yan Copyright (C) 2008
+##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
 ##
 ##   This file is part of the R package copula.
 ##
@@ -18,7 +18,6 @@
 ##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
 ##
 #################################################################################
-
 
 
 mvdc <- function(copula, margins, paramMargins, marginsIdentical = FALSE) {

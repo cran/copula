@@ -74,6 +74,8 @@ evTest <- function(x, r = 6, N = 1000, m = 30, offset=0.5)
            as.double(offset),
            s0 = double(N * nr),
            PACKAGE="copula")$s0
+
+  ## combined p-values?
   s0 <- matrix(s0, ncol = nr, byrow = TRUE)
   pval <- apply(s0 >= matrix(s, nrow=N, ncol=nr, byrow=TRUE),
                 2, function(x) (sum(x) + 0.5) / (N + 1) )

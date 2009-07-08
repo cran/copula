@@ -1,6 +1,6 @@
 /*#################################################################################
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008
+##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008, 2009
 ##
 ##   This file is part of the R package copula.
 ##
@@ -73,7 +73,8 @@ void J_sm(int n, int p, int q, double *U,  int *B, double *J)
 ******************************************************************************/
 
 void bootstrap_serial(int *n, int *N, int *p, int *q, double *U, int *m, 
-		      double *MA0, double *I0, int *subset, char **subset_char)
+		      double *MA0, double *I0, int *subset, char **subset_char,
+		      int *pe)
 {
   int i, k, np = *n + *p - 1, p1[1], m1[1], sb[1];
   int *B = Calloc(np, int);
@@ -105,8 +106,8 @@ void bootstrap_serial(int *n, int *N, int *p, int *q, double *U, int *m,
   /* N repetitions */
   for (k=0;k<*N;k++) { 
 
-    if ((k+1) % 100 == 0)
-      Rprintf("Permutation iteration %d\n",k+1);
+    if ((*pe > 0) && ((k+1) % (*pe) == 0))
+      Rprintf("Simulation iteration %d\n",k+1);
 
     /* identity row selection */
     for (i=0;i<np;i++)

@@ -1,6 +1,6 @@
 #################################################################################
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008
+##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
 ##
 ##   This file is part of the R package copula.
 ##
@@ -41,7 +41,7 @@ binom.sum <- function(n,k)
 
 # simulate the distribution of TA for A of cardinality 2 to m under independence
 
-indepTestSim <- function(n,p,m=p,N=1000)
+indepTestSim <- function(n,p,m=p,N=1000,print.every=100)
 {
     if (!is.numeric(n) || (n <- as.integer(n)) < 2)
         stop("n should be an integer greater than 2")
@@ -65,6 +65,7 @@ indepTestSim <- function(n,p,m=p,N=1000)
              subsets.char = character(sb),
              fisher0 = double(N),
              tippett0 = double(N),
+             as.integer(print.every),
              PACKAGE="copula")
 
     d <- list(sample.size = n,
@@ -167,7 +168,7 @@ indepTest <- function(x, d, alpha=0.05)
 # simulate the distribution of TAs for A of cardinality 2 to m
 # containing 1 under serial independence
 
-serialIndepTestSim <- function(n,lag.max,m=lag.max+1,N=1000)
+serialIndepTestSim <- function(n,lag.max,m=lag.max+1,N=1000,print.every=100)
 {
     if (!is.numeric(n) || (n <- as.integer(n)) < 2)
         stop("n should be an integer greater than 2")
@@ -199,6 +200,7 @@ serialIndepTestSim <- function(n,lag.max,m=lag.max+1,N=1000)
              subsets.char = character(sb),
              fisher0 = double(N),
              tippett0 = double(N),
+             as.integer(print.every),
              PACKAGE="copula")
 
     d <- list(sample.size = n,
@@ -297,7 +299,8 @@ serialIndepTest <- function(x, d, alpha=0.05)
 ##
 ##############################################################################
 
-multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05)
+multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05,
+                          print.every=100)
 {
     if (!is.numeric(x <- as.matrix(x)))
         stop("data should be numerical")
@@ -338,6 +341,7 @@ multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05)
                     I0 = double(N),
                     subsets = integer(sb),
                     subsets.char = character(sb),
+                    as.integer(print.every),
                     PACKAGE="copula")
 
     subsets <- bootstrap$subsets.char[(p+2):sb]
@@ -361,6 +365,7 @@ multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05)
              fisher = double(1),
              tippett = double(1),
              Ipval = double(1),
+             as.integer(print.every),
              PACKAGE="copula")
     
     ## compute critical values at the alpha level
@@ -389,7 +394,8 @@ multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05)
 ##
 ##############################################################################
 
-multSerialIndepTest <- function(x, lag.max, m=lag.max+1, N=1000, alpha=0.05)
+multSerialIndepTest <- function(x, lag.max, m=lag.max+1, N=1000, alpha=0.05,
+                                print.every=100)
 {
     if (!is.numeric(x <- as.matrix(x)))
         stop("data should be numerical")
@@ -428,6 +434,7 @@ multSerialIndepTest <- function(x, lag.max, m=lag.max+1, N=1000, alpha=0.05)
                     I0 = double(N),
                     subsets = integer(sb),
                     subsets.char = character(sb),
+                    as.integer(print.every),
                     PACKAGE="copula")
     
     subsets <- bootstrap$subsets.char[2:sb]
@@ -480,19 +487,21 @@ multSerialIndepTest <- function(x, lag.max, m=lag.max+1, N=1000, alpha=0.05)
 #
 ##############################################################################
 
-dependogram <- function(test, pvalues=FALSE)
+dependogram <- function(test, pvalues=FALSE, print=FALSE)
 {
   if (class(test) != "indepTest")
-    stop("'test' should be obtained by means of the functions empcopu.test, empcopm.test, empcops.test or empcopsm.test")
+    stop("'test' should be obtained by means of the functions indepTest, multIndepTest, serialIndepTest, or multSerialIndepTest")
   if (!is.logical(pvalues))
     stop("'pvalues' should be a boolean")
-
+  if (!is.logical(print))
+    stop("'print' should be a boolean")
+  
   par(las=3)
   
   l <- length(test$statistics)
   if (pvalues == TRUE)
     {
-      plot(c(1,1:l),c(0,test$pvalues), type="h", ylab="p-value per subset", xlab="subsets",
+      plot(c(1,1:l),c(0,test$pvalues), type="h", ylab="p-value per subset", xlab="",
            axes=FALSE, main="Dependogram")
       axis(1,at=1:l,label=test$subsets)
       axis(2)
@@ -500,12 +509,36 @@ dependogram <- function(test, pvalues=FALSE)
     }
   else
     {
-      plot(c(1,1:l),c(0,test$statistics), type="h", ylab="statistic per subset", xlab="subsets",
+      plot(c(1,1:l),c(0,test$statistics), type="h", ylab="statistic per subset", xlab="",
            axes=FALSE, main="Dependogram")
       axis(1,at=1:l,label=test$subsets)
       axis(2)
       points(1:l,test$critical.values,pch=20)
     }
+  if (print)
+    {
+      cat("The subset statistics, p-values and critical values are:\n")
+      print(data.frame(subset=test$subsets, statistic=test$statistics,
+                       pvalue=test$pvalues, critvalue=test$critical.values))
+      cat("The critical values are such that the simultaneous acceptance region \n",
+          "has probability 1 -", test$alpha, "under the null.\n")
+      cat("The individual rejection probability for any statistic obtained from the Mobius \n", 
+          "decomposition is 1 -", test$beta, "under the null.\n\n")
+    }
+}
+
+
+#############################################################################
+## summary and show methods for class 'indepTest'
+#############################################################################
+print.indepTest <- function(x, ...)
+{
+  cat("\nGlobal Cramer-von Mises statistic:", x$global.statistic,
+      "with p-value", x$global.statistic.pvalue, "\n")
+  cat("Combined p-values from the Mobius decomposition:\n")
+  cat("  ", x$fisher.pvalue, " from Fisher's rule,\n")
+  cat("  ", x$tippett.pvalue, " from Tippett's rule.\n")
+ 
 }
 
 ##############################################################################

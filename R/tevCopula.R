@@ -19,7 +19,6 @@
 ##
 #################################################################################
 
-
 AfunTev <- function(copula, w) {
   rho <- copula@parameters[1]
   ## nu <- getdf(copula) ## defined in tCopula.R
@@ -122,6 +121,20 @@ dtevCopula <- function(copula, u) {
          logu * Ader2 * dwdu2 * dwdu1 + logu * Ader1 * d2wdu1du2)
   pdf
 }
+
+derCdfWrtArgsSymEvCopula <- function(cop, u) {
+  mat <- matrix(NA, nrow(u), 2)
+  pcop <- pcopula(cop, u)
+  loguv <- log(u[,1]) + log(u[,2])
+  w <- log(u[,2]) / loguv
+  a <- Afun(cop, w)
+  aDer <- AfunDer(cop, w)$der1
+  mat[,1] <- pcop * (a / u[,1] - loguv * aDer * log(u[,2]) / (loguv)^2 / u[,1])
+  mat[,2] <- pcop * (a / u[,2] + loguv * aDer * log(u[,1]) / (loguv)^2 / u[,2])
+  mat
+}
+
+setMethod("derCdfWrtArgs", signature("tevCopula"), derCdfWrtArgsSymEvCopula)
 
 #######################################################################
 ## This block is copied from ../../copulaUtils/assoc/

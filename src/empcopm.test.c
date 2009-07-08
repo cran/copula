@@ -1,6 +1,6 @@
 /*#################################################################################
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008
+##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008, 2009
 ##
 ##   This file is part of the R package copula.
 ##
@@ -73,7 +73,8 @@ void J_m(int n, int p, int *b, double *U,  int *R, double *J)
 ******************************************************************************/
 
 void bootstrap(int *n, int *N, int *p, int *b, double *U, int *m, 
-	       double *MA0, double *I0, int *subset, char **subset_char)
+	       double *MA0, double *I0, int *subset, char **subset_char,
+	       int *pe)
 {
   int i, j, k, sb[1];
   int *R = Calloc((*n) * (*p), int);
@@ -99,8 +100,8 @@ void bootstrap(int *n, int *N, int *p, int *b, double *U, int *m,
   /* N repetitions */
   for (k=0;k<*N;k++) { 
 
-    if ((k+1) % 100 == 0)
-      Rprintf("Permutation iteration %d\n",k+1);
+    if ((*pe > 0) && ((k+1) % (*pe) == 0))
+      Rprintf("Simulation iteration %d\n",k+1);
     
     /* generate row selection within the blocks */
     /* for (j=0;j<*p;j++) 

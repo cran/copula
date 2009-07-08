@@ -21,9 +21,9 @@
 }
 
 \usage{
-indepTestSim(n, p, m = p, N = 1000)
+indepTestSim(n, p, m = p, N = 1000, print.every = 100)
 indepTest(x, d, alpha=0.05)
-dependogram(test, pvalues = FALSE)
+dependogram(test, pvalues = FALSE, print = FALSE)
 }
 
 \arguments{
@@ -32,9 +32,11 @@ dependogram(test, pvalues = FALSE)
   \item{p}{Dimension of the data when simulating the distribution of the test
     statistics under independence.}
   \item{m}{Maximum cardinality of the subsets of variables for which a test statistic
-  is to be computed. It makes sense to consider \code{m << p} especially when
-  \code{p} is large.}
+    is to be computed. It makes sense to consider \code{m << p} especially when
+    \code{p} is large.}
   \item{N}{Number of repetitions when simulating under independence.}
+  \item{print.every}{Progress is printed every \code{"print.every"}
+    iterations. No progress is printed if it is nonpositive.}
   \item{x}{Data frame or data matrix containing realizations (one per
     line) of the random vector whose independence is to be tested.}
   \item{d}{Object of class \code{"indepTestDist"} as returned by
@@ -45,6 +47,7 @@ dependogram(test, pvalues = FALSE)
   \item{test}{Object of class \code{"indepTest"} as return by the function \code{indepTest}.}
   \item{pvalues}{Logical indicating whether the dependogram should be
     drew from test statistics or the corresponding p-values.}
+  \item{print}{Logical indicating whether details should be printed.}
 }
 \details{See the references below for more details, especially the third
   one.
@@ -127,9 +130,9 @@ test <- indepTest(x,d)
 
 test
 
-## Display the dependogram:
+## Display the dependogram with the details:
 
-dependogram(test)
+dependogram(test,print=TRUE)
 
 ## We could have tested for a weaker form of independence, for instance,
 ## by only computing statistics for subsets whose cardinality is between 2
@@ -139,7 +142,7 @@ y <- matrix(runif(500),100,5)
 d <- indepTestSim(100,5,3)
 test <- indepTest(y,d)
 test
-dependogram(test)
+dependogram(test,print=TRUE)
 
 ## NB: In order to save d for future use, the save function can be used.
 }

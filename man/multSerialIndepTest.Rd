@@ -15,7 +15,8 @@
 }
 
 \usage{
-multSerialIndepTest(x, lag.max, m=lag.max+1, N=1000, alpha=0.05)
+multSerialIndepTest(x, lag.max, m=lag.max+1, N=1000, alpha=0.05,
+                    print.every = 100)
 }
 
 \arguments{
@@ -28,6 +29,8 @@ multSerialIndepTest(x, lag.max, m=lag.max+1, N=1000, alpha=0.05)
   \item{N}{Number of bootstrap/permutation samples.}
   \item{alpha}{Significance level used in the computation of the critical values for
     the test statistics.}
+  \item{print.every}{Progress is printed every \code{"print.every"}
+    iterations. No progress is printed if it is nonpositive.}
 }
 \details{See the references below for more details, especially the last
   one.
@@ -64,7 +67,8 @@ multSerialIndepTest(x, lag.max, m=lag.max+1, N=1000, alpha=0.05)
   
   I. Kojadinovic and J. Yan (2008), Tests of multivariate serial
   independence based on a Möbius decomposition of the independence
-  empirical copula process, submitted. 
+  empirical copula process, \emph{Annals of the Institute of Statistical
+  Mathematics}, in press. 
 }
 
 \seealso{
@@ -89,7 +93,7 @@ test <- multSerialIndepTest(x,3)
 test
 
 ## Display the dependogram
-dependogram(test)
+dependogram(test,print=TRUE)
 }
 
 \encoding{latin1}
