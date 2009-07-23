@@ -16,6 +16,7 @@
 \alias{asymCopula-class}
 \alias{tawnCopula-class}
 \alias{tevCopula-class}
+\alias{schlatherCopula-class}
 
 % Undocumented S4 methods
 

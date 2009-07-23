@@ -87,11 +87,17 @@ rfrankBivCopula <- function(copula, n) {
   val
 }
 
+## rfrankBivCopula <- function(copula, n) {
+##   delta <- copula@parameters[1]
+##   q <- runif(n); u <- runif(n)
+##   v <- - 1/ delta * log( 1 - (1 - exp(-delta)) / ((1 / q - 1) * exp(- delta * u) + 1))
+##   cbind(u, v)
+## }
 
 rfrankCopula <- function(copula, n) {
   dim <- copula@dimension
   alpha <- copula@parameters[1]
-  if (abs(alpha - 0 < .Machine$double.eps ^ (1/3)))
+  if (abs(alpha - 0) < .Machine$double.eps ^ (1/3))
     return(rcopula(indepCopula(dim), n))
 ##   if (abs(alpha) <= .Machine$double.eps^.9)
 ##     return (matrix(runif(n * dim), nrow = n))
