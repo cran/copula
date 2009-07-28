@@ -93,7 +93,7 @@ rclaytonBivCopula <- function(copula, n) {
 rclaytonCopula <- function(copula, n) {
   dim <- copula@dimension
   alpha <- copula@parameters[1]
-  if (abs(alpha - 0 < .Machine$double.eps ^ (1/3)))
+  if (abs(alpha - 0) < .Machine$double.eps ^ (1/3))
     return(rcopula(indepCopula(dim), n))
   if (dim == 2) return (rclaytonBivCopula(copula, n))
   ## gamma frailty
