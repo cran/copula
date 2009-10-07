@@ -51,8 +51,8 @@ AfunDerSchlather <- function(copula, w) {
     attr(.value, "hessian") <- .hessian
     .value
   }), list(alpha = alpha, w = w))
-  der1 <- c(attr(value, "gradient"))
-  der2 <- c(attr(value, "hessian"))
+  der1 <- c(attr(zder, "gradient"))
+  der2 <- c(attr(zder, "hessian"))
   data.frame(der1 = der1, der2 = der2)
 }
 

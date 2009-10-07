@@ -3,7 +3,6 @@
 % Undocumented code objects
 \alias{Anfun}
 \alias{asymCopula}
-\alias{evTest}
 \alias{evTestA}
 \alias{exchEVTest}
 \alias{exchTest}

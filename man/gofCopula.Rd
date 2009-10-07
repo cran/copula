@@ -81,7 +81,7 @@ gofCopula(copula, x, N = 1000, method = "mpl",
 
   I. Kojadinovic and J. Yan (2009). A goodness-of-fit test for
   multivariate multiparameter copulas based on multiplier central limit
-  theorems. Submitted.
+  theorems. \emph{Statistics and Computing}. In press.
 }
 \seealso{ \code{\link{fitCopula}}, \code{\link{ellipCopula}}. }
 \examples{

@@ -45,25 +45,25 @@ setMethod("show", signature("copula"), showCopula)
 
 
 #### numerical computation of association measures
-kendallsTauCopula <- function(copula, eps = NULL, ...) {
-  integrand <- function(u) pcopula(copula, u) * dcopula(copula, u)
-  if (is.null(eps)) .eps <- .Machine$double.eps^0.9
-  else .eps <- eps
-  lower <- c(.eps, .eps)
-  upper <- c(1 - .eps, 1 - .eps)
-  integ <- adapt(ndim=2, lower=lower, upper=upper, functn=integrand, ...)$value
-  4 * integ - 1
-}
+## kendallsTauCopula <- function(copula, eps = NULL, ...) {
+##   integrand <- function(u) pcopula(copula, u) * dcopula(copula, u)
+##   if (is.null(eps)) .eps <- .Machine$double.eps^0.9
+##   else .eps <- eps
+##   lower <- c(.eps, .eps)
+##   upper <- c(1 - .eps, 1 - .eps)
+##   integ <- adapt(ndim=2, lower=lower, upper=upper, functn=integrand, ...)$value
+##   4 * integ - 1
+## }
 
-spearmansRhoCopula <- function(copula, eps = NULL, ...) {
-  integrand <- function(u) pcopula(copula, u)
-  if (is.null(eps)) .eps <- .Machine$double.eps^0.9
-  else .eps <- eps
-  lower <- c(.eps, .eps)
-  upper <- c(1 - .eps, 1 - .eps)
-  integ <- adapt(ndim=2, lower=lower, upper=upper, functn=integrand, ...)$value
-  12 * integ - 3                 
-}
+## spearmansRhoCopula <- function(copula, eps = NULL, ...) {
+##   integrand <- function(u) pcopula(copula, u)
+##   if (is.null(eps)) .eps <- .Machine$double.eps^0.9
+##   else .eps <- eps
+##   lower <- c(.eps, .eps)
+##   upper <- c(1 - .eps, 1 - .eps)
+##   integ <- adapt(ndim=2, lower=lower, upper=upper, functn=integrand, ...)$value
+##   12 * integ - 3                 
+## }
 
 
 #### numerical tail index, not accurate

@@ -1,11 +1,11 @@
 Package: copula
-Version: 0.8-10
-Date: 2009-07-28
+Version: 0.8-12
+Date: 2009-10-07
 Title: Multivariate dependence with copulas
 Author: Jun Yan <jyan@stat.uconn.edu> and Ivan Kojadinovic
         <ivan@stat.auckland.ac.nz>.
 Maintainer: Jun Yan <jyan@stat.uconn.edu>
-Depends: methods, mvtnorm, scatterplot3d, sn, adapt, pspline
+Depends: methods, mvtnorm, scatterplot3d, sn, pspline
 Enhances: nor1mix
 Description: Classes (S4) of commonly used copulas including elliptical
         (normal and t), Archimedean (Clayton, Gumbel, Frank, and
@@ -30,6 +30,6 @@ Collate: Classes.R Copula.R derCdfPdf.R E.R amhCopula.R amhExpr.R
         indepTests.R logseries.R mvdc.R normalCopula.R plackettCopula.R
         plackettExpr.R schlatherCopula.R skewNormalCopula.R stable.R
         tCopula.R tawnCopula.R tawnExpr.R tevCopula.R zzz.R
-Packaged: 2009-07-28 13:45:40 UTC; jyan
+Packaged: 2009-10-08 01:57:43 UTC; jyan
 Repository: CRAN
-Date/Publication: 2009-07-30 12:51:55
+Date/Publication: 2009-10-08 12:41:09
