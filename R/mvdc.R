@@ -21,6 +21,10 @@
 
 
 mvdc <- function(copula, margins, paramMargins, marginsIdentical = FALSE) {
+  if (marginsIdentical) {
+    if (length(margins) == 1) margins <- rep(margins, copula@dimension)
+    if (length(paramMargins) == 1) paramMargins <- rep(paramMargins, copula@dimension)
+  }
   new("mvdc", copula = copula, margins = margins, paramMargins = paramMargins,
        marginsIdentical = marginsIdentical)
 }

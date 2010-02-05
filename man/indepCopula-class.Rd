@@ -2,7 +2,7 @@
 \docType{class}
 \alias{indepCopula-class}
 \title{Class "indepCopula" }
-\description{Independent copula class.}
+\description{Independence copula class.}
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("indepCopula",
     ...)} or by function \code{"indepCopula"}. Such objects can be
@@ -11,6 +11,9 @@
 }
 \section{Slots}{
   \describe{
+    \item{\code{exprdist}:}{Object of class \code{"expression"}:
+      expressions of the cdf and pdf of the copula. These expressions
+      are used in function 'pcopula' and 'dcopula'. }
     \item{\code{dimension}:}{Object of class \code{"numeric"}, dimension
     of the copula. }
     \item{\code{parameters}:}{Object of class \code{"numeric"},

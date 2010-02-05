@@ -3,8 +3,11 @@
 \alias{evCopula-class}
 \alias{galambosCopula-class}
 \alias{huslerReissCopula-class}
+\alias{tawnCopula-class}
+\alias{tevCopula-class}
+
 \title{Class "evCopula" }
-\description{Class representing extreme value copulas.}
+\description{Class representing extreme-value copulas.}
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("evCopula",
     ...)} or by function \code{"evCopula"}.
@@ -36,18 +39,20 @@
   }
 }
 \section{Extends}{
-  Class \code{"evCopula"} extends class \code{"copula"} directly. Both
-  class \code{"galambosCopula"} and class \code{"huslerReissCopula"}
-  extend class \code{"evCopula"} directly.
+  Class \code{"evCopula"} extends class \code{"copula"}
+  directly. Classes \code{"galambosCopula"}, \code{"huslerReissCopula"},
+  \code{"tawnCopula"}, and \code{"tevCopula"} extend class \code{"evCopula"} directly.
 }
 \note{
-  The expressions of pdf are obtained by differentiating the cdf
-  expression using function \code{"deriv"}.
-
-  \code{"gumbelCopula"} is also of class \code{"archmCopula"}.
+  %The expressions of pdf are obtained by differentiating the cdf
+  %expression using function \code{"deriv"}.
+  Objects of class \code{"gumbelCopula"} are also of class \code{"archmCopula"}.
 }
 \seealso{
-  \code{\link{evCopula}}, 
+  \code{\link{evCopula}},
+  \code{\link{evTestC}},
+  \code{\link{evTestK}},
+  \code{\link{gofEVCopula}},
   \code{\link{copula-class}}.
 }
 \keyword{classes}

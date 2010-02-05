@@ -74,7 +74,8 @@ setGeneric("rhoDerFun", function(copula) standardGeneric("rhoDerFun"))
 ##          contains = list()
 ##          )
 setClass("indepCopula",
-         representation("copula"),
+         representation = representation("copula",
+           exprdist = "expression"),
          contains = list("copula")
          )
 
@@ -271,6 +272,8 @@ setClass("mvdc",
          		marginsIdentical = "logical"),
          validity = function(object){
            dim <- object@copula@dimension
+           stopifnot(dim == length(object@margins))
+           stopifnot(dim == length(object@paramMargins))
            if(object@marginsIdentical){
              if(!all(object@margins[1] == object@margins[-1]))
                return("margins are not identical")

@@ -1,15 +1,15 @@
-\name{evTest}
-\alias{evTest}
+\name{evTestC}
+\alias{evTestC}
 
-\title{Large-sample test of extreme-value dependence}
+\title{Large-sample test of multivariate extreme-value dependence}
 \description{
-  Test of extreme-value dependence based on the empirical copula and
+  Test of multivariate extreme-value dependence based on the empirical copula and
   max-stability. The test statistics are defined in Kojadinovic and Yan
   (2009). Approximate p-values for the test statistics are obtained
-  by means of a fast \emph{multiplier} technique.  
+  by means of a \emph{multiplier} technique.  
 }
 \usage{
-evTest(x, N = 1000)
+evTestC(x, N = 1000)
 }
 
 \arguments{
@@ -39,15 +39,16 @@ evTest(x, N = 1000)
     of extreme-value dependence for multivariate copulas.
     Submitted.
 }
-\seealso{ \code{\link{evCopula}}. }
+\seealso{ \code{\link{evTestK}}, \code{\link{evCopula}},
+  \code{\link{gofEVCopula}}, \code{\link{Anfun}}. }
 \examples{
-## Do the data come from an extreme-value copula? 
-evTest(rcopula(gumbelCopula(3), 200)) 
-evTest(rcopula(claytonCopula(3), 200))
+## Do these data come from an extreme-value copula? 
+evTestC(rcopula(gumbelCopula(3), 200)) 
+evTestC(rcopula(claytonCopula(3), 200))
 
-## A three-dimensional example
-evTest(rcopula(gumbelCopula(3, dim=3), 200)) 
-evTest(rcopula(claytonCopula(3, dim=3), 200))
+## Three-dimensional examples
+evTestC(rcopula(gumbelCopula(3, dim=3), 200)) 
+evTestC(rcopula(claytonCopula(3, dim=3), 200))
 }
 
 \keyword{htest}

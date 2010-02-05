@@ -445,7 +445,6 @@ void evsymtest_derA(double *U, double *V, int *n, double *t, int *m,
 
 ***********************************************************************/
     
-
 void evsymtest_stat(double *S, double *T, int *n, double *t, int *m, 
 		    int *CFG, double *stat)
 {

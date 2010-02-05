@@ -1,6 +1,6 @@
 Package: copula
-Version: 0.8-12
-Date: 2009-10-07
+Version: 0.9-2
+Date: 2010-02-05
 Title: Multivariate dependence with copulas
 Author: Jun Yan <jyan@stat.uconn.edu> and Ivan Kojadinovic
         <ivan@stat.auckland.ac.nz>.
@@ -10,7 +10,7 @@ Enhances: nor1mix
 Description: Classes (S4) of commonly used copulas including elliptical
         (normal and t), Archimedean (Clayton, Gumbel, Frank, and
         Ali-Mikhail-Haq), extreme value (Gumbel, Husler-Reiss,
-        Galambos, and t-EV), and other families (Plackett and
+        Galambos, Tawn, and t-EV), and other families (Plackett and
         Farlie-Gumbel-Morgenstern). Methods for density, distribution,
         random number generation, bivariate dependence measures,
         perspective and contour plots. Functions for fitting copula
@@ -18,18 +18,18 @@ Description: Classes (S4) of commonly used copulas including elliptical
         variables and random vectors. Serial independence tests for
         univariate and multivariate continuous time series.
         Goodness-of-fit tests for copulas based on multipliers and on
-        the parametric bootstrap.
+        the parametric bootstrap. Tests of extreme-value dependence.
 License: GPL (>= 3)
 Collate: Classes.R Copula.R derCdfPdf.R E.R amhCopula.R amhExpr.R
-        archmCopula.R asymCopula.R claytonCopula.R claytonExpr.R
-        debye.R ellipCopula.R evCopula.R evTests.R exchTests.R
-        fgmCopula.R fitCopula.R fitMvdc.R frankCopula.R frankExpr.R
-        galambosCopula.R galambosExpr-math.R galambosExpr.R
+        archmCopula.R asymCopula.R asymExplicitCopula.R claytonCopula.R
+        claytonExpr.R debye.R ellipCopula.R evCopula.R evTests.R
+        exchTests.R fgmCopula.R fitCopula.R fitMvdc.R frankCopula.R
+        frankExpr.R galambosCopula.R galambosExpr-math.R galambosExpr.R
         gofEVTests.R gofTests.R graphics.R gumbelCopula.R gumbelExpr.R
         huslerReissCopula.R huslerReissExpr.R indepCopula.R
         indepTests.R logseries.R mvdc.R normalCopula.R plackettCopula.R
         plackettExpr.R schlatherCopula.R skewNormalCopula.R stable.R
         tCopula.R tawnCopula.R tawnExpr.R tevCopula.R zzz.R
-Packaged: 2009-10-08 01:57:43 UTC; jyan
+Packaged: 2010-02-11 20:30:14 UTC; ivan
 Repository: CRAN
-Date/Publication: 2009-10-08 12:41:09
+Date/Publication: 2010-02-12 08:00:17

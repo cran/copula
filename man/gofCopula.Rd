@@ -76,10 +76,10 @@ gofCopula(copula, x, N = 1000, method = "mpl",
   for copulas: A review and a power study. \emph{Insurance: Mathematics and
     Economics}, 44, 199-214.
   
-  I. Kojadinovic and J. Yan (2009). Fast large-sample goodness-of-fit
-  tests for copulas. Submitted.
+  I. Kojadinovic, J. Yan and M. Holmes (2010). Fast large-sample goodness-of-fit
+  tests for copulas. \emph{Statistica Sinica}. In press.
 
-  I. Kojadinovic and J. Yan (2009). A goodness-of-fit test for
+  I. Kojadinovic and J. Yan (2010). A goodness-of-fit test for
   multivariate multiparameter copulas based on multiplier central limit
   theorems. \emph{Statistics and Computing}. In press.
 }

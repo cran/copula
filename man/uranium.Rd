@@ -13,7 +13,7 @@ measured for the following elements: uranium (U), Lithium (Li), cobalt
 }
 \usage{data(uranium)}
 \format{
-  A data frame with 655 observations on the following 7 variables:
+  A data frame with 655 observations of the following 7 variables:
   \describe{
     \item{\code{U}}{a numeric vector of uranium.}
     \item{\code{Li}}{a numeric vector of Lithium.}

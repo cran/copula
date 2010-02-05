@@ -218,7 +218,7 @@ fitCopula.ml <- function(data, copula, start=NULL,
                          method="BFGS",
                          estimate.variance=TRUE) {
   if (copula@dimension != ncol(data))
-    stop("The dimention of the data and copual do not match.\n")
+    stop("The dimention of the data and copula do not match.\n")
   
   if (is.null(start)) start <- fitCopula.itau(copula, data)@estimate  
   if (length(copula@parameters) != length(start))

@@ -72,7 +72,7 @@ fitCopula(copula, data, method="mpl", start=NULL, lower=NULL, upper=NULL,
   \emph{International Statistical Review} 73, 111-129.
   
   C. Genest and A.-C. Favre (2007). Everything you always wanted to know about
-  copula modeling but were afraid to ask. \emph{Journal of Hydrological Engineering}
+  copula modeling but were afraid to ask. \emph{Journal of Hydrologic Engineering}
   12, 347-368.
   
   I. Kojadinovic and J. Yan (2008), Comparison of three semiparametric methods

@@ -4,10 +4,6 @@
 \alias{pcopula}
 \alias{rcopula}
 
-\alias{dcopula,indepCopula-method}
-\alias{pcopula,indepCopula-method}
-\alias{rcopula,indepCopula-method}
-
 \alias{dcopula,claytonCopula-method}
 \alias{dcopula,frankCopula-method}
 \alias{dcopula,gumbelCopula-method}
@@ -20,7 +16,9 @@
 \alias{dcopula,tevCopula-method}
 \alias{dcopula,plackettCopula-method}
 \alias{dcopula,fgmCopula-method}
+\alias{dcopula,indepCopula-method}
 \alias{dcopula,asymCopula-method}
+\alias{dcopula,asymExplicitCopula-method}
 
 \alias{pcopula,claytonCopula-method}
 \alias{pcopula,frankCopula-method}
@@ -33,8 +31,10 @@
 \alias{pcopula,tawnCopula-method}
 \alias{pcopula,tevCopula-method}
 \alias{pcopula,plackettCopula-method}
-\alias{pcopula,fgmCopula-method} 
+\alias{pcopula,fgmCopula-method}
+\alias{pcopula,indepCopula-method}
 \alias{pcopula,asymCopula-method}
+\alias{pcopula,asymExplicitCopula-method}
 
 
 \alias{rcopula,claytonCopula-method}
@@ -47,8 +47,10 @@
 \alias{rcopula,huslerReissCopula-method}
 \alias{rcopula,plackettCopula-method}
 \alias{rcopula,fgmCopula-method}
-\alias{rcopula,evCopula-method} 
+\alias{rcopula,evCopula-method}
+\alias{rcopula,indepCopula-method}
 \alias{rcopula,asymCopula-method}
+\alias{rcopula,asymExplicitCopula-method}
 
 \title{Copula distribution functions}
 \description{

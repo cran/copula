@@ -238,7 +238,7 @@ void cramer_vonMises_Pickands(int *n, int *m, double *S,
 			      double *stat)
 {
   int i;
-  double t, Ac, Au, dc, dAinv, // du,
+  double t, Ac, Au, dc, du,
     invA0 = inv_A_Pickands(*n, S, T, 0.0), 
     invA1 = inv_A_Pickands(*n, S, T, 1.0);
  
@@ -248,12 +248,12 @@ void cramer_vonMises_Pickands(int *n, int *m, double *S,
       t = (double)i/(double)(*m);
       Au = inv_A_Pickands(*n, S, T, t);
       Ac = Au - (1.0 - t) * (invA0 - 1.0) - t * (invA1 - 1.0); // correction
-      // du = 1 / Au - Atheta[i];
-      dAinv =  Ac - 1 / Atheta[i];
+      du = 1 / Au - Atheta[i];
+      // dAinv =  Ac - 1 / Atheta[i];
       dc = 1 / Ac - Atheta[i];
       stat[0] += dc * dc;
-      // stat[1] += du * du;
-      stat[1] += dAinv * dAinv;
+      stat[1] += du * du;
+      // stat[1] += dAinv * dAinv;
     }
   stat[0] = stat[0] * (double)(*n)/(double)(*m);
   stat[1] = stat[1] * (double)(*n)/(double)(*m);
@@ -265,7 +265,7 @@ void cramer_vonMises_CFG(int *n, int *m, double *S,
 			 double *stat)
 {
   int i;
-  double t, Au, Ac, dc, dlogA, // du
+  double t, Au, Ac, dc, du,
     logA0 = log_A_CFG(*n, S, T, 0.0),
     logA1 = log_A_CFG(*n, S, T, 1.0);
 
@@ -276,11 +276,11 @@ void cramer_vonMises_CFG(int *n, int *m, double *S,
       Au = log_A_CFG(*n, S, T, t);
       Ac = Au - (1.0 - t) * logA0 - t * logA1; // endpoint corrected
       dc = exp(Ac) - Atheta[i];
-      // du = exp(Au) - Atheta[i];
-      dlogA = Ac - log(Atheta[i]);
+      du = exp(Au) - Atheta[i];
+      // dlogA = Ac - log(Atheta[i]);
       stat[0] += dc * dc;
-      // stat[1] += du * du;
-      stat[1] += dlogA * dlogA;
+      stat[1] += du * du;
+      // stat[1] += dlogA * dlogA;
     }
   stat[0] = stat[0] * (double)(*n)/(double)(*m);
   stat[1] = stat[1] * (double)(*n)/(double)(*m);

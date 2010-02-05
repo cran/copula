@@ -26,7 +26,7 @@ rmvdc(mvdc, n)
     distributions to be identical. }
   \item{mvdc}{ a \code{"mvdc"} object. }
   \item{x}{ a vector of the copula dimension or a matrix with number of
-    rows being the copula dimension, giving the coordinates of the
+    columns being the copula dimension, giving the coordinates of the
     points where the density or distribution function needs to be
     evaluated.}
   \item{n}{ number of observations to be generated. }

@@ -47,21 +47,24 @@ showFitMvdc <- function(object) {
   idx2 <- cumsum(marNpar)
   idx1 <- idx2 - marNpar + 1
   margid <- object@mvdc@marginsIdentical
-  if(margid){
+  if (sum(marNpar) > 0) { ## sometimes there is no marginal params
+    if(margid){
       cat("Margins:\n")
       print(foo@parameters[idx1[1]:idx2[1], 1:4, drop=FALSE])
     }
-  else {
-    for (i in 1:p) {
-      cat("Margin ", i, ":\n")
-      print(foo@parameters[idx1[i]:idx2[i], 1:2, drop=FALSE])
+    else {
+      for (i in 1:p) {
+        cat("Margin ", i, ":\n")
+        print(foo@parameters[idx1[i]:idx2[i], 1:2, drop=FALSE])
       }
     }
+  }
   cat("Copula:\n")
+  copParIdx <- 1:length(object@mvdc@copula@parameters)
   if(margid)
-    print(foo@parameters[- (1:idx2[1]), 1:4, drop=FALSE])
+    print(foo@parameters[sum(marNpar) + copParIdx, 1:4, drop=FALSE])
   else
-    print(foo@parameters[- (1:rev(idx2)[1]), 1:2, drop=FALSE])
+    print(foo@parameters[sum(marNpar) + copParIdx, 1:2, drop=FALSE])
   
   cat("The maximized loglikelihood is ", foo@loglik, "\n")
   cat("The convergence code is ", foo@convergence, "see ?optim.\n")
@@ -77,15 +80,15 @@ summaryFitMvdc <- function(object) {
   marNpar <- unlist(lapply(object@mvdc@paramMargins, length))
   p <- object@mvdc@copula@dimension
 
-  if(object@mvdc@marginsIdentical){ 
-     pnames <- c(paste(paste("m", lapply(object@mvdc@paramMargins, names)[[1]], sep=".")),
-              object@mvdc@copula@param.names)
-     }
+  if (sum(marNpar) == 0) margpnames <- NULL
+  else if(object@mvdc@marginsIdentical){ 
+    margpnames <- c(paste(paste("m", lapply(object@mvdc@paramMargins, names)[[1]], sep=".")))
+  }
   else{
-     pnames <- c(paste(paste("m", rep(1:p, marNpar), sep=""),
-                    unlist(lapply(object@mvdc@paramMargins, names)), sep="."),
-              object@mvdc@copula@param.names)
-       }
+    margpnames <- c(paste(paste("m", rep(1:p, marNpar), sep=""),
+                          unlist(lapply(object@mvdc@paramMargins, names)), sep="."))
+  }
+  pnames <- c(margpnames, object@mvdc@copula@param.names)
   dimnames(parameters) <-
     list(pnames,
          c("Estimate", "Std. Error", "z value", "Pr(>|z|)"))
@@ -108,6 +111,7 @@ loglikMvdc <- function(param, x, mvdc, suppressMessages=FALSE) {
   marNpar <- unlist(lapply(mvdc@paramMargins, length))
   idx2 <- cumsum(marNpar)
   idx1 <- idx2 - marNpar + 1
+
   for (i in 1:p) {
     if (marNpar[i] > 0) {
       ## parnames <- mvdc@paramMargins[[i]]
@@ -118,7 +122,10 @@ loglikMvdc <- function(param, x, mvdc, suppressMessages=FALSE) {
       for (j in 1:marNpar[i]) mvdc@paramMargins[[i]][j] <- par[j]
     }      
   }
-  if(margid)
+  if (idx2[p] == 0) { # no marginal parameters
+    mvdc@copula@parameters <- param
+  }
+  else if(margid)
       mvdc@copula@parameters <- param[- (1:idx2[1])]
   else
       mvdc@copula@parameters <- param[- (1:rev(idx2)[1])]

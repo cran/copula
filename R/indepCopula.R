@@ -21,13 +21,31 @@
 
 
 indepCopula <- function(dim = 2) {
+    ## get expressions of cdf and pdf
+  cdfExpr <- function(n) {
+    uis <- paste("u", 1:n, sep="")
+    expr <- paste(uis, collapse="*")
+    parse(text = expr)
+  }
+  
+  pdfExpr <- function(cdf, n) {
+    val <- cdf
+    for (i in 1:n) {
+      val <- D(val, paste("u", i, sep=""))
+    }
+    val
+  }
+  cdf <- cdfExpr(dim)
+  pdf <- pdfExpr(cdf, dim)
+  
   val <- new("indepCopula",
              dimension = dim,
+             exprdist = c(cdf=cdf, pdf=pdf),
              parameters = double(0),
              param.names = character(0),
              param.lowbnd = double(0),
              param.upbnd = double(0),
-             message = "Independent copula")
+             message = "Independence copula")
   val
 }
 

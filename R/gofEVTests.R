@@ -26,8 +26,9 @@
 ## copula is a copula of the desired family whose parameters, if necessary,
 ## will be used as starting values in fitCopula
 
-gofAfun <- function(copula, x, N = 1000, method = "mpl", estimator = "CFG",
-                    m = 1000, print.every = 100, optim.method = "Nelder-Mead")
+gofEVCopula <- function(copula, x, N = 1000, method = "mpl",
+                        estimator = "CFG", m = 1000, print.every = 100,
+                        optim.method = "Nelder-Mead")
   {
     n <- nrow(x)
     
@@ -76,15 +77,22 @@ gofAfun <- function(copula, x, N = 1000, method = "mpl", estimator = "CFG",
                      as.integer(estimator == "CFG"),
                      PACKAGE="copula")$stat
       }
-    
-    return(list(statistic=s,
-                pvalue=sapply(1:2, function(i) (sum(s0[,i] >= s[i])+0.5)/(N+1)),
-                parameters=fcop@parameters))
+
+    ## corrected version only
+    gof <- list(statistic=s[1],
+                pvalue=(sum(s0[,1] >= s[1])+0.5)/(N+1),
+                parameters=fcop@parameters)
+
+    class(gof) <- "gofCopula"
+    gof
   }
 
 #######################################################3
+## version for simulations
+## was named gofEVCopula before
+## not exported
 
-gofEVCopula <- function(copula, x, N = 1000, method = "mpl", # estimator = "CFG",
+gofAfun <- function(copula, x, N = 1000, method = "mpl", # estimator = "CFG",
                         m = 1000, print.every = 100, optim.method = "Nelder-Mead")
   {
     n <- nrow(x)
