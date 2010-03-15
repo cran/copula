@@ -1,6 +1,6 @@
 Package: copula
-Version: 0.9-2
-Date: 2010-02-05
+Version: 0.9-3
+Date: 2010-03-15
 Title: Multivariate dependence with copulas
 Author: Jun Yan <jyan@stat.uconn.edu> and Ivan Kojadinovic
         <ivan@stat.auckland.ac.nz>.
@@ -30,6 +30,6 @@ Collate: Classes.R Copula.R derCdfPdf.R E.R amhCopula.R amhExpr.R
         indepTests.R logseries.R mvdc.R normalCopula.R plackettCopula.R
         plackettExpr.R schlatherCopula.R skewNormalCopula.R stable.R
         tCopula.R tawnCopula.R tawnExpr.R tevCopula.R zzz.R
-Packaged: 2010-02-11 20:30:14 UTC; ivan
+Packaged: 2010-03-16 02:14:58 UTC; jyan
 Repository: CRAN
-Date/Publication: 2010-02-12 08:00:17
+Date/Publication: 2010-03-16 17:06:30

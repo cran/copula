@@ -1,3 +1,13 @@
+2010-03-15 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
+
+	* Corrected a bug in rcopula for claytonCopula for dim >= 3.
+	Thanks to Zhongyi Yuan <zhongyi-yuan@uiowa.edu>.
+	* Added mvtnorm in NAMESPACE to make the package work if these 
+	functions are overwritten by other packages:
+	importFrom(mvtnorm, dmvnorm, pmvnorm, dmvt, pmvt)
+	
+
+
 2009-10-07 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
 
 	* Removed dependence on package adapt, which has been withdrawn from CRAN

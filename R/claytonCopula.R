@@ -100,7 +100,8 @@ rclaytonCopula <- function(copula, n) {
   val <- matrix(runif(n * dim), nrow = n)
   if (abs(alpha) <= 100 * .Machine$double.eps)
     return (val)  ## the limit is independence
-  gam <- rgamma(n, shape = 1/alpha, rate = 1/alpha) ## fixed from rate = 1
+  ## gam <- rgamma(n, shape = 1/alpha, rate = 1/alpha) ## fixed from rate = 1
+  gam <- rgamma(n, shape = 1/alpha, rate = 1) ## fixed from rate = 1
   gam <- matrix(gam, nrow = n, ncol = dim)
   genInv(copula, - log(val) / gam)
 }

@@ -91,12 +91,12 @@ rcopula(copula, n)
 }
 \references{
   E.W. Frees and E.A. Valdez (1998). Understanding relationships using
-    copulas.  \emph{North American Actuarial Journal}, 2:1--25.
+  copulas.  \emph{North American Actuarial Journal}, 2:1--25.
   
   C. Genest and A.-C. Favre (2007). Everything you always wanted to know
-    about copula modeling but were afraid to ask. \emph{Journal of
-  Hydrological Engineering}, 12:347--368.
- 
+  about copula modeling but were afraid to ask. \emph{Journal of
+    Hydrologic Engineering}, 12:347--368.
+  
   H. Joe (1997). \emph{Multivariate Models and Dependence Concepts}.
   Chapman and Hall, London.
 

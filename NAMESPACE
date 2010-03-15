@@ -2,6 +2,13 @@ useDynLib(copula)
 
 importFrom(graphics, persp, contour)
 
+importFrom(mvtnorm, dmvnorm, pmvnorm, dmvt, pmvt)
+
+importFrom(sn, dmst) ## need to clean this up later
+importFrom(sn, qsn, dsn, psn, dmsn, pmsn) ## for skewNormalCopula; unused currently
+
+## importFrom(pspline)
+           
 export(dcopula, pcopula, rcopula)
 export(dmvdc, pmvdc, rmvdc)
 export(kendallsTau, spearmansRho, tailIndex)
