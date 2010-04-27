@@ -23,7 +23,7 @@
 ## EV test based on Cn
 ###################################################################
 
-evTestC <- function(x,N = 1000)
+evTestC <- function(x, N = 1000)
 {
   ## make pseudo-observations
   p <- ncol(x)
@@ -31,30 +31,31 @@ evTestC <- function(x,N = 1000)
   u <- apply(x,2,rank)/(n+1)
 
   ## set r according to recommendations
-  if (p == 2)
-    r <- 5:7
-  else if (p == 3 || p == 4)
-    r <- 2:4
-  else if (p > 4)
-    {
-      warning("the test might not hold its level for small sample sizes")
-      r <- 2:3
-    }
-  else stop("the data matrix should have at least two columns")
-    
+  r <- 3:5
   nr <- length(r)
+
+  ## grid = pseudo-observations
+  m <- 0
+
+  ## offsets
+  offset <- offsetect <- 0
+  offsetstat <- -1
   
   ## make grid
-  m <- ceiling(2000^(1/p)) # grid size
-  y <- seq(1/m, 1 - 1/m, len = m)
-  v <- vector("list", p)
-  for (i in 1:p)
-    v[[i]] <- y
-  g <- as.matrix(expand.grid(v))
-  m <- nrow(g)
-  
-  ## not very important
-  offset <- 0.5
+  if (m > 0)
+    {
+      y <- seq(1/m, 1 - 1/m, len = m)
+      v <- vector("list", p)
+      for (i in 1:p)
+        v[[i]] <- y
+      g <- as.matrix(expand.grid(v))
+      m <- nrow(g)
+    }
+  else
+    {
+      g <- u
+      m <- n
+    }
 
   ## compute the test statistic
   s <- .C("evtest_stat",
@@ -63,9 +64,9 @@ evTestC <- function(x,N = 1000)
           as.integer(p),
           as.double(g),
           as.integer(m),
-          as.double(r),
+          as.double(1/r),
           as.integer(nr),
-          as.double(offset),
+          as.double(offsetstat),
           stat = double(nr),
           PACKAGE="copula")$stat
   
@@ -76,22 +77,26 @@ evTestC <- function(x,N = 1000)
            as.double(g),
            as.integer(m),
            as.integer(N),
-           as.double(r),
+           as.double(1/r),
            as.integer(nr),
            as.double(offset),
+           as.double(offsetect),
            s0 = double(N * nr),
            PACKAGE="copula")$s0
 
-  ## p-values
-  s0 <- matrix(s0, ncol = nr, byrow = TRUE)
+  #s0 <- matrix(s0, ncol = nr, byrow = TRUE)
   #pval <- apply(s0 >= matrix(s, nrow=N, ncol=nr, byrow=TRUE),
   #              2, function(x) (sum(x) + 0.5) / (N + 1) )
-  comb.s <- sum(s) 
-  comb.pval <- ( sum( apply(s0, 1, sum) >= comb.s ) + 0.5 ) / (N + 1) 
-
+  #comb.s <- sum(s) 
+  #comb.pval <- ( sum( apply(s0, 1, sum) >= comb.s ) + 0.5 ) / (N + 1) 
+  #
   #return(list(statistic=c(s, comb.s),
   #            pvalue=c(pval, comb.pval), s0=s0))
 
+  ## p-values
+  s0 <- matrix(s0, ncol = nr, byrow = TRUE)
+  comb.s <- sum(s) 
+  comb.pval <- ( sum( apply(s0, 1, sum) >= comb.s ) + 0.5 ) / (N + 1) 
   evt <- list(statistic=comb.s,pvalue=comb.pval)
   class(evt) <- "evTest"
   evt

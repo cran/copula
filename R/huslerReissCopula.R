@@ -154,7 +154,7 @@ kendallsTauHuslerReissCopula <- function(copula) {
 }
 
 calibKendallsTauHuslerReissCopula <- function(copula, tau) {
-  if (any(tau < 0)) warning("tau is out of range (0, 1)")
+  if (any(tau < 0)) warning("tau is out of the range [0, 1]")
   huslerReissTauInv <- approxfun(x = .huslerReissTau$assoMeasFun$fm$ysmth,
                                  y = .huslerReissTau$assoMeasFun$fm$x, rule = 2)
   

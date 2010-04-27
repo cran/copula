@@ -156,7 +156,7 @@ kendallsTauTevCopula <- function(copula) {
 }
 
 calibKendallsTauTevCopula <- function(copula, tau) {
-  if (any(tau < 0)) warning("tau is out of range (0, 1)")
+  if (any(tau < 0)) warning("tau is out of range [0, 1]")
   tevTauInv <- approxfun(x = .tevTau$assoMeasFun$fm$ysmth,
                          y = .tevTau$assoMeasFun$fm$x, rule=2)
   
@@ -197,7 +197,7 @@ spearmansRhoTevCopula <- function(copula) {
 }
 
 calibSpearmansRhoTevCopula <- function(copula, rho) {
-  if (any(rho < 0)) warning("rho is out of range (0, 1)")
+  if (any(rho < 0)) warning("rho is out of range [0, 1]")
   tevRhoInv <- approxfun(x = .tevRho$assoMeasFun$fm$ysmth,
                          y = .tevRho$assoMeasFun$fm$x, rule = 2)
   

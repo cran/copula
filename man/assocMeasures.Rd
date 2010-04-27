@@ -61,6 +61,7 @@
 \alias{calibKendallsTau,frankCopula-method}
 \alias{calibKendallsTau,gumbelCopula-method}
 \alias{calibKendallsTau,plackettCopula-method}
+\alias{calibKendallsTau,fgmCopula-method}
 \alias{calibKendallsTau,galambosCopula-method}
 \alias{calibKendallsTau,huslerReissCopula-method}
 \alias{calibKendallsTau,tawnCopula-method}
@@ -80,6 +81,7 @@
 \alias{calibSpearmansRho,tawnCopula-method}
 \alias{calibSpearmansRho,tevCopula-method}
 \alias{calibSpearmansRho,plackettCopula-method}
+\alias{calibSpearmansRho,fgmCopula-method}
 
 
 \title{Dependence measures for copulas}
@@ -117,7 +119,8 @@ calibSpearmansRho(copula, rho)
   copulas.  \emph{North American Actuarial Journal}, 2:1--25.
 
   I. Kojadinovic and J. Yan (2008), Comparison of three semiparametric methods
-  for estimating dependence parameters in copula models, submitted.
+  for estimating dependence parameters in copula models,
+  Insurance: Mathematics and Economics, in press.
 }
 \examples{
 gumbel.cop <- gumbelCopula(3)

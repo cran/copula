@@ -49,7 +49,12 @@ double ec(double *U, int n, int p, double *u, double o)
 	ind *= (U[i + n * j] <= u[j]);
       res += ind;
     }
-  return (res + o)/(n + 1.0);
+  if (o < 0)
+    return res/(n + 1.0);
+  else if (o > 0)
+    return (res + o)/(n + 1.0);
+  else
+    return res/n;
 }
 
 /***********************************************************************
@@ -70,7 +75,8 @@ double derec(double *U, int n, int p, double *u, double *v, double o)
 ***********************************************************************/
 
 void evtest(double *U, int *n, int *p, double *g, int *m, 
-	    int *N, double *tg,  int *nt, double *o, double *s0)
+	    int *N, double *tg,  int *nt, double *o, double *oect, 
+	    double *s0)
 {
   double *influ = Calloc((*n) * (*m) * (*nt), double);
   double *random = Calloc(*n, double);
@@ -103,7 +109,7 @@ void evtest(double *U, int *n, int *p, double *g, int *m,
 	      vt[k] =  ut[k];
 	    }
 	  
-	  ecterm = t *  R_pow(ec(U, *n, *p, u, *o), t - 1); 
+	  ecterm = R_pow(ec(U, *n, *p, ut, *oect), (1 - t)/t) / t; 
 	  
 	  /* derivatives */
 	  for (k = 0; k < *p; k++)
@@ -137,7 +143,7 @@ void evtest(double *U, int *n, int *p, double *g, int *m,
 		  dt += dert[k] * (U[i + k * (*n)] <= ut[k]);
 		}
 	      influ[i + j * (*n) + c * (*n) * (*m)] 
-		= (indt - dt - ecterm * (ind - d)) * invsqrtn;
+		= (ecterm * (indt - dt) - (ind - d)) * invsqrtn;
 	    }
 	}
       
@@ -211,7 +217,7 @@ void evtest_stat(double *U, int *n, int *p, double *g, int *m,
 	      u[k] = g[j + k * (*m)];
 	      ut[k] =  R_pow(u[k], t);
 	    }
-	  diff = ec(U, *n, *p, ut, *o) - R_pow(ec(U, *n, *p, u, *o), t);
+	  diff = R_pow(ec(U, *n, *p, ut, *o), 1/t) - ec(U, *n, *p, u, *o);
 	  stat[c] += diff * diff;
 	}
       stat[c] = stat[c] * (*n) / (*m);

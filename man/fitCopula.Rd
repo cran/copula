@@ -76,7 +76,8 @@ fitCopula(copula, data, method="mpl", start=NULL, lower=NULL, upper=NULL,
   12, 347-368.
   
   I. Kojadinovic and J. Yan (2008), Comparison of three semiparametric methods
-  for estimating dependence parameters in copula models, submitted.
+  for estimating dependence parameters in copula models,
+  Insurance: Mathematics and Economics, in press.
 }
 
 \note{

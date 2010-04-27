@@ -1,3 +1,9 @@
+2010-04-27 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
+
+	* Improved evTestC.
+	* Added calibKendallsTau and calibSpearmansRho for the FGM copula.
+	* Improved documentation and changed CITATION file.
+
 2010-03-15 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
 
 	* Corrected a bug in rcopula for claytonCopula for dim >= 3.
@@ -6,13 +12,10 @@
 	functions are overwritten by other packages:
 	importFrom(mvtnorm, dmvnorm, pmvnorm, dmvt, pmvt)
 	
-
-
 2009-10-07 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
 
 	* Removed dependence on package adapt, which has been withdrawn from CRAN
 	due to license issues.
-	
 
 2009-09-22 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
 
@@ -24,7 +27,6 @@
 	* Fixed a bug in rcopula for claytonCopula when dependence is negative. 
 	Thanks to Dominik Sznajder <dominik.sznajder@wis.kuleuven.be> for 
 	reporting it.
-
 
 2009-07-23 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
 

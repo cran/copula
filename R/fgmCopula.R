@@ -159,6 +159,21 @@ spearmansRhoFgmCopula <- function(copula) {
     1 * alpha / 3                              
 }
 
+#########################################################
+
+calibKendallsTauFgmCopula <- function(copula, tau) {
+  if (any(tau < -2/9 | tau > 2/9))
+    stop("tau is out of the range [-2/9, 2/9]")
+  9 * tau / 2
+}
+
+#########################################################
+
+calibSpearmansRhoFgmCopula <- function(copula, rho) {
+  if (any(rho < -1/3 | rho > 1/3))
+    stop("rho is out of the range [-1/3, 1/3]")
+  3 * rho
+}
 
 #########################################################
 
@@ -167,5 +182,5 @@ setMethod("pcopula", signature("fgmCopula"), pfgmCopula)
 setMethod("dcopula", signature("fgmCopula"), dfgmCopula)
 setMethod("kendallsTau", signature("fgmCopula"), kendallsTauFgmCopula)
 setMethod("spearmansRho", signature("fgmCopula"), spearmansRhoFgmCopula)
-# setMethod("calibKendallsTau", signature("fgmCopula"), calibKendallsTauCopula)
-# setMethod("calibSpearmansRho", signature("fgmCopula"), calibSpearmansRhoCopula)
+setMethod("calibKendallsTau", signature("fgmCopula"), calibKendallsTauFgmCopula)
+setMethod("calibSpearmansRho", signature("fgmCopula"), calibSpearmansRhoFgmCopula)
