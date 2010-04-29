@@ -82,6 +82,17 @@ gofCopula(copula, x, N = 1000, method = "mpl",
   I. Kojadinovic and J. Yan (2010). A goodness-of-fit test for
   multivariate multiparameter copulas based on multiplier central limit
   theorems. \emph{Statistics and Computing}. In press.
+
+  I. Kojadinovic and J. Yan (2010). Modeling Multivariate Distributions
+  with Continuous Margins Using the copula R Package. \emph{Journal of
+  Statistical Software}, 34(9), pages 1-20. 
+}
+\note{
+  These tests were derived under the assumption of continuous margins,
+  which implies that ties occur with probability zero. The
+  presence of ties in the data might substantially affect the  
+  approximate p-values. One way of dealing with ties was suggested in the
+  last reference.
 }
 \seealso{ \code{\link{fitCopula}}, \code{\link{ellipCopula}}. }
 \examples{

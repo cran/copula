@@ -170,14 +170,14 @@ kendallsTauGalambosCopula <- function(copula) {
 }
 
 calibKendallsTauGalambosCopula <- function(copula, tau) {
-  if (any(tau < 0)) warning("tau is out of the range (0, 1)")
+  if (any(tau < 0)) warning("tau is out of the range [0, 1]")
   galambosTauInv <- approxfun(x = .galambosTau$assoMeasFun$fm$ysmth,
                               y = .galambosTau$assoMeasFun$fm$x, rule = 2)
   
   ss <- .galambosTau$ss
   theta <- galambosTauInv(tau)
   ## 0.0001 is arbitrary
-  ifelse(tau <= 0, 0.0001, .galambosTau$trFuns$backwardTransf(theta, ss))
+  ifelse(tau <= 0.0001, 0, .galambosTau$trFuns$backwardTransf(theta, ss))
 }
 
 galambosTauDer <- function(alpha) {
@@ -210,7 +210,7 @@ spearmansRhoGalambosCopula <- function(copula) {
 }
 
 calibSpearmansRhoGalambosCopula <- function(copula, rho) {
-  if (any(rho < 0)) warning("rho is out of range (0, 1)")
+  if (any(rho < 0)) warning("rho is out of the range [0, 1]")
   galambosRhoInv <- approxfun(x = .galambosRho$assoMeasFun$fm$ysmth,
                               y = .galambosRho$assoMeasFun$fm$x, rule = 2)
   

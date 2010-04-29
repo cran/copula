@@ -195,7 +195,7 @@ spearmansRhoHuslerReissCopula <- function(copula) {
 }
 
 calibSpearmansRhoHuslerReissCopula <- function(copula, rho) {
-  if (any(rho < 0)) warning("rho is out of range (0, 1)")
+  if (any(rho < 0)) warning("rho is out of the range [0, 1]")
   huslerReissRhoInv <- approxfun(x = .huslerReissRho$assoMeasFun$fm$ysmth,
                                  y = .huslerReissRho$assoMeasFun$fm$x, rule = 2)
   

@@ -115,12 +115,12 @@ calibSpearmansRho(copula, rho)
   expression for the normal copula as an approximation.
 }
 \references{
-  E.W. Frees and E.A. Valdez (1998).Understanding relationships using
+  E.W. Frees and E.A. Valdez (1998). Understanding relationships using
   copulas.  \emph{North American Actuarial Journal}, 2:1--25.
 
-  I. Kojadinovic and J. Yan (2008), Comparison of three semiparametric methods
-  for estimating dependence parameters in copula models,
-  Insurance: Mathematics and Economics, in press.
+  I. Kojadinovic and J. Yan (2010). Comparison of three semiparametric methods
+  for estimating dependence parameters in copula models.
+  \emph{Insurance: Mathematics and Economics}, in press.
 }
 \examples{
 gumbel.cop <- gumbelCopula(3)

@@ -169,7 +169,7 @@ tailIndexGumbelCopula <- function(copula, ...) {
 
 calibKendallsTauGumbelCopula <- function(copula, tau) {
   if (any(tau < 0)) warning("tau is out of the range [0, 1]")
-  ifelse(tau < 0, 1, 1/(1 - tau))
+  ifelse(tau <= 0, 1, 1/(1 - tau))
 }
 
 

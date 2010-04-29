@@ -91,7 +91,7 @@ calibKendallsTauTawnCopula <- function(copula, tau) {
   taumax <- 8 * atan(sqrt(alpha / (4 - alpha))) / sqrt(alpha * (4 - alpha)) - 2
   bad <- (tau < 0 | tau >= taumax)
   if (any(bad)) warning("tau is out of the range [0, 0.4183992]")
-  ifelse(tau < 0, 0,
+  ifelse(tau <= 0, 0,
          ifelse(tau >= taumax, 1, calibKendallsTauCopula(copula, tau)))
 }
 
@@ -128,8 +128,8 @@ calibSpearmansRhoTawnCopula <- function(copula, rho) {
   alpha <- 1
   rhomax <- 12 * ( (8 - alpha) * alpha + 8 * sqrt( (8 - alpha) * alpha ) * atan(sqrt(alpha) / sqrt(8 - alpha)) ) / ( (8 - alpha)^2 * alpha ) - 3
   bad <- (rho < 0 | rho >= rhomax)
-  if (any(bad)) warning("rho is out of range [0, 0.58743682]")
-  ifelse(rho < 0, 0,
+  if (any(bad)) warning("rho is out of the range [0, 0.58743682]")
+  ifelse(rho <= 0, 0,
          ifelse(rho >= rhomax, 1, calibSpearmansRhoCopula(copula, rho)))
 }
 

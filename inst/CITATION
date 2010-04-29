@@ -1,16 +1,36 @@
-citHeader("To cite package copula in publications please use:")
+citHeader("To cite the R package copula in publications use:")
 
+citEntry(entry = "Article",
+  title        = "Enjoy the Joy of Copulas: With a Package {copula}",
+  author       = personList(as.person("Jun Yan")),
+  journal      = "Journal of Statistical Software",
+  year         = "2007",
+  volume       = "21",
+  number       = "4",
+  pages        = "1--21",
+  url          = "http://www.jstatsoft.org/v21/i04/",
 
-citEntry(entry="Article",
-         title = "Modeling multivariate distributions with continuous margins using the copula R package",
-         author = personList(as.person("Ivan Kojadinovic"),as.person("Jun Yan")),
-         year         = "2010",
-         journal      = "Journal of Statistical Software",
-         volume       = "xx",
-         number       = "x",
-         pages        = "xx--xx",
-         textVersion = 
-         paste("Ivan Kojadinovic and Jun Yan,",
-               "Modeling multivariate distributions with continuous margins using the copula R package",
-               "Journal of Statistical Software, xx(x), pages xx--xx, 2010.")
+  textVersion  =
+  paste("Jun Yan (2007).",
+        "Enjoy the Joy of Copulas: With a Package copula.",
+        "Journal of Statistical Software, 21(4), 1-21.",
+        "URL http://www.jstatsoft.org/v21/i04/.")
+)
+
+citEntry(entry = "Article",
+  title        = "Modeling Multivariate Distributions with Continuous Margins Using the {copula} {R} Package",
+  author       = personList(as.person("Ivan Kojadinovic"),
+                   as.person("Jun Yan")),
+  journal      = "Journal of Statistical Software",
+  year         = "2010",
+  volume       = "34",
+  number       = "9",
+  pages        = "1--20",
+  url          = "http://www.jstatsoft.org/v34/i09/",
+
+  textVersion  =
+  paste("Ivan Kojadinovic, Jun Yan (2010).",
+        "Modeling Multivariate Distributions with Continuous Margins Using the copula R Package.",
+        "Journal of Statistical Software, 34(9), 1-20.",
+        "URL http://www.jstatsoft.org/v34/i09/.")
 )

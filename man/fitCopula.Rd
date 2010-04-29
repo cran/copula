@@ -75,9 +75,9 @@ fitCopula(copula, data, method="mpl", start=NULL, lower=NULL, upper=NULL,
   copula modeling but were afraid to ask. \emph{Journal of Hydrologic Engineering}
   12, 347-368.
   
-  I. Kojadinovic and J. Yan (2008), Comparison of three semiparametric methods
-  for estimating dependence parameters in copula models,
-  Insurance: Mathematics and Economics, in press.
+  I. Kojadinovic and J. Yan (2010). Comparison of three semiparametric methods
+  for estimating dependence parameters in copula models.
+  \emph{Insurance: Mathematics and Economics}, in press.
 }
 
 \note{

@@ -163,16 +163,18 @@ spearmansRhoFgmCopula <- function(copula) {
 
 calibKendallsTauFgmCopula <- function(copula, tau) {
   if (any(tau < -2/9 | tau > 2/9))
-    stop("tau is out of the range [-2/9, 2/9]")
-  9 * tau / 2
+    warning("tau is out of the range [-2/9, 2/9]")
+  ifelse(tau <= -2/9, -1,
+         ifelse(tau >= 2/9, 1, 9 * tau / 2))
 }
 
 #########################################################
 
 calibSpearmansRhoFgmCopula <- function(copula, rho) {
   if (any(rho < -1/3 | rho > 1/3))
-    stop("rho is out of the range [-1/3, 1/3]")
-  3 * rho
+    warning("rho is out of the range [-1/3, 1/3]")
+  ifelse(rho <= -1/3, -1,
+         ifelse(rho >= 1/3, 1, 3 * rho))
 }
 
 #########################################################

@@ -61,7 +61,7 @@ fit <- fitMvdc(x, myMvd, c(1,1,2))
 fit
 
 #### Roger Koenker prepared a demo illustrating MLE for a Clayton AR(1)
-#### copula model with identical, uder-defined Student marginals
+#### copula model with identical, user-defined Student marginals
 ## demo("QARClayton")
 }
 \keyword{ models }% at least one, from doc/KEYWORDS

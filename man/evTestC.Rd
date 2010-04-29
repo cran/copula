@@ -38,7 +38,19 @@ evTestC(x, N = 1000)
   I. Kojadinovic and J. Yan (2010). Large-sample tests
     of extreme-value dependence for multivariate copulas.
     Submitted.
+    
+  I. Kojadinovic and J. Yan (2010). Modeling Multivariate Distributions
+  with Continuous Margins Using the copula R Package. \emph{Journal of
+  Statistical Software}, 34(9), pages 1-20. 
 }
+\note{
+  This test was derived under the assumption of continuous margins,
+  which implies that ties occur with probability zero. The
+  presence of ties in the data might substantially affect the  
+  approximate p-value. One way of dealing with ties was suggested in the
+  last reference.
+}
+  
 \seealso{ \code{\link{evTestK}}, \code{\link{evCopula}},
   \code{\link{gofEVCopula}}, \code{\link{Anfun}}. }
 \examples{
