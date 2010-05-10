@@ -1,3 +1,7 @@
+2010-04-27 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu
+	* Replaced .Machine$double.xmax^.5 with sqrt(.Machine$double.xmax)
+	in Copula.R to get around the CRAN check error on windows64-x86_64.
+
 2010-04-27 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
 
 	* Improved evTestC.

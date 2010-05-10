@@ -88,8 +88,10 @@ calibKendallsTauCopula <- function(copula, tau) {
   .eps <- .Machine$double.eps^.5
   lower <- copula@param.lowbnd + .eps
   upper <- copula@param.upbnd - .eps
-  lower <- ifelse(lower == -Inf, -.Machine$double.xmax^.5, lower)
-  upper <- ifelse(upper == Inf, .Machine$double.xmax^.5, upper)
+##   lower <- ifelse(lower == -Inf, -.Machine$double.xmax^.5, lower)
+##   upper <- ifelse(upper == Inf, .Machine$double.xmax^.5, upper)
+  lower <- ifelse(lower == -Inf, -sqrt(.Machine$double.xmax), lower)
+  upper <- ifelse(upper == Inf, sqrt(.Machine$double.xmax), upper)
   sol <- uniroot(myfun, interval=c(lower, upper))$root
   sol
 }
@@ -102,8 +104,10 @@ calibSpearmansRhoCopula <- function(copula, rho) {
   .eps <- .Machine$double.eps^.5
   lower <- copula@param.lowbnd
   upper <- copula@param.upbnd
-  lower <- ifelse(lower == -Inf, -.Machine$double.xmax^.5, lower)
-  upper <- ifelse(upper == Inf, .Machine$double.xmax^.5, upper)
+##   lower <- ifelse(lower == -Inf, -.Machine$double.xmax^.5, lower)
+##   upper <- ifelse(upper == Inf, .Machine$double.xmax^.5, upper)
+  lower <- ifelse(lower == -Inf, -sqrt(.Machine$double.xmax), lower)
+  upper <- ifelse(upper == Inf, sqrt(.Machine$double.xmax), upper)
   sol <- uniroot(myfun, interval=c(lower, upper))$root
   sol
 }
