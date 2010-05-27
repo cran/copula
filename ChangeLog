@@ -1,10 +1,17 @@
-2010-04-27 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu
+2010-05-27 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu
+
+	* Added the function evTestA that can be used to test whether data come from
+	an extreme-value copula. 
+
+2010-05-11 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu
+
 	* Replaced .Machine$double.xmax^.5 with sqrt(.Machine$double.xmax)
 	in Copula.R to get around the CRAN check error on windows64-x86_64.
 
 2010-04-27 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
 
-	* Improved evTestC.
+	* Improved evTestC. 
+	* Added evTestK.
 	* Added calibKendallsTau and calibSpearmansRho for the FGM copula.
 	* Improved documentation and changed CITATION file.
 
@@ -23,7 +30,7 @@
 
 2009-09-22 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
 
-	* Added the function evTest that can be used to test whether data come from
+	* Added the function evTestC that can be used to test whether data come from
 	an extreme-value copula. 
 
 2009-07-28 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>

@@ -38,8 +38,8 @@ evTestC <- function(x, N = 1000)
   m <- 0
 
   ## offsets
-  offset <- offsetect <- 0
-  offsetstat <- -1
+  offset <- offsetect <- -1
+  offsetstat <- 0
   
   ## make grid
   if (m > 0)
@@ -112,26 +112,20 @@ print.evTest <- function(x, ...)
 ## EV test based on An
 ###################################################################
 
-evTestA <- function(x, N = 1000, estimator = "CFG", derivatives = "Cn",
-                    m=30, offset = TRUE)
+evTestA <- function(x, N = 1000, derivatives = "An")
 {
   ## make pseudo-observations
   n <- nrow(x)
   u <- apply(x,2,rank)/(n+1)
 
   ## make grid
-  if (m > 0)
-    {
-      xis <- yis <- seq(1/m, 1 - 1/m, len = m)
-      g <- as.matrix(expand.grid(xis, yis))
-      m <- m^2
-    }
-  else
-    {
-      g <- u
-      m <- n
-    }
+  ## m = 0
+  g <- u
+  m <- n
 
+  estimator <- "CFG"
+  offset <- 0.5
+  
   ## compute the test statistic
   s <- .C("evtestA_stat",
           as.double(u[,1]),
@@ -142,7 +136,7 @@ evTestA <- function(x, N = 1000, estimator = "CFG", derivatives = "Cn",
           as.integer(m),
           as.integer(estimator == "CFG"),
           stat = double(1),
-          as.integer(offset),
+          as.double(offset),
           PACKAGE="copula")$stat
   
   if (derivatives == "Cn")
@@ -170,7 +164,9 @@ evTestA <- function(x, N = 1000, estimator = "CFG", derivatives = "Cn",
              s0 = double(N),
              PACKAGE="copula")$s0
 
-  return(list(statistic=s, pvalue=(sum(s0 >= s)+0.5)/(N+1),s0=s0))  
+  evt <- list(statistic=s, pvalue=(sum(s0 >= s)+0.5)/(N+1))
+  class(evt) <- "evTest"
+  evt
 }
 
 ###################################################################

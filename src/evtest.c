@@ -49,9 +49,7 @@ double ec(double *U, int n, int p, double *u, double o)
 	ind *= (U[i + n * j] <= u[j]);
       res += ind;
     }
-  if (o < 0)
-    return res/(n + 1.0);
-  else if (o > 0)
+  if (o >= 0.0)
     return (res + o)/(n + 1.0);
   else
     return res/n;
@@ -629,7 +627,7 @@ void evtestA_derA(double *U, double *V, int *n, double *u, double *v,
 
     
 void evtestA_stat(double *U, double *V, int *n, double *u, double *v, int *m,  
-		  int *CFG, double *stat, int *offset)
+		  int *CFG, double *stat, double *offset)
 {
   int i, j;
   double s = 0.0, diff, cA0, cA1, Aj, t, loguv;
@@ -666,10 +664,12 @@ void evtestA_stat(double *U, double *V, int *n, double *u, double *v, int *m,
 	Aj = 1.0 / (inv_A_Pickands(*n, S, T, t)
 		    - (1.0 - t) * (cA0  - 1.0)
 		    - t * (cA1 - 1.0));
-      if (*offset)
-	diff = ecop(U, V, *n, u[j], v[j]) * (*n) / (*n+1) + 0.5/(*n+1)  - exp(loguv * Aj);
-      else
+      if (*offset < 0.0)
 	diff = ecop(U, V, *n, u[j], v[j]) - exp(loguv * Aj);
+      else
+	diff = ecop(U, V, *n, u[j], v[j]) * (*n) / (*n+1) 
+	  + (*offset)/(*n+1) - exp(loguv * Aj);
+	
       
       s += diff * diff;
     }

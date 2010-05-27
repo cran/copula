@@ -32,7 +32,7 @@ evTestK(x, method = "fsample")
     Journal of Statistics}, 37, pages 1-9.
 
 }
-\seealso{ \code{\link{evTestC}}, \code{\link{evCopula}},
+\seealso{ \code{\link{evTestC}}, \code{\link{evTestA}}, \code{\link{evCopula}},
   \code{\link{gofEVCopula}}, \code{\link{Anfun}}. }
 \examples{
 ## Do the data come from an extreme-value copula? 

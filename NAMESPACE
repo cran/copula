@@ -64,7 +64,8 @@ export(gofCopula, gofEVCopula)
 ## testing purpose
 ## export(fitCopula.repar)
 
-export(evTestC, evTestA, evTestAA, evTestK)
+## other nonparametric tests
+export(evTestC, evTestA, evTestK)
 export(exchEVTest, exchTest)
 
 ## asymmetric copula class testing
@@ -76,3 +77,4 @@ export(asymExplicitCopula)
 S3method(print, indepTest)
 S3method(print, gofCopula)
 S3method(print, evTest)
+

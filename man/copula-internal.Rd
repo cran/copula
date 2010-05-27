@@ -3,7 +3,6 @@
 % Undocumented code objects
 \alias{asymCopula}
 \alias{asymExplicitCopula}
-\alias{evTestA}
 \alias{evTestAA}
 \alias{exchEVTest}
 \alias{exchTest}

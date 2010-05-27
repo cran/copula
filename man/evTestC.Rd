@@ -4,8 +4,7 @@
 \title{Large-sample test of multivariate extreme-value dependence}
 \description{
   Test of multivariate extreme-value dependence based on the empirical copula and
-  max-stability. The test statistics are defined in Kojadinovic and Yan
-  (2010). Approximate p-values for the test statistics are obtained
+  max-stability. The test statistics are defined in the second reference. Approximate p-values for the test statistics are obtained
   by means of a \emph{multiplier} technique.  
 }
 \usage{
@@ -20,7 +19,7 @@ evTestC(x, N = 1000)
 }
 \details{
 
-  More details are available in Kojadinovic and Yan (2010).
+  More details are available in the second reference.
   See also Remillard and Scaillet (2009).
   
 }
@@ -51,7 +50,7 @@ evTestC(x, N = 1000)
   last reference.
 }
   
-\seealso{ \code{\link{evTestK}}, \code{\link{evCopula}},
+\seealso{ \code{\link{evTestK}}, \code{\link{evTestA}}, \code{\link{evCopula}},
   \code{\link{gofEVCopula}}, \code{\link{Anfun}}. }
 \examples{
 ## Do these data come from an extreme-value copula? 

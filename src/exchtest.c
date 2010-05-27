@@ -53,8 +53,7 @@ void evsymtest(double *U, double *V, int *n, double *t, int *m,
 
   double sumt, sum1t, At, A1t, process, mean, 
     invsqrtn = 1.0/sqrt(*n), minTkSi, minSkTi, 
-    lb = 1.0 / (*n + 1.0), ub = *n / (*n + 1.0),
-    cA0, cA1;
+    lb = 1.0 / (*n + 1.0), ub = *n / (*n + 1.0), cA0, cA1;
 
   int i, j, k, l; 
 
