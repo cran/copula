@@ -66,15 +66,22 @@ exchEVTest <- function(x, N = 1000,  estimator = "CFG", derivatives = "Cn", m = 
              s0 = double(N),
              PACKAGE="copula")$s0
   
-  return(list(statistic=s, pvalue=(sum(s0 >= s)+0.5)/(N+1),s0=s0))
-  
+  excht <- list(statistic=s, pvalue=(sum(s0 >= s)+0.5)/(N+1))
+  class(excht) <- "exchTest"
+  excht
+}
+
+print.exchTest <- function(x, ...)
+{
+  cat("Statistic:", x$statistic,
+      "with p-value", x$pvalue, "\n\n")
 }
 
 ###################################################################
 ## Test of exchangeability based on Cn
 ###################################################################
 
-exchTest <- function(x, N = 1000, m=30)
+exchTest <- function(x, N = 1000, m = 0)
 {
   ## make pseudo-observations
   n <- nrow(x)
@@ -115,6 +122,7 @@ exchTest <- function(x, N = 1000, m=30)
            s0 = double(N),
            PACKAGE="copula")$s0
 
-  return(list(statistic=s, pvalue=(sum(s0 >= s)+0.5)/(N+1),s0=s0))
-  
+  excht <- list(statistic=s, pvalue=(sum(s0 >= s)+0.5)/(N+1))
+  class(excht) <- "exchTest"
+  excht
 }

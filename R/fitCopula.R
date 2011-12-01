@@ -23,6 +23,7 @@
 ################################################################
 ## Class fitCopula
 ################################################################
+
 setClass("fitCopula",
          representation(estimate = "numeric",
                         var.est = "matrix",
@@ -75,17 +76,21 @@ setMethod("summary", signature("fitCopula"), summaryFitCopula)
 ################################################################
 ## Wrapper function
 ################################################################
+
 fitCopula <- function(copula, data,
                       method = "mpl", 
                       start = NULL,
-                      lower=NULL, upper=NULL,
-                      optim.control=list(NULL),
-                      optim.method="BFGS",
-                      estimate.variance = TRUE) {
+                      lower = NULL, upper = NULL,
+                      optim.control = list(maxit=1000),
+                      optim.method = "BFGS",
+                      estimate.variance = TRUE,
+                      hideWarnings = TRUE) {
   if (method == "ml") 
-    fit <- fitCopula.ml(data, copula, start, lower, upper, optim.control, optim.method, estimate.variance)
+    fit <- fitCopula.ml(data, copula, start, lower, upper, optim.control,
+                        optim.method, estimate.variance, hideWarnings)
   else if (method == "mpl")
-    fit <- fitCopula.mpl(copula, data, start, lower, upper, optim.control, optim.method, estimate.variance)
+    fit <- fitCopula.mpl(copula, data, start, lower, upper, optim.control,
+                         optim.method, estimate.variance, hideWarnings)
   else if (method == "itau")
     fit <- fitCopula.itau(copula, data, estimate.variance)
   else if (method == "irho")
@@ -97,23 +102,25 @@ fitCopula <- function(copula, data,
 ###############################################################
 ## fitCopula with maximizing pseudo-likelihood
 ###############################################################
+
 fitCopula.mpl <- function(copula, data, start=NULL,
                           lower=NULL, upper=NULL,
                           optim.control=list(NULL),
-                          optim.method="Nelder-Mead",
-                          estimate.variance = TRUE) {
+                          optim.method=NULL,
+                          estimate.variance = TRUE,
+                          hideWarnings = TRUE) {
   q <- length(copula@parameters)
   if (is.null(start)) {
     if (hasMethod("calibKendallsTau", class(copula))) {
       start <- fitCopula.itau(copula, data, FALSE)@estimate
-      if (is.na(loglikCopula(start, data, copula)))
+      if (is.na(loglikCopula(start, data, copula, hideWarnings)))
         start <- copula@parameters
     }
     else start <- copula@parameters
   }
   
   fit <- fitCopula.ml(data, copula, start, lower, upper,
-                      optim.control, optim.method, FALSE)
+                      optim.control, optim.method, FALSE, hideWarnings)
   var.est <- if(estimate.variance) varPL(fit@copula, data) / nrow(data) else matrix(NA, q, q)
   ans <- new("fitCopula",
              estimate = fit@estimate,
@@ -129,6 +136,7 @@ fitCopula.mpl <- function(copula, data, start=NULL,
 ###############################################################
 ## fitCopula using inversion of Kendall's tau
 ###############################################################
+
 fitCopula.itau <- function(copula, data, estimate.variance=TRUE) {
   q <- length(copula@parameters)
   X <- getXmat(copula)
@@ -155,6 +163,7 @@ fitCopula.itau <- function(copula, data, estimate.variance=TRUE) {
 ###############################################################
 ## fitCopula using inversion of Spearman's rho
 ###############################################################
+
 fitCopula.irho <- function(copula, data, estimate.variance=TRUE) {
   q <- length(copula@parameters)
   X <- getXmat(copula)
@@ -182,7 +191,6 @@ fitCopula.irho <- function(copula, data, estimate.variance=TRUE) {
 ## fitCopula using maximum pseudo-likelihood
 ###############################################################
 
-
 chkParamBounds <- function(copula) {
   param <- copula@parameters
   upper <- copula@param.upbnd
@@ -192,19 +200,19 @@ chkParamBounds <- function(copula) {
   else return(TRUE)
 }
 
-loglikCopula <- function(param, x, copula, suppressMessages=FALSE) {
+loglikCopula <- function(param, x, copula, hideWarnings=FALSE) {
   slot(copula, "parameters") <- param
   if (!chkParamBounds(copula)) return(NaN)
   
   ## messageOut may be used for debugging
-  if (suppressMessages) {
+  if (hideWarnings) {
     messageOut <- textConnection("fitMessages", open="w", local=TRUE)
     sink(messageOut); sink(messageOut, type="message")
     options(warn = -1) ## ignore warnings; can be undesirable!
   }
   loglik <- try(sum(log(dcopula(copula, x))))
   
-  if (suppressMessages) {
+  if (hideWarnings) {
     options(warn = 0)
     sink(type="message"); sink(); close(messageOut)
   }
@@ -215,12 +223,13 @@ loglikCopula <- function(param, x, copula, suppressMessages=FALSE) {
 fitCopula.ml <- function(data, copula, start=NULL,
                          lower=NULL, upper=NULL,
                          optim.control=list(NULL),
-                         method="BFGS",
-                         estimate.variance=TRUE) {
+                         method=NULL,
+                         estimate.variance=TRUE,
+                         hideWarnings=FALSE) {
   if (copula@dimension != ncol(data))
     stop("The dimention of the data and copula do not match.\n")
   
-  if (is.null(start)) start <- fitCopula.itau(copula, data)@estimate  
+  if (is.null(start)) start <- fitCopula.itau(copula, data, FALSE)@estimate  
   if (length(copula@parameters) != length(start))
     stop("The length of start and copula parameters do not match.\n")
 
@@ -231,15 +240,15 @@ fitCopula.ml <- function(data, copula, start=NULL,
   if (!is.null(optim.control[[1]])) control <- c(control, optim.control)
   q <- length(copula@parameters)
   eps <- .Machine$double.eps ^ 0.5
-  if (is.null(lower)) lower <- ifelse(method == "L-BFGS-B", copula@param.lowbnd + eps, -Inf)
-  if (is.null(upper)) upper <- ifelse(method == "L-BFGS-B", copula@param.upbnd - eps, Inf)
+  if (is.null(lower)) lower <- ifelse(method %in% c("Brent","L-BFGS-B"), copula@param.lowbnd + eps, -Inf)
+  if (is.null(upper)) upper <- ifelse(method %in% c("Brent","L-BFGS-B"), copula@param.upbnd - eps, Inf)
 ##  if (p >= 2) {
   if (TRUE) {
     fit <- optim(start, loglikCopula,
                  lower=lower, upper=upper,
                  method=method,
-                 copula = copula, x = data, suppressMessages = TRUE,
-                 control=control)
+                 copula = copula, x = data, hideWarnings = hideWarnings,
+                 control = control)
     copula@parameters[1:q] <- fit$par
     loglik <- fit$val
     convergence <- fit$convergence
@@ -258,7 +267,7 @@ fitCopula.ml <- function(data, copula, start=NULL,
     fit.last <- optim(copula@parameters, loglikCopula,
                       lower=lower, upper=upper,
                       method=method,
-                      copula=copula, x =data, suppressMessages=TRUE,
+                      copula=copula, x=data, hideWarnings=hideWarnings,
                       control=c(control, maxit=0), hessian=TRUE)
     var.est <- try(solve(-fit.last$hessian))
     if (inherits(var.est, "try-error"))
@@ -360,7 +369,6 @@ influ.terms <- function(u, influ, q)
 
 ## cop is the FITTED copula
 ## u are the available pseudo-observations
-
 varPL <- function(cop,u)
   {
     ## check if variance can be computed
@@ -395,7 +403,6 @@ varPL <- function(cop,u)
 
 ## cop is the FITTED copula
 ## u are the available pseudo-observations
-
 getL <- function(copula) {
   ## for ellipCopula only
   p <- copula@dimension
@@ -510,7 +517,6 @@ varKendall <- function(cop,u) {
 
 ## cop is the FITTED copula
 ## u are the available pseudo-observations
-
 varSpearman <- function(cop,u)  {
   ## check if variance can be computed
   if (!hasMethod("rhoDer", class(cop))) {

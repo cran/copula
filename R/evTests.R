@@ -37,9 +37,9 @@ evTestC <- function(x, N = 1000)
   ## grid = pseudo-observations
   m <- 0
 
-  ## offsets
-  offset <- offsetect <- -1
-  offsetstat <- 0
+  ## parameters
+  offsetstat <- 0.75
+  der2n <- TRUE
   
   ## make grid
   if (m > 0)
@@ -56,46 +56,35 @@ evTestC <- function(x, N = 1000)
       g <- u
       m <- n
     }
-
-  ## compute the test statistic
-  s <- .C("evtest_stat",
-          as.double(u),
-          as.integer(n),
-          as.integer(p),
-          as.double(g),
-          as.integer(m),
-          as.double(1/r),
-          as.integer(nr),
-          as.double(offsetstat),
-          stat = double(nr),
-          PACKAGE="copula")$stat
   
-  s0 <- .C("evtest",
-           as.double(u),
-           as.integer(n),
-           as.integer(p),
-           as.double(g),
-           as.integer(m),
-           as.integer(N),
-           as.double(1/r),
-           as.integer(nr),
-           as.double(offset),
-           as.double(offsetect),
-           s0 = double(N * nr),
-           PACKAGE="copula")$s0
+  out <- .C("evtest",
+            as.double(u),
+            as.integer(n),
+            as.integer(p),
+            as.double(g),
+            as.integer(m),
+            as.integer(N),
+            as.double(1/r),
+            as.integer(nr),
+            s0 = double(N * nr),
+            as.integer(der2n),
+            as.double(offsetstat),
+            stat = double(nr),
+            PACKAGE="copula")
 
-  #s0 <- matrix(s0, ncol = nr, byrow = TRUE)
-  #pval <- apply(s0 >= matrix(s, nrow=N, ncol=nr, byrow=TRUE),
-  #              2, function(x) (sum(x) + 0.5) / (N + 1) )
-  #comb.s <- sum(s) 
-  #comb.pval <- ( sum( apply(s0, 1, sum) >= comb.s ) + 0.5 ) / (N + 1) 
-  #
-  #return(list(statistic=c(s, comb.s),
-  #            pvalue=c(pval, comb.pval), s0=s0))
+  ## s <- out$stat
+  ## s0 <- matrix(out$s0, ncol = nr, byrow = TRUE)
+  ## pval <- apply(s0 >= matrix(s, nrow=N, ncol=nr, byrow=TRUE),
+  ##               2, function(x) (sum(x) + 0.5) / (N + 1) )
+  ## comb.s <- sum(s) 
+  ## comb.pval <- ( sum( apply(s0, 1, sum) >= comb.s ) + 0.5 ) / (N + 1) 
+  
+  ## return(list(statistic=c(s, comb.s),
+  ##             pvalue=c(pval, comb.pval), s0=s0))
 
   ## p-values
-  s0 <- matrix(s0, ncol = nr, byrow = TRUE)
-  comb.s <- sum(s) 
+  s0 <- matrix(out$s0, ncol = nr, byrow = TRUE)
+  comb.s <- sum(out$stat) 
   comb.pval <- ( sum( apply(s0, 1, sum) >= comb.s ) + 0.5 ) / (N + 1) 
   evt <- list(statistic=comb.s,pvalue=comb.pval)
   class(evt) <- "evTest"

@@ -71,7 +71,7 @@ dcopula(frank.cop, x)
 
 ## A 7-dim Gumbel copula
 gumbel.cop <- gumbelCopula(2, dim = 7)
-## exprdist$pdf is not available
+## the expression of the pdf is not available
 gumbel.cop@exprdist
 ## but can still be evaluated
 dcopula(gumbel.cop, x)

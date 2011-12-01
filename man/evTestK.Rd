@@ -5,7 +5,7 @@
 \description{
   Test of extreme-value dependence based on the  bivariate probability integral
   transformation. The test statistic is defined in
-  Ben Ghorbal, Neslehova and Genest (2009). 
+  Ben Ghorbal, Nešlehová and Genest (2009). 
 }
 \usage{
 evTestK(x, method = "fsample")
@@ -17,9 +17,9 @@ evTestK(x, method = "fsample")
     \code{"fsample"} (finite-sample), \code{"asymptotic"} or \code{"jackknife"}.}
 }
 \details{
-  The code for this test was generously provided by Johanna Neslehova. 
+  The code for this test was generously provided by Johanna Nešlehová. 
   More details are available in Appendix B of
-  Ben Ghorbal, Neslehova and Genest (2009).
+  Ben Ghorbal, Nešlehová and Genest (2009).
 }
 \value{
   Returns a list whose attributes are:
@@ -27,7 +27,7 @@ evTestK(x, method = "fsample")
   \item{pvalue}{ corresponding p-value. }
 }
 \references{
-  M. Ben Ghorbal, C. Genest, and J. Neslehova (2009). On the test of Ghoudi,
+  M. Ben Ghorbal, C. Genest, and J. Nešlehová (2009). On the test of Ghoudi,
   Khoudraji, and Rivest for extreme-value dependence. \emph{The Canadian
     Journal of Statistics}, 37, pages 1-9.
 
@@ -40,5 +40,6 @@ evTestK(rcopula(gumbelCopula(3), 200))
 evTestK(rcopula(claytonCopula(3), 200))
 }
 
+\encoding{UTF-8}
 \keyword{htest}
 \keyword{multivariate}

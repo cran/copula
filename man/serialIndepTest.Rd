@@ -7,7 +7,7 @@
 
 \description{
   Serial independence test based on the empirical copula process as
-  proposed in Ghoudi et al. (2001) and Genest and Rémillard (2004). The
+  proposed in Ghoudi et al. (2001) and Genest and RÃ©millard (2004). The
   test, which is the serial analog of \code{\link{indepTest}}, can be
   seen as composed of three steps: (i) a simulation step, which consists
   in simulating the distribution of the test statistics under serial
@@ -58,40 +58,40 @@ serialIndepTest(x, d, alpha=0.05)
   containing the values of the test statistics for each subset and each
   repetition) and \code{dist.global.statistic.independence} (a vector a
   length \code{N} containing the values of the serial version of the
-  global Cramér-von Mises test statistic for each repetition --- see
+  global CramÃ©r-von Mises test statistic for each repetition --- see
   last reference p.175).
     
   The function \code{"serialIndepTest"} returns an object of class
   \code{"indepTest"} whose attributes are: \code{subsets},
   \code{statistics}, \code{critical.values}, \code{pvalues},
-  \code{fisher.pvalue} (a p-value resulting from a combination \emph{à la}
+  \code{fisher.pvalue} (a p-value resulting from a combination \emph{Ã  la}
   Fisher of the subset statistic p-values), \code{tippett.pvalue} (a
-  p-value resulting from a combination \emph{à la} Tippett of the subset
+  p-value resulting from a combination \emph{Ã  la} Tippett of the subset
   statistic p-values), \code{alpha} (global significance level of the
   test), \code{beta} (1 - \code{beta} is the significance level per
-  statistic), \code{global.statistic} (value of the global Cramér-von
+  statistic), \code{global.statistic} (value of the global CramÃ©r-von
   Mises statistic derived directly from the serial independence
   empirical copula process --- see last reference p 175) and
   \code{global.statistic.pvalue} (corresponding p-value).
 }
 
 \references{
-  P. Deheuvels (1979). La fonction de dépendance empirique et ses
-  propriétés: un test non paramétrique d'indépendance, \emph{Acad. Roy.
+  P. Deheuvels (1979). La fonction de dÃ©pendance empirique et ses
+  propriÃ©tÃ©s: un test non paramÃ©trique d'indÃ©pendance, \emph{Acad. Roy.
     Belg. Bull. Cl. Sci.}, 5th Ser. 65:274--292.
   
   P. Deheuvels (1981), A non parametric test for independence,
   \emph{Publ. Inst. Statist. Univ. Paris}. 26:29--50.
   
-  C. Genest and B. Rémillard (2004), Tests of independence and
+  C. Genest and B. RÃ©millard (2004), Tests of independence and
   randomness based on the empirical copula process. \emph{Test}, 13:335--369.
   
-  C. Genest, J.-F. Quessy and B. Rémillard (2006). Local
+  C. Genest, J.-F. Quessy and B. RÃ©millard (2006). Local
   efficiency of a Cramer-von Mises test of independence,
   \emph{Journal of Multivariate Analysis}, 97:274--294.
   
-  C. Genest, J.-F. Quessy and B. Rémillard (2007), Asymptotic
-  local efficiency of Cramér-von Mises tests for multivariate
+  C. Genest, J.-F. Quessy and B. RÃ©millard (2007), Asymptotic
+  local efficiency of CramÃ©r-von Mises tests for multivariate
   independence. \emph{The Annals of Statistics}, 35:166--191.
 }
 
@@ -135,5 +135,5 @@ dependogram(test,print=TRUE)
 ## NB: In order to save d for future use, the save function can be used.
 }
 
-\encoding{latin1}
+\encoding{UTF-8}
 \keyword{htest}

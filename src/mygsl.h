@@ -1,3 +1,5 @@
+#include <R.h>
+
 #ifndef __MYGSL_H__
 #define __MYGSL_H__
 
@@ -72,7 +74,7 @@ typedef struct gsl_sf_result_struct gsl_sf_result;
 
 #define GSL_ERROR(reason, gsl_errno) \
        do { \
-       printf("ERROR: %d\n", gsl_errno); \
+       Rprintf("ERROR: %d\n", gsl_errno); \
        return gsl_errno ; \
        } while (0)
 

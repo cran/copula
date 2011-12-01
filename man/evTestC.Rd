@@ -34,9 +34,9 @@ evTestC(x, N = 1000)
   copulas. \emph{Journal of Multivariate Analysis}, 100(3),
   pages 377-386.
   
-  I. Kojadinovic and J. Yan (2010). Large-sample tests
-    of extreme-value dependence for multivariate copulas.
-    Submitted.
+  I. Kojadinovic, J. Segers and J. Yan (2011). Large-sample tests of
+  extreme-value dependence for multivariate copulas. \emph{The Canadian
+    Journal of Statistics}, 39:4, pages 703-720.
     
   I. Kojadinovic and J. Yan (2010). Modeling Multivariate Distributions
   with Continuous Margins Using the copula R Package. \emph{Journal of

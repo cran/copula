@@ -42,7 +42,7 @@
 
 rPosStable <- function(n, alpha) {
   ## reference: Chambers, Mallows, and Stuck 1976, JASA, p.341
-  if (alpha >= 1) stop("alpha must be > 1")
+  if (alpha >= 1) stop("alpha must be < 1")
   theta <- runif(n, 0, pi)
   w <- rexp(n)
   a <- sin((1 - alpha) *theta) * (sin(alpha * theta))^(alpha / (1 - alpha)) / (sin(theta))^(1/(1 - alpha))

@@ -48,7 +48,7 @@ evTestA(x, N = 1000, derivatives = "An")
   
   I. Kojadinovic and J. Yan (2010). Nonparametric rank-based tests of
   bivariate extreme-value dependence. \emph{Journal of Multivariate
-    Analysis}, in press.
+    Analysis}, 101:2234--2249.
     
   I. Kojadinovic and J. Yan (2010). Modeling Multivariate Distributions
   with Continuous Margins Using the copula R Package. \emph{Journal of

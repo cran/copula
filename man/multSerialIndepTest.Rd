@@ -1,13 +1,13 @@
 \name{multSerialIndepTest}
 \alias{multSerialIndepTest}
-% \alias{multSerialIndepTest.jy}
+
 
 \title{Serial independence test for multivariate continuous time series
   based on the empirical copula process}
 
 \description{
   Analog of the serial independence test based on the empirical 
-  copula process proposed by Christian Genest and Bruno Rémillard (see
+  copula process proposed by Christian Genest and Bruno RÃ©millard (see
   \code{\link{serialIndepTest}}) for \emph{multivariate} time
   series. The main difference comes from the fact that critical values
   and p-values are obtainted through the bootstrap/permutation
@@ -40,35 +40,35 @@ multSerialIndepTest(x, lag.max, m=lag.max+1, N=1000, alpha=0.05,
   The function \code{"multSerialIndepTest"} returns an object of class
   \code{"indepTest"} whose attributes are: \code{subsets},
   \code{statistics}, \code{critical.values}, \code{pvalues},
-  \code{fisher.pvalue} (a p-value resulting from a combination \emph{à la}
+  \code{fisher.pvalue} (a p-value resulting from a combination \emph{Ã  la}
     Fisher of the subset statistic p-values), \code{tippett.pvalue} (a p-value
-  resulting from a combination \emph{à la} Tippett of the subset statistic p-values), \code{alpha} (global significance level of the test), \code{beta}
+  resulting from a combination \emph{Ã  la} Tippett of the subset statistic p-values), \code{alpha} (global significance level of the test), \code{beta}
   (1 - \code{beta} is the significance level per statistic),
-  \code{global.statistic} (value of the global Cramér-von Mises
+  \code{global.statistic} (value of the global CramÃ©r-von Mises
   statistic derived directly from
   the independence empirical copula process - see \code{In} in the last reference) and
   \code{global.statistic.pvalue} (corresponding p-value).
 }
 
 \references{
-  P. Deheuvels (1979). La fonction de dépendance empirique et ses
-  propriétés: un test non paramétrique d'indépendance, \emph{Acad. Roy.
+  P. Deheuvels (1979). La fonction de dÃ©pendance empirique et ses
+  propriÃ©tÃ©s: un test non paramÃ©trique d'indÃ©pendance, \emph{Acad. Roy.
     Belg. Bull. Cl. Sci.}, 5th Ser. 65:274--292.
   
   P. Deheuvels (1981), A non parametric test for independence,
   \emph{Publ. Inst. Statist. Univ. Paris}. 26:29--50.
   
-  C. Genest and B. Rémillard (2004), Tests of independence and
+  C. Genest and B. RÃ©millard (2004), Tests of independence and
   randomness based on the empirical copula process. \emph{Test}, 13:335--369.
   
-  K. Ghoudi, R. Kulperger, and B. Rémillard (2001), A nonparametric test
+  K. Ghoudi, R. Kulperger, and B. RÃ©millard (2001), A nonparametric test
   of serial independence for times series and residuals. \emph{Journal
-    of Multivariate Analysis},79:191--218.
+    of Multivariate Analysis}, 79:191--218.
   
-  I. Kojadinovic and J. Yan (2008), Tests of multivariate serial
-  independence based on a Möbius decomposition of the independence
+  I. Kojadinovic and J. Yan (2011), Tests of multivariate serial
+  independence based on a MÃ¶bius decomposition of the independence
   empirical copula process, \emph{Annals of the Institute of Statistical
-  Mathematics}, in press. 
+  Mathematics}, 63:347--373. 
 }
 
 \seealso{
@@ -96,5 +96,5 @@ test
 dependogram(test,print=TRUE)
 }
 
-\encoding{latin1}
+\encoding{UTF-8}
 \keyword{htest}

@@ -48,7 +48,7 @@ ellipCopula <- function(family, param, dim = 2, dispstr = "ex", df = 4, ...) {
     stop(paste("Valid family names are", familiesImplemented))
   copula <- switch(fam,
                    normalCopula(param, dim = dim, dispstr = dispstr),
-                   tCopula(param, dim = dim, dispstr = dispstr, df = df)
+                   tCopula(param, dim = dim, dispstr = dispstr, df = df, ...)
                    )
   copula
 }

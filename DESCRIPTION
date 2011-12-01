@@ -1,11 +1,11 @@
 Package: copula
-Version: 0.9-7
-Date: 2010-05-27
+Version: 0.9-9
+Date: 2011-12-01
 Title: Multivariate dependence with copulas
-Author: Jun Yan <jyan@stat.uconn.edu> and Ivan Kojadinovic
-        <ivan@stat.auckland.ac.nz>.
-Maintainer: Jun Yan <jyan@stat.uconn.edu>
-Depends: methods, mvtnorm, scatterplot3d, sn, pspline
+Author: Jun Yan <jun.yan@uconn.edu> and Ivan Kojadinovic
+        <ivan.kojadinovic@univ-pau.fr>
+Maintainer: Ivan Kojadinovic <ivan.kojadinovic@univ-pau.fr>
+Depends: R (>= 2.14), methods, mvtnorm, scatterplot3d, pspline
 Enhances: nor1mix
 Description: Classes (S4) of commonly used copulas including elliptical
         (normal and t), Archimedean (Clayton, Gumbel, Frank, and
@@ -18,7 +18,8 @@ Description: Classes (S4) of commonly used copulas including elliptical
         variables and random vectors. Serial independence tests for
         univariate and multivariate continuous time series.
         Goodness-of-fit tests for copulas based on multipliers and on
-        the parametric bootstrap. Tests of extreme-value dependence.
+        the parametric bootstrap. Bivariate and multivariate tests of 
+	extreme-value dependence. Bivariate tests of exchangeability. 
 License: GPL (>= 3)
 Collate: Classes.R Copula.R derCdfPdf.R E.R amhCopula.R amhExpr.R
         archmCopula.R asymCopula.R asymExplicitCopula.R claytonCopula.R
@@ -27,9 +28,9 @@ Collate: Classes.R Copula.R derCdfPdf.R E.R amhCopula.R amhExpr.R
         frankExpr.R galambosCopula.R galambosExpr-math.R galambosExpr.R
         gofEVTests.R gofTests.R graphics.R gumbelCopula.R gumbelExpr.R
         huslerReissCopula.R huslerReissExpr.R indepCopula.R
-        indepTests.R logseries.R mvdc.R normalCopula.R plackettCopula.R
-        plackettExpr.R schlatherCopula.R skewNormalCopula.R stable.R
+        indepTests.R logseries.R mult.R mvdc.R normalCopula.R
+        plackettCopula.R plackettExpr.R schlatherCopula.R stable.R
         tCopula.R tawnCopula.R tawnExpr.R tevCopula.R zzz.R
 Repository: CRAN
-Date/Publication: 2010-05-28 06:55:55
-Packaged: 2010-05-27 03:00:03 UTC; ivan
+Packaged: 2011-12-01 12:28:08 UTC; ikojadin
+Date/Publication: 2011-12-02 16:22:52

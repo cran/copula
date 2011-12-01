@@ -3,9 +3,6 @@
 % Undocumented code objects
 \alias{asymCopula}
 \alias{asymExplicitCopula}
-\alias{evTestAA}
-\alias{exchEVTest}
-\alias{exchTest}
 
 % Undocumented S4 classes:
 \alias{asymCopula-class}

@@ -20,12 +20,6 @@
 #################################################################################*/
 
 
-/*****************************************************************************
-
-  Goodness-of-fit tests for copulas 
-
-*****************************************************************************/
-
 #include <R.h>
 #include <Rmath.h>
 #include <R_ext/Applic.h>
@@ -282,6 +276,10 @@ void evsymtest_derA(double *U, double *V, int *n, double *t, int *m,
 	{
 	  /* t terms */
 	  tj = t[j];
+	  if (tj < invsqrtn)
+	    tj = invsqrtn;
+	  else if  (tj > 1.0 - invsqrtn)
+	    tj = 1.0 - invsqrtn;
 	  tjp = tj + invsqrtn;
 	  tjm = tj - invsqrtn;
 	  At = exp(log_A_CFG(*n, S, T, tj)
@@ -298,6 +296,10 @@ void evsymtest_derA(double *U, double *V, int *n, double *t, int *m,
 
 	  /* 1 - t terms */
 	  tj = 1.0 - t[j];
+	  if (tj < invsqrtn)
+	    tj = invsqrtn;
+	  else if  (tj > 1.0 - invsqrtn)
+	    tj = 1.0 - invsqrtn;
 	  tjp = tj + invsqrtn;
 	  tjm = tj - invsqrtn;
 	  A1t = exp(log_A_CFG(*n, S, T, tj)
@@ -316,6 +318,10 @@ void evsymtest_derA(double *U, double *V, int *n, double *t, int *m,
 	{ 
 	  /* t terms */
 	  tj = t[j];
+	  if (tj < invsqrtn)
+	    tj = invsqrtn;
+	  else if  (tj > 1.0 - invsqrtn)
+	    tj = 1.0 - invsqrtn;
 	  tjp = tj + invsqrtn;
 	  tjm = tj - invsqrtn;
 	  
@@ -336,6 +342,10 @@ void evsymtest_derA(double *U, double *V, int *n, double *t, int *m,
 	  
 	  /* 1 - t terms */
 	  tj = 1.0 - t[j];
+	  if (tj < invsqrtn)
+	    tj = invsqrtn;
+	  else if  (tj > 1.0 - invsqrtn)
+	    tj = 1.0 - invsqrtn;
 	  tjp = tj + invsqrtn;
 	  tjm = tj - invsqrtn;
 	  A1t = 1.0 / (inv_A_Pickands(*n, S, T, tj) 
@@ -505,6 +515,10 @@ double Cn(double *U, double *V, int n, double u, double v)
 double der1Cn(double *U, double *V, int n, double u, double v)
 {
   double invsqrtn = 1.0 / sqrt(n);
+  if (u < invsqrtn)
+    u = invsqrtn;
+  else if (u > 1.0 - invsqrtn)
+    u = 1.0 - invsqrtn;
   return (Cn(U, V, n, u + invsqrtn, v) - Cn(U, V, n, u - invsqrtn, v)) 
     / (2.0 * invsqrtn);
 }
@@ -512,7 +526,11 @@ double der1Cn(double *U, double *V, int n, double u, double v)
 double der2Cn(double *U, double *V, int n, double u, double v)
 {
   double invsqrtn = 1.0 / sqrt(n);
-  return (Cn(U, V, n, u ,v + invsqrtn) - Cn(U, V, n, u ,v - invsqrtn)) 
+  if (v < invsqrtn)
+    v = invsqrtn;
+  else if (v > 1.0 - invsqrtn)
+    v = 1.0 - invsqrtn;
+  return (Cn(U, V, n, u, v + invsqrtn) - Cn(U, V, n, u, v - invsqrtn)) 
     / (2.0 * invsqrtn);
 }
 
@@ -586,8 +604,6 @@ void exchtestCn(double *U, double *V, int *n, double *u, double *v,
 
 ***********************************************************************/
  
-
-    
 void exchtestCn_stat(double *U, double *V, int *n, double *u, double *v, 
 		     int *m, double *stat)
 {

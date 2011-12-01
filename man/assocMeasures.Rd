@@ -120,7 +120,7 @@ calibSpearmansRho(copula, rho)
 
   I. Kojadinovic and J. Yan (2010). Comparison of three semiparametric methods
   for estimating dependence parameters in copula models.
-  \emph{Insurance: Mathematics and Economics}, in press.
+  \emph{Insurance: Mathematics and Economics}, 47:52--63.
 }
 \examples{
 gumbel.cop <- gumbelCopula(3)

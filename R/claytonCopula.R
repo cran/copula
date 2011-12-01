@@ -144,7 +144,7 @@ dclaytonCopula.pdf <- function(copula, u) {
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
-  val <- c(eval(claytonCopula.pdf.algr[dim]))
+  val <- pmax(c(eval(claytonCopula.pdf.algr[dim])),0)
   ## clean up
   val[apply(u, 1, function(v) any(v < 0))] <- 0
   val[apply(u, 1, function(v) any(v > 1))] <- 0

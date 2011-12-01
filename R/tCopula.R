@@ -84,7 +84,7 @@ dtCopula <- function(copula, u) {
   df <- getdf(copula)
   if (is.vector(u)) u <- matrix(u, ncol = dim)
   x <- qt(u, df)
-  val <- dmst(x, Omega = sigma, alpha = rep(0, dim),  df = df) /
+  val <- dmvt(x, delta = rep(0, dim), sigma = sigma, df = df, log = FALSE) /
     apply(x, 1, function(v) prod(dt(v, df = df)))
   val[apply(u, 1, function(v) any(v <= 0))] <- 0
   val[apply(u, 1, function(v) any(v >= 1))] <- 0

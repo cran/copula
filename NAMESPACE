@@ -4,9 +4,8 @@ importFrom(graphics, persp, contour)
 
 importFrom(mvtnorm, dmvnorm, pmvnorm, dmvt, pmvt)
 
-importFrom(sn, dmst) ## need to clean this up later
-importFrom(sn, qsn, dsn, psn, dmsn, pmsn) ## for skewNormalCopula; unused currently
-
+## importFrom(sn, dmst)
+## importFrom(sn, qsn, dsn, psn, dmsn, pmsn) 
 ## importFrom(pspline)
            
 export(dcopula, pcopula, rcopula)
@@ -55,15 +54,6 @@ export(indepTestSim, indepTest, multIndepTest,
 ## gof tests
 export(gofCopula, gofEVCopula)
 
-## derivatives; testing
-# export(derCdfWrtParams, derPdfWrtParams, tauDer, rhoDer)
-# export(derCdfWrtArgs)
-
-## graphical tools for testing independence
-## export(ChiPlot, KPlot)
-## testing purpose
-## export(fitCopula.repar)
-
 ## other nonparametric tests
 export(evTestC, evTestA, evTestK)
 export(exchEVTest, exchTest)
@@ -77,4 +67,13 @@ export(asymExplicitCopula)
 S3method(print, indepTest)
 S3method(print, gofCopula)
 S3method(print, evTest)
+S3method(print, exchTest)
+
+## testing
+## export(derCdfWrtParams, derPdfWrtParams, tauDer, rhoDer)
+## export(derCdfWrtArgs)
+## export(ChiPlot, KPlot)
+## testing purpose
+## export(fitCopula.repar)
+## export(multcomp)
 

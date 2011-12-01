@@ -70,22 +70,22 @@ gofCopula(copula, x, N = 1000, method = "mpl",
   C. Genest and B. Remillard (2008). Validity of the parametric
   bootstrap for goodness-of-fit testing in semiparametric models.
   \emph{Annales de l'Institut Henri Poincare: Probabilites et Statistiques},
-  44, 1096-1127.
+  44:1096--1127.
 
   C. Genest, B. Remillard and D. Beaudoin (2009). Goodness-of-fit tests
   for copulas: A review and a power study. \emph{Insurance: Mathematics and
-    Economics}, 44, 199-214.
+    Economics}, 44:199-214.
   
-  I. Kojadinovic, J. Yan and M. Holmes (2010). Fast large-sample goodness-of-fit
-  tests for copulas. \emph{Statistica Sinica}. In press.
+  I. Kojadinovic, J. Yan and M. Holmes (2011). Fast large-sample goodness-of-fit
+  tests for copulas. \emph{Statistica Sinica}, 21:841--871.
 
-  I. Kojadinovic and J. Yan (2010). A goodness-of-fit test for
+  I. Kojadinovic and J. Yan (2011). A goodness-of-fit test for
   multivariate multiparameter copulas based on multiplier central limit
-  theorems. \emph{Statistics and Computing}. In press.
+  theorems. \emph{Statistics and Computing}. 21:17--30.
 
   I. Kojadinovic and J. Yan (2010). Modeling Multivariate Distributions
   with Continuous Margins Using the copula R Package. \emph{Journal of
-  Statistical Software}, 34(9), pages 1-20. 
+  Statistical Software}, 34(9):1--20. 
 }
 \note{
   These tests were derived under the assumption of continuous margins,

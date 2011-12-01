@@ -1,7 +1,16 @@
+2011-11-24 Ivan Kojadinovic <ivan.kojadinovic@univ-pau.fr>
+
+	* Added the function exchTest (resp. exchEVTest) that can be used 
+	to test whether data come from an exchangeable bivariate copula 
+	(resp. an exchangeable bivariate extreme-value copula).
+	* Added the hideWarnings flag in fitCopula. Also, maxit set to 
+	1000 by default when calling optim.
+	* Corrected a few bugs. Many thanks for all the reports.
+
 2010-05-27 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu
 
-	* Added the function evTestA that can be used to test whether data come from
-	an extreme-value copula. 
+	* Added the function evTestA that can be used to test whether 
+	data come from an extreme-value copula. 
 
 2010-05-11 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu
 

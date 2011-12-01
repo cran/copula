@@ -21,7 +21,7 @@ tCopula(param, dim = 2, dispstr = "ex", df = 4, df.fixed = FALSE)
     positive definite matrix characterizing the elliptical
     copula. Implemented structures are "ex" for exchangeable, "ar1" for
     AR(1), "toep" for Toeplitz, and "un" for unstructured. }
-  \item{df}{ a numerical value specifying the number of degrees of freedom of the
+  \item{df}{ a integer value specifying the number of degrees of freedom of the
     multivariate t distribution used to construct the t copulas.}
   \item{df.fixed}{ TRUE means that the degrees of freedom will never be
     considered as a parameter to be estimated; FALSE means that

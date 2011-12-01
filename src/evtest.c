@@ -49,10 +49,7 @@ double ec(double *U, int n, int p, double *u, double o)
 	ind *= (U[i + n * j] <= u[j]);
       res += ind;
     }
-  if (o >= 0.0)
-    return (res + o)/(n + 1.0);
-  else
-    return res/n;
+  return res/(n + o);
 }
 
 /***********************************************************************
@@ -61,9 +58,9 @@ double ec(double *U, int n, int p, double *u, double o)
  
 ***********************************************************************/
 
-double derec(double *U, int n, int p, double *u, double *v, double o)
+double derec(double *U, int n, int p, double *u, double *v, double denom)
 {
-  return (ec(U, n, p, u, o) - ec(U, n, p, v, o)) *  sqrt(n) / 2.0; 
+  return (ec(U, n, p, u, 0.0) - ec(U, n, p, v, 0.0)) / denom; 
 }
 
 /***********************************************************************
@@ -73,8 +70,8 @@ double derec(double *U, int n, int p, double *u, double *v, double o)
 ***********************************************************************/
 
 void evtest(double *U, int *n, int *p, double *g, int *m, 
-	    int *N, double *tg,  int *nt, double *o, double *oect, 
-	    double *s0)
+	    int *N, double *tg,  int *nt, double *s0, int *der2n, 
+	    double *o, double *stat)
 {
   double *influ = Calloc((*n) * (*m) * (*nt), double);
   double *random = Calloc(*n, double);
@@ -86,7 +83,8 @@ void evtest(double *U, int *n, int *p, double *g, int *m,
   double *der = Calloc(*p, double);
   double *dert = Calloc(*p, double);
  
-  double t, ecterm, process, mean, ind, indt, d, dt, invsqrtn = 1.0/sqrt(*n);
+  double t, ecterm, process, process2, mean, ind, indt, d, dt, denom,
+    invsqrtn = 1.0/sqrt(*n), tmpu, tmpv, diff, ecut, ecu;
 
   int i, j, k, l, c;
 
@@ -107,23 +105,72 @@ void evtest(double *U, int *n, int *p, double *g, int *m,
 	      vt[k] =  ut[k];
 	    }
 	  
-	  ecterm = R_pow(ec(U, *n, *p, ut, *oect), (1 - t)/t) / t; 
+	  ecterm = R_pow(ec(U, *n, *p, ut, 0.0), (1 - t)/t) / t; 
 	  
 	  /* derivatives */
 	  for (k = 0; k < *p; k++)
 	    {
-	      u[k] += invsqrtn;
-	      v[k] -= invsqrtn;
-	      der[k] = derec(U, *n, *p, u, v, *o);
-	      u[k] -= invsqrtn;
-	      v[k] += invsqrtn;
-	      
-	      ut[k] += invsqrtn;
-	      vt[k] -= invsqrtn;
-	      dert[k] = derec(U, *n, *p, ut, vt, *o);
-	      ut[k] -= invsqrtn;
-	      vt[k] += invsqrtn;
-	      
+	      /* bins = 2 invsqrtn */
+	      if (*der2n) 
+		{
+		  denom = 2.0 * invsqrtn;
+		  
+		  /* u and v */
+		  if (u[k] < invsqrtn)
+		    {
+		      tmpu = u[k]; tmpv = v[k];
+		      u[k] = 2.0 * invsqrtn; v[k] = 0.0;
+		      der[k] = derec(U, *n, *p, u, v, denom);
+		      u[k] = tmpu; v[k] = tmpv;
+		    }
+		  else if (u[k] > 1.0 - invsqrtn)
+		    {
+		      tmpu = u[k]; tmpv = v[k];
+		      u[k] = 1.0; v[k] = 1.0 - 2.0 * invsqrtn;
+		      der[k] = derec(U, *n, *p, u, v, denom);
+		      u[k] = tmpu; v[k] = tmpv;
+		    }
+		  else 
+		    {
+		      u[k] += invsqrtn; v[k] -= invsqrtn;
+		      der[k] = derec(U, *n, *p, u, v, denom);
+		      u[k] -= invsqrtn; v[k] += invsqrtn;
+		    }
+
+		  /* ut and vt */
+		  if (ut[k] < invsqrtn)
+		    {
+		      tmpu = ut[k]; tmpv = vt[k];
+		      ut[k] = 2.0 * invsqrtn; vt[k] = 0.0;
+		      dert[k] = derec(U, *n, *p, ut, vt, denom);
+		      ut[k] = tmpu; vt[k] = tmpv;
+		    }
+		  else if (ut[k] > 1.0 - invsqrtn)
+		    {
+		      tmpu = ut[k]; tmpv = vt[k];
+		      ut[k] = 1.0; vt[k] = 1.0 - 2.0 * invsqrtn;
+		      dert[k] = derec(U, *n, *p, ut, vt, denom);
+		      ut[k] = tmpu; vt[k] = tmpv;
+		    }
+		  else 
+		    {
+		      ut[k] += invsqrtn; vt[k] -= invsqrtn;
+		      dert[k] = derec(U, *n, *p, ut, vt, denom);
+		      ut[k] -= invsqrtn; vt[k] += invsqrtn;
+		    }
+		} 
+	      else /* bins decreasing near 0 and 1 */
+		{
+		  u[k] += invsqrtn; v[k] -= invsqrtn;
+		  denom = MIN(u[k], 1.0) - MAX(v[k], 0.0); 
+		  der[k] = derec(U, *n, *p, u, v, denom);
+		  u[k] -= invsqrtn; v[k] += invsqrtn;
+		  
+		  ut[k] += invsqrtn; vt[k] -= invsqrtn;
+		  denom = MIN(ut[k], 1.0) - MAX(vt[k], 0.0);
+		  dert[k] = derec(U, *n, *p, ut, vt, denom);
+		  ut[k] -= invsqrtn; vt[k] += invsqrtn;
+		}
 	    }
 	  
 	  /* for each pseudo-obs */
@@ -138,13 +185,12 @@ void evtest(double *U, int *n, int *p, double *g, int *m,
 		  ind *= (U[i + k * (*n)] <= u[k]);
 		  indt *= (U[i + k * (*n)] <= ut[k]);
 		  d += der[k] * (U[i + k * (*n)] <= u[k]);
-		  dt += dert[k] * (U[i + k * (*n)] <= ut[k]);
+		  dt += dert[k]  * (U[i + k * (*n)] <= ut[k]);
 		}
 	      influ[i + j * (*n) + c * (*n) * (*m)] 
 		= (ecterm * (indt - dt) - (ind - d)) * invsqrtn;
 	    }
 	}
-      
     }
   
   GetRNGstate();
@@ -171,7 +217,7 @@ void evtest(double *U, int *n, int *p, double *g, int *m,
 	      process = 0.0;
 	      for (i = 0; i < *n; i++)
 		process += (random[i] - mean) * influ[i + j * (*n) + c * (*n) * (*m)];
-
+	      
 	      s0[k] += process * process;
 	    }
 	  s0[k] /= *m;
@@ -180,30 +226,7 @@ void evtest(double *U, int *n, int *p, double *g, int *m,
 
   PutRNGstate();
 
-  Free(influ);
-  Free(random);
-  Free(u);
-  Free(v);
-  Free(ut);
-  Free(vt);
-  Free(der);
-  Free(dert);
-}
-
-/***********************************************************************
-  
- Extreme-Value test statistic
- 
-***********************************************************************/
-    
-void evtest_stat(double *U, int *n, int *p, double *g, int *m,  
-		 double *tg,  int *nt, double *o, double *stat)
-{
-  int j, k, c;
-  double diff, t;
-  double *u = Calloc(*p, double);
-  double *ut = Calloc(*p, double);
-
+  /* test statistic */
   for (c = 0; c < *nt; c++) 
     {
       stat[c] = 0.0;
@@ -215,16 +238,24 @@ void evtest_stat(double *U, int *n, int *p, double *g, int *m,
 	      u[k] = g[j + k * (*m)];
 	      ut[k] =  R_pow(u[k], t);
 	    }
-	  diff = R_pow(ec(U, *n, *p, ut, *o), 1/t) - ec(U, *n, *p, u, *o);
+	  ecut = ec(U, *n, *p, ut, *o);
+	  ecu = ec(U, *n, *p, u, *o);
+	  //diff = (R_pow(ecut, 1/t) * (*n + 1 - 1/t) -  ecu * (*n)) / (*n + 0.3);
+	  diff = R_pow(ecut, 1/t) - ecu;
 	  stat[c] += diff * diff;
 	}
       stat[c] = stat[c] * (*n) / (*m);
     }
 
+  Free(influ);
+  Free(random);
   Free(u);
+  Free(v);
   Free(ut);
+  Free(vt);
+  Free(der);
+  Free(dert);
 }
-
 
 /***********************************************************************
   
