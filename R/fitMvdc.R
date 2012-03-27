@@ -1,23 +1,17 @@
-#################################################################################
+## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
 ##
-##   This file is part of the R package copula.
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
 ##
-##   The R package copula is free software: you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package copula is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
-##
-#################################################################################
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
 
 setClass("fitMvdc",
          representation(estimate = "numeric",
@@ -26,8 +20,7 @@ setClass("fitMvdc",
                         convergence = "integer",
                         nsample = "integer",
                         mvdc = "mvdc"),
-         validity = function(object) TRUE,
-         contains = list()         
+         validity = function(object) TRUE
          )
 
 
@@ -35,8 +28,7 @@ setClass("summaryFitMvdc",
          representation(loglik = "numeric",
                         convergence = "integer",
                         parameters = "data.frame"),
-         validity = function(object) TRUE,
-         contains = list()
+         validity = function(object) TRUE
          )
 
 showFitMvdc <- function(object) {
@@ -60,14 +52,12 @@ showFitMvdc <- function(object) {
     }
   }
   cat("Copula:\n")
-  copParIdx <- 1:length(object@mvdc@copula@parameters)
-  if(margid)
-    print(foo@parameters[sum(marNpar) + copParIdx, 1:4, drop=FALSE])
-  else
-    print(foo@parameters[sum(marNpar) + copParIdx, 1:2, drop=FALSE])
-  
+  copParIdx <- seq_along(object@mvdc@copula@parameters)
+  print(foo@parameters[sum(marNpar) + copParIdx,
+                       if(margid) 1:4 else 1:2, drop=FALSE])
   cat("The maximized loglikelihood is ", foo@loglik, "\n")
   cat("The convergence code is ", foo@convergence, "see ?optim.\n")
+  invisible(object)
 }
 
 summaryFitMvdc <- function(object) {
@@ -80,30 +70,28 @@ summaryFitMvdc <- function(object) {
   marNpar <- unlist(lapply(object@mvdc@paramMargins, length))
   p <- object@mvdc@copula@dimension
 
-  if (sum(marNpar) == 0) margpnames <- NULL
-  else if(object@mvdc@marginsIdentical){ 
-    margpnames <- c(paste(paste("m", lapply(object@mvdc@paramMargins, names)[[1]], sep=".")))
-  }
-  else{
-    margpnames <- c(paste(paste("m", rep(1:p, marNpar), sep=""),
-                          unlist(lapply(object@mvdc@paramMargins, names)), sep="."))
-  }
-  pnames <- c(margpnames, object@mvdc@copula@param.names)
+  margpnames <-
+      if (sum(marNpar) == 0) NULL
+      else if(object@mvdc@marginsIdentical)
+          c(paste(paste("m", lapply(object@mvdc@paramMargins, names)[[1]], sep=".")))
+      else
+          c(paste(paste("m", rep(1:p, marNpar), sep=""),
+                  unlist(lapply(object@mvdc@paramMargins, names)), sep="."))
   dimnames(parameters) <-
-    list(pnames,
+    list(c(margpnames, object@mvdc@copula@param.names),
          c("Estimate", "Std. Error", "z value", "Pr(>|z|)"))
-  ret <- new("summaryFitMvdc",
-             loglik = object@loglik,
-             convergence = object@convergence,
-             parameters = parameters)
-  ret
+  new("summaryFitMvdc",
+      loglik = object@loglik,
+      convergence = object@convergence,
+      parameters = parameters)
 }
 
 
 setMethod("show", signature("fitMvdc"), showFitMvdc)
 setMethod("summary", signature("fitMvdc"), summaryFitMvdc)
 
-####################################################################
+
+################################################################################
 
 loglikMvdc <- function(param, x, mvdc, suppressMessages=FALSE) {
   p <- mvdc@copula@dimension
@@ -115,20 +103,16 @@ loglikMvdc <- function(param, x, mvdc, suppressMessages=FALSE) {
   for (i in 1:p) {
     if (marNpar[i] > 0) {
       ## parnames <- mvdc@paramMargins[[i]]
-      k <- ifelse(margid,1,i)
+      k <- if(margid) 1 else i
       par <- param[idx1[k]: idx2[k]]
       ## names(par) <- parnames
       ## mvdc@paramMargins[i] <- as.list(par)
       for (j in 1:marNpar[i]) mvdc@paramMargins[[i]][j] <- par[j]
-    }      
+    }
   }
-  if (idx2[p] == 0) { # no marginal parameters
-    mvdc@copula@parameters <- param
-  }
-  else if(margid)
-      mvdc@copula@parameters <- param[- (1:idx2[1])]
-  else
-      mvdc@copula@parameters <- param[- (1:rev(idx2)[1])]
+  mvdc@copula@parameters <-
+      if (idx2[p] == 0) # no marginal parameters
+          param else if(margid) param[- (1:idx2[1])] else param[- (1:rev(idx2)[1])]
 
   ## messageOut may be used for debugging
   if (suppressMessages) {
@@ -171,17 +155,16 @@ fitMvdc <- function(data, mvdc, start,
   loglik <- fit$val
 
   fit.last <- optim(fit$par, loglikMvdc, method=method, mvdc=mvdc, x =data, suppressMessages=TRUE, control=c(control, maxit=1), hessian=TRUE)
-    
+
   var.est <- try(solve(-fit.last$hessian))
   if (inherits(var.est, "try-error"))
     warning("Hessian matrix not invertible")
 
-  ans <- new("fitMvdc",
+  new("fitMvdc",
              estimate = fit$par,
              var.est = var.est,
              loglik = loglik,
              convergence = fit$convergence,
              nsample = nrow(data),
              mvdc = mvdc)
-  ans
 }

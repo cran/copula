@@ -1,17 +1,17 @@
 /* specfunc/debye.c
- * 
+ *
  * Copyright (C) 1996, 1997, 1998, 1999, 2000 Gerard Jungman
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
@@ -27,11 +27,13 @@
 /* #include "error.h" */
 /* #include "check.h" */
 
-#include "mygsl.h"
 #include <math.h>
 #include <stdio.h>
 #include <float.h>
 
+#include "cop_gsl.h"
+
+// --> gsl/specfunc/ :
 #include "chebyshev.h"
 #include "cheb_eval.c"
 
@@ -195,7 +197,7 @@ int gsl_sf_debye_1_e(const double x, gsl_sf_result * result)
   }
 }
 
-    
+
 int gsl_sf_debye_2_e(const double x, gsl_sf_result * result)
 {
   const double val_infinity = 4.80822761263837714;

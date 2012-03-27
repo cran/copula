@@ -1,38 +1,32 @@
-#################################################################################
+## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
 ##
-##   This file is part of the R package copula.
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
 ##
-##   The R package copula is free software: you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package copula is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
-##
-#################################################################################
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-normalCopula <- function(param, dim = 2, dispstr = "ex") {
+normalCopula <- function(param, dim = 2L, dispstr = "ex") {
   pdim <- length(param)
-  val <- new("normalCopula",
-             dispstr = dispstr,
-             dimension = dim,
-             parameters = param,
-             param.names = paste("rho", 1:pdim, sep="."),
-             param.lowbnd = rep(-1, pdim),
-             param.upbnd = rep(1, pdim),
-             message = "Normal copula family",
-             getRho = function(obj) {obj@parameters}
-             )
-  val
+  dim <- as.integer(dim)
+  new("normalCopula",
+      dispstr = dispstr,
+      dimension = dim,
+      parameters = param,
+      param.names = paste("rho", 1:pdim, sep="."),
+      param.lowbnd = rep(-1, pdim),
+      param.upbnd = rep(1, pdim),
+      message = "Normal copula family",
+      getRho = function(obj) {obj@parameters}
+      )
 }
 
 
@@ -44,34 +38,30 @@ rnormalCopula <- function(copula, n) {
 
 
 pnormalCopula <- function(copula, u) {
-  mycdf.vector <- function(x) {
-    pmvnorm(lower = rep(-Inf, dim), upper = qnorm(x), sigma = sigma)
-  }
-
   dim <- copula@dimension
+  i.lower <- rep.int(-Inf, dim)
   sigma <- getSigma(copula)
-  if (is.vector(u)) u <- matrix(u, ncol = dim)
-  u[u <= 0] <- 0
-  u[u >= 1] <- 1
-  val <- apply(u, 1, mycdf.vector)
-  val
+  u <- matrix(pmax(0, pmin(1, u)), ncol = dim)
+  apply(qnorm(u), 1, function(qu)
+        pmvnorm(lower = i.lower, upper = qu, sigma = sigma))
 }
 
-dnormalCopula <- function(copula, u) {
+dnormalCopula <- function(copula, u, log=FALSE, ...) {
   dim <- copula@dimension
   sigma <- getSigma(copula)
-  if (is.vector(u)) u <- matrix(u, ncol = dim)
+  if(!is.matrix(u)) u <- matrix(u, ncol = dim)
   x <- qnorm(u)
-  val <- dmvnorm(x, sigma = sigma) / apply(x, 1, function(v) prod(dnorm(v)))
-  val[apply(u, 1, function(v) any(v <= 0))] <- 0
-  val[apply(u, 1, function(v) any(v >= 1))] <- 0
-  val
+  ## work in log-scale [less over-/under-flow, then (maybe) transform:
+  val <- dmvnorm(x, sigma = sigma, log=TRUE) - rowSums(dnorm(x, log=TRUE))
+  if(any(out <- !is.na(u) & (u <= 0 | u >= 1))) val[out] <- -Inf
+  if(log) val else exp(val)
 }
 
 
 showNormalCopula <- function(object) {
   showCopula(object)
   if (object@dimension > 2) cat("dispstr: ", object@dispstr, "\n")
+  invisible(object)
 }
 
 

@@ -1,27 +1,24 @@
-#################################################################################
+## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
 ##
-##   This file is part of the R package copula.
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
 ##
-##   The R package copula is free software: you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package copula is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
-##
-#################################################################################
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
 
-###################################################################
-## EV test based on Cn
-###################################################################
+
+##------- FIXME{MM}: Shouldn't all these inherit from "htest" (and use its print() method)?
+##        and ditto for all other ./*Tests.R  !!!
+
+
+### EV test based on Cn ########################################################
 
 evTestC <- function(x, N = 1000)
 {
@@ -40,7 +37,7 @@ evTestC <- function(x, N = 1000)
   ## parameters
   offsetstat <- 0.75
   der2n <- TRUE
-  
+
   ## make grid
   if (m > 0)
     {
@@ -56,8 +53,8 @@ evTestC <- function(x, N = 1000)
       g <- u
       m <- n
     }
-  
-  out <- .C("evtest",
+
+  out <- .C(evtest,
             as.double(u),
             as.integer(n),
             as.integer(p),
@@ -69,23 +66,22 @@ evTestC <- function(x, N = 1000)
             s0 = double(N * nr),
             as.integer(der2n),
             as.double(offsetstat),
-            stat = double(nr),
-            PACKAGE="copula")
+            stat = double(nr))[c("s0", "stat")]
 
   ## s <- out$stat
   ## s0 <- matrix(out$s0, ncol = nr, byrow = TRUE)
   ## pval <- apply(s0 >= matrix(s, nrow=N, ncol=nr, byrow=TRUE),
   ##               2, function(x) (sum(x) + 0.5) / (N + 1) )
-  ## comb.s <- sum(s) 
-  ## comb.pval <- ( sum( apply(s0, 1, sum) >= comb.s ) + 0.5 ) / (N + 1) 
-  
+  ## comb.s <- sum(s)
+  ## comb.pval <- ( sum( apply(s0, 1, sum) >= comb.s ) + 0.5 ) / (N + 1)
+
   ## return(list(statistic=c(s, comb.s),
   ##             pvalue=c(pval, comb.pval), s0=s0))
 
   ## p-values
   s0 <- matrix(out$s0, ncol = nr, byrow = TRUE)
-  comb.s <- sum(out$stat) 
-  comb.pval <- ( sum( apply(s0, 1, sum) >= comb.s ) + 0.5 ) / (N + 1) 
+  comb.s <- sum(out$stat)
+  comb.pval <- ( sum( apply(s0, 1, sum) >= comb.s ) + 0.5 ) / (N + 1)
   evt <- list(statistic=comb.s,pvalue=comb.pval)
   class(evt) <- "evTest"
   evt
@@ -95,11 +91,11 @@ print.evTest <- function(x, ...)
 {
   cat("Statistic:", x$statistic,
       "with p-value", x$pvalue, "\n\n")
+  invisible(x)
 }
 
-###################################################################
-## EV test based on An
-###################################################################
+
+### EV test based on An ########################################################
 
 evTestA <- function(x, N = 1000, derivatives = "An")
 {
@@ -114,9 +110,9 @@ evTestA <- function(x, N = 1000, derivatives = "An")
 
   estimator <- "CFG"
   offset <- 0.5
-  
+
   ## compute the test statistic
-  s <- .C("evtestA_stat",
+  s <- .C(evtestA_stat,
           as.double(u[,1]),
           as.double(u[,2]),
           as.integer(n),
@@ -125,11 +121,10 @@ evTestA <- function(x, N = 1000, derivatives = "An")
           as.integer(m),
           as.integer(estimator == "CFG"),
           stat = double(1),
-          as.double(offset),
-          PACKAGE="copula")$stat
-  
+          as.double(offset))$stat
+
   if (derivatives == "Cn")
-    s0 <- .C("evtestA",
+    s0 <- .C(evtestA,
              as.double(u[,1]),
              as.double(u[,2]),
              as.integer(n),
@@ -138,10 +133,9 @@ evTestA <- function(x, N = 1000, derivatives = "An")
              as.integer(m),
              as.integer(estimator == "CFG"),
              as.integer(N),
-             s0 = double(N),
-             PACKAGE="copula")$s0
+             s0 = double(N))$s0
   else
-    s0 <- .C("evtestA_derA",
+    s0 <- .C(evtestA_derA,
              as.double(u[,1]),
              as.double(u[,2]),
              as.integer(n),
@@ -150,17 +144,15 @@ evTestA <- function(x, N = 1000, derivatives = "An")
              as.integer(m),
              as.integer(estimator == "CFG"),
              as.integer(N),
-             s0 = double(N),
-             PACKAGE="copula")$s0
+             s0 = double(N))$s0
 
   evt <- list(statistic=s, pvalue=(sum(s0 >= s)+0.5)/(N+1))
   class(evt) <- "evTest"
   evt
 }
 
-###################################################################
-## EV test based on An CFG - An Pickands
-###################################################################
+
+### EV test based on An CFG - An Pickands ######################################
 
 evTestAA <- function(x, N = 1000,  derivatives = "Cn", m = 100)
 {
@@ -172,47 +164,43 @@ evTestAA <- function(x, N = 1000,  derivatives = "Cn", m = 100)
   g <- seq(1/m, 1 - 1/m, len = m)
 
   ## compute the test statistic
-  s <- .C("evTestAA_stat",
+  s <- .C(evTestAA_stat,
           as.double(-log(u[,1])),
           as.double(-log(u[,2])),
           as.integer(n),
           as.double(g),
           as.integer(m),
-          stat = double(1),
-          PACKAGE="copula")$stat
-  
+          stat = double(1))$stat
+
   if (derivatives == "Cn")
-    s0 <- .C("evTestAA",
+    s0 <- .C(evTestAA,
              as.double(u[,1]),
              as.double(u[,2]),
              as.integer(n),
              as.double(g),
              as.integer(m),
              as.integer(N),
-             s0 = double(N),
-             PACKAGE="copula")$s0
+             s0 = double(N))$s0
   else
-    s0 <- .C("evTestAA_derA",
+    s0 <- .C(evTestAA_derA,
              as.double(u[,1]),
              as.double(u[,2]),
              as.integer(n),
              as.double(g),
              as.integer(m),
              as.integer(N),
-             s0 = double(N),
-             PACKAGE="copula")$s0
-  
-  return(list(statistic=s, pvalue=(sum(s0 >= s)+0.5)/(N+1),s0=s0))
-  
+             s0 = double(N))$s0
+
+  structure(class = "evTest",
+            list(statistic=s, pvalue=(sum(s0 >= s)+0.5)/(N+1),s0=s0))
 }
 
-###################################################################
-## EV test based on K - Ben Ghorbal, Neslehova and Genest (2009)
-## Canadian Journal of Statistics, volume 37
-## Code provided by Johanna Neslehova
-###################################################################
 
-## internal functions 
+### EV test based on K - Ben Ghorbal, Neslehova and Genest (2009)
+### Canadian Journal of Statistics, volume 37
+### Code provided by Johanna Neslehova
+
+## internal functions
 I <- function(X,i,j)
 {
   if (X[i,1] <= X[j,1] && X[i,2] <= X[j,2]) {ind <- 1} else {ind <- 0}
@@ -226,34 +214,31 @@ zero.mat <- function(n)
   A <- NULL
   for(k in 1:n){
     A <- rbind(A,matrix(c(rep(y,(k-1)),x,rep(y,(n-k))),byrow=TRUE,nrow=n))
-  }	
+  }
   A
 }
 
 mult.row <- function(M,delete=TRUE)
 {
   n <- ncol(M)
-  out <- ((matrix(rep(as.vector(t(M)),n),ncol=n,byrow=TRUE))*(matrix(as.vector(t(matrix(rep(as.vector(M),n),nrow=n))),byrow=TRUE,ncol=n)))
-  if(delete == TRUE) {out <- out*zero.mat(n)}
-  out
-}	
-	
-fun <- function(x,y)
-{
-  as.numeric(!(x>y))
-}	
+  out <- matrix(rep(as.vector(t(M)),n),ncol=n,byrow=TRUE) *
+         matrix(as.vector(t(matrix(rep(as.vector(M),n),nrow=n))),byrow=TRUE,ncol=n)
+  if(delete) out*zero.mat(n) else out
+}
+
 
 ind.matrix <- function(X)
 {
   n <- nrow(X)
   x <- as.numeric(X[,1])
   y <- as.numeric(X[,2])
-  M1 <- outer(x,x,FUN=fun)
-  M2 <- outer(y,y,FUN=fun)
+  fun <- function(x,y) as.numeric(!(x>y))
+  M1 <- outer(x,x, FUN=fun)
+  M2 <- outer(y,y, FUN=fun)
   M1*M2
 }
-		
-## calculating the thetas
+
+## calculating the thetas for GKRstatistic
 thetas <- function(X)
 {
   mu <- numeric(7)
@@ -274,7 +259,7 @@ thetas <- function(X)
   BMB <- sum(B*MB)
   AMB <- sum(A*MB)
   BsqMB <- sum(B.sq*MB)
-  MN <- sum(O) 
+  MN <- sum(O)
   MBMB <- sum(MB*MB)
   b1 <- sum(B)
   b2 <- sum(B.sq)
@@ -302,12 +287,12 @@ thetas <- function(X)
   c[4] <- 2*(MBMB - b3 - AMB + b2 - absq) #2*(MBMB - b3 - absq)
   c[5] <- BsqMB - BMB #b1*MN - b3 -2*BMB
   c[6] <- BsqMB - absq #BsqMB
-  c[7] <- b2*b1 - b3 - absq #b4 
+  c[7] <- b2*b1 - b3 - absq #b4
   mu[7] <- (b2)^2 - b4 - BsqMB - sum(c)
-  return(list(mu=mu,theta=theta))	
-}	
-				
-##calculation of the GKR test statistic Sn		
+  return(list(mu=mu,theta=theta))
+}
+
+## calculation of the GKR test statistic Sn
 Sn <- function(X)
 {
   n <- nrow(X)
@@ -315,29 +300,25 @@ Sn <- function(X)
   M <- ind.matrix(X)*D  #delete entries on the diagonal
   w <- sum(M)
   w.sq <- sum((M%*%t(M))*D)
-  Sn <- -1+(8*w)/(n*(n-1))-(9*w.sq)/(n*(n-1)*(n-2))
-  Sn
+  -1 + (8*w)/(n*(n-1)) - (9*w.sq)/(n*(n-1)*(n-2))
 }
 
 ## Jackknife variance estimator THIS CODE CAN BE IMPROVED!!!!!!!
 GKRJack <- function(X)
-  {	
-    n <- nrow(X)
-    Sn <- Sn(X)
-    VSn <- numeric()
-    for(i in 1:n){
-      cond <- !(1:n == i)
-      VSn[i] <- Sn(X[cond,])
-    }
-    var <- ((n-1)/n)*(sum((VSn-rep(Sn,n))^2))
-    return(list(Sn=Sn,var=var))
-  }
-
-
-## Calculation of Sn and its fininte sample and asymptotic variance; theta41 = theta[4], theta42 = theta[5], theta51 = theta[6] and theta52=theta[7]	
-GKRstatistic <- function(X,variance=c("fsample","asymptotic","all")) #If variance="all", the function gives the asymptotic (var[1]), finite sample (var[2]) and jackknife variance (var[3]) of sqrt(n)*Sn.
 {
-  variance <- match.arg(variance,c("fsample","asymptotic","all"))
+    stopifnot(is.numeric(n <- nrow(X)))
+    Sn <- Sn(X)
+    VSn <- vapply(1:n, function(i) Sn(X[-i, ,drop=FALSE]), 1.)
+    list(Sn=Sn, var = (n-1)/n * sum(VSn - Sn)^2)
+}
+
+## Calculation of Sn and its finite sample and asymptotic variance;
+## theta41 = theta[4], theta42 = theta[5], theta51 = theta[6] and theta52=theta[7]
+## If variance="all", the function gives the asymptotic (var[1]), finite sample (var[2])
+## and jackknife variance (var[3]) of sqrt(n)*Sn.
+GKRstatistic <- function(X, variance=c("fsample","asymptotic","all"))
+{
+  variance <- match.arg(variance)
   n <- nrow(X)
   psi <- numeric(5)
   mu <- numeric(7)
@@ -376,20 +357,19 @@ GKRstatistic <- function(X,variance=c("fsample","asymptotic","all")) #If varianc
     VSn <- numeric(n)
     for(i in 1:n){
       cond <- !(1:n == i)
-      VSn[i] <- Sn(X[cond,])			
+      VSn[i] <- Sn(X[cond,])
     }
     var <- c(var,n*((n-1)/n)*(sum((VSn-rep(Sn,n))^2)))
-  }	
+  }
   return(list(Sn=Sn,tau=tau,mu=mu,psi=psi,var=var))
 }
 
-##########################################################
-## Test function: GKR test
-##########################################################
 
-evTestK <- function(x, method = "fsample")
+### Test function: GKR test ####################################################
+
+evTestK <- function(x, method = c("fsample","asymptotic","jackknife"))
 {
-  method <- match.arg(method,c("fsample","asymptotic","jackknife"))
+  method <- match.arg(method)
   n <- nrow(x)
   negvar <- FALSE
   tmp <- switch(method,
@@ -403,13 +383,13 @@ evTestK <- function(x, method = "fsample")
                 "jackknife"=n*tmp$var
                 )
   if(var < 0){
-    ##print("Variance estimator less then zero, using jackknife instead")
+    message("Variance estimator less then zero, using jackknife instead")## <- MM: reactivated 2012-02-22
     negvar <- TRUE
     var <- n*GKRJack(x)$var
     method <- "jackknife"
   }
-  
-  Tn <- (sqrt(n)*tmp$Sn)/(sqrt(var))
+
+  Tn <- sqrt(n)*tmp$Sn/sqrt(var)
   ##calpha <- qnorm((1-alpha/2))
   ##reject <- (abs(Tn)>calpha)
   p.value <- pnorm(-abs(Tn))+pnorm(abs(Tn),lower.tail=FALSE)

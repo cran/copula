@@ -8,9 +8,9 @@
   parameters and dimension.
 }
 \usage{
-ellipCopula(family, param, dim = 2, dispstr = "ex", df = 4, ...)
+ellipCopula (family, param, dim = 2, dispstr = "ex", df = 4, ...)
 normalCopula(param, dim = 2, dispstr = "ex")
-tCopula(param, dim = 2, dispstr = "ex", df = 4, df.fixed = FALSE)
+    tCopula (param, dim = 2, dispstr = "ex", df = 4, df.fixed = FALSE)
 }
 \arguments{
   \item{family}{ a character string specifying the family of an
@@ -36,7 +36,8 @@ tCopula(param, dim = 2, dispstr = "ex", df = 4, df.fixed = FALSE)
   \code{"ellipCopula"} is a wrapper for \code{"normalCopula"} and
   \code{"tCopula"}.
 }
-\seealso{ \code{\link{archmCopula}}, \code{\link{fitCopula}}. }
+\seealso{ \code{\link{archmCopula}}, \code{\link{fitCopula}}.
+}
 \examples{
 norm.cop <- normalCopula(c(0.5, 0.6, 0.7), dim = 3, dispstr = "un")
 t.cop <- tCopula(c(0.5, 0.3), dim = 3, dispstr = "toep",
@@ -44,9 +45,11 @@ t.cop <- tCopula(c(0.5, 0.3), dim = 3, dispstr = "toep",
 ## from the wrapper
 norm.cop <- ellipCopula("normal", param = c(0.5, 0.6, 0.7),
                         dim = 3, dispstr = "un")
-## 3d scatter plot of 1000 random observations
-## scatterplot3d(rcopula(norm.cop, 1000))
-## scatterplot3d(rcopula(t.cop, 1000))
+if(require("scatterplot3d")) {
+  ## 3d scatter plot of 1000 random observations
+  scatterplot3d(rcopula(norm.cop, 1000))
+  scatterplot3d(rcopula(t.cop, 1000))
 }
-\keyword{ distribution }% at least one, from doc/KEYWORDS
-\keyword{ multivariate }% __ONLY ONE__ keyword per line
+}
+\keyword{distribution}
+\keyword{multivariate}

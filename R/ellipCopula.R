@@ -1,23 +1,18 @@
-#################################################################################
+## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
 ##
-##   This file is part of the R package copula.
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
 ##
-##   The R package copula is free software: you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package copula is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
-##
-#################################################################################
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
+
 
 getSigma <- function(copula) {
   dim <- copula@dimension
@@ -41,16 +36,15 @@ getSigma <- function(copula) {
   sigma
 }
 
-ellipCopula <- function(family, param, dim = 2, dispstr = "ex", df = 4, ...) {
+ellipCopula <- function(family, param, dim = 2L, dispstr = "ex", df = 4, ...) {
   familiesImplemented <- c("normal", "t")
   fam <- pmatch(family, familiesImplemented, -1)
   if (fam == -1)
     stop(paste("Valid family names are", familiesImplemented))
-  copula <- switch(fam,
-                   normalCopula(param, dim = dim, dispstr = dispstr),
-                   tCopula(param, dim = dim, dispstr = dispstr, df = df, ...)
-                   )
-  copula
+  switch(fam,
+         normalCopula(param, dim = dim, dispstr = dispstr),
+         tCopula(param, dim = dim, dispstr = dispstr, df = df, ...)
+         )
 }
 
 calibKendallsTauEllipCopula <- function(copula, tau) {

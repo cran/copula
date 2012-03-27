@@ -34,3 +34,22 @@ citEntry(entry = "Article",
         "Journal of Statistical Software, 34(9), 1-20.",
         "URL http://www.jstatsoft.org/v34/i09/.")
 )
+
+citEntry(entry = "Article",
+  title        = "Nested Archimedean Copulas Meet {R}: The {nacopula} Package",
+  author       = personList(as.person("Marius Hofert"),
+                   as.person("Martin M\\\"achler")),
+  journal      = "Journal of Statistical Software",
+  year         = "2011",
+  volume       = "39",
+  number       = "9",
+  pages        = "1--20",
+  url          = "http://www.jstatsoft.org/v39/i09/",
+
+  textVersion  =
+  paste("Marius Hofert, Martin Maechler (2011).",
+        "Nested Archimedean Copulas Meet R: The nacopula Package.",
+        "Journal of Statistical Software, 39(9), 1-20.",
+        "URL http://www.jstatsoft.org/v39/i09/.")
+)
+

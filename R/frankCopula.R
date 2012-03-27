@@ -1,23 +1,17 @@
-#################################################################################
+## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
 ##
-##   This file is part of the R package copula.
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
 ##
-##   The R package copula is free software: you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package copula is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
-##
-#################################################################################
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
 genFunFrank <- function(copula, u) {
@@ -42,7 +36,7 @@ genFunDer2Frank <- function(copula, u) {
 ##   eval(genInvDerFrank.expr[n + 1], list(s=s, alpha=copula@parameters[1]))
 ## }
 
-frankCopula <- function(param, dim = 2) {
+frankCopula <- function(param, dim = 2L) {
   ## get expressions of cdf and pdf
   cdfExpr <- function(n) {
     expr <-   "- log( (exp(- alpha * u1) - 1) / (exp(- alpha) - 1) )"
@@ -53,7 +47,7 @@ frankCopula <- function(param, dim = 2) {
     expr <- paste("-1/alpha * log(1 + exp(-(", expr, ")) * (exp(-alpha) - 1))")
     parse(text = expr)
   }
-  
+
   pdfExpr <- function(cdf, n) {
     val <- cdf
     for (i in 1:n) {
@@ -62,7 +56,7 @@ frankCopula <- function(param, dim = 2) {
     val
   }
 
-  if (dim > 2 && param[1] < 0)
+  if ((dim <- as.integer(dim)) > 2 && param[1] < 0)
     stop("param can be negative only for dim = 2")
   cdf <- cdfExpr(dim)
   if (dim <= 6)  pdf <- pdfExpr(cdf, dim)
@@ -79,9 +73,9 @@ frankCopula <- function(param, dim = 2) {
 }
 
 rfrankBivCopula <- function(copula, n) {
-  val <- cbind(runif(n), runif(n)) 
+  val <- cbind(runif(n), runif(n))
   ## to fix numerical rounding problems for alpha >35 but not for alpha < -35
-  alpha <- - abs(copula@parameters[1]) 
+  alpha <- - abs(copula@parameters[1])
   val[,2] <- -1/alpha * log(1 + val[,2] * (1 - exp(-alpha)) / (exp(-alpha * val[,1]) * (val[,2] - 1) - val[,2])) ## reference: Joe (1997, p.147)
   if (copula@parameters[1] > 0) val[,2] <- 1 - val[,2]
   val
@@ -112,7 +106,7 @@ rfrankCopula <- function(copula, n) {
 
 pfrankCopula <- function(copula, u) {
   dim <- copula@dimension
-  if (is.vector(u)) u <- matrix(u, ncol = dim)
+  if(!is.matrix(u)) u <- matrix(u, ncol = dim)
   cdf <- copula@exprdist$cdf
   dim <- copula@dimension
   alpha <- copula@parameters[1]
@@ -121,12 +115,13 @@ pfrankCopula <- function(copula, u) {
   eval(cdf)
 }
 
-dfrankCopula <- function(copula, u) {
-  if (is.vector(u)) u <- matrix(u, nrow = 1)
+dfrankCopula <- function(copula, u, log=FALSE, ...) {
+  if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   pdf <- copula@exprdist$pdf
   dim <- copula@dimension
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
+  if(log) stop("'log=TRUE' not yet implemented")
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
   val <- eval(pdf)
 #  val[apply(u, 1, function(v) any(v <= 0))] <- 0
@@ -135,7 +130,7 @@ dfrankCopula <- function(copula, u) {
 }
 
 ## dfrankCopula.expr <- function(copula, u) {
-##   if (is.vector(u)) u <- matrix(u, nrow = 1)
+##   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
 ##   s <- apply(genFunFrank(copula, u), 1, sum)
 ##   pdf <- genInvDerFrank(copula, s, copula@dimension) *
 ##     apply(genFunDerFrank(copula, u, 1), 1, prod)
@@ -145,7 +140,7 @@ dfrankCopula <- function(copula, u) {
 dfrankCopula.pdf <- function(copula, u) {
   dim <- copula@dimension
   if (dim > 6) stop("Frank copula PDF not implemented for dimension > 6.")
-  if (is.vector(u)) u <- matrix(u, nrow = 1)
+  if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
   c(eval(frankCopula.pdf.algr[dim]))
@@ -163,7 +158,7 @@ spearmansRhoFrankCopula <- function(copula) {
     1 - 12/alpha * (debye1(alpha) - debye2(alpha))
 }
 
-tailIndexFrankCopula <- function(copula, ...) {
+tailIndexFrankCopula <- function(copula) {
   c(lower=0, upper=0)
 }
 

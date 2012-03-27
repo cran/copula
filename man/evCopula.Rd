@@ -19,7 +19,6 @@ tevCopula(param, df = 4, df.fixed = FALSE)
 
 %gumbelCopula(param)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{family}{ a character string specifying the family of an
     extreme-value copula. %Implemented families are "gumbel", "galambos" and
@@ -36,7 +35,7 @@ tevCopula(param, df = 4, df.fixed = FALSE)
   \item{\dots}{ currently nothing. }
 }
 \value{
-  An object of class \code{"gumbelCopula"}, \code{"galambosCopula"}, 
+  An object of class \code{"gumbelCopula"}, \code{"galambosCopula"},
   \code{"huslerReissCopula"}, \code{"tawnCopula"}, or \code{"tevCopula"}.
 }
 \note{

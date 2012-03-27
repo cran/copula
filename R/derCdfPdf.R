@@ -1,30 +1,22 @@
-#################################################################################
+## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
 ##
-##   This file is part of the R package copula.
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
 ##
-##   The R package copula is free software: you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package copula is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
-##
-#################################################################################
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
 
-#########################################################
-## partial derivatives of the CDF wrt arguments
-#########################################################
+
+### partial derivatives of the CDF wrt arguments ###############################
 
 setGeneric("derCdfWrtArgs", function(cop, u) standardGeneric("derCdfWrtArgs"))
-
 
 ## Warning: This function assumes symmetry in u
 derCdfWrtArgsExplicitCopula <- function(cop, u)
@@ -73,11 +65,11 @@ derCdfWrtArgsEllipCopula <- function(cop, u)
         v <- qt(u,df=df)
       }
     else stop("not implemented")
-      
+
     n <- nrow(u)
     mat <- matrix(0,n,p)
-    
-    for (j in 1:p) 
+
+    for (j in 1:p)
       {
         s <- sigma[-j,-j] - sigma[-j,j,drop=FALSE] %*% sigma[j,-j,drop=FALSE]
 
@@ -93,7 +85,7 @@ derCdfWrtArgsEllipCopula <- function(cop, u)
                                   upper = v[i,-j],
                                   mean = v[i,j] * sigma[-j,j],
                                   sigma = drop(s))
-        else if (class(cop) == "tCopula") 
+        else if (class(cop) == "tCopula")
           if (p == 2)
             {
               rho <- cop@parameters
@@ -106,16 +98,15 @@ derCdfWrtArgsEllipCopula <- function(cop, u)
                                upper = drop(sqrt((df+1)/(df+v[i,j]^2)) *
                                  (v[i,-j] - v[i,j] * sigma[-j,j])),
                                sigma = s, df = df + 1)
-        
+
       }
-    return(mat)    
+    return(mat)
   }
 
 setMethod("derCdfWrtArgs", signature("ellipCopula"), derCdfWrtArgsEllipCopula)
 
-#########################################################
-## Plackett formula for elliptical copulas
-#########################################################
+
+### Plackett formula for elliptical copulas ####################################
 
 setGeneric("plackettFormulaDim2", function(cop, x) standardGeneric("plackettFormulaDim2"))
 
@@ -147,7 +138,7 @@ plackettFormulaNormalCopula <- function(cop, p, rho, s, m, x, i, j)
            * if (p == 3) pnorm(drop((x[-c(i,j)] - m %*% x[c(i,j)])/sqrt(s)))
            else pmvnorm(lower = rep(-Inf, p - 2),
                         upper = drop(x[-c(i,j)] - m %*% x[c(i,j)]),
-                        sigma = s))                 
+                        sigma = s))
   }
 
 setMethod("plackettFormula", signature("normalCopula"), plackettFormulaNormalCopula)
@@ -158,7 +149,7 @@ plackettFormulaTCopula <- function(cop, p, rho, s, m, x, i, j)
     term <- 1 + (x[i]^2 + x[j]^2 - 2 * rho * x[i] * x[j]) / (df * (1 - rho^2))
     return(term^(-df / 2) / (2 * pi * sqrt(1 - rho^2)) *
            if (p == 3) pt(drop((x[-c(i,j)] - m %*% x[c(i,j)]) / sqrt(term * s)), df= df)
-           else pmvt(df = df, lower = rep(-Inf, p - 2), 
+           else pmvt(df = df, lower = rep(-Inf, p - 2),
                      upper = drop((x[-c(i,j)] - m %*% x[c(i,j)]) / sqrt(term)),
                      sigma = s))
   }
@@ -166,9 +157,7 @@ plackettFormulaTCopula <- function(cop, p, rho, s, m, x, i, j)
 setMethod("plackettFormula", signature("tCopula"), plackettFormulaTCopula)
 
 
-#########################################################
-## partial derivatives of the CDF wrt parameters
-#########################################################
+### partial derivatives of the CDF wrt parameters ##############################
 
 setGeneric("derCdfWrtParams", function(cop, u) standardGeneric("derCdfWrtParams"))
 
@@ -198,7 +187,7 @@ setMethod("derCdfWrtParams", signature("gumbelCopula"), derCdfWrtParamsExplicitC
 derCdfWrtParamsEllipCopula <- function(cop, u)
   {
     p <- cop@dimension
-    
+
     ## quantile transformation
     if (class(cop) == "normalCopula")
       v <- qnorm(u)
@@ -206,34 +195,34 @@ derCdfWrtParamsEllipCopula <- function(cop, u)
       v <- qt(u,df=cop@df)
     else stop("not implemented")
 
-    if (p == 2) 
+    if (p == 2)
       plackettFormulaDim2(cop, v)
     else
       {
         n <- nrow(u)
         sigma <- getSigma(cop)
-        
+
         if (cop@dispstr %in% c("ex","ar1")) ## exchangeable or ar1
           {
             rho <- cop@parameters
             r <- matrix(c(1,-rho,-rho,1),2,2)/(1 - rho^2)
             m <- sigma[-c(1,2),c(1,2)] %*% r
             s <- sigma[-c(1,2),-c(1,2)] - sigma[-c(1,2),c(1,2)] %*% r %*% sigma[c(1,2),-c(1,2)]
-            
+
             mat <- matrix(0,n,1)
-            
+
             if (cop@dispstr == "ex") ## exchangeable
-              for (k in 1:n) 
+              for (k in 1:n)
                 for (j in 1:(p-1))
-                  for (i in (j+1):p)      
+                  for (i in (j+1):p)
                     mat[k,1] <- mat[k,1] + plackettFormula(cop, p, rho, s, m, v[k,], i, j)
             else ## ar1
-              for (k in 1:n) 
+              for (k in 1:n)
                 for (j in 1:(p-1))
-                  for (i in (j+1):p)      
+                  for (i in (j+1):p)
                     mat[k,1] <- mat[k,1] + (i - j) * rho ^ (i - j - 1) *
                       plackettFormula(cop, p, rho, s, m, v[k,], i, j)
-   
+
             return(mat)
           }
         else # unstructured or toeplitz
@@ -247,8 +236,8 @@ derCdfWrtParamsEllipCopula <- function(cop, u)
                   r <- matrix(c(1,-rho,-rho,1),2,2)/(1 - rho^2)
                   m <- sigma[-c(i,j),c(i,j)] %*% r
                   s <- sigma[-c(i,j),-c(i,j)] - sigma[-c(i,j),c(i,j)] %*% r %*% sigma[c(i,j),-c(i,j)]
-     
-                  for (k in 1:n) 
+
+                  for (k in 1:n)
                     mat[k,l] <- plackettFormula(cop, p, rho, s, m, v[k,], i, j)
                   l <- l + 1
                 }
@@ -269,11 +258,9 @@ derCdfWrtParamsEllipCopula <- function(cop, u)
   }
 
 setMethod("derCdfWrtParams", signature("ellipCopula"), derCdfWrtParamsEllipCopula)
-    
-#########################################################
-## partial derivatives of the PDF wrt arguments
-## for ellipCopula: DIVIDED BY PDF 
-#########################################################
+
+
+### Partial derivatives of the PDF wrt arguments for ellipCopula: DIVIDED BY PDF
 
 setGeneric("derPdfWrtArgs", function(cop, u) standardGeneric("derPdfWrtArgs"))
 
@@ -308,7 +295,7 @@ setMethod("derPdfWrtArgs", signature("normalCopula"), derPdfWrtArgsNormalCopula)
 
 derPdfWrtArgsTCopula <- function(cop, u)
   {
-   
+
     df <- cop@df
     v <- qt(u,df=df)
     w <- dt(v,df=df)
@@ -321,10 +308,7 @@ derPdfWrtArgsTCopula <- function(cop, u)
 setMethod("derPdfWrtArgs", signature("tCopula"), derPdfWrtArgsTCopula)
 
 
-#########################################################
-## partial derivatives of the PDF wrt parameters
-## for ellipCopula: DIVIDED BY PDF 
-#########################################################
+### Partial derivatives of the PDF wrt parameters for ellipCopula: DIVIDED BY PDF
 
 setGeneric("derPdfWrtParams", function(cop, u) standardGeneric("derPdfWrtParams"))
 
@@ -345,7 +329,7 @@ setMethod("derPdfWrtParams", signature("gumbelCopula"), derPdfWrtParamsExplicitC
 derPdfWrtParamsEllipCopula <- function(cop, u)
   {
     p <- cop@dimension
-    
+
     ## quantile transformation
     if (class(cop) == "normalCopula")
       v <- qnorm(u)
@@ -366,17 +350,17 @@ derPdfWrtParamsEllipCopula <- function(cop, u)
           return(as.matrix((1 + df) * rho / (rho^2 - 1) + (2 + df) * (df * rho + v[,1] * v[,2])
                            / (df * (1 - rho^2) + v[,1]^2 + v[,2]^2 - 2 * rho * v[,1] * v[,2])))
       }
-    else 
-      {    
+    else
+      {
         n <- nrow(u)
         sigma <- getSigma(cop)
         detsig <- det(sigma)
         invsig <- solve(sigma)
-        
+
         if (cop@dispstr %in% c("ex","ar1")) ## exchangeable or ar1
           {
             rho <- cop@parameters
-            
+
             dersig <- matrix(1,p,p)
             if (cop@dispstr == "ex") ## ex
               diag(dersig) <- 0
@@ -384,16 +368,16 @@ derPdfWrtParamsEllipCopula <- function(cop, u)
               for (i in 1:p)
                 for (j in 1:p)
                   dersig[i,j] <- abs(i - j) * rho^(abs(i - j) - 1)
-            
+
             derdetsig <- detsig * sum(diag(invsig %*% dersig))
             derinvsig <- - invsig %*% dersig %*% invsig
             firstterm <- derdetsig/detsig
-            
+
             if (class(cop) == "normalCopula")
               mat <- - (firstterm + rowSums((v %*% derinvsig) * v))/2
             else if (class(cop) == "tCopula")
               mat <- - (firstterm + (df + p) * rowSums((v %*% derinvsig) * v)
-                        / (df +  rowSums((v %*% invsig) * v)) ) / 2 
+                        / (df +  rowSums((v %*% invsig) * v)) ) / 2
             return(as.matrix(mat))
           }
         else ## unstructured or toeplitz
@@ -428,12 +412,11 @@ derPdfWrtParamsEllipCopula <- function(cop, u)
           }
       }
   }
-    
+
 setMethod("derPdfWrtParams", signature("ellipCopula"), derPdfWrtParamsEllipCopula)
 
-#########################################################
-## dcopula wrapper for influence coefficients
-#########################################################
+
+### dcopula wrapper for influence coefficients #################################
 
 setGeneric("dcopwrap",  function(cop, u, ...) standardGeneric("dcopwrap"))
 

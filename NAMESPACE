@@ -1,13 +1,18 @@
-useDynLib(copula)
+useDynLib(copula, .registration=TRUE)
 
-importFrom(graphics, persp, contour)
+### Part I: Former copula ######################################################
 
-importFrom(mvtnorm, dmvnorm, pmvnorm, dmvt, pmvt)
+importFrom("graphics", persp, contour)
+
+importFrom("mvtnorm",
+           dmvnorm, pmvnorm, rmvnorm,
+           dmvt, pmvt, rmvt)
+
+## FIXME[instead of "Depends"]: importFrom(pspline)
 
 ## importFrom(sn, dmst)
-## importFrom(sn, qsn, dsn, psn, dmsn, pmsn) 
-## importFrom(pspline)
-           
+## importFrom(sn, qsn, dsn, psn, dmsn, pmsn)
+
 export(dcopula, pcopula, rcopula)
 export(dmvdc, pmvdc, rmvdc)
 export(kendallsTau, spearmansRho, tailIndex)
@@ -20,13 +25,13 @@ export(genFun, genInv, genFunDer1, genFunDer2)
 export(Afun, AfunDer, Anfun)
 
 exportClasses(mvdc)
-exportClasses(copula, ellipCopula, archmCopula, evCopula)
+exportClasses(Copula, copula, ellipCopula, archmCopula, evCopula)
 exportClasses(indepCopula)
 exportClasses(normalCopula, tCopula)
 exportClasses(claytonCopula, frankCopula, gumbelCopula, amhCopula)
 exportClasses(galambosCopula, huslerReissCopula, tawnCopula, tevCopula)
 exportClasses(plackettCopula)
-exportClasses(fgmCopula) 
+exportClasses(fgmCopula)
 
 export(mvdc)
 export(ellipCopula, archmCopula, evCopula)
@@ -75,5 +80,82 @@ S3method(print, exchTest)
 ## export(ChiPlot, KPlot)
 ## testing purpose
 ## export(fitCopula.repar)
-## export(multcomp)
+## export(multcomp) ---> R/mult.R
 
+
+### Part II: Former nacopula ###################################################
+
+## Copyright (C) 2010--2011  Marius Hofert and Martin Maechler
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
+
+
+## Now  'Depend'  on  stats4 and bbmle :
+##importFrom("stats4", mle)
+importMethodsFrom("stats4", coef,confint, logLik, AIC, BIC, summary, plot, profile)
+
+importFrom("gsl", debye_1)
+
+importFrom("ADGofTest", ad.test)
+
+importFrom("stabledist", dstable)
+
+exportClasses("acopula",
+              "nacopula", "outer_nacopula",
+              "interval", "maybeInterval"
+              )
+
+## Generics, functions and acopula - family objects defined in this package
+export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
+       ,"getAcop"
+       ,"cacopula", "dnacopula", "pnacopula", "rnacopula" ,"rnchild"
+       ## estimation
+       ## ,"coeffG", "polyG", "polyJ", "signFF"
+       ,"initOpt"
+       ,"beta.", "beta.hat", "pobs"
+       ,"ebeta", "etau", "emde", "dDiag", "edmle", "emle", "enacopula"
+       ## goodness-of-fit
+       ,"K", "gtrafouni", "rtrafo", "htrafo", "gnacopula"
+       ## misc
+       ,"onacopula", "onacopulaL", "nac2list", "nesdepth", rnacModel, nacPairthetas
+       ,"polynEval"
+       ,"printNacopula"
+       ,"interval"
+       ,"opower"
+       ,"prob"
+       ,"timing"
+       ## Should we provide these in a separate (very small) R package ?
+       ,"sinc", "A..Z"
+       ,"rstable1"
+       ,"retstable", "retstableR"
+       ,"dSibuya", "pSibuya", "dsumSibuya", "rSibuya", "rSibuyaR"
+       ,"rlog", "rlogR", "rF01Frank", "rF01Joe", "rFFrank", "rFJoe"
+       ##,"logm1expm"
+       ,"polylog", "Bernoulli", "Bernoulli.all", "Eulerian", "Stirling1", "Stirling2", "Eulerian.all", "Stirling1.all", "Stirling2.all"
+       ,"psiDabsMC"
+       ,"setTheta"
+       ,"tauAMH"
+       ,"allComp" # <- maybe keep private ?
+       ,"safeUroot"
+       ,"splom2"
+       )
+
+exportMethods(## for both own and "other" generics:
+	      "prob",
+	      "%in%", "dim",
+	      "format", "show"
+	      )
+
+if(getRversion() < "2.12")
+    export("adjustcolor")

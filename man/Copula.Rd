@@ -19,6 +19,7 @@
 \alias{dcopula,indepCopula-method}
 \alias{dcopula,asymCopula-method}
 \alias{dcopula,asymExplicitCopula-method}
+\alias{dcopula,nacopula-method}
 
 \alias{pcopula,claytonCopula-method}
 \alias{pcopula,frankCopula-method}
@@ -35,6 +36,7 @@
 \alias{pcopula,indepCopula-method}
 \alias{pcopula,asymCopula-method}
 \alias{pcopula,asymExplicitCopula-method}
+\alias{pcopula,nacopula-method}
 
 
 \alias{rcopula,claytonCopula-method}
@@ -51,6 +53,7 @@
 \alias{rcopula,indepCopula-method}
 \alias{rcopula,asymCopula-method}
 \alias{rcopula,asymExplicitCopula-method}
+\alias{rcopula,nacopula-method}
 
 \title{Copula distribution functions}
 \description{
@@ -58,17 +61,21 @@
   \code{copula} object.
 }
 \usage{
-dcopula(copula, u)
-pcopula(copula, u)
-rcopula(copula, n)
+dcopula(copula, u, log=FALSE, \dots)
+pcopula(copula, u, \dots)
+rcopula(copula, n, \dots)
 }
 \arguments{
-  \item{copula}{ a \code{"copula"} object. }
-  \item{u}{ a vector of the copula dimension or a matrix with number of
+  \item{copula}{an \R object of class \code{"\linkS4class{Copula}"},
+    (i.e., \code{"\linkS4class{copula}"} or  \code{"\linkS4class{nacopula}"}).}
+  \item{u}{a vector of the copula dimension or a matrix with number of
     rows being the copula dimension, giving the coordinates of the
     points where the density or distribution function needs to be evaluated.
   }
-  \item{n}{ number of observations to be generated. }
+  \item{log}{logical indicating if the \eqn{\log(f(\cdot))}{log(f(.))}
+    should be returned instead of \eqn{f(\cdot)}{f(.)}.}
+  \item{n}{(for \code{rcopula()}:) number of observations to be generated.}
+  \item{\dots}{further optional arguments for some methods, e.g., \code{method}.}
 }
 \details{
   The density function of an Archimedean copula was obtained by
@@ -76,11 +83,11 @@ rcopula(copula, n)
   Mathematica and then processed by \code{deriv} to give
   algorithmic expressions. The maximum dimension implemented is 10 for
   Clayton and Gumbel, and 6 for Frank.
-  
+
   The distribution function of a \code{t} copula uses \code{pmvt} from
   package \code{mvtnorm}. The density function of a \code{t} copula uses the
   \code{dmst} from package \code{sn}.
-  
+
   The random number generator for an Archimedean copula uses the
   conditional approach for the bivariate case and the Marshal-Olkin (1988)
   approach for dimension greater than 2.
@@ -92,22 +99,22 @@ rcopula(copula, n)
 \references{
   E.W. Frees and E.A. Valdez (1998). Understanding relationships using
   copulas.  \emph{North American Actuarial Journal}, 2:1--25.
-  
+
   C. Genest and A.-C. Favre (2007). Everything you always wanted to know
   about copula modeling but were afraid to ask. \emph{Journal of
     Hydrologic Engineering}, 12:347--368.
-  
+
   H. Joe (1997). \emph{Multivariate Models and Dependence Concepts}.
   Chapman and Hall, London.
 
   A.W. Marshal and I. Olkin (1988). Families of multivariate
   distributions. \emph{Journal of the American Statistical Association},
   83:834--841.
-      
+
   R.B. Nelsen (2006). \emph{An introduction to Copulas}. Springer, New York.
 }
 \seealso{
-  \code{\link{copula-class}},
+  the \code{\linkS4class{copula}} class,
   \code{\link{ellipCopula}},
   \code{\link{archmCopula}},
   \code{\link{fgmCopula}}. }
@@ -120,12 +127,16 @@ dcopula(norm.cop, x)
 pcopula(norm.cop, x)
 persp(norm.cop, dcopula)
 contour(norm.cop, pcopula)
+
 ## a 3-dimensional normal copula
 u <- rcopula(normalCopula(0.5, dim = 3), 1000)
-## scatterplot3d(u)
+if(require("scatterplot3d"))
+  scatterplot3d(u)
+
 ## a 3-dimensional clayton copula
 v <- rcopula(claytonCopula(2, dim = 3), 1000)
-## scatterplot3d(v)
+if(require("scatterplot3d"))
+  scatterplot3d(v)
 }
-\keyword{distribution}% at least one, from doc/KEYWORDS
-\keyword{multivariate}% __ONLY ONE__ keyword per line
+\keyword{distribution}
+\keyword{multivariate}

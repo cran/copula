@@ -1,23 +1,17 @@
-#################################################################################
+## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
 ##
-##   This file is part of the R package copula.
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
 ##
-##   The R package copula is free software: you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package copula is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
-##
-#################################################################################
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
 AfunGalambos <- function(copula, w) {
@@ -42,11 +36,11 @@ AfunDerGalambos <- function(copula, w) {
     .expr26 <- .expr12 - 1
     .value <- 1 - .expr5^.expr7
     .grad <- array(0, c(length(.value), 1L), list(NULL, c("w")))
-    .hessian <- array(0, c(length(.value), 1L, 1L), list(NULL, 
+    .hessian <- array(0, c(length(.value), 1L, 1L), list(NULL,
         c("w"), c("w")))
     .grad[, "w"] <- -(.expr11 * .expr18)
-    .hessian[, "w", "w"] <- -(.expr5^(.expr10 - 1) * (.expr10 * 
-        .expr17) * .expr18 + .expr11 * (.expr7 * (w^.expr26 * 
+    .hessian[, "w", "w"] <- -(.expr5^(.expr10 - 1) * (.expr10 *
+        .expr17) * .expr18 + .expr11 * (.expr7 * (w^.expr26 *
         .expr12 * .expr1 + .expr3^.expr26 * .expr12 * .expr1)))
     attr(.value, "gradient") <- .grad
     attr(.value, "hessian") <- .hessian
@@ -83,13 +77,13 @@ derAfunWrtParamGalambos <- function(copula, w) {
     .expr24 <- .expr8 * .expr13 - .expr16 * .expr22
     .value <- 1 - .expr8
     .grad <- array(0, c(length(.value), 1L), list(NULL, c("alpha")))
-    .hessian <- array(0, c(length(.value), 1L, 1L), list(NULL, 
+    .hessian <- array(0, c(length(.value), 1L, 1L), list(NULL,
         c("alpha"), c("alpha")))
     .grad[, "alpha"] <- -.expr24
-    .hessian[, "alpha", "alpha"] <- -(.expr24 * .expr13 - .expr8 * 
-        (.expr10 * (2 * alpha/.expr11^2) + .expr21/.expr5 * .expr12) - 
-        ((.expr16 * .expr13 - .expr5^(.expr15 - 1) * (.expr15 * 
-            .expr21)) * .expr22 + .expr16 * (.expr12 * .expr21 - 
+    .hessian[, "alpha", "alpha"] <- -(.expr24 * .expr13 - .expr8 *
+        (.expr10 * (2 * alpha/.expr11^2) + .expr21/.expr5 * .expr12) -
+        ((.expr16 * .expr13 - .expr5^(.expr15 - 1) * (.expr15 *
+            .expr21)) * .expr22 + .expr16 * (.expr12 * .expr21 -
             .expr7 * (.expr20 * .expr19 + .expr18 * .expr17))))
     attr(.value, "gradient") <- .grad
     attr(.value, "hessian") <- .hessian
@@ -102,13 +96,12 @@ derAfunWrtParamGalambos <- function(copula, w) {
 
 
 galambosCopula <- function(param) {
-  ## dim = 2
-  dim <- 2
+  dim <- 2L
   cdf <- expression( exp(log(u1 * u2) *  (1 - ((log(u2) / log(u1 * u2))^(-alpha) + (1 - (log(u2) / log(u1 * u2)))^(-alpha))^(-1/alpha))) )
   derCdfWrtU1 <- D(cdf, "u1")
   pdf <- D(derCdfWrtU1, "u2")
 
-  val <- new("galambosCopula",
+  new("galambosCopula",
              dimension = dim,
              exprdist = c(cdf = cdf, pdf = pdf),
              parameters = param[1],
@@ -116,22 +109,22 @@ galambosCopula <- function(param) {
              param.lowbnd = 0,
              param.upbnd = Inf,
              message = "Galambos copula family; Extreme value copula")
-  val
 }
-  
+
 pgalambosCopula <- function(copula, u) {
   dim <- copula@dimension
-  if (is.vector(u)) u <- matrix(u, nrow = 1)
+  if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
   c(eval(galambosCopula.algr$cdf))
 }
 
-dgalambosCopula <- function(copula, u) {
+dgalambosCopula <- function(copula, u, log=FALSE, ...) {
   dim <- copula@dimension
   alpha <- copula@parameters[1]
+  if(log) stop("'log=TRUE' not yet implemented")
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
-  if (is.vector(u)) u <- matrix(u, nrow = 1)
+  if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   c(eval(galambosCopula.algr$pdf))
 }
@@ -152,8 +145,7 @@ rgalambosCopula <- function(copula, n) {
 }
 
 
-#######################################################################
-## This block is copied from ../../copulaUtils/assoc/
+## This block is copied from ../../copulaUtils/assoc/ ##########################
 
 galambosTauFun <- function(alpha) {
   ss <- .galambosTau$ss
@@ -173,7 +165,7 @@ calibKendallsTauGalambosCopula <- function(copula, tau) {
   if (any(tau < 0)) warning("tau is out of the range [0, 1]")
   galambosTauInv <- approxfun(x = .galambosTau$assoMeasFun$fm$ysmth,
                               y = .galambosTau$assoMeasFun$fm$x, rule = 2)
-  
+
   ss <- .galambosTau$ss
   theta <- galambosTauInv(tau)
   ## 0.0001 is arbitrary
@@ -213,7 +205,7 @@ calibSpearmansRhoGalambosCopula <- function(copula, rho) {
   if (any(rho < 0)) warning("rho is out of the range [0, 1]")
   galambosRhoInv <- approxfun(x = .galambosRho$assoMeasFun$fm$ysmth,
                               y = .galambosRho$assoMeasFun$fm$x, rule = 2)
-  
+
   ss <- .galambosRho$ss
   theta <- galambosRhoInv(rho)
   ifelse(rho <= 0, 0, .galambosRho$trFuns$backwardTransf(theta, ss))
@@ -233,7 +225,8 @@ rhoDerGalambosCopula <- function(copula) {
   alpha <- copula@parameters[1]
   galambosRhoDer(alpha)
 }
-###########################################################################
+
+################################################################################
 
 setMethod("pcopula", signature("galambosCopula"), pgalambosCopula)
 setMethod("dcopula", signature("galambosCopula"), dgalambosCopula)

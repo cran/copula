@@ -1,69 +1,153 @@
-library(copula)
+## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
+
+
+require(copula)
 ## library(fCopulae)
 
 #### preparation for a grid
-n <- 11
-u <- seq(0, 1, length=n)
-v <- seq(0, 1, length=n)
+n1 <- 17
+n2 <- 21
+eps <- .001 ## <- not going to very extremes
+u1 <- seq(0, 1, length=n1); u1[1] <- eps; u1[n1] <- 1-eps
+u2 <- seq(0, 1, length=n2); u2[1] <- eps; u2[n2] <- 1-eps
 
-#### dim = 2
-umat <- as.matrix(expand.grid(u1=u, u2=u))
+### d=2 ########################################################################
 
-#### all copulas give the same tau except galambos, amh
+Exp.grid <- function(...)
+    as.matrix(expand.grid(..., KEEP.OUT.ATTRS = FALSE))
+
+umat <- Exp.grid(u1=u1, u2=u2)
+
+## all copulas give the same tau except galambos, amh
 tau <- 0.5
 
-## frankCopula 
+pdf("densCop_2d.pdf")
+
+fCols <- colorRampPalette(c("red", "white", "blue"), space = "Lab")
+
+
+## frankCopula
 theta.fr <- calibKendallsTau(frankCopula(0), tau)
-dcop <- dcopula(frankCopula(param=theta.fr, dim = 2), umat)
-round(matrix(dcop, ncol = n), 3)
+dcop <- matrix(dcopula(frankCopula(param=theta.fr, dim = 2), umat),
+               n1, n2)
+filled.contour(u1, u2, dcop, color.palette = fCols,
+               main=sprintf("Density( frankCopula(%.4g) )", theta.fr))
+round(dcop, 3)
+
 
 ## claytonCopula
-theta.cl <- calibKendallsTau(claytonCopula(1), tau)
-dcop <- dcopula(claytonCopula(param=theta.cl, dim = 2), umat)
-round(matrix(dcop, ncol = n), 3)
+(theta.cl <- calibKendallsTau(claytonCopula(1), tau))
+stopifnot(all.equal(theta.cl, copClayton@tauInv(tau), tol = 1e-13))
+dcop <- matrix(dcopula(claytonCopula(param=theta.cl, dim = 2), umat),
+               n1, n2)
+filled.contour(u1, u2, dcop, color.palette = fCols,
+               main=sprintf(" Density( claytonCopula(%.4g) )", theta.cl))
+filled.contour(u1, u2, log(dcop), color.palette = fCols,
+               main=sprintf("log Density( claytonCopula(%.4g) )", theta.cl))
+round(dcop, 3)
+
+
 
 ## gumbelCopula
 theta.gu <- calibKendallsTau(gumbelCopula(1), tau)
-dcop <- dcopula(gumbelCopula(param=theta.gu, dim = 2), umat)
-round(matrix(dcop, ncol = n), 3)
+stopifnot(all.equal(theta.gu, copGumbel@tauInv(tau), tol = 1e-13))
+dcop <- matrix(dcopula(gumbelCopula(param=theta.gu, dim = 2), umat),
+               n1, n2)
+filled.contour(u1, u2, dcop, color.palette = fCols,
+               main=sprintf("Density( gumbelCopula(%.4g) )", theta.gu))
+filled.contour(u1, u2, log(dcop), color.palette = fCols,
+               main=sprintf("log Density( gumbelCopula(%.4g) )", theta.gu))
+round(dcop, 3)
+
 
 ## normalCopula
 theta.n <- calibKendallsTau(normalCopula(0), tau)
-dcop <- dcopula(normalCopula(param=theta.n, dim = 2), umat)
-round(matrix(dcop, ncol = n), 3)
+dcop <- matrix(dcopula(normalCopula(param=theta.n, dim = 2), umat),
+               n1, n2)
+filled.contour(u1, u2, log(dcop), color.palette = fCols,
+               main=sprintf("log Density( normalCopula(%.4g) )", theta.n))
+filled.contour(u1, u2, dcop, color.palette = fCols,
+               main=sprintf("Density( normalCopula(%.4g) )", theta.n))
+round(dcop, 3)
+
 
 ## tCopula
-theta.t <- calibKendallsTau(tCopula(0, df=10), tau)
-dcop <- dcopula(tCopula(param=theta.n, dim = 2, df=10), umat)
-round(matrix(dcop, ncol = n), 3)
+(theta.t. <- calibKendallsTau(tCopula(0, df=10), tau))
+dcop <- matrix(dcopula(tCopula(param=theta.t., dim = 2, df=10), umat),
+               n1, n2)
+filled.contour(u1, u2, log(dcop), color.palette = fCols,
+               main=sprintf("log Density( tCopula(%.4g, df = 10) )", theta.t.))
+filled.contour(u1, u2, dcop, color.palette = fCols,
+               main=sprintf("Density( tCopula(%.4g, df = 10) )", theta.t.))
+round(dcop, 3)
+## tCopula -- df=4
+(theta <- calibKendallsTau(tCopula(0, df=4), tau))
+dcop <- matrix(dcopula(tCopula(param=theta, dim = 2, df=4), umat),
+               n1, n2)
+filled.contour(u1, u2, log(dcop), color.palette = fCols,
+               main=sprintf("log Density( tCopula(%.4g, df = 4) )", theta))
+filled.contour(u1, u2, dcop, color.palette = fCols,
+               main=sprintf("Density( tCopula(%.4g, df = 4) )", theta))
+round(dcop, 3)
 
 ## galambosCopula
-#theta.ga <- calibKendallsTau(galambosCopula(1), tau) ## takes too long to find
-theta.ga <- 10
-kendallsTau(galambosCopula(theta.ga))
-dcop <- dcopula(galambosCopula(param=theta.ga), umat)
-round(matrix(dcop, ncol = n), 3)
+#
+(theta <- calibKendallsTau(galambosCopula(1), tau))
+stopifnot(all.equal(tau, kendallsTau(galambosCopula(theta)), tol = 1e-5))
+dcop <- matrix(dcopula(galambosCopula(param=theta), umat),
+               n1, n2)
+filled.contour(u1, u2, log(dcop), color.palette = fCols,
+               main=sprintf("log Density( galambosCopula(%.4g) )", theta))
+filled.contour(u1, u2, dcop, color.palette = fCols,
+               main=sprintf("Density( galambosCopula(%.4g) )", theta))
+round(dcop, 3)
+
 
 ## amhCopula
-#theta.amh <- calibKendallsTau(galambosCopula(1), tau) ## tau not in the range
-theta.amh <- 0.9
-kendallsTau(amhCopula(theta.amh))
-dcop <- dcopula(amhCopula(param=theta.amh), umat)
-round(matrix(dcop, ncol = n), 3)
+tau <- 0.3 ## -- to be in range for AMH
+(theta <- calibKendallsTau(amhCopula(1), tau))
+stopifnot(all.equal(tau, kendallsTau(amhCopula(theta)), tol = 1e-5))
+dcop <- matrix(dcopula(amhCopula(param=theta), umat),
+               n1, n2)
+filled.contour(u1, u2, dcop, color.palette = fCols,
+               main=sprintf("Density( amhCopula(%.4g) )", theta))
+round(dcop, 3)
 
-##############################################################
-################ for package fCopulae
+dev.off()
+
+### d > 2 ######################################################################
+
+### for package fCopulae
 ## dcop.f <- darchmCopula(umat, alpha=2, type=1, alternative=T)
-## round(matrix(dcop.f, ncol = n), 3)
+## round(matrix(dcop.f, n1, n2), 3)
 ## dcop.fCopulae <- darchmCopula(umat, alpha=theta.fr, type = 5, alternative = TRUE)
-## round (matrix(dcop.fCopulae, ncol = n), 3)
+## round (matrix(dcop.fCopulae, n1, n2), 3)
 
 ## dim = 3, frankCopula
-umat <- expand.grid(u1=u, u2=u, u3=u)
-dcop <- dcopula(frankCopula(param=theta.fr, dim = 3), umat)
-round(array(dcop, c(n,n,n)), 3)
+um3 <- Exp.grid(u1=u1, u2=u2, u3=u1)
+dcop <- dcopula(frankCopula(param=theta.fr, dim = 3), um3)
+stopifnot(dcop >= 0)# no NA here
+round(array(dcop, c(n1,n2,n1)), 3)
 
-## dim = 4; doesn't work well; some NaN
-umat <- expand.grid(u1=u, u2=u, u3=u, u4=u)
-dcop <- dcopula(frankCopula(param=theta.fr, dim = 4), umat)
-round(array(dcop, c(n,n,n,n)), 3)
+## dim = 4 --- fine as long we are "out of corners"
+um4 <- Exp.grid(u1=u1, u2=u2, u3=u1, u4=rev(u2))
+dcop <- dcopula(frankCopula(param=theta.fr, dim = 4), um4)
+stopifnot(dcop >= 0,# no NA here
+	  all.equal(dcop, copFrank@dacopula(um4, theta = theta.fr)))
+## round(array(dcop, c(n1,n2,n1,n2)), 3)
+
+
+cat('Time elapsed: ', proc.time(),'\n') # for ''statistical reasons''

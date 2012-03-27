@@ -1,34 +1,29 @@
-#################################################################################
+## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
 ##
-##   This file is part of the R package copula.
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
 ##
-##   The R package copula is free software: you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package copula is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
-##
-#################################################################################
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
+
 
 genFunClayton <- function(copula, u) {
   alpha <- copula@parameters[1]
   ## (u^(-alpha) - 1) / alpha ## This is in Nelson Table 4.1; alpha in denom redundant
-  u^(-alpha) - 1 
+  u^(-alpha) - 1
 }
 
 genInvClayton <- function(copula, s) {
   alpha <- copula@parameters[1]
   ## (1 + alpha * s)^(-1/alpha) ## corresponding to the comment above
-  (1 + s)^(-1/alpha) 
+  (1 + s)^(-1/alpha)
 }
 
 genFunDer1Clayton <- function(copula, u) {
@@ -41,7 +36,7 @@ genFunDer2Clayton <- function(copula, u) {
   eval(claytonCopula.genfunDer.expr[2])
 }
 
-claytonCopula <- function(param, dim = 2) {
+claytonCopula <- function(param, dim = 2L) {
   ## get expressions of cdf and pdf
   cdfExpr <- function(n) {
     expr <- "u1^(-alpha) - 1"
@@ -52,7 +47,7 @@ claytonCopula <- function(param, dim = 2) {
     expr <- paste("(1 + (", expr, "))^ (-1/alpha)")
     parse(text = expr)
   }
-  
+
   pdfExpr <- function(cdf, n) {
     val <- cdf
     for (i in 1:n) {
@@ -61,7 +56,7 @@ claytonCopula <- function(param, dim = 2) {
     val
   }
 
-  if (dim > 2 && param[1] < 0)
+  if ((dim <- as.integer(dim)) > 2 && param[1] < 0)
     stop("param can be negative only for dim = 2")
   cdf <- cdfExpr(dim)
   if (dim <= 6)  pdf <- pdfExpr(cdf, dim)
@@ -71,7 +66,7 @@ claytonCopula <- function(param, dim = 2) {
              parameters = param[1],
              exprdist = c(cdf = cdf, pdf = pdf),
              param.names = "param",
-             param.lowbnd = ifelse(dim == 2, -1, 0),
+             param.lowbnd = if(dim == 2) -1 else 0,
              param.upbnd = Inf,
              message = "Clayton copula family; Archimedean copula")
   val
@@ -109,23 +104,23 @@ rclaytonCopula <- function(copula, n) {
 
 pclaytonCopula <- function(copula, u) {
   dim <- copula@dimension
-  if (is.vector(u)) u <- matrix(u, ncol = dim)
+  if(!is.matrix(u)) u <- matrix(u, ncol = dim)
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (apply(u, 1, prod))
   cdf <- copula@exprdist$cdf
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
-  val <- eval(cdf)
-  pmax(val, 0)
+  pmax(eval(cdf), 0)
 }
 
 
-dclaytonCopula <- function(copula, u) {
+dclaytonCopula <- function(copula, u, log=FALSE, ...) {
   dim <- copula@dimension
-  if (is.vector(u)) u <- matrix(u, ncol = dim)
+  if(!is.matrix(u)) u <- matrix(u, ncol = dim)
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
   pdf <- copula@exprdist$pdf
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  if(log) stop("'log=TRUE' not yet implemented")
   val <- c(eval(pdf))
   val[apply(u, 1, function(v) any(v < 0))] <- 0
   val[apply(u, 1, function(v) any(v > 1))] <- 0
@@ -140,7 +135,7 @@ dclaytonCopula <- function(copula, u) {
 dclaytonCopula.pdf <- function(copula, u) {
   dim <- copula@dimension
   if (dim > 10) stop("Clayton copula PDF not implemented for dimension > 10.")
-  if (is.vector(u)) u <- matrix(u, nrow = 1)
+  if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
@@ -148,11 +143,11 @@ dclaytonCopula.pdf <- function(copula, u) {
   ## clean up
   val[apply(u, 1, function(v) any(v < 0))] <- 0
   val[apply(u, 1, function(v) any(v > 1))] <- 0
-  
+
   val[apply(u, 1, function(v) any(v == 0) & any(v > 0))] <- 0
-  
+
   ## if (alpha > 0)
-  ## else 
+  ## else
   val
 }
 
@@ -173,7 +168,7 @@ claytonRhoFun <- function(alpha) {
   valFunPos <- .claytonRhoPos$assoMeasFun$valFun
   theta <- forwardTransf(alpha, ss)
 
-  c(ifelse(alpha <= 0, valFunNeg(theta), valFunPos(theta)))
+  as.vector(if(alpha <= 0) valFunNeg(theta) else valFunPos(theta))
 }
 
 claytonRhoDer <- function(alpha) {
@@ -184,7 +179,7 @@ claytonRhoDer <- function(alpha) {
   valFunPos <- .claytonRhoPos$assoMeasFun$valFun
   theta <- forwardTransf(alpha, ss)
 
-  c(ifelse(alpha <= 0, valFunNeg(theta, 1), valFunPos(theta, 1))) * forwardDer(alpha, ss)
+  as.vector(if(alpha <= 0) valFunNeg(theta, 1) else valFunPos(theta, 1)) * forwardDer(alpha, ss)
 }
 
 spearmansRhoClaytonCopula <- function(copula) {
@@ -196,12 +191,12 @@ spearmansRhoClaytonCopula <- function(copula) {
 calibSpearmansRhoClaytonCopula <- function(copula, rho) {
   claytonRhoInvNeg <- approxfun(x = .claytonRhoNeg$assoMeasFun$fm$ysmth,
                                 y = .claytonRhoNeg$assoMeasFun$fm$x)
-  
+
   claytonRhoInvPos <- approxfun(x = .claytonRhoPos$assoMeasFun$fm$ysmth,
                                 y = .claytonRhoPos$assoMeasFun$fm$x)
-  
+
   ss <- .claytonRhoNeg$ss
-  theta <- ifelse(rho <= 0, claytonRhoInvNeg(rho), claytonRhoInvPos(rho))
+  theta <- if(rho <= 0) claytonRhoInvNeg(rho) else claytonRhoInvPos(rho)
   .claytonRhoPos$trFuns$backwardTransf(theta, ss)
 }
 
@@ -210,11 +205,10 @@ rhoDerClaytonCopula <- function(copula) {
   claytonRhoDer(alpha)
 }
 
-tailIndexClaytonCopula <- function(copula, ...) {
-  upper <- 0
+tailIndexClaytonCopula <- function(copula) {
   alpha <- copula@parameters
-  lower <- ifelse(alpha > 0, 2 ^ (-1/alpha), 0)
-  c(lower=lower, upper=upper)
+  c(lower= if(alpha > 0) 2 ^ (-1/alpha) else 0,
+    upper= 0)
 }
 
 tauDerClaytonCopula <- function(copula) {

@@ -1,27 +1,20 @@
-#################################################################################
+## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
 ##
-##   This file is part of the R package copula.
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
 ##
-##   The R package copula is free software: you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package copula is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
-##
-#################################################################################
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
 
-#######################################################
-#### asymmetric explicit copulas
-#######################################################
+
+### asymmetric explicit copulas ################################################
 
 setClass("asymExplicitCopula",
          representation = representation(
@@ -120,7 +113,7 @@ asymExplicitCopula <- function(shapes, copula1, copula2) {
              message = "Asymmetric Explicit Copula")
 }
 
-  
+
 getAsymExplicitCopulaComps <- function(object) {
   p1 <- length(object@copula1@parameters)
   p2 <- length(object@copula2@parameters)
@@ -170,10 +163,11 @@ densDers <- function(idx, u, dg, copula, derExprs) {
   c(eval(derExprs[dorder + 1])) * dgu
 }
 
-dasymExplicitCopula <- function(copula, u) {
+dasymExplicitCopula <- function(copula, u, log=FALSE, ...) {
   u <- as.matrix(u)
   comps <- getAsymExplicitCopulaComps(copula)
   a <- comps$shapes
+  if(log) stop("'log=TRUE' not yet implemented")
   u1 <- t(t(u)^(1 - a))
   u2 <- t(t(u)^a)
   dg1 <- t((1 - a) * t(u)^(-a))

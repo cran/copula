@@ -1,0 +1,46 @@
+#### Major (to fix before next release) ########################################
+
+(*) bug fixes for estimation methods!
+
+#### Intermediate #####################################################################
+
+(MM) R/special-func.R & man/Bernoulli.Rd: Research for better algorithms <--> Rmpfr
+
+(MM) please take a look at gtrafouni() in ./R/gof.R: Can "Remillard" (and "Genest")
+ be made faster? Especially "Remillard" is slow (although B Remillard told me that his
+ method is faster than C. Genest's.)
+
+#### Minor #####################################################################
+
+(*) write nice little function that provides confidence intervals for tau and lambda's
+(*) fix:
+    cop <- onacopulaL("Frank", list(200, 1:2)); rnacopula(100, cop)
+    maybe use limit copulas also for other families (upper frechet bound)
+(*) add an ASCII-plot for the hierarchical structure;
+    Actually, define setAs("nacopula", "dendrogram", ....) and then use
+    dendrogram print()ing.
+(*) design a function that gets an outer nacopula and returns a matrix of
+    numbers which correspond to the different sectors; this can be used, e.g.,
+    for building a [default] color-matrix for splom2 or for estimation purposes etc.
+(*) it would be good to have tryCatch.W.E in the package [call it tryCatchWE --
+    easier to type]
+    Maybe one can also directly return a list with "value", "error", and "warning"?
+    [So far, "value" can also contain the errors => a bit unhandy, but maybe the
+    only "elegant" general solution]
+
+(*) From time to time (well, whenever Marius has.. ;-)) check the .Rd files
+    for overlong lines, i.e. apply
+      for f in *Rd; do printf '%20s: ' $f ; printf '%4d\n' `maxcol $f` ; done
+
+
+#### Long-term maybe ###########################################################
+
+(*) implement Khoudraji or Liebscher trafo incl. density etc.
+(*) allow families to have outer power parameters (outer power families)
+(*) be compatible with package copula
+(*) include pairwise estimators for nACs
+(*) FIXME in enacopula (in estimation.R): return an object?
+(*) can we create a function for the GIG generator similar to opower()?
+
+
+

@@ -1,62 +1,58 @@
-/*#################################################################################
-##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008, 2009
-##
-##   This file is part of the R package copula.
-##
-##   The R package copula is free software: you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package copula is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
-##
-#################################################################################*/
+/*
+  Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
+
+  This program is free software; you can redistribute it and/or modify it under
+  the terms of the GNU General Public License as published by the Free Software
+  Foundation; either version 3 of the License, or (at your option) any later
+  version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  details.
+
+  You should have received a copy of the GNU General Public License along with
+  this program; if not, see <http://www.gnu.org/licenses/>.
+*/
 
 
 /*****************************************************************************
 
-  Goodness-of-fit tests for copulas 
+  Goodness-of-fit tests for copulas
 
 *****************************************************************************/
 
 #include <R.h>
 #include <Rmath.h>
+
 #include "Anfun.h"
+#include "gof.h"
 
 /***********************************************************************
-  
+
   Computes the empirical copula
   U contains the pseudo-obs that define the empirical copula
-  V[k + m * j], j=1...p, is the value at which the empirical copula 
+  V[k + m * j], j=1...p, is the value at which the empirical copula
   is to be computed
   m is the number of lines of V
 
 ***********************************************************************/
-
-double empcop(int n, int p, double *U, double *V, int m, int k)
+// FIXME: provide  R interface
+double empcop(int n, int p, double *U,
+	      double *V, int m, int k)
 {
-  int i,j, ind;
-  double ec = 0.0;
-  
-  for (i=0;i<n;i++)
-    {
-      ind = 1;
-      for (j=0;j<p;j++)
-	ind *= (U[i + n * j] <= V[k + m * j]);
-      ec += (double)ind;
+    double ec = 0.;
+    for (int i=0; i < n; i++) {
+	int ind = 1;
+	for (int j=0; j < p; j++)
+	    ind *= (U[i + n * j] <= V[k + m * j]);
+	ec += (double)ind;
     }
-  return ec/(double)n;
+    return ec/(double)n;
 }
 
 /***********************************************************************
-  
+
   Computes the Cramer-von Mises test statistic
   U contains the pseudo-obs that define the empirical copula
   FU are observations simulated from a copula fitted from U
@@ -64,66 +60,55 @@ double empcop(int n, int p, double *U, double *V, int m, int k)
 
 ***********************************************************************/
 
-void cramer_vonMises(int *n, int *p, double *U, double *Ctheta, 
+void cramer_vonMises(int *n, int *p, double *U, double *Ctheta,
 		     double *stat)
 {
-  int i;
-  double s = 0.0, diff;
-  
-  for (i=0;i<*n;i++)
-    {
-      diff = empcop(*n,*p,U,U,*n,i) - Ctheta[i];
+  double s = 0.;
+  for(int k=0; k < *n; k++) {
+      double diff = empcop(*n,*p,U, U,*n,k) - Ctheta[k];
       s += diff * diff;
-    }
-  
+  }
   *stat = s;
 }
 
-void cramer_vonMises_2(int *p, double *U, int *n, double *V, int *m, 
+void cramer_vonMises_2(int *p, double *U, int *n, double *V, int *m,
 		       double *Ctheta, double *stat)
 {
-  int i;
-  double s = 0.0, diff;
-  
-  for (i=0;i<*m;i++)
-    {
-      diff = empcop(*n,*p,U,V,*m,i) - Ctheta[i];
-      s +=  diff * diff;
+    double s = 0.;
+    for (int k=0; k < *m; k++) {
+	double diff = empcop(*n,*p,U,V,*m,k) - Ctheta[k];
+	s +=  diff * diff;
     }
-  
-  *stat = s * (*n) / (*m);
+    *stat = s * (*n) / (*m);
 }
 
 /***********************************************************************
-  
+
  Empirical copula (for the multiplier)
- 
+
 ***********************************************************************/
 
 double ecopula(double *U, int n, int p, double *u)
 {
-  int i,j;
-  double ind, res = 0.0;
-  
-  for (i = 0; i < n; i++)
-    {
-      ind = 1.0;
-      for (j = 0; j < p; j++)
-	ind *= (U[i + n * j] <= u[j]);
+  double res = 0.;
+  for (int i = 0; i < n; i++) {
+      double ind = 1.;
+      for (int j = 0; j < p; j++)
+	  ind *= (U[i + n * j] <= u[j]);
       res += ind;
-    }
+  }
   return res/n;
 }
 
 /***********************************************************************
-  
+
  Derivative from the empirical copula (for the multiplier)
- 
+
 ***********************************************************************/
 
 double derecopula(double *U, int n, int p, double *u, double *v)
 {
-  return (ecopula(U, n, p, u) - ecopula(U, n, p, v)) *  sqrt(n) / 2.0; 
+  return (ecopula(U, n, p, u) - ecopula(U, n, p, v)) *  sqrt(n) / 2.0;
 }
 
 /***********************************************************************
@@ -133,25 +118,25 @@ double derecopula(double *U, int n, int p, double *u, double *v)
   u is n x p (the grid points)
   influ is n x m
   s0 is N
- 
+
 ***********************************************************************/
 
 
-void multiplier(int *p, double *u0, int *m, double *u, int *n, 
-		double *influ, int *N, double *s0) 
+void multiplier(int *p, double *u0, int *m, double *u, int *n,
+		double *influ, int *N, double *s0)
 {
   int i, j, k, l, ind;
   double *influ_mat = Calloc((*m) * (*n), double);
   double *random = Calloc(*m, double);
   double *v1 = Calloc(*p, double);
-  double *v2 = Calloc(*p, double); 
+  double *v2 = Calloc(*p, double);
   double *der = Calloc(*p, double);
   double mean, process, invsqrtm = 1.0/sqrt(*m);
 
   /* influence matrix */
   for (j = 0; j < *n; j++) /* loop over the grid points */
-    { 
-      /* derivatives wrt args */ 
+    {
+      /* derivatives wrt args */
       for (k = 0; k < *p; k++)
 	{
 	  v1[k] = u[j + k * (*n)];
@@ -163,19 +148,19 @@ void multiplier(int *p, double *u0, int *m, double *u, int *n,
 	  v2[k] -= invsqrtm;
 	  der[k] = derecopula(u0, *m, *p, v1, v2);
 	  v1[k] -= invsqrtm;
-	  v2[k] += invsqrtm; 
+	  v2[k] += invsqrtm;
 	}
-      
+
       for (i = 0; i < *m; i++) /* loop over the data */
 	{
 	  influ_mat[i + j * (*m)] = 0.0;
 	  ind = 1;
-	  for (k = 0; k < *p; k++) 
+	  for (k = 0; k < *p; k++)
 	    {
 	      ind *= (u0[i + k * (*m)] <= u[j + k * (*n)]);
 	      influ_mat[i + j * (*m)] -= der[k] * (u0[i + k * (*m)] <= u[j + k * (*n)]);
 	    }
-	  influ_mat[i + j * (*m)] += ind; /* - influ[j + i * (*n)];*/ 
+	  influ_mat[i + j * (*m)] += ind; /* - influ[j + i * (*n)];*/
 	  influ[j + i * (*n)] *= invsqrtm;
 	  influ_mat[i + j * (*m)] *= invsqrtm;
 	}
@@ -190,22 +175,22 @@ void multiplier(int *p, double *u0, int *m, double *u, int *n,
       mean = 0.0;
       for (i=0;i<*m;i++)
 	{
-	  random[i] = norm_rand(); /*(unif_rand() < 0.5) ? -1.0 : 1.0 ;*/ 
+	  random[i] = norm_rand(); /*(unif_rand() < 0.5) ? -1.0 : 1.0 ;*/
 	  mean += random[i];
 	}
       mean /= *m;
-      
+
       /* realization number l */
       s0[l] = 0.0;
       for (j=0;j<*n;j++)
-	{ 
+	{
 	  process = 0.0;
 	  for (i=0;i<*m;i++)
-	    process += (random[i] - mean) * influ_mat[i + j * (*m)] 
+	    process += (random[i] - mean) * influ_mat[i + j * (*m)]
 	      - random[i] * influ[j + i * (*n)];
 	  s0[l] += process * process;
 	}
-      s0[l] /= *n; 
+      s0[l] /= *n;
     }
 
   PutRNGstate();
@@ -219,29 +204,29 @@ void multiplier(int *p, double *u0, int *m, double *u, int *n,
 
 /*****************************************************************************
 
-  Goodness-of-fit tests for extreme-value copulas 
+  Goodness-of-fit tests for extreme-value copulas
 
 *****************************************************************************/
 
 /***********************************************************************
-  
-  Computes the Cramer-von Mises test statistics 
+
+  Computes the Cramer-von Mises test statistics
   n: sample size
   m: size of the grid
-  stat = n/m \sum_{i=0}^{m-1} [An(i/m) - A_{theta_n}(i/m)]^2 
- 
+  stat = n/m \sum_{i=0}^{m-1} [An(i/m) - A_{theta_n}(i/m)]^2
+
 ***********************************************************************/
 
 /* Pickands estimator */
-void cramer_vonMises_Pickands(int *n, int *m, double *S, 
+void cramer_vonMises_Pickands(int *n, int *m, double *S,
 			      double *T, double *Atheta,
 			      double *stat)
 {
   int i;
   double t, Ac, Au, dc, du,
-    invA0 = inv_A_Pickands(*n, S, T, 0.0), 
+    invA0 = inv_A_Pickands(*n, S, T, 0.0),
     invA1 = inv_A_Pickands(*n, S, T, 1.0);
- 
+
   stat[0] = 0.0; stat[1] = 0.0;
   for (i=0;i<*m;i++)
     {
@@ -260,8 +245,8 @@ void cramer_vonMises_Pickands(int *n, int *m, double *S,
 }
 
 /* CFG estimator */
-void cramer_vonMises_CFG(int *n, int *m, double *S, 
-			 double *T, double *Atheta, 
+void cramer_vonMises_CFG(int *n, int *m, double *S,
+			 double *T, double *Atheta,
 			 double *stat)
 {
   int i;
@@ -287,9 +272,9 @@ void cramer_vonMises_CFG(int *n, int *m, double *S,
 }
 
 
-/* wrapper */ 
-void cramer_vonMises_Afun(int *n, int *m, double *S, 
-			  double *T, double *Atheta, 
+/* wrapper */
+void cramer_vonMises_Afun(int *n, int *m, double *S,
+			  double *T, double *Atheta,
 			  double *stat, int *CFG)
 {
   if (*CFG)

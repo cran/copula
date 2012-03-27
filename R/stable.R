@@ -1,28 +1,23 @@
-#################################################################################
+## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
 ##
-##   This file is part of the R package copula.
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
 ##
-##   The R package copula is free software: you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package copula is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
-##
-#################################################################################
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
 
-#### This function is never used.
-#### It is commented out on 06/09/2009 because dgamma, which is called by
-#### sgen, has becomes an intrinsic gfortran function, and gives warnings
-#### while doing R CMD check with gfortran-4.4.
+
+### This function is never used.
+### It is commented out on 06/09/2009 because dgamma, which is called by
+### sgen, has becomes an intrinsic gfortran function, and gives warnings
+### while doing R CMD check with gfortran-4.4.
 ## rstable <- function(n, alpha, beta, scale = 1, location = 0, iparam = 1) {
 ##   if (alpha > 2) stop ("alpha must be <= 2")
 ##   if (beta < -1 | beta > 1) stop("beta must be <= 1 and >= -1")

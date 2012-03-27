@@ -1,23 +1,17 @@
-#################################################################################
+## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
 ##
-##   This file is part of the R package copula.
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
 ##
-##   The R package copula is free software: you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package copula is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
-##
-#################################################################################
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
 genFunAmh <- function(copula, u) {
@@ -38,7 +32,7 @@ genFunDer2Amh <- function(copula, u) {
 }
 
 
-amhCopula <- function(param, dim = 2) {
+amhCopula <- function(param, dim = 2L) {
   ## get expressions of cdf and pdf
   cdfExpr <- function(n) {
     expr <-   "log((1 - alpha * (1 - u1)) / u1)"
@@ -50,7 +44,7 @@ amhCopula <- function(param, dim = 2) {
     expr <- gsub("s", expr, "(1 - alpha) / (exp(s) - alpha)")
     parse(text = expr)
   }
-  
+
   pdfExpr <- function(cdf, n) {
     val <- cdf
     for (i in 1:n) {
@@ -61,27 +55,25 @@ amhCopula <- function(param, dim = 2) {
 
 ##   if (dim > 2 && param[1] < 0)
 ##     stop("param can be negative only for dim = 2")
-  if (dim > 2) stop("dim can only be 2 for this copula")
-  
-  cdf <- cdfExpr(dim)
-  if (dim <= 6)  pdf <- pdfExpr(cdf, dim)
-  else pdf <- NULL
+  if((dim <- as.integer(dim))> 2) stop("dim can only be 2 for this copula")
 
-  val <- new("amhCopula",
-             dimension = dim,
-             parameters = param[1],
-             exprdist = c(cdf = cdf, pdf = pdf),
-             param.names = "param",
-             param.lowbnd = -1,
-             param.upbnd = 1,
-             message = "Amh copula family; Archimedean copula")
-  val
+  cdf <- cdfExpr(dim)
+  pdf <- if (dim <= 6)  pdfExpr(cdf, dim) else NULL
+
+  new("amhCopula",
+      dimension = dim,
+      parameters = param[1],
+      exprdist = c(cdf = cdf, pdf = pdf),
+      param.names = "param",
+      param.lowbnd = -1,
+      param.upbnd = 1,
+      message = "Amh copula family; Archimedean copula")
 }
 
 
 pamhCopula <- function(copula, u) {
   dim <- copula@dimension
-  if (is.vector(u)) u <- matrix(u, ncol = dim)
+  if(!is.matrix(u)) u <- matrix(u, ncol = dim)
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (apply(u, 1, prod))
   ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
@@ -91,16 +83,17 @@ pamhCopula <- function(copula, u) {
 }
 
 
-damhCopula <- function(copula, u) {
+damhCopula <- function(copula, u, log = FALSE, ...) {
   dim <- copula@dimension
-  if (is.vector(u)) u <- matrix(u, ncol = dim)
+  if(!is.matrix(u)) u <- matrix(u, ncol = dim)
   alpha <- copula@parameters[1]
+  if(log) stop("'log=TRUE' not yet implemented")
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
   ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   ## bivariate anyway
   u1 <- u[,1]
   u2 <- u[,2]
-  (-1 + alpha^2*(-1 + u1 + u2 - u1*u2) - alpha*(-2 + u1 + u2 + u1*u2)) / (-1 + alpha*(-1 + u1)*(-1 + u2))^3 
+  (-1 + alpha^2*(-1 + u1 + u2 - u1*u2) - alpha*(-2 + u1 + u2 + u1*u2)) / (-1 + alpha*(-1 + u1)*(-1 + u2))^3
 }
 
 
@@ -124,7 +117,7 @@ ramhCopula <- function(copula, n) {
   cbind(u, v)
 }
 
-kendallsTauAmhCopula <- function(copula, ...) {
+kendallsTauAmhCopula <- function(copula) {
   alpha <- copula@parameters[1]
   ## Nelsen (2006, p.172)
   ## range of tau: [(5 - 8 log 2) / 3, 1/3] ~= [-0.1817, 0.3333]

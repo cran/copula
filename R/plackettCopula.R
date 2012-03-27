@@ -1,34 +1,27 @@
-#################################################################################
+## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2009
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
 ##
-##   This file is part of the R package copula.
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
 ##
-##   The R package copula is free software: you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package copula is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
-##
-#################################################################################
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
 plackettCopula <- function(param) {
     ## get expressions of cdf and pdf
   cdfExpr <- parse(text = "0.5 / (alpha - 1) * (1 + (alpha - 1) * (u1 + u2) - ((1 + (alpha - 1) * (u1 + u2))^2 - 4 * alpha * (alpha - 1) * u1 * u2)^0.5)")
-  
+
   pdfExpr <- parse(text = "((1 + (alpha - 1) * (u1 + u2))^2 - 4 * alpha * (alpha - 1) * u1 * u2)^(- 3/2) * alpha * (1 + (alpha - 1) * (u1 + u2 - 2 * u1 * u2))")
 
-  ## dim = 2
-  dim <- 2
-  val <- new("plackettCopula",
+  dim <- 2L
+  new("plackettCopula",
              dimension = dim,
              parameters = param[1],
              exprdist = c(cdf = cdfExpr, pdf = pdfExpr),
@@ -36,12 +29,11 @@ plackettCopula <- function(param) {
              param.lowbnd = 0,
              param.upbnd = Inf,
              message = "Plackett copula family")
-  val
 }
-  
+
 pplackettCopula <- function(copula, u) {
   dim <- copula@dimension
-  if (is.vector(u)) u <- matrix(u, nrow = 1)
+  if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   u1 <- u[,1]
   u2 <- u[,2]
@@ -51,14 +43,15 @@ pplackettCopula <- function(copula, u) {
   0.5 / eta * (1 + eta * (u1 + u2) - ((1 + eta * (u1 + u2))^2 - 4 * alpha * eta * u1 * u2)^0.5)
 }
 
-dplackettCopula <- function(copula, u) {
+dplackettCopula <- function(copula, u, log = FALSE, ...) {
   dim <- copula@dimension
-  if (is.vector(u)) u <- matrix(u, nrow = 1)
+  if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   u1 <- u[,1]
   u2 <- u[,2]
   alpha <- copula@parameters[1]
   eta <- alpha - 1
+  if(log) stop("'log=TRUE' not yet implemented")
   ## Joe (1997, p.141)
   ((1 + eta * (u1 + u2))^2 - 4 * alpha * eta * u1 * u2)^(- 3/2) * alpha * (1 + eta * (u1 + u2 - 2 * u1 * u2))
 }
@@ -115,12 +108,10 @@ kendallsTauPlackettCopula <- function(copula) {
 }
 
 
-
-
 calibKendallsTauPlackettCopula <- function(copula, tau) {
   plackettTauInvLt1 <- approxfun(x = .plackettTau$assoMeasFun$fm$ysmth,
                                  y = .plackettTau$assoMeasFun$fm$x)
-  
+
   ss <- .plackettTau$ss
   theta <- ifelse(tau <= 0, plackettTauInvLt1(tau), 1 / plackettTauInvLt1(-tau))
   .plackettTau$trFuns$backwardTransf(theta, ss)

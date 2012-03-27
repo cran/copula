@@ -1,23 +1,19 @@
-/*#################################################################################
-##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008, 2009
-##
-##   This file is part of the R package copula.
-##
-##   The R package copula is free software: you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package copula is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
-##
-#################################################################################*/
+/*
+  Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
+
+  This program is free software; you can redistribute it and/or modify it under
+  the terms of the GNU General Public License as published by the Free Software
+  Foundation; either version 3 of the License, or (at your option) any later
+  version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  details.
+
+  You should have received a copy of the GNU General Public License along with
+  this program; if not, see <http://www.gnu.org/licenses/>.
+*/
 
 
 /*****************************************************************************
@@ -31,6 +27,7 @@
 #include <R.h>
 #include <Rmath.h>
 
+#include "set.utils.h"
 
 /*****************************************************************************
 
@@ -38,7 +35,7 @@
 
 *****************************************************************************/
 
-int card(int n) 
+int card(int n)
 {
   int i;
   for(i=0; n; n >>= 1)
@@ -52,10 +49,10 @@ int card(int n)
 
 *****************************************************************************/
 
-double sum_binom(int n, int k) 
+double sum_binom(int n, int k)
 {
   int i;
-  double s = 1.0; 
+  double s = 1.0;
   for (i=1;i<=k;i++)
     s += choose(n,i);
   return s;
@@ -63,16 +60,16 @@ double sum_binom(int n, int k)
 
 /*****************************************************************************
 
-  Generation of the first k + 1 levels of the power set of X 
+  Generation of the first k + 1 levels of the power set of X
   in the "natural" order. Recursive function.
 
 *****************************************************************************/
 
-void k_power_set_rec(int n, int k, int last, int *power_set, int *b) 
+void k_power_set_rec(int n, int k, int last, int *power_set, int *b)
 {
   int i, istart;
 
-  /* look for the leftmost 1 in b and start to fill blank cases 
+  /* look for the leftmost 1 in b and start to fill blank cases
      with 1 left from this position */
   istart = n;
 
@@ -94,12 +91,12 @@ void k_power_set_rec(int n, int k, int last, int *power_set, int *b)
 
 /*****************************************************************************
 
-  Generation of the first k + 1 levels of the power set of X 
-  in the "natural" order. Wrapps the previous function. 
+  Generation of the first k + 1 levels of the power set of X
+  in the "natural" order. Wrapps the previous function.
 
 *****************************************************************************/
 
-void k_power_set(int *n, int *k, int *power_set) 
+void k_power_set(int *n, int *k, int *power_set)
 {
   power_set[0] = 0;
   k_power_set_rec(*n, *k, 0, power_set, power_set);
@@ -132,37 +129,37 @@ void binary2subset(int n, int b, int *x)
 
 #define SET_MAX 4
 
-void k_power_set_char(int *n, int *sb, int *k_power_set, char **subset) 
+void k_power_set_char(int *n, int *sb, int *k_power_set, char **subset)
 {
   int i, j;
   int x[32];
   char string[255];
-  
+
   sprintf(subset[0],"{}");
-  
+
   for(i=1; i<*sb; i++) {
-    
+
     for(j=0; j<*n; j++)
       x[j]=0;
 
     binary2subset(*n,k_power_set[i],x);
 
     subset[i] = (char *) R_alloc(SET_MAX * (*n), sizeof(char));
-    
+
     sprintf(subset[i],"{%d",x[0]+1);
-    
+
     for(j=1; j<card(k_power_set[i]); j++) {
-      
+
       sprintf(string,",%d", x[j]+1);
       strcat(subset[i],string);
     }
-    
+
     strcat(subset[i],"}");
   }
 }
 
 /*****************************************************************************
- 
+
   Writing a set function given in "natural" order in the binary order
   Pre: power_set contains the power_set in "natural" order
 

@@ -1,29 +1,25 @@
-/*#################################################################################
-##
-##   R package Copula by Jun Yan and Ivan Kojadinovic Copyright (C) 2008, 2009
-##
-##   This file is part of the R package copula.
-##
-##   The R package copula is free software: you can redistribute it and/or modify
-##   it under the terms of the GNU General Public License as published by
-##   the Free Software Foundation, either version 3 of the License, or
-##   (at your option) any later version.
-##
-##   The R package copula is distributed in the hope that it will be useful,
-##   but WITHOUT ANY WARRANTY; without even the implied warranty of
-##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##   GNU General Public License for more details.
-##
-##   You should have received a copy of the GNU General Public License
-##   along with the R package copula. If not, see <http://www.gnu.org/licenses/>.
-##
-#################################################################################*/
+/*
+  Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
+
+  This program is free software; you can redistribute it and/or modify it under
+  the terms of the GNU General Public License as published by the Free Software
+  Foundation; either version 3 of the License, or (at your option) any later
+  version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  details.
+
+  You should have received a copy of the GNU General Public License along with
+  this program; if not, see <http://www.gnu.org/licenses/>.
+*/
 
 
 /*****************************************************************************
 
-  Multivariate independence test  based on the empirical 
-  copula process as proposed by Christian Genest and Bruno 
+  Multivariate independence test  based on the empirical
+  copula process as proposed by Christian Genest and Bruno
   Rémillard (2004), Test 13:2, pages 335-369.
 
   Ivan Kojadinovic, May 2007, modified Dec 2007
@@ -38,19 +34,19 @@
 /*****************************************************************************
 
   Array J
-  
+
 ******************************************************************************/
 
-void J_u(int n, int p, double *R, double *J)
+void J_u(int n, int p, const double R[], double *J)
 {
   int i, j, l, m;
-  
+
   m=0;
   for (j=0;j<p;j++)
     for (l=0;l<n;l++)
       for (i=0;i<n;i++)
 	J[m++] = 1.0 - fmax2(R[i + n*j], R[l + n*j])/n;
-  
+
 }
 
 /*****************************************************************************
@@ -61,15 +57,15 @@ void J_u(int n, int p, double *R, double *J)
   N: number of repetitions
   p: dimension of data
   m: max. card. of A
-  TA0: values of TA under independence (N repetitions) 
+  TA0: values of TA under independence (N repetitions)
   G0: values of the global stat. under independence (N repetitions)
-  subset: subsets of {1,...,p} in binary notation (int) whose card. is 
+  subset: subsets of {1,...,p} in binary notation (int) whose card. is
   between 2 and m in "natural" order
   subset_char: similar, for printing
-  
+
 ******************************************************************************/
 
-void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0, 
+void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
 			       double *G0, int *subset, char **subset_char,
 			       double *fisher0, double *tippett0, int *pe)
 {
@@ -77,38 +73,38 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
   double *R = Calloc((*n) * (*p), double);
   double *J = Calloc((*n) * (*n) * (*p), double);
   double *K = Calloc((*n) * (*p), double);
-  double *L = Calloc(*p, double);  
+  double *L = Calloc(*p, double);
   double pvalue, r;
 
-  /* number of subsets */ 
+  /* number of subsets */
   *sb = (int)sum_binom(*p,*m);
 
-  /* partial power set in "natural" order */ 
+  /* partial power set in "natural" order */
   k_power_set(p, m, subset);
 
   /* convert partial power set to char for printing */
   k_power_set_char(p, sb, subset, subset_char);
-  
+
   /* Simulate the distribution of TA under independence */
 
   GetRNGstate();
-  
+
   /* N repetitions */
-  for (k=0;k<*N;k++) 
-    { 
+  for (k=0;k<*N;k++)
+    {
       if ((*pe > 0) && ((k+1) % (*pe) == 0))
 	Rprintf("Simulation iteration %d\n",k+1);
-      
+
       /* generate data */
-      for (j=0;j<*p;j++) 
-	{	
+      for (j=0;j<*p;j++)
+	{
 	  for (i=0;i<*n;i++)
 	    R[i + (*n) * j] = i+1;
-	  
+
 	  /* permutation = random ranks in column j */
 	  for (i=*n-1;i>=0;i--)
 	    {
-	      r = R[j * (*n) + i]; 
+	      r = R[j * (*n) + i];
 	      index = (int)((i + 1) *  unif_rand());
 	      R[j * (*n) + i] = R[j * (*n) + index];
 	      R[j * (*n) + index] = r;
@@ -116,10 +112,10 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
 	}
 
       /* compute arrays J, K, L */
-      J_u(*n, *p, R, J); 
+      J_u(*n, *p, R, J);
       K_array(*n, *p, J, K);
       L_array(*n, *p, K, L);
-      
+
       /* for subsets i of cardinality greater than 1 and lower than m */
       for (i=*p+1;i<*sb;i++)
 	TA0[k + (*N) * (i - *p - 1)] =  M_A_n(*n, *p, J, K, L, subset[i]);
@@ -127,19 +123,19 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
       /* global stat under independence*/
       G0[k] = I_n(*n, *p, J, K, L);
     }
-  
+
   PutRNGstate();
-  
-  /* compute W à la Fisher and à la Tippett from TA0 */ 
-  for (k=0;k<*N;k++) 
+
+  /* compute W à la Fisher and à la Tippett from TA0 */
+  for (k=0;k<*N;k++)
     {
       fisher0[k] = 0.0;
       tippett0[k] = 1.0;
-      for (i=0;i<*sb-*p-1;i++) 
+      for (i=0;i<*sb-*p-1;i++)
 	{
 	  /* p-value */
 	  count = 0;
-	  for (j=0;j<*N;j++) 
+	  for (j=0;j<*N;j++)
 	    if (TA0[j + (*N) * i] >= TA0[k + (*N) * i])
 	      count ++;
 	  pvalue = (double)(count + 0.5)/(*N + 1.0);
@@ -150,8 +146,8 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
 
   Free(R);
 
-  Free(J); 
-  Free(K); 
+  Free(J);
+  Free(K);
   Free(L);
 }
 
@@ -164,13 +160,13 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
   m: max. cardinality of subsets of {1,...,p}
   TA0: simulated values of TA under independence (size: N * (sb - p - 1))
   N: number of repetitions (nrows TA0, fisher0, tippett0)
-  subset: subsets of {1,...,p} in binary notation (int) whose card. is 
+  subset: subsets of {1,...,p} in binary notation (int) whose card. is
   between 2 and m in "natural" order
-  TA: test statistics (size: sum.bin. - p - 1) 
+  TA: test statistics (size: sum.bin. - p - 1)
   pval: corresponding p-values (size = sum.bin. - p - 1)
   fisher: pvalue à la Fisher
   tippett: pvalue à la Tippett
-  
+
 ******************************************************************************/
 
 void empirical_copula_test(double *R, int *n, int *p, int *m, double *TA0, double *G0,
@@ -185,55 +181,55 @@ void empirical_copula_test(double *R, int *n, int *p, int *m, double *TA0, doubl
   double *L = Calloc(*p, double);
 
   /* compute arrays J, K, L */
-  J_u(*n, *p, R, J); 
+  J_u(*n, *p, R, J);
   K_array(*n, *p, J, K);
   L_array(*n, *p, K, L);
 
   /* compute W from the current data */
   *fisher = 0.0;
   *tippett = 1.0;
-  
+
   /* for subsets i of cardinality greater than 1 */
-  for (i=0;i<sb-*p-1;i++) 
+  for (i=0;i<sb-*p-1;i++)
     {
       TA[i] = M_A_n(*n, *p, J, K, L, subset[i]);
- 
+
       /* p-value */
       count = 0;
-      for (k=0;k<*N;k++) 
+      for (k=0;k<*N;k++)
 	if (TA0[k + (*N) * i] >= TA[i])
 	  count ++;
       pval[i] = (double)(count + 0.5)/(*N + 1.0);
- 
+
       *fisher -= 2*log(pval[i]);
       *tippett = fmin2(*tippett,pval[i]);
     }
-  
+
   /* p-values of the Fisher and Tippett statistics */
   count = 0;
-  for (k=0;k<*N;k++) 
+  for (k=0;k<*N;k++)
     if (fisher0[k] >= *fisher)
       count ++;
   *fisher = (double)(count + 0.5)/(*N + 1.0);
 
   count = 0;
-  for (k=0;k<*N;k++) 
+  for (k=0;k<*N;k++)
     if (tippett0[k] <= *tippett)
       count ++;
   *tippett = (double)(count + 0.5)/(*N + 1.0);
 
 
-  /* compute global stat from the current data and the corresponding p-value*/ 
-  *G = I_n(*n, *p, J, K, L); 
-  
+  /* compute global stat from the current data and the corresponding p-value*/
+  *G = I_n(*n, *p, J, K, L);
+
   count = 0;
-  for (k=0;k<*N;k++) 
+  for (k=0;k<*N;k++)
     if (G0[k] >= *G)
       count ++;
   *globpval = (double)(count + 0.5)/(*N + 1.0);
 
-  Free(J); 
-  Free(K); 
+  Free(J);
+  Free(K);
   Free(L);
 }
 

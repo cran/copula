@@ -1,37 +1,330 @@
+2012-02-21  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Description): big merge of 'copula' + 'nacopula'
+
+2012-02-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.8-0, released to CRAN
+
+2012-01-20  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllClass.R (nesdepth): nesdepth(<NAC>) gives the nesting depth.
+
+2011-12-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/aux-acopula.R (coeffG): 'method' now contains all dsumSibuya()
+	methods; former "dsumSibuya" is deprecated in favor of "dsSib.log".
+
 2011-11-24 Ivan Kojadinovic <ivan.kojadinovic@univ-pau.fr>
 
-	* Added the function exchTest (resp. exchEVTest) that can be used 
-	to test whether data come from an exchangeable bivariate copula 
+	* Added the function exchTest (resp. exchEVTest) that can be used
+	to test whether data come from an exchangeable bivariate copula
 	(resp. an exchangeable bivariate extreme-value copula).
-	* Added the hideWarnings flag in fitCopula. Also, maxit set to 
+	* Added the hideWarnings flag in fitCopula. Also, maxit set to
 	1000 by default when calling optim.
 	* Corrected a few bugs. Many thanks for all the reports.
 
+2011-08-31  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.7-9, ready for CRAN; released as 0.7-9-1, 2011-09-23
+
+2011-08-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/special-func.R (log1mexpm): more careful with NAs.
+
+2011-06-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/special-func.R (Bernoulli, Bernoulli.all): first "experiments":
+	need accuracy even more than speed.
+
+2011-04-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/special-func.R (polylog): introduce 'is.minus.log' so we can
+	get much more accurate Frank density for high correlation.
+
+2010-07-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Date): ready for CRAN submission
+
+2010-06-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/nacopula.R (onacopula): allow 'family' be a family object as
+	well (not only a family *name*)  ===> can use it with opower()-cops!
+	(onacopulaL): new function, working recursively with *list*
+	argument.
+
+2010-06-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* man/tauAMH.Rd, NAMESPACE: add help file and export
+
+2010-06-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/aux-acopula.R (tauAMH): nicely working for theta -> 0
+
+2010-06-10  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/aux-acopula.R (retstableC): maybe use *both* methods, when V0
+	is vector; new  printAcopula()
+	(printNacopula): as well: now show(<nacopula>) is nice.
+
+2010-06-09  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/safeUroot.R: add 'check.conv' argument.
+
 2010-05-27 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu
 
-	* Added the function evTestA that can be used to test whether 
-	data come from an extreme-value copula. 
+	* Added the function evTestA that can be used to test whether
+	data come from an extreme-value copula.
 
 2010-05-11 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu
 
 	* Replaced .Machine$double.xmax^.5 with sqrt(.Machine$double.xmax)
 	in Copula.R to get around the CRAN check error on windows64-x86_64.
 
+2010-05-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/rstable1.R (rstable1C): use rstable1 := rstable1C
+	and look at it --> do *NOT* pass gamma to C as it is sometimes a vector.
+	* src/retstable.c (rstable_c, ...): corresponding changes
+
+2010-05-04  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/retstable.c (retstable_c): with 'method', instead of
+	retstable_MH_c() etc.
+	* tests/retstable-ex.R (histSt): add first comparisons "MH"  <--> "LD"
+	LD is much faster but looks wrong.
+
+	* DESCRIPTION (Version): 0.3-0
+	* R/aux-ACopula.R (retstableC): finally switch to retstableC()
+	which now works; new 'method' argument, in tests only using
+	retstable_MH at the moment.
+
+	* tests/NAC-experi.R (print.chiSqChk_cop3d): need to allow P-value < 0.05
+	* src/init.c (updates)
+
+2010-05-03  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* src/retstable.c (retstable_LD): Luc Devroye's algorithm for
+	tilted stable added; fixed buglets; some renaming (after meeting
+	with MM).
+	* src/nacopula.h, src/init.c: renaming
+
+2010-04-28  Marius Hofert <marius.hofert@math.ethz.ch> and Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* src/retstable.c: new retstable() versions; but buggy, according
+	to our distribution tests in tests/NAC-experi.R
+
 2010-04-27 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
 
-	* Improved evTestC. 
+	* Improved evTestC.
 	* Added evTestK.
 	* Added calibKendallsTau and calibSpearmansRho for the FGM copula.
 	* Improved documentation and changed CITATION file.
 
-2010-03-15 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
+2010-04-10  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.2-2
+	* R/nacopula.R (onACopula), man/onACopula.Rd: a - correct -
+	constructor for "outer_nACopula".
+	* tests/NAC-experi.R: using onACopula() consequently.
+	* ChangeLog: update it hugely (using svn2cl and much editing).
+
+2010-04-09  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* inst/doc/Makefile:
+	  add Makefile for my convenience
+	* tests/NAC-experi.R, tests/retstable-ex.R, tests/retstable_Nstat.rda:
+	investigate #{calls} to rstable1(1, *)
+	* R/aux-ACopula.R (retstable), src/retstable.c,..: retstable() C
+	  version: correct interface, wrong result.
+
+2010-04-08  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* src/init.c, src/nacopula.h, src/retstable.c, *:
+	  retstable using eval(); using registration and nacopula.h try
+	  fixing mess of rfjoe/rFJoe by reverting to original name
+
+2010-04-07  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* src/retstable.c: first C version; does not work (...)
+
+2010-04-07  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* NAMESPACE, R/nacopula.R, src/rfjoe.c (rFJoe): port to C
+
+2010-04-05  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* R/*.R, inst/doc/nacopula.Rnw, tests/*.R:
+	  ensure copula function()s also work with NULL instead of
+	  numeric(0); improve testing output; cosmetics
+
+2010-04-04  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* tests/NAC-experi.R:
+	  now, NAC-experi.R works! (except for Gumbel, see FIXME)
+	* R/nacopula.R (rn): solved the problem!
+	* tests/NAC-experi.R: add Chi-Square Test. --> problems found
+
+2010-04-03  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* inst/doc/nacopula.Rnw:
+	  solve Sweave.sty/jss.cls issue; use {bm} instead of {bbm}
+	  for indicator
+	* inst/doc/jss.bst, ...: add jss files
+	* R/cop_objects.R,...: cosmetic (style) improvements.
+
+2010-04-02  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* R/cop_objects.R: fixed error in rFJoe, ....
+
+2010-04-01  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* R/cop_objects.R: much smaller default 'noTerms' for tau in Joe.
+	Leads to a uniformly bounded error (over all theta) < 10^-5.
+	* tests/NAC-experi.R: taueps adjusted in order to pass ...
+	* R/aux-ACopula.R (retstable: simplified
+	* tests/copula-play.R: cleaned up; works flawlessly
+	* tests/NAC-experi.R: clean up; added large-dim. example
+
+2010-04-01  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* R/cop_objects.R (rlog): nomore extraneous runif(); slight
+	simplification.
+
+2010-04-01  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* R/cop_objects.R: slight improvement for rejFFrank
+	* R/aux-ACopula.R (retstable): vectorized: reduces runtime for
+	Clayton by 60%.
+
+2010-03-31  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* R/cop_objects.R (copGumbel): Vectorized V01().
+	* R/cop_objects.R (rnchild): fixed error
+	* R/nacopula.R (rn): found and fixed sorting error.
+	* tests/NAC-experi.R: improvement; ....
+
+	* inst/doc/nacopula.Rnw: finished theory part
+
+2010-03-30  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* inst/doc/nacopula.Rnw: first version, 99.9% from Marius.
+
+2010-03-29  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.2-0 {up from 0.1-1};
+	(Imports): gsl [no longer in 'Depends']
+	* NAMESPACE: newly added namespace.
+
+	* R/nacopula.R (rn, rnchild): fix another missing lapply().
+	* man/rn.Rd, man/rnchild.Rd, man/value-methods.Rd: rudimentary
+
+2010-03-29  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* man/*.Rd, R/*.R: renaming class to "outer_nACopula"
+
+2010-03-22  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* R/nacopula.R: fixed error
+	* tests/NAC-experi.R: added tests of rn().
+	  (almost) implemented "mean example".
+	* R/nacopula.R (rn): first trial implementation.
+
+2010-03-18  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* R/cop_objects.R: improved Frank and Joe.
+
+2010-03-15  Marius Hofert <marius.hofert@math.ethz.ch>, Ivan Kojadinovic <ivan@stat.auckland.ac.nz>, and Jun Yan <jyan@stat.uconn.edu>
+
+	* R/cop_objects.R (Frank, Joe): new versions for V0() and V01().
 
 	* Corrected a bug in rcopula for claytonCopula for dim >= 3.
 	Thanks to Zhongyi Yuan <zhongyi-yuan@uiowa.edu>.
-	* Added mvtnorm in NAMESPACE to make the package work if these 
+	* Added mvtnorm in NAMESPACE to make the package work if these
 	functions are overwritten by other packages:
 	importFrom(mvtnorm, dmvnorm, pmvnorm, dmvt, pmvt)
-	
+
+2010-02-02  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* R/cop_objects.R (Frank, Joe): Improved versions for sampling.
+
+2010-01-14  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* R/cop_objects.R (AMH): Sampling V01() now directly via rnbinom()
+
+2009-12-15  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* R/cop_objects.R (Joe): new idea for sampling.
+	* tests/copula-play.R (tstCop): included "Joe" again.
+
+2009-12-14  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* tests/copula-play.R (tstCop): Added tests for psi(), psiInv()
+	+ boundaries ==> all work
+
+2009-12-10  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* tests/copula-play.R (tstCop): improve, measuring CPU time used.
+	* R/safeUroot.R (safeUroot): use instead of just uniroot().
+
+2009-12-09  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* tests/NAC-experi.R: compute "by hand" and compare.
+
+2009-12-08  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION, R/cop_objects.R (Frank): use gsl::debye_1() for tau().
+	* R/*.R, tests/NAC-experi.R: value() fix and first test.
+
+2009-12-07  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* tests/copula-play.R: testfunction added
+	* R/nacopula.R (value): written; not yet tested
+	* R/cop_objects.R: vectorized tau()
+
+2009-11-24  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* R/cop_objects.R (Frank): found & fixed error from
+	Devroye(1986) which is wrong!
+
+2009-11-23  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* R/MH-Acopula.r, tests/*.R: fix, extend, ...
+
+2009-11-23  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* R/AllClass.R: ..
+	* R/cop_objects.R: fixes
+
+2009-11-17  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* R/cop_objects.R: new: moved functions from MH-Acopula.r
+
+2009-11-17  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION, R/AllClass.R (dim): change to validity for nAC*.
+
+2009-11-16  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* R/AllClass.R (initialize): method for ACopula which
+	  auto-constructs the "paraConstr" function from the "paraInterval"
+	  specification; allow to set parameter "theta" of ACopula
+	* R/rstable1.R: tweaks
+	* R/Auxiliaries.R, man/interval-class.Rd: add "interval" class and
+	interval() constructor
+
+2009-11-16  Marius Hofert <marius.hofert@math.ethz.ch>
+
+	* R/cop_objects.R: parameter interval for copAMH
+
+2009-11-14  Martin Maechler <maechler@stat.math.ethz.ch>
+
+	* R/rstable1.R, man/rstable1.Rd: fix rstable(alpha = 1, beta != 0)
+
+2009-11-10  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/MH-Acopula.r: original code of Marius Hofert
+
 2009-10-07 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
 
 	* Removed dependence on package adapt, which has been withdrawn from CRAN
@@ -40,12 +333,12 @@
 2009-09-22 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
 
 	* Added the function evTestC that can be used to test whether data come from
-	an extreme-value copula. 
+	an extreme-value copula.
 
 2009-07-28 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
 
-	* Fixed a bug in rcopula for claytonCopula when dependence is negative. 
-	Thanks to Dominik Sznajder <dominik.sznajder@wis.kuleuven.be> for 
+	* Fixed a bug in rcopula for claytonCopula when dependence is negative.
+	Thanks to Dominik Sznajder <dominik.sznajder@wis.kuleuven.be> for
 	reporting it.
 
 2009-07-23 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
@@ -55,59 +348,59 @@
 
 2009-06-04 Ivan Kojadinovic <ivan@stat.auckland.ac.nz> and Jun Yan <jyan@stat.uconn.edu>
 
-	* Significantly improved the multiplier version of gofCopula. 
-	There are no more repeatability problems and the test is slightly 
+	* Significantly improved the multiplier version of gofCopula.
+	There are no more repeatability problems and the test is slightly
 	faster. Documentation updated.
 
-	* Fixed various warning messages. 
+	* Fixed various warning messages.
 
 2009-01-22 Jun Yan <jyan@stat.uconn.edu> and Ivan Kojadinovic <ivan@stat.auckland.ac.nz>
 
-	* Fixed a bug in the random number generation for the 
+	* Fixed a bug in the random number generation for the
 	Husler-Reiss family.
 
-	* Changed the default optimization method in fitCopula to 
-	"Nelder-Mead". 
+	* Changed the default optimization method in fitCopula to
+	"Nelder-Mead".
 
-	* Added "optim.method" parameter to "gofCopula". 
+	* Added "optim.method" parameter to "gofCopula".
 
-	* The functions "fitCopula" and "gofCopula" should now work 
+	* The functions "fitCopula" and "gofCopula" should now work
 	for the Husler-Reiss and the Galambos families. The derivatives
 	w.r.t. parameters and arguments are also implemented.
 
-	* Added conditions in "fitCopula" so that the variance is not 
+	* Added conditions in "fitCopula" so that the variance is not
 	estimated if the appropriate functions are not defined.
 
-	* Switched order of argument "copula" and "data" in fitCopula 
+	* Switched order of argument "copula" and "data" in fitCopula
 	to be consistent with gofCopula.
 
-	* Changed "UseMethod" to "setGeneric" for defining generic 
+	* Changed "UseMethod" to "setGeneric" for defining generic
 	functions.
 
 	* Documention for "gofCopula" improved.
 
 2008-11-18  Ivan Kojadinovic  <ivan@stat.auckland.ac.nz>
 
-	* Jun has modified the structure of "fitCopula". Inversion 
+	* Jun has modified the structure of "fitCopula". Inversion
 	of Spearman's rho and Kendall's tau can now be used to estimate
-	the dependence parameters. The large-sample standard errors of 
-	the estimates can also be computed in almost all situations. 
+	the dependence parameters. The large-sample standard errors of
+	the estimates can also be computed in almost all situations.
 
-	* The argument list of function "fitCopula" has changed from 
-	the last version. A newly added "method" argument precedes 
-	the "start" argument, because "start" may not be needed for 
-	inverting Kendall's tau or Spearman's rho. The returned object 
-	of "fitCopula" also has component "est" renamed to "estimate" 
-	to be more informative.	
+	* The argument list of function "fitCopula" has changed from
+	the last version. A newly added "method" argument precedes
+	the "start" argument, because "start" may not be needed for
+	inverting Kendall's tau or Spearman's rho. The returned object
+	of "fitCopula" also has component "est" renamed to "estimate"
+	to be more informative.
 
-	* The function "gofCopula" has been modified to reflect the 
-	changes in "fitCopula". The multiplier method has also been 
-	improved. 
+	* The function "gofCopula" has been modified to reflect the
+	changes in "fitCopula". The multiplier method has also been
+	improved.
 
-	* Warning messages from evaluating likelihood at invalid 
-	parameter values is suppressed when calling optim. It is not 
+	* Warning messages from evaluating likelihood at invalid
+	parameter values is suppressed when calling optim. It is not
 	the optimal way, but let's experiment with it for a while.
-	
+
 	* Corresponding documentation improved.
 
 2008-10-16 Roger Koenker <rkoenker@uiuc.edu>
@@ -123,38 +416,38 @@
 
 2008-09-17  Jun Yan <jyan@stat.uconn.edu>
 
-	* Fixed numerical rounding problem for rcopula method for 
-	bivariate Frank copula with alpha >= 35 using its symmetry, 
+	* Fixed numerical rounding problem for rcopula method for
+	bivariate Frank copula with alpha >= 35 using its symmetry,
 	since it works for alpha <= -35.
 
 	* Added "indepCopula" class.
 
-	* Changed default method to "parametric.bootstrap" for 
-	gofCopula; the multiplier needs to be fixed for its 
+	* Changed default method to "parametric.bootstrap" for
+	gofCopula; the multiplier needs to be fixed for its
 	considerable variation between replications.
-	
+
 2008-08-29  Jun Yan <jyan@stat.uconn.edu>
 
-	* Bug fixed in the random number generation for the 
-	Clayton copula.	
+	* Bug fixed in the random number generation for the
+	Clayton copula.
 
 	* empcop*.test functions renamed to *indepTest.
-	    
+
 	* Documentation improved.
 
 2008-07-17  Jun Yan <jyan@stat.uconn.edu>
 
-	* Ivan has implemented and tested multiplier CLT 
-	goodness-of-fit tests (bivariate and multivariate) for 
+	* Ivan has implemented and tested multiplier CLT
+	goodness-of-fit tests (bivariate and multivariate) for
 	certain copulas.
 
 	* Restructured R files under directory R.
 
-	* Expressions for derivatives of cdf/pdf are now stored 
+	* Expressions for derivatives of cdf/pdf are now stored
 	as opposed to computed on the fly.
 
 	* Numerical approximation functions for tau and rho
-	and its derivatives for special cases are now stored 
+	and its derivatives for special cases are now stored
 	in sysdata.rda under directory R.
 
 
@@ -162,49 +455,49 @@
 
 	* The structure of the empcop*.test has been changed.
 	All the statistics are computed using the same code.
-	The only difference comes from the array J which changes 
-	according to whether * in {u,m,s,sm}. The computation 
+	The only difference comes from the array J which changes
+	according to whether * in {u,m,s,sm}. The computation
 	is much faster.
 
 2008-01-14  Jun Yan <jyan@stat.uconn.edu>
 
-	* Restructured empcopsm for better performance. 
+	* Restructured empcopsm for better performance.
 	Arrays W, K, and L are stored for reference in each permutation.
 	The computation is about 3 times faster.
-	
+
 	* Fixed a bug in random permutation:
 	(i + 1) * runif() instead of i * runif().
-	The bug is seen for the case n = 2, where no permutation 
+	The bug is seen for the case n = 2, where no permutation
 	would happen.
-	
-	* When compute p-values of Tippett, use obs <= sim as oppose to 
+
+	* When compute p-values of Tippett, use obs <= sim as oppose to
 	obs < sim because this statistic is discrete.
-	
+
 2008-01-02  Ivan Kojadinovic  <ivan@stat.auckland.ac.nz>
 
-	* The tests of independence based on the empirical copula 
-	have been renamed to empcopu.test (univariate) and 
+	* The tests of independence based on the empirical copula
+	have been renamed to empcopu.test (univariate) and
 	empcopm.test (multivariate).
 
 	* Some computations have been improved.
 
-	* Serial analogs of these tests have been implemented. They 
-	are called empcops.test and empcopsm.test and can be used to 
-	test serial independence in univariate and multivariate 
+	* Serial analogs of these tests have been implemented. They
+	are called empcops.test and empcopsm.test and can be used to
+	test serial independence in univariate and multivariate
 	continuous time series.
 
 2007-12-11  Jun Yan <jyan@stat.uconn.edu>
 
 	* Fixed a bug in fitCopula (thanks to Rodrigo Dupleich
-	<rodrigo.dupleich@citi.com> for reporting).	
+	<rodrigo.dupleich@citi.com> for reporting).
 
 2007-12-07  Ivan Kojadinovic  <ivan@stat.auckland.ac.nz>
 
-	* Added the function empcop.rv.test, a test of independence 
+	* Added the function empcop.rv.test, a test of independence
 	  among continuous random vectors based on the empirical copula.
 
 	* Improved empcop.test.
-	
+
 	* Fixed a bug in fgm.c.
 
 2007-10-16  Jun Yan  <jyan@stat.uconn.edu>
@@ -218,8 +511,8 @@
 	* Added try-error handler for loglikCopula and loglikMvdc.
 	This will allow the optimizer to keep searching when NaN is returned.
 
-	* Changed the way to generate function calls to evaluate 
-	[dpqr]<distrib> for each margin, thank to 
+	* Changed the way to generate function calls to evaluate
+	[dpqr]<distrib> for each margin, thank to
 	Martin Maechler <maechler@stat.math.ethz.ch>.
 	The package can interact now with package nor1mix.
 
@@ -231,25 +524,25 @@
 2007-06-02  Ivan Kojadinovic  <ivan.kojadinovic@univ-nantes.fr>
 
 	* Farlie-Gumbel-Morgenstern class implemented with
-	distribution, density and random number generation. 
-	Class needs to be properly tested, especially random 
+	distribution, density and random number generation.
+	Class needs to be properly tested, especially random
 	number generation.
 
 2007-06-01  Jun Yan  <jyan@p-lnx401.stat.uiowa.edu>
 
-	* Merged with package copulab by Ivan Kojadinovic 
+	* Merged with package copulab by Ivan Kojadinovic
 	<ivan.kojadinovic@.univ-nantes.fr>, who
-	provides the multivariate independence test of 
+	provides the multivariate independence test of
 	Genest and Rémillard (2004).
-	
+
 
 2007-05-18  Jun Yan  <jyan@p-lnx401.stat.uiowa.edu>
 
 	* Association measures are exported into the namespace:
 	kendallsTau, spearmansRho, and tailIndex. Calibration
-	functions are implemented for Kendall's tau and Spearman's rho. 
+	functions are implemented for Kendall's tau and Spearman's rho.
 
-	* Extreme value copula class is implemented. This class 
+	* Extreme value copula class is implemented. This class
 	includes Galambos, Husler-Reiss.
 
 	* Added Archimedean copula Ali-Mikhail-Haq.
@@ -259,14 +552,14 @@
 2007-04-28  Jun Yan  <jyan@p-lnx401.stat.uiowa.edu>
 
 	* The three Archemedean copulas (clayton, frank, and gumbel) now
-	have their density expressions imported from mathematica, after 
+	have their density expressions imported from mathematica, after
 	some symbolic simplification, which helps to eliminate some numerical
-	precisions problems on the boundary of the unit square. 
+	precisions problems on the boundary of the unit square.
 
 	Frank copula has the most complicated expressions. On 4GB memory
 	machine it ran out of memory for dim = 10. So for frank copula, the
-	maximum dimension implemented is dim = 6.	
-	
+	maximum dimension implemented is dim = 6.
+
 	The symbolic expressions are processed in R with function deriv
 	to generate efficient algorithmic expressions.
 

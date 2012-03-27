@@ -41,11 +41,11 @@ estimate.variance=TRUE, hideWarnings=TRUE)
   the loglikelihood evaluated at the given value of \code{"param"}.
     
   The return values of \code{"fitCopula"} is an object of class
-  \code{"fitCopula"} ontaining slots:
+  \code{"fitCopula"} containing slots:
   \item{estimate}{ the estimate of the parameters. }
   \item{var.est}{ estimate of the asymptotic variance estimate of the parameter estimator. }
   \item{method}{ the estimation method. }
-  \item{loglik}{ loglikelihood at \code{"est"}. }
+  \item{loglik}{ loglikelihood at \code{"estimate"}. }
   \item{copula}{ the fitted copula. }
 }
 \references{

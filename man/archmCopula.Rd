@@ -30,24 +30,34 @@ amhCopula(param, dim = 2)
   \code{"frankCopula"}, \code{"gumbelCopula"}, or \code{"amhCopula"}.
 }
 \details{
-  \code{"archmCopula"} is a wrapper for \code{"claytonCopula"},
-  \code{"frankCopula"}, \code{"gumbelCopula"} and \code{"amhCopula"}.
+  \code{archmCopula()} is a wrapper for \code{claytonCopula()},
+  \code{frankCopula()}, \code{gumbelCopula()} and \code{amhCopula()}.
 
   Only the bivariate Ali-Mikhail-Haq copula family (\code{"amhCopula"})
   is available.
 
-  
+
   The maximum dimension for which the expression of the pdf is available is 6 for
   the Clayton, Gumbel and Frank families. The cdf expression is always available.
 
   The maximum dimension for which \code{"dcopula"} can be evaluated is
-  10 for the Clayton and Gumbel families, and 6 for the Frank family. They are also the
-  maximum dimensions for which maximum likelihood estimation can be done.
+  10 for the Clayton and Gumbel families, and 6 for the Frank family.
+  They are also the maximum dimensions for which maximum likelihood
+  estimation can be done.
+
+  It is now recommended to work with the
+  \code{\linkS4class{acopula}}-classed Archimedean copulas, as there is
+  now restriction on the dimension there.
 }
 \references{
   R.B. Nelsen (2006), \emph{An introduction to Copulas}, Springer, New York.
-}  
-\seealso{ \code{\link{ellipCopula}}, \code{\link{evCopula}}. }
+}
+\seealso{
+  \code{\link{ellipCopula}}, \code{\link{evCopula}}.
+
+  \code{\linkS4class{acopula}}-classed Archimedean copulas, such as
+  \code{\link{copClayton}}, \code{\link{copGumbel}}, etc.
+}
 \examples{
 clayton.cop <- claytonCopula(2, dim = 3)
 ## scatterplot3d(rcopula(clayton.cop, 1000))

@@ -1,11 +1,17 @@
 Package: copula
-Version: 0.9-9
-Date: 2011-12-01
-Title: Multivariate dependence with copulas
+Version: 0.99-0
+Date: $Date: 2012-03-27 23:12:34 +0200 (Tue, 27. Mar 2012) $
+Revision: $Revision: 661 $
+Title: Multivariate Dependence with Copulas
 Author: Jun Yan <jun.yan@uconn.edu> and Ivan Kojadinovic
-        <ivan.kojadinovic@univ-pau.fr>
-Maintainer: Ivan Kojadinovic <ivan.kojadinovic@univ-pau.fr>
-Depends: R (>= 2.14), methods, mvtnorm, scatterplot3d, pspline
+        <ivan.kojadinovic@univ-pau.fr>, Marius Hofert
+        <marius.hofert@math.ethz.ch> and Martin Maechler
+        <maechler@stat.math.ethz.ch>
+Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
+Depends: R (>= 2.14), methods, pspline
+Imports: stats4, graphics, gsl, ADGofTest, stabledist, mvtnorm
+Suggests: lattice, MASS, Matrix, KernSmooth, sfsmisc, Rmpfr, bbmle,
+        scatterplot3d
 Enhances: nor1mix
 Description: Classes (S4) of commonly used copulas including elliptical
         (normal and t), Archimedean (Clayton, Gumbel, Frank, and
@@ -18,19 +24,31 @@ Description: Classes (S4) of commonly used copulas including elliptical
         variables and random vectors. Serial independence tests for
         univariate and multivariate continuous time series.
         Goodness-of-fit tests for copulas based on multipliers and on
-        the parametric bootstrap. Bivariate and multivariate tests of 
-	extreme-value dependence. Bivariate tests of exchangeability. 
+        the parametric bootstrap. Bivariate and multivariate tests of
+        extreme-value dependence. Bivariate tests of exchangeability.
+        Now with former 'nacopula' for working with nested Archimedean
+        copulas.  Specifically, providing procedures for computing
+        function values and cube volumes, characteristics such as
+        Kendall's tau and tail dependence coefficients, efficient
+        sampling algorithms, various estimators, and goodness-of-fit
+        tests.  The package also contains related univariate
+        distributions and special functions such as the Sibuya
+        distribution, the polylogarithm, Stirling and Eulerian numbers.
 License: GPL (>= 3)
-Collate: Classes.R Copula.R derCdfPdf.R E.R amhCopula.R amhExpr.R
+Collate: AllClass.R Classes.R Copula.R Auxiliaries.R aux-acopula.R
+        cop_objects.R derCdfPdf.R E.R amhCopula.R amhExpr.R
         archmCopula.R asymCopula.R asymExplicitCopula.R claytonCopula.R
-        claytonExpr.R debye.R ellipCopula.R evCopula.R evTests.R
-        exchTests.R fgmCopula.R fitCopula.R fitMvdc.R frankCopula.R
-        frankExpr.R galambosCopula.R galambosExpr-math.R galambosExpr.R
-        gofEVTests.R gofTests.R graphics.R gumbelCopula.R gumbelExpr.R
-        huslerReissCopula.R huslerReissExpr.R indepCopula.R
-        indepTests.R logseries.R mult.R mvdc.R normalCopula.R
-        plackettCopula.R plackettExpr.R schlatherCopula.R stable.R
-        tCopula.R tawnCopula.R tawnExpr.R tevCopula.R zzz.R
+        claytonExpr.R debye.R ellipCopula.R estimation.R evCopula.R
+        evTests.R exchTests.R fgmCopula.R fitCopula.R fitMvdc.R
+        frankCopula.R frankExpr.R galambosCopula.R galambosExpr-math.R
+        galambosExpr.R gof.R gofEVTests.R gofTests.R graphics.R
+        gumbelCopula.R gumbelExpr.R huslerReissCopula.R
+        huslerReissExpr.R indepCopula.R indepTests.R logseries.R mvdc.R
+        normalCopula.R nacopula.R plackettCopula.R plackettExpr.R
+        rstable1.R safeUroot.R special-func.R schlatherCopula.R
+        stable.R timing.R trafos.R tCopula.R tawnCopula.R tawnExpr.R
+        tevCopula.R zzz.R
+Encoding: UTF-8
+Packaged: 2012-03-29 15:04:51 UTC; maechler
 Repository: CRAN
-Packaged: 2011-12-01 12:28:08 UTC; ikojadin
-Date/Publication: 2011-12-02 16:22:52
+Date/Publication: 2012-03-30 15:10:22
