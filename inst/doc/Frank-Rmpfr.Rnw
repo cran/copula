@@ -147,10 +147,6 @@ options(width = 75,
         ## prompt="R> ",
         continue="  ")# 2 (or 3) blanks: use same length as 'prompt'
 copDDir <- system.file('doc', package='copula')
-copSrcDDir <- { if(Sys.getenv("USER") == "maechler")
-                    '~/R/Pkgs/copula/inst/doc' else
-                file.path(dirname(tempdir()),"copula-Frank-saveDir") }
-if(!file.exists(copSrcDDir)) stopifnot(dir.create(copSrcDDir))
 
 Sys.setenv(LANGUAGE = "en")
 if(.Platform$OS.type != "windows")
@@ -377,7 +373,7 @@ require("Rmpfr")## compute the same with *high* accuracy ...
 ## using three different precisions:
 MPrecBits <- c(160, 128, 96)
 mkNm <- function(bits) sprintf("%03d.bits", bits)
-## As it takes a while seconds, cache the result:
+## As it takes a while, cache the result:
 fnam <- sprintf("mlogL_mpfr_%s.rda", Sys.info()[["machine"]])
 if (!file.exists(fn <- file.path(copDDir,fnam))) {
   print(system.time(
@@ -388,8 +384,11 @@ if (!file.exists(fn <- file.path(copDDir,fnam))) {
         nlM
     })
   )) ## 91.226 0.013 91.506 [nb-mm icore 5]
-    names(nllMP) <- mkNm(MPrecBits)
-    save(nllMP, file = file.path(copSrcDDir, fnam))
+  names(nllMP) <- mkNm(MPrecBits)
+  copSrcDDir <- if(Sys.getenv("USER") == "maechler")
+      '~/R/Pkgs/copula/inst/doc' else ""
+  if(file.exists(copSrcDDir))# <<- only for certain users; not on CRAN etc
+      save(nllMP, file = file.path(copSrcDDir, fnam))
 } else load(fn)
 
 colB <- c("blue3","violetred4","tan3")
@@ -408,7 +407,7 @@ So, clearly, high-precision computations can solve the
 numerical problems, if the precision is high enough. E.g., for $\theta = 100$,
 it needs more than 128 bits precision.
 
-Let's look at the phenomenon in more details now.
+Let us look at the phenomenon in more details now.
 The flesh in the \code{mlogL()} computation is (up to the constant
 $\log(d)$, $d=5$), only the sum of the two terms
 <<empty-prompt, echo=FALSE>>=
@@ -479,7 +478,7 @@ psiDabs.3 <- function(t, theta, log=FALSE) {
 }
 @
 Does this already solve the ``diagonal likelihood'' problem?
-Let's see, using a
+We investigate via the graphic
 <<nlogL-2-plot, fig=TRUE>>=
 p.mlogL(th = seq(11, 99, by = 1/4),
         mlogL = (mlogL2 <- function(theta)

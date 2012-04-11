@@ -15,7 +15,7 @@
 
 tCopula <- function(param, dim = 2L, dispstr = "ex", df = 4, df.fixed = FALSE) {
   dim <- as.integer(dim)
-  pdim <- length(param)
+  stopifnot((pdim <- length(param)) >= 1, is.numeric(param))
   parameters <- param
   param.names <- paste("rho", 1:pdim, sep=".")
   param.lowbnd <- rep.int(-1, pdim)
@@ -63,11 +63,19 @@ ptCopula <- function(copula, u) {
   dim <- copula@dimension
   sigma <- getSigma(copula)
   df <- getdf(copula)
+  if(df != as.integer(df))
+    stop("'df' is not integer; therefore, pcopula() cannot be computed yet")
   if(!is.matrix(u)) u <- matrix(u, ncol = dim)
   u[u < 0] <- 0
   u[u > 1] <- 1
+  ## FIXME: this should work, but does not --  checkmvArgs() gives
+  ## -----    ‘upper’ is not a numeric vector
+  ## apply(u, 1, pmvt,
+  ##       lower = rep.int(-Inf, dim), upper = qt(u, df = df),
+  ##       sigma = sigma, df = df)
   apply(u, 1, function(x) pmvt(lower = rep.int(-Inf, dim),
                                upper = qt(x, df = df), sigma = sigma, df = df))
+
 }
 
 dtCopula <- function(copula, u, log = FALSE, ...) {

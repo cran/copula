@@ -1,0 +1,214 @@
+
+R version 2.15.0 Patched (2012-04-09 r58947) -- "Easter Beagle"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
+> ##
+> ## This program is free software; you can redistribute it and/or modify it under
+> ## the terms of the GNU General Public License as published by the Free Software
+> ## Foundation; either version 3 of the License, or (at your option) any later
+> ## version.
+> ##
+> ## This program is distributed in the hope that it will be useful, but WITHOUT
+> ## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+> ## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+> ## details.
+> ##
+> ## You should have received a copy of the GNU General Public License along with
+> ## this program; if not, see <http://www.gnu.org/licenses/>.
+> 
+> require(copula)
+Loading required package: copula
+Loading required package: pspline
+> ## fCopulae: don't do on CRAN, and really "can not" suggest fCopulae
+> tryfCop <- TRUE # for interactive convenience
+> ## when run as BATCH:
+> tryfCop <- (Sys.getenv("USER") == "maechler"
++ 	    ) || nzchar(Sys.getenv("R_copula_check_fCop"))
+> 
+> if(tryfCop) { ## will only "work" if not "--as-cran"
++     .r <- require
++     tryfCop <- suppressWarnings(.r(fCopulae, quietly=TRUE)) }
+> 
+> ## From system.file("test-tools-1.R", package="Matrix"):
+> ## Make sure errors are signaled
+> assertError <- function(expr) {
++     d.expr <- deparse(substitute(expr))
++     t.res <- tryCatch(expr, error = function(e) e)
++     if(!inherits(t.res, "error"))
++ 	stop(d.expr, "\n\t did not give an error", call. = FALSE)
++     invisible(t.res)
++ }
+> numTailIndexLower <- function(copula, u) {
++   ## u is a vector approaching 0
++   pcopula(copula, cbind(u, u, deparse.level = 0)) / u
++ }
+> 
+> numTailIndexUpper <- function(copula, u) {
++   # u is a vector approaching 1
++   (1 - 2 * u + pcopula(copula, cbind(u, u, deparse.level = 0))) / (1 - u)
++ }
+> 
+> (u.0 <- sort(outer(c(1,2,5), 10^-(1:5)), decreasing=TRUE)[-(1:2)])
+ [1] 1e-01 5e-02 2e-02 1e-02 5e-03 2e-03 1e-03 5e-04 2e-04 1e-04 5e-05 2e-05
+[13] 1e-05
+> ## 0.1, 0.05, 0.02, 0.01, ..... 1e-5
+> u.1 <- 1 - u.0
+> 
+> ### Upper Tail Dependence ---------------------------
+> 
+> # R/Copula:
+> gumbC3  <- gumbelCopula(param= 3, dim = 2)
+> gumbC20 <- gumbelCopula(param=20, dim = 2)
+> gumbC40 <- gumbelCopula(param=40, dim = 2)
+> 
+> ut20 <- numTailIndexUpper(gumbC20, u.1)
+> (ut40 <- numTailIndexUpper(gumbC40, u.1))
+ [1] 0.9834402 0.9829724 0.9826993 0.9826095 0.9825648 0.9825381 0.9825292
+ [8] 0.9825248 0.9825221 0.9825212 0.9825208 0.9825205 0.9825204
+> 
+> stopifnot(
++  all.equal(tailIndex(gumbC20)[["upper"]],
++            numTailIndexUpper(gumbC20, 1 - 1e-7), tol=1e-8)
++  ,
++  all.equal(tailIndex(gumbC40)[["upper"]],
++            numTailIndexUpper(gumbC40, 1 - 1e-7), tol=1e-8)
++ )
+> 
+> if(tryfCop) { ## Rmetrics
++     C <- parchmCopula(u.1,u.1, alpha=40, type = "4", alternative = TRUE)
++     stopifnot(all.equal(ut40,     (1-2*u.1+C)/(1-u.1),
++                         check.attr=FALSE, tol= 1e-14))
++ }
+> 
+> 
+> ### Lower Tail Dependence-------------------------
+> 
+> S <- cbind(u.0,u.0)
+> # R/Copula:
+> ## C  <- pcopula(copula = gumbelCopula(param=20, dim = 2), S)
+> ## (C1  <- C/u.0)
+> (lt20 <- numTailIndexLower(gumbC20, u.0))
+ [1] 0.9220088 0.8997447 0.8711360 0.8501003 0.8295725 0.8031951 0.7837999
+ [8] 0.7648732 0.7405529 0.7226705 0.7052198 0.6827963 0.6663085
+> 
+> if(tryfCop) { ## Rmetrics
++     C <-  parchmCopula(S, alpha=20, type = "4", alternative = FALSE)
++     stopifnot(all.equal(lt20, C/u.0, check.attr=FALSE, tol= 1e-14))
++ }
+> 
+> signif(numTailIndexLower(gumbC3, 10^-(5*(1:40))),   3)#--> 0
+ [1] 5.02e-02 2.52e-03 1.26e-04 6.33e-06 3.18e-07 1.59e-08 7.99e-10 4.01e-11
+ [9] 2.01e-12 1.01e-13 5.06e-15 2.54e-16 1.27e-17 6.39e-19 3.21e-20 1.61e-21
+[17] 8.07e-23 4.05e-24 2.03e-25 1.02e-26 5.11e-28 2.56e-29 1.29e-30 6.45e-32
+[25] 3.23e-33 1.62e-34 8.14e-36 4.08e-37 2.05e-38 1.03e-39 5.16e-41 2.59e-42
+[33] 1.30e-43 6.51e-45 3.26e-46 1.64e-47 8.21e-49 4.12e-50 2.07e-51 1.04e-52
+> ## but for large theta, the convergence (to 0) is *MUCH* slower:
+> signif(numTailIndexLower(gumbC20, 10^-(5*(1:40))),  3)
+ [1] 6.66e-01 4.44e-01 2.96e-01 1.97e-01 1.31e-01 8.75e-02 5.83e-02 3.89e-02
+ [9] 2.59e-02 1.72e-02 1.15e-02 7.66e-03 5.10e-03 3.40e-03 2.27e-03 1.51e-03
+[17] 1.01e-03 6.70e-04 4.47e-04 2.98e-04 1.98e-04 1.32e-04 8.80e-05 5.86e-05
+[25] 3.91e-05 2.60e-05 1.73e-05 1.16e-05 7.70e-06 5.13e-06 3.42e-06 2.28e-06
+[33] 1.52e-06 1.01e-06 6.74e-07 4.49e-07 2.99e-07 1.99e-07 1.33e-07 8.85e-08
+> 
+> 
+> ###-------------- Frank --------------------------
+> Frank2 <- frankCopula(param=2, dim = 2)
+> tailIndex(Frank2) # 0 0
+lower upper 
+    0     0 
+> 
+> ## Upper and lower tail dependence
+> (tl <- numTailIndexLower(Frank2, u.0))
+ [1] 1.937118e-01 1.052856e-01 4.449229e-02 2.267824e-02 1.145085e-02
+ [6] 4.607652e-03 2.308420e-03 1.155362e-03 4.624221e-04 2.312573e-04
+[11] 1.156402e-04 4.625886e-05 2.312989e-05
+> stopifnot(all.equal(tl, numTailIndexUpper(Frank2, u.1), tol=1e-10))
+> 
+> stopifnot(
++   (tu1 <- numTailIndexUpper(Frank2, .99999)) < .00003
++ ,
++   all.equal(tu1, numTailIndexLower(Frank2, .00001), tol=1e-6)
++ ,
++   (tu2 <- numTailIndexUpper(Frank2, 1-1e-6)) < 3e-6
++ ,
++   all.equal(tu2, numTailIndexLower(Frank2, 1e-6), tol=1e-10)
++ )
+> 
+> 
+> 
+> ###-------------- Elliptic --------------------------
+> 
+> u2 <- cbind(u.0,u.1)
+> 
+> (t.7.3 <- tCopula(0.7, df=3, dim = 2))
+t copula family  
+Dimension:  2 
+Parameters:
+   rho.1  =  0.7 
+   df  =  3 
+> (t.9.2 <- tCopula(0.9, df=2, dim = 2))
+t copula family  
+Dimension:  2 
+Parameters:
+   rho.1  =  0.9 
+   df  =  2 
+> 
+> t.frac <- tCopula(0.9, df=2.5, dim = 2)
+> ## fractional df  currently (must) *fail* for pcopula
+> assertError(pcopula(t.frac, cbind(u.0,u.1)))
+> 
+> stopifnot( {
++     ft <- dcopula(t.frac, u2)
++     all.equal(ft, dcopula(t.frac, u2[,2:1]), tol=1e-15)
++  },
++  !is.unsorted(ft)
++  ,
++  all.equal(tailIndex(t.7.3)[["upper"]],
++            numTailIndexUpper(t.7.3, 1 - 1e-8), tol=1e-5)
++  ,
++  all.equal(tailIndex(t.9.2)[["upper"]],
++            numTailIndexUpper(t.9.2, 1 - 1e-8), tol=1e-7)
++  ,
++  all.equal(tailIndex(t.7.3)[["lower"]],
++            numTailIndexLower(t.7.3, 1e-8), tol=1e-5)
++  ,
++  all.equal(tailIndex(t.9.2)[["lower"]],
++            numTailIndexLower(t.9.2, 1e-8), tol=1e-7)
++ )
+> 
+> (ut. <- numTailIndexUpper(t.7.3, u.1))
+ [1] 0.5326067 0.4993520 0.4751115 0.4648960 0.4585944 0.4537609 0.4516561
+ [8] 0.4503362 0.4493123 0.4488632 0.4485805 0.4483607 0.4482642
+> 
+> if(tryfCop && .r(fCopulae)) { ## Rmetrics
++     p.fC <- pellipticalCopula(u = u.1, v = u.1, rho = 0.7, param = c(nu=3))
++     p. <- pcopula(t.7.3, u = cbind(u.1, u.1))
++     ## they are really not "so equal"
++     stopifnot(
++     all.equal(p.fC, p., check.attr=FALSE, tol= 0.002)
++     )
++ }
+> 
+> 
+> 
+> cat('Time elapsed: ', proc.time(),'\n') # for ''statistical reasons''
+Time elapsed:  0.824 0.02 0.843 0 0 
+> 
+> proc.time()
+   user  system elapsed 
+  0.824   0.020   0.843 

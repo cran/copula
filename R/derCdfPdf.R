@@ -52,56 +52,56 @@ setMethod("derCdfWrtArgs", signature("gumbelCopula"), derCdfWrtArgsExplicitCopul
 setMethod("derCdfWrtArgs", signature("indepCopula"), derCdfWrtArgsIndepCopula)
 
 derCdfWrtArgsEllipCopula <- function(cop, u)
-  {
+{
     p <- cop@dimension
     sigma <- getSigma(cop)
 
     ## quantile transformation
     if (class(cop) == "normalCopula")
-      v <- qnorm(u)
+	v <- qnorm(u)
     else if (class(cop) == "tCopula")
-      {
-        df <- cop@df
-        v <- qt(u,df=df)
-      }
+    {
+	df <- cop@df
+	v <- qt(u,df=df)
+    }
     else stop("not implemented")
 
     n <- nrow(u)
     mat <- matrix(0,n,p)
 
     for (j in 1:p)
-      {
-        s <- sigma[-j,-j] - sigma[-j,j,drop=FALSE] %*% sigma[j,-j,drop=FALSE]
+    {
+	s <- sigma[-j,-j] - sigma[-j,j,drop=FALSE] %*% sigma[j,-j,drop=FALSE]
 
-        if (class(cop) == "normalCopula")
-          if (p == 2)
-            {
-              rho <- cop@parameters
-              mat[,j] <- pnorm(v[,-j], rho * v[,j], sqrt(1 - rho^2))
-            }
-          else
-            for (i in 1:n)
-              mat[i,j] <- pmvnorm(lower = rep(-Inf, p - 1),
-                                  upper = v[i,-j],
-                                  mean = v[i,j] * sigma[-j,j],
-                                  sigma = drop(s))
-        else if (class(cop) == "tCopula")
-          if (p == 2)
-            {
-              rho <- cop@parameters
-              mat[,j] <-  pt(sqrt((df+1)/(df+v[,j]^2)) / sqrt(1 - rho^2)
-                             * (v[,-j] - rho * v[,j]), df=df+1)
-            }
-          else
-            for (i in 1:n)
-              mat[i,j] <- pmvt(lower = rep(-Inf, p - 1),
-                               upper = drop(sqrt((df+1)/(df+v[i,j]^2)) *
-                                 (v[i,-j] - v[i,j] * sigma[-j,j])),
-                               sigma = s, df = df + 1)
+	if (class(cop) == "normalCopula")
+	    if (p == 2) {
+		rho <- cop@parameters
+		mat[,j] <- pnorm(v[,-j], rho * v[,j], sqrt(1 - rho^2))
+	    }
+	    else
+		for (i in 1:n)
+		    mat[i,j] <- pmvnorm(lower = rep(-Inf, p - 1), upper = v[i,-j],
+					mean = v[i,j] * sigma[-j,j],
+					sigma = drop(s))
+	else if (class(cop) == "tCopula")
+	    if (p == 2) {
+		rho <- cop@parameters
+		mat[,j] <-  pt(sqrt((df+1)/(df+v[,j]^2)) / sqrt(1 - rho^2)
+			       * (v[,-j] - rho * v[,j]), df=df+1)
+	    }
+	    else {
+		if(df != as.integer(df))
+		    stop("'df' is not integer; therefore, derCdfWrtArgs() cannot be computed yet")
+		for (i in 1:n)
+		    mat[i,j] <- pmvt(lower = rep(-Inf, p - 1),
+				     upper = drop(sqrt((df+1)/(df+v[i,j]^2)) *
+				     (v[i,-j] - v[i,j] * sigma[-j,j])),
+				     sigma = s, df = df + 1)
+	    }
 
-      }
-    return(mat)
-  }
+    }
+    mat
+}
 
 setMethod("derCdfWrtArgs", signature("ellipCopula"), derCdfWrtArgsEllipCopula)
 
@@ -113,8 +113,10 @@ setGeneric("plackettFormulaDim2", function(cop, x) standardGeneric("plackettForm
 plackettFormulaDim2NormalCopula <- function(cop, x)
   {
     rho <- cop@parameters
-    return(as.matrix(exp(-(x[,1]^2 + x[,2]^2 - 2 * rho * x[,1] * x[,2])
-                             /(2 * (1 - rho^2)))/(2 * pi * sqrt(1 - rho^2))))
+    ir2 <- 1 - rho^2
+    as.matrix(exp(-(x[,1]^2 + x[,2]^2 - 2 * rho * x[,1] * x[,2]) /
+                  (2 * ir2)) /
+              (2 * pi * sqrt(ir2)))
   }
 
 setMethod("plackettFormulaDim2", signature("normalCopula"), plackettFormulaDim2NormalCopula)
@@ -122,9 +124,10 @@ setMethod("plackettFormulaDim2", signature("normalCopula"), plackettFormulaDim2N
 plackettFormulaDim2TCopula <- function(cop, x)
   {
     rho <- cop@parameters
+    ir2 <- 1 - rho^2
     df <- cop@df
-    return(as.matrix((1 + (x[,1]^2 + x[,2]^2 - 2 * rho * x[,1] * x[,2]) /
-                          (df * (1 - rho^2)))^(-df / 2) / (2 * pi * sqrt(1 - rho^2))))
+    as.matrix((1 + (x[,1]^2 + x[,2]^2 - 2 * rho * x[,1] * x[,2]) /
+               (df * ir2))^(-df / 2) / (2 * pi * sqrt(ir2)))
   }
 
 setMethod("plackettFormulaDim2", signature("tCopula"), plackettFormulaDim2TCopula)
@@ -132,27 +135,31 @@ setMethod("plackettFormulaDim2", signature("tCopula"), plackettFormulaDim2TCopul
 setGeneric("plackettFormula",  function(cop, p, rho, s, m, x, i, j) standardGeneric("plackettFormula"))
 
 plackettFormulaNormalCopula <- function(cop, p, rho, s, m, x, i, j)
-  {
-    return(exp(-(x[i]^2 + x[j]^2 - 2 * rho * x[i] * x[j]) /
-               (2 * (1 - rho^2))) / (2 * pi * sqrt(1 - rho^2))
-           * if (p == 3) pnorm(drop((x[-c(i,j)] - m %*% x[c(i,j)])/sqrt(s)))
+{
+    exp(-(x[i]^2 + x[j]^2 - 2 * rho * x[i] * x[j]) /
+               (2 * (1 - rho^2))) / (2 * pi * sqrt(1 - rho^2)) *
+           (if (p == 3) pnorm(drop((x[-c(i,j)] - m %*% x[c(i,j)])/sqrt(s)))
            else pmvnorm(lower = rep(-Inf, p - 2),
                         upper = drop(x[-c(i,j)] - m %*% x[c(i,j)]),
                         sigma = s))
-  }
+}
 
 setMethod("plackettFormula", signature("normalCopula"), plackettFormulaNormalCopula)
 
 plackettFormulaTCopula <- function(cop, p, rho, s, m, x, i, j)
-  {
+{
+    stopifnot(p >= 3)
     df <- cop@df
+    if(df != as.integer(df) && p > 3)
+	stop("'df' is not integer; therefore, plackettFormula() cannot be computed yet")
     term <- 1 + (x[i]^2 + x[j]^2 - 2 * rho * x[i] * x[j]) / (df * (1 - rho^2))
-    return(term^(-df / 2) / (2 * pi * sqrt(1 - rho^2)) *
-           if (p == 3) pt(drop((x[-c(i,j)] - m %*% x[c(i,j)]) / sqrt(term * s)), df= df)
-           else pmvt(df = df, lower = rep(-Inf, p - 2),
-                     upper = drop((x[-c(i,j)] - m %*% x[c(i,j)]) / sqrt(term)),
-                     sigma = s))
-  }
+    ## return:
+    term^(-df / 2) / (2 * pi * sqrt(1 - rho^2)) *
+	if (p == 3) pt(drop((x[-c(i,j)] - m %*% x[c(i,j)]) / sqrt(term * s)), df= df)
+	else pmvt(df = df, lower = rep(-Inf, p - 2),
+		  upper = drop((x[-c(i,j)] - m %*% x[c(i,j)]) / sqrt(term)),
+		  sigma = s)
+}
 
 setMethod("plackettFormula", signature("tCopula"), plackettFormulaTCopula)
 
