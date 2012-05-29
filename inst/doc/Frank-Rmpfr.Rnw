@@ -458,8 +458,8 @@ Further investigation shows that the culprit is really the use of
 large theta, and hence should be replaced by the generally accurate
 %% as shown by   Maechler (2011) --- FIXME: finally right that small paper!!
 %%               =========================  ~/R/MM/NUMERICS/log1-exp.R
-<<log1mexpm>>=
-log1mexpm <- function(a)
+<<log1mexp>>=
+log1mexp <- function(a)
 {
     stopifnot(a >= 0)
     r <- a
@@ -472,8 +472,8 @@ log1mexpm <- function(a)
 so that we rather compute $|\psi^\prime(.)|$ via
 <<psiDabs.3>>=
 psiDabs.3 <- function(t, theta, log=FALSE) {
-  w <- log1mexpm(theta) - t
-  Li. <- if(log) w - log1mexpm(-w) else -exp(w)/expm1(w)
+  w <- log1mexp(theta) - t
+  Li. <- if(log) w - log1mexp(-w) else -exp(w)/expm1(w)
   if(log) Li. - log(theta) else Li. / theta
 }
 @
@@ -514,10 +514,10 @@ psiInvD1abs.1(0.999, th = 715, log=TRUE)
 @
 However, as $\log(\mathrm{expm1}(y)) = \log(e^y -1) = \log(e^y(1 - e^{-y}))
 = y + \log(1 - e^{-y})$, the ``numerical stable'' solution is to replace
-\code{log(expm1(y))} by \code{y + log1mexpm(y)}, such that we will use
+\code{log(expm1(y))} by \code{y + log1mexp(y)}, such that we will use
 <<def-psiInvD1abs-2>>=
 psiInvD1abs.2 <- function(u, theta, log = FALSE)
-  if(log) log(theta)- {y <- u*theta; y + log1mexpm(y)} else theta/expm1(u*theta)
+  if(log) log(theta)- {y <- u*theta; y + log1mexp(y)} else theta/expm1(u*theta)
 @
 Unfortunately, this improves the situation for large $\theta$ only slightly:
 <<llog-theta-plot-3, fig=TRUE>>=

@@ -12,7 +12,7 @@ indepCopula(dim = 2)
   \item{dim}{ the dimension of the copula. }
 }
 \value{
-  An independence copula object of class \code{"indepCopula"}.
+  An independence copula object of class \code{"\linkS4class{indepCopula}"}.
 }
 \seealso{ \code{\link{archmCopula}}, \code{\link{ellipCopula}}, \code{\link{evCopula}}. }
 \examples{

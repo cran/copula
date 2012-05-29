@@ -14,10 +14,8 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-### TODO Should we try to be compatible to 'Copula' package ??
-
 ## This has advantage that arithmetic with scalars works "for free" already:
-setClass("interval", contains =  "numeric", # of length 2
+setClass("interval", contains = "numeric", # of length 2
 	 representation(open  = "logical"),# of length 2
 	 validity = function(object) {
 	     if(length(rng <- object@.Data) != 2) "interval must be of length 2"

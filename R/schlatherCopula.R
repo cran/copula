@@ -15,10 +15,8 @@
 
 
 ## Schlather copula; does not offer full range of dependence
-setClass("schlatherCopula",
-         representation = representation("evCopula"),
-           # exprdist = "expression"),
-         contains = list("evCopula")
+setClass("schlatherCopula", contains = "evCopula"
+           # , exprdist = "expression")
          )
 
 AfunSchlather <- function(copula, w) { ## one-parameter for now

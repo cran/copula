@@ -16,11 +16,11 @@ fgmCopula(param, dim = 2)
   \item{\dots}{ currently nothing. }
 }
 \value{
-  A Farlie-Gumbel-Morgenstern copula object of class \code{"fgmCopula"}.
+  A Farlie-Gumbel-Morgenstern copula object of class \code{"\linkS4class{fgmCopula}"}.
 }
 \note{
   The verification of the validity of the parameter values is of high
-  complexity and may not work for high dimensional copulas. 
+  complexity and may not work for high dimensional copulas.
 
   The random number generation needs to be properly tested, especially
   for dimensions higher than 2.

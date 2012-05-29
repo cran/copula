@@ -16,7 +16,7 @@ pmvdc(mvdc, x)
 rmvdc(mvdc, n)
 }
 \arguments{
-  \item{copula}{ an object of \code{"copula"}. }
+  \item{copula}{ an object of \code{"\linkS4class{copula}"}. }
   \item{margins}{ a character vector specifying all the marginal
     distributions. See details below.}
   \item{paramMargins}{ a list whose each component is a list of named
@@ -37,11 +37,11 @@ rmvdc(mvdc, n)
   example, \code{norm} can be used to specify marginal distribution,
   because \code{dnorm}, \code{pnorm}, and \code{qnorm} are all
   available.
-  
+
   A user-defined distribution, for example, \code{fancy}, can be used as
   margin provided that \code{dfancy}, \code{pfancy}, and \code{qfancy} are
   available.
-    
+
   Each component list in argument \code{paramMargins} is a list with
   named components which are used to specify the parameters of the
   marginal distributions. For example,

@@ -87,7 +87,8 @@ dtCopula <- function(copula, u, log = FALSE, ...) {
   ## work in log-scale [less over-/under-flow, then (maybe) transform:
   val <- dmvt(x, delta = rep.int(0, dim), sigma = sigma, df = df, log = TRUE) -
       rowSums(dt(x, df = df, log=TRUE))
-  if(any(out <- !is.na(u) & (u <= 0 | u >= 1))) val[out] <- -Inf
+  if(any(out <- !is.na(u) & (u <= 0 | u >= 1)))
+    val[apply(out, 1, any)] <- -Inf
   if(log) val else exp(val)
 }
 

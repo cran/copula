@@ -10,12 +10,12 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{copula}:}{Object of class \code{"copula"}, specifying
+    \item{\code{copula}:}{Object of class \code{"\linkS4class{copula}"}, specifying
       the copula. }
     \item{\code{margins}:}{Object of class \code{"character"},
       specifying the marginal distributions. }
     \item{\code{paramMargins}:}{Object of class \code{"list"}, whose
-      each component is a list of named components, giving the parameter 
+      each component is a list of named components, giving the parameter
       values of the marginal distributions. See \code{\link{mvdc}}. }
     \item{\code{marginsIdentical}:}{Object of class \code{"logical"},
       that, if TRUE, restricts the marginal distributions to be

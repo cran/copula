@@ -16,15 +16,15 @@
 
 ### asymmetric copulas #########################################################
 
-setClass("asymCopula",
+setClass("asymCopula", contains = "copula",
          representation = representation(
-           "copula",
            copula1 = "copula",
            copula2 = "copula"
            ),
          validity = function(object) {
-           stopifnot(object@copula1@dimension == object@copula2@dimension)
-                      dim <- object@dimension
+             if(object@copula1@dimension != object@copula2@dimension)
+                 return("The dimensions of the two copulas are different")
+           dim <- object@dimension
            ## from Classes.R
            if (dim != as.integer(dim))
              return("dim must be integer")
@@ -39,10 +39,10 @@ setClass("asymCopula",
              return("Parameter and lower bound have non-equal length")
            if (any(is.na(param) | param > upper | param < lower))
              return("Parameter value out of bound")
-           else return (TRUE)
-         },
-         contains = list("copula")
-         )
+	   ## else return
+	   TRUE
+	 })
+
 
 ## Liebscher (2008, JMA); the special case is Khoudraji
 gfun <- function(u, a) u^a
@@ -74,10 +74,11 @@ getCopulaComps <- function(object) {
 }
 
 AfunAsymCopula <- function(copula, w) {
-  ## assuming copula@copula1 and copula@copula2 are both evCopula
   comps <- getCopulaComps(copula)
-  a1 <- comps$shape[1];  a2 <- comps$shape[2]
   copula1 <- comps$copula1; copula2 <- comps$copula2
+  ## assuming copula1 and copula2 are both evCopula
+  stopifnot(is(copula1, "evCopula"), is(copula2, "evCopula"))
+  a1 <- comps$shape[1];  a2 <- comps$shape[2]
   den1 <- (1 - a1) * (1 - w) + (1 - a2) * w
   den2 <- a1 * (1 - w) + a2 * w
   t1 <- (1 - a2) * w / den1; t1 <- ifelse(is.na(t1), 1, t1)

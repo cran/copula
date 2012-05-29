@@ -6,7 +6,7 @@
   based on the empirical copula process}
 
 \description{
-  Analog of the serial independence test based on the empirical 
+  Analog of the serial independence test based on the empirical
   copula process proposed by Christian Genest and Bruno Rémillard (see
   \code{\link{serialIndepTest}}) for \emph{multivariate} time
   series. The main difference comes from the fact that critical values
@@ -53,22 +53,22 @@ multSerialIndepTest(x, lag.max, m=lag.max+1, N=1000, alpha=0.05,
 \references{
   P. Deheuvels (1979). La fonction de dépendance empirique et ses
   propriétés: un test non paramétrique d'indépendance, \emph{Acad. Roy.
-    Belg. Bull. Cl. Sci.}, 5th Ser. 65:274--292.
-  
+    Belg. Bull. Cl. Sci.}, 5th Ser. \bold{65}, 274--292.
+
   P. Deheuvels (1981), A non parametric test for independence,
-  \emph{Publ. Inst. Statist. Univ. Paris}. 26:29--50.
-  
+  \emph{Publ. Inst. Statist. Univ. Paris}. \bold{26}, 29--50.
+
   C. Genest and B. Rémillard (2004), Tests of independence and
-  randomness based on the empirical copula process. \emph{Test}, 13:335--369.
-  
+  randomness based on the empirical copula process. \emph{Test} \bold{13}, 335--369.
+
   K. Ghoudi, R. Kulperger, and B. Rémillard (2001), A nonparametric test
   of serial independence for times series and residuals. \emph{Journal
-    of Multivariate Analysis}, 79:191--218.
-  
+    of Multivariate Analysis} \bold{79}, 191--218.
+
   I. Kojadinovic and J. Yan (2011), Tests of multivariate serial
   independence based on a Möbius decomposition of the independence
   empirical copula process, \emph{Annals of the Institute of Statistical
-  Mathematics}, 63:347--373. 
+  Mathematics} \bold{63}, 347--373.
 }
 
 \seealso{

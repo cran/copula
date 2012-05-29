@@ -4,6 +4,13 @@
 
 #### Intermediate #####################################################################
 
+(MM) opower() --> either produce acopula with parameter *vector*, or
+     --- maybe in any case ---
+     produce an object of class 'opacopula' ("outer power Archimedean copula")
+     which is just 'acopula' with a new show method ("thetabase" at least!),
+     possibly a new slot ...
+  Longer term: want to *estimate* those correctly [MLE at least].
+
 (MM) R/special-func.R & man/Bernoulli.Rd: Research for better algorithms <--> Rmpfr
 
 (MM) please take a look at gtrafouni() in ./R/gof.R: Can "Remillard" (and "Genest")

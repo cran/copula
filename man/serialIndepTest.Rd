@@ -60,7 +60,7 @@ serialIndepTest(x, d, alpha=0.05)
   length \code{N} containing the values of the serial version of the
   global Cramér-von Mises test statistic for each repetition --- see
   last reference p.175).
-    
+
   The function \code{"serialIndepTest"} returns an object of class
   \code{"indepTest"} whose attributes are: \code{subsets},
   \code{statistics}, \code{critical.values}, \code{pvalues},
@@ -79,20 +79,20 @@ serialIndepTest(x, d, alpha=0.05)
   P. Deheuvels (1979). La fonction de dépendance empirique et ses
   propriétés: un test non paramétrique d'indépendance, \emph{Acad. Roy.
     Belg. Bull. Cl. Sci.}, 5th Ser. 65:274--292.
-  
+
   P. Deheuvels (1981), A non parametric test for independence,
   \emph{Publ. Inst. Statist. Univ. Paris}. 26:29--50.
-  
+
   C. Genest and B. Rémillard (2004), Tests of independence and
-  randomness based on the empirical copula process. \emph{Test}, 13:335--369.
-  
+  randomness based on the empirical copula process. \emph{Test} \bold{13}, 335--369.
+
   C. Genest, J.-F. Quessy and B. Rémillard (2006). Local
   efficiency of a Cramer-von Mises test of independence,
-  \emph{Journal of Multivariate Analysis}, 97:274--294.
-  
+  \emph{Journal of Multivariate Analysis} \bold{97}, 274--294.
+
   C. Genest, J.-F. Quessy and B. Rémillard (2007), Asymptotic
   local efficiency of Cramér-von Mises tests for multivariate
-  independence. \emph{The Annals of Statistics}, 35:166--191.
+  independence. \emph{The Annals of Statistics} \bold{35}, 166--191.
 }
 
 \seealso{

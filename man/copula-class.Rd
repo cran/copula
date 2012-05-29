@@ -35,7 +35,7 @@
   such copulas can be created via functions \code{\link{evCopula}},
   \code{\link{archmCopula}} and \code{\link{ellipCopula}}.
 
-  \code{"plackettCopula"} and \code{"fgmCopula"} are special types of
+  \code{"plackettCopula"} and \code{"\linkS4class{fgmCopula}"} are special types of
   copulas which do not belong to either one of the three classes above.
 }
 \section{Warning}{

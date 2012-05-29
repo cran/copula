@@ -18,7 +18,7 @@ source(system.file("Rsource", "utils.R", package="copula"))
 ##--> tryCatch.W.E(), canGet()
 stopifnot(require(Runuran), require(optimx))
 
-## ==== GIG generator and related functions ====================================
+### GIG generator and related functions ########################################
 
 ## generator (parameters theta_1 in IR, theta_2 in (0,Inf))
 ## note: theta_1!=0 and theta_2=0 reduces to copClayton@psi(t, 1/theta_1)

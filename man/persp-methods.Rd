@@ -6,20 +6,20 @@
 \alias{persp,mvdc-method}
 \title{ Methods for function `persp' in Package `copula' }
 \description{
- Methods for function \code{persp} in package \pkg{copula} 
+ Methods for function \code{persp} in package \pkg{copula}
 }
 \section{Methods}{
 \describe{
-  \item{x = "copula"}{perspective plot for a \code{"copula"} or
-    \code{"indepCopula"} object. }
+  \item{x = "copula"}{perspective plot for a \code{"\linkS4class{copula}"} or
+    \code{"\linkS4class{indepCopula}"} object. }
   \item{x = "mvdc"}{perspective plot for a \code{"mvdc"} object. }
 }}
 \details{
-  When \code{x} is of class \code{"copula"}, the following arguments can be supplied:
+  When \code{x} is of class \code{"\linkS4class{copula}"}, the following arguments can be supplied:
   \describe{
     \item{fun}{the function to be plotted, i.e., \code{"dcopula"} or \code{"pcopula"}.}
     \item{n (= 51)}{the number of points to do the plotting.}
-    \item{arguments for \code{"persp"}}{theta = -30, phi = 30, expand = 0.618.} 
+    \item{arguments for \code{"persp"}}{theta = -30, phi = 30, expand = 0.618.}
   }
 
   When \code{x} is of class \code{"mvdc"}, the following arguments

@@ -493,9 +493,9 @@ coeffG <- function(d, alpha, method = c("sort", "horner", "direct", "dsumSibuya"
 ##'       = (-1)^{d-k}\sum_{j=k}^d \theta^{-j} s(d,j) S(j,k)
 ##'       = (d!/k!)\sum_{l=1}^k (-1)^{d-l} \binom{k}{l}\binom{\alpha l}{d}
 ##' @author Marius Hofert
-polyG <- function(lx, alpha, d, method=
-                  c("default", "pois", "pois.direct", "stirling", "stirling.horner",
-                    coeffG.methods),
+polyG <- function(lx, alpha, d, method= c("default", "default2012", "default2011",
+                                "pois", "pois.direct", "stirling", "stirling.horner",
+                                coeffG.methods),
                   log=FALSE)
 {
     stopifnot(length(alpha)==1, 0 < alpha, alpha <= 1,
@@ -505,11 +505,53 @@ polyG <- function(lx, alpha, d, method=
     method <- match.arg(method, choices = eval(formals()[["method"]]))
     Meth <- if(method %in% coeffG.methods) "coeffG" else method
     switch(Meth,
-	   "default" =
+	   "default" =, "default2012" =
        {
-           ## default method: the following is clearly too simple
-           ## ------- should even use different methods for different  x := exp(lx)
+           ## "default2012" compiled by Yongcheng Wong (MSc thesis c/o M.Maechler, April 2012)
+           ## it switches to "Rmpfr" when the accuracy would be less than 5 digits
+	   meth2012 <- function(d, alpha, lx) {
+	       if (d <= 30) "direct"
+	       else if (d <= 50) {
+		   if (alpha <= 0.8) "direct" else "dsSib.log"
+	       }
+	       else if (d <= 70) {
+		   if (alpha <= 0.7) "direct" else "dsSib.log"
+	       }
+	       else if (d <= 90) {
+		   if (alpha <= 0.5) "direct"
+		   else if (alpha >= 0.8) "dsSib.log"
+		   else if (lx <= 4.08) "pois"
+		   else if (lx >= 5.4) "direct"
+		   else "dsSib.Rmpfr"
+	       }
+	       else if (d <= 120) {
+		   if (alpha < 0.003) "sort"
+		   else if (alpha <= 0.4) "direct"
+		   else if (alpha >= 0.8) "dsSib.log"
+		   else if (lx <= 3.55) "pois"
+		   else if (lx >= 5.92) "direct"
+		   else "dsSib.Rmpfr"
+	       }
+	       else if (d <= 170) {
+		   if (alpha < 0.01) "sort"
+		   else	 if (alpha <= 0.3) "direct"
+		   else if (alpha >= 0.9) "dsSib.log"
+		   else if (lx <= 3.55) "pois"
+		   else "dsSib.Rmpfr"
+	       }
+	       else if (d <= 200) {
+		   if (lx <= 2.56) "pois"
+		   else if (alpha >= 0.9) "dsSib.log"
+		   else "dsSib.Rmpfr"
+	       }
+	       else "dsSib.Rmpfr"
+	   }
+	   Recall(lx, alpha = alpha, d = d,
+		  method = meth2012(d, alpha, lx), log = log)
+       },
 
+	   "default2011" = ## first "old" default
+       {
 	   Recall(lx, alpha=alpha, d=d,
                   method = if(d <= 100) {
                       if(alpha <= 0.54) "stirling"
@@ -732,8 +774,11 @@ rFJoe <- function(n, alpha) rSibuya(n, alpha)
 ##' @author Marius Hofert and Martin Maechler
 ##' note: - p_{x,n} = 0 for x < n;  p_{n,n} = alpha^n
 ##'       - numerically challenging, e.g., dsumSibuya(100, 96, 0.01) < 0 for all methods
+##'  o  Called as  dsumSibuya(d, k, alpha, method = meth.dsSib, log=log)
+##'     from coeffG()                      -------------------
 dsumSibuya <- function(x, n, alpha,
-		       method= c("log", "direct", "Rmpfr", "Rmpfr0", "RmpfrM", "diff", "exp.log"),
+		       method= c("log", "direct", "diff", "exp.log",
+				"Rmpfr", "Rmpfr0", "RmpfrM", "Rmpfr0M"),
                        mpfr = list(minPrec = 21, fac = 1.25, verbose=TRUE),
 		       log=FALSE)
 {
@@ -785,25 +830,29 @@ dsumSibuya <- function(x, n, alpha,
 	   S <- mapply(f.one, x, n, USE.NAMES = FALSE)
 	   if(log) log(S) else S
        },
-	   "Rmpfr" =,
-	   "Rmpfr0" =,
-	   "RmpfrM" =
+	   "Rmpfr" =,  "Rmpfr0" =,
+	   "RmpfrM" =, "Rmpfr0M" =
        {
+	   stopifnot(require("Rmpfr"))
 	   ## as "direct" but using high-precision arithmetic, where
 	   ## the precision should be set via alpha = mpfr(*, precBits= .)
-	   stopifnot(require(Rmpfr))
-	   if(!is(alpha, "mpfr"))
-	       alpha <- mpfr(alpha, precBits = max(100, min(x, 10000)))
-## FIXME: Hmm, when recalling, alpha becomes more and more precise, even going from n[i] to n[i+1]
-###
-### that's not ok.. strictly should only recall for those (x,n) pairs where it's needed
-	   pr. <- getPrec(alpha)
-	   mpfr.0 <- mpfr(0, precBits = pr.)
-	   mayRecall <- (method != "Rmpfr0")
-           stopifnot(is.numeric(minPrec <- mpfr$minPrec),
-                     is.numeric(fac.pr <- mpfr$fac), fac.pr > 1,
-                     length(mpfr$verbose) == 1)
-	   ## FIXME
+	   mayRecall <- !grepl("Rmpfr0", method) ## only if not "Rmpfr0(M)"
+	   if(mayRecall) {
+	       ## FIXME(?): Hmm, when recalling, alpha becomes more and more precise, even going from n[i] to n[i+1]
+	       ## that's not ok.. strictly should only recall for those (x,n) pairs where it's needed
+	       stopifnot(is.numeric(minPrec <- mpfr$minPrec),
+			 is.numeric(fac.pr <- mpfr$fac), fac.pr > 1,
+			 length(mpfr$verbose) == 1)
+	   }
+	   mayRecall <- !grepl("Rmpfr0", method) ## only if not "Rmpfr0(M)"
+	   if(mayRecall) {
+	       stopifnot(is.numeric(minPrec <- mpfr$minPrec),
+			 is.numeric(fac.pr <- mpfr$fac), fac.pr > 1,
+			 length(mpfr$verbose) == 1)
+	   }
+	   mpfr.0 <- mpfr(0, precBits =
+			  if(!is(alpha, "mpfr")) 64 else getPrec(alpha))
+	   ## FIXME: --- speedup possible! ---
 	   if(FALSE && l.x == 1 && l.n == x. && all(n == seq_len(x.))) { ## Special case -- from coeffG()
 	       message("fast special case ..") ## <- just for now
 	       ## change notation (for now)
@@ -818,15 +867,24 @@ dsumSibuya <- function(x, n, alpha,
 	       stop("fast special case -- is still wrong !")
 	       S <- new("mpfr", unlist(lapply(j, f.sp)))
 	   } else { ## usual case
-	       f.one <- function(x,n, alpha) {
+	       f.1 <- function(x,n, alpha) {
 		   if(x < n) return(mpfr.0)
+                   pr. <- .dsSib.mpfr.prec(x, n, alpha)
+                   ##     ================
+                   alpha <- mpfr(alpha, precBits = pr.)
 		   j <- seq_len(n)
+		   ##if(TRUE) { # "old"/for debug:
 		   ## now do this in parts {to analyze}:
 		   ## sum(chooseMpfr.all(n)*chooseMpfr(alpha*j,x)*(-1)^(x-j))
 		   c.n <- chooseMpfr.all(n)
 		   ca.j <- chooseMpfr(alpha*j,x) * (-1)^(x-j)
 		   trms <- c.n * ca.j
 		   S <- sum(trms) # <-- sum of *huge* (partly alternating) terms getting almost 0
+		   ## } else {	      # "new", typically faster
+		   ##	  ## FIXME: extend  sumBinMpfr() so it accepts a *vector* f.x
+		   ##	  ## sumBinomMpfr(n, FUN, n0, alternating=TRUE, precBits) is not yet available
+		   ##	  S <- sum(chooseZ(n,j) * (-1)^(x-j) * chooseMpfr(alpha * j, x))
+		   ## }
 		   if(mayRecall) {
 		       recall <- (S <= 0)
 		       if(recall) { ## complete loss of precision -- recall with higher precision
@@ -848,10 +906,10 @@ dsumSibuya <- function(x, n, alpha,
 				      method="RmpfrM", log=FALSE)
 		       } else S
 		   } else S
-	       }## end{ f.one() }
-	       S <- new("mpfr", mapply(f.one, x, n, alpha, USE.NAMES=FALSE))
+	       }## end{ f.1() }
+	       S <- new("mpfr", mapply(f.1, x, n, alpha, USE.NAMES=FALSE))
 	   }
-	   if(method == "RmpfrM")
+	   if(grepl("M$", method)) ## "RmpfrM" or "Rmpfr0M"
 	       if(log) log(S) else S
 	   else
 	       as.numeric(if(log) log(S) else S)
@@ -885,6 +943,48 @@ dsumSibuya <- function(x, n, alpha,
 	   ## otherwise
 	   stop(sprintf("unsupported method '%s' in dsumSibuya", method)))
 }
+
+..dsSib.mpfr.prec <- function(d,k,alpha)
+{
+    ## no checking here on purpose -- note that this works *vectorized*
+    ldk <- log(d - k + 1)
+    la <- log(alpha)
+    sa <- sqrt(alpha)
+    ## .dsSib.mpfr.precEXPR  from above:
+    yhat <- 0.606778486870861  + 1.00415795049476 * log(k) +
+        -0.0115467115092516 * ldk + -0.236630339094924 * la + 6.84638655885601 * sa +
+            -7.59637383430576 * alpha + -0.529181206860549 * ldk * sa +
+                0.579077302168194 * ldk * alpha + 4.07566657020875 * la * alpha
+    pmax(64, exp(yhat + 0.18))
+}
+
+.dsSib.mpfr.prec <- function(d, k, alpha)
+{
+    stopifnot(is.numeric(d), is.numeric(k), is.numeric(alpha),
+              length(d) == 1, length(k) == 1, length(alpha) == 1,
+              d == as.integer(d), k == as.integer(k),
+              d >= k, 0 < alpha, alpha < 1)
+    if(alpha < 0.001)
+	stop("mpfr precision needed for	 alpha < 0.001	is not yet available.\n",
+	     " Please report to maintainer(\"copula\") if you need this to be changed")
+    ## @MM: --> ~/R/MM/Pkg-ex/copula/dsSibMpfr-prec/dsSibMpfr-ex.R
+    p <-
+        if (k <= 5)
+            64
+        else if (alpha >= 0.2) {
+            if (d-k >= 170)
+                64
+            else if (d-k >= 90) {
+                if (d <= 120)
+                    64
+            } else if (d-k > 2) {
+                if ((d - 70*alpha) < 9)
+                    64
+            }
+        }
+    if(is.null(p)) ..dsSib.mpfr.prec(d,k,alpha) else p
+}
+
 
 ### polynomial evaluation for Joe
 
@@ -1033,15 +1133,17 @@ cacopula <- function(u, cop, n.MC=0, log=FALSE) {
 ##'        pois.direct: directly uses the Poisson density
 ##'        pois:        intelligently uses the Poisson density with lsum
 ##' @param log if TRUE the log of psiDabs is returned
-##' @author Marius Hofert
+##' @param is.log.t if TRUE, the argument t contains log(<mathematical t>)
+##' @author Marius Hofert, Martin Maechler
 ##' Note: psiDabsMC(0) is always finite, although, theoretically, psiDabs(0) may
 ##'       be Inf (e.g., for Gumbel and Joe)
 psiDabsMC <- function(t, family, theta, degree=1, n.MC,
                       method=c("log", "direct", "pois.direct", "pois"),
-                      log = FALSE)# not yet: is.log.t = FALSE)
+                      log = FALSE, is.log.t = FALSE)
 {
     res <- numeric(length(t))
     V <- getAcop(family)@V0(n.MC, theta)
+    Vt <- if(is.log.t) function(tt) V %*% t(exp(tt)) else function(tt) V %*% t(tt)
     method <- match.arg(method)
     switch(method,
 	   ## the following is not faster than "log":
@@ -1061,26 +1163,27 @@ psiDabsMC <- function(t, family, theta, degree=1, n.MC,
                iInf <- is.infinite(t)
                res[iInf] <- -Inf # log(0)
                if(any(!iInf))
-                   res[!iInf] <- lsum(-V %*% t(t[!iInf]) + degree*log(V) - log(n.MC))
+                   res[!iInf] <- lsum(-Vt(t[!iInf]) + degree*log(V) - log(n.MC))
                if(log) res else exp(res)
            },
            "direct" = { # direct method
-               lx <- -V %*% t(t) + degree*log(V)
+               lx <- -Vt(t) + degree*log(V)
                res <- colMeans(exp(lx)) # can be all zeros if lx is too small [e.g., if t is too large]
                if(log) log(res) else res
            },
            "pois.direct" = {
-               poi <- dpois(degree, lambda=V %*% t(t))
-               res <- factorial(degree)/t^degree * colMeans(poi)
+               m.poi <- colMeans(dpois(degree, lambda=Vt(t)))
+               ## is.log.t:  "t^degree" = exp(t)^degree = exp(t * degree)
+               res <- factorial(degree)*(if(is.log.t) exp(-t * degree) else t^-degree) * m.poi
                if(log) log(res) else res
            },
            "pois" = {
                iInf <- is.infinite(t)
                res[iInf] <- -Inf # log(0)
                if(any(!iInf)) {
-                   t. <- t[!iInf]
-                   lpoi <- dpois(degree, lambda=V %*% t(t.), log=TRUE) # (n.MC, length(t.))-matrix
-                   b <- -log(n.MC) + lfactorial(degree) - degree*rep(log(t.), each=n.MC) + lpoi # (n.MC, length(t.))-matrix
+                   t <- t[!iInf]
+                   lpoi <- dpois(degree, lambda=Vt(t), log=TRUE) # (n.MC, length(t))-matrix
+                   b <- -log(n.MC) + lfactorial(degree) - degree*rep(if(is.log.t)t else log(t), each=n.MC) + lpoi
                    res[!iInf] <- lsum(b)
                }
                if(log) res else exp(res)

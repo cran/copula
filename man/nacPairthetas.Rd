@@ -34,6 +34,9 @@ options(width=97)
 stopifnot(isSymmetric(PT <- nacPairthetas(mm)))
 round(PT, 2)
 
+## The tau's -- "Kendall's correlation matrix" :
+round(copGumbel@tau(PT), 2)
+
 ## do this several times:
 m1 <- rnacModel("Gumbel", d=15, pr.comp = 1/8, order="seq")
 stopifnot(isSymmetric(PT <- nacPairthetas(m1)))

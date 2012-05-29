@@ -21,9 +21,9 @@
 
 gofCopula <- function(copula, x, N = 1000, method = "mpl",
                       simulation = c("pb", "mult"), print.every = 100,
-                      optim.method = "BFGS")
+                      optim.method = "BFGS", optim.control = list(maxit=20))
 {
-    M <- -1 ## fixed!
+    M <- -1 ## fixed - for gofMCLT.*()
 
     x <- as.matrix(x)
     n <- nrow(x)
@@ -35,26 +35,26 @@ gofCopula <- function(copula, x, N = 1000, method = "mpl",
     if (copula@dimension != p)
       stop("The copula and the data should be of the same dimension")
 
-
-
     gof <-
         switch(match.arg(simulation),
                "pb" = { ## parametric bootstrap
-                   gofPB(copula, x, N, method, print.every, optim.method)
+                   gofPB(copula, x, N=N, method = method,
+                         print.every=print.every, optim.method=optim.method, optim.control=optim.control)
                },
                "mult" = { ## multiplier
                    if (method == "mpl")
-                       gofMCLT.PL(copula, x, N, M, optim.method)
+                       gofMCLT.PL(copula, x, N=N, M=M,
+                                  optim.method=optim.method, optim.control=optim.control)
                    else if (method %in% c("irho","itau")) {
                        if (copula@dimension != 2)
                            stop("The simulation method 'mult' can be used in combination with the estimation methods 'irho' and 'itau' only in the bivariate case.")
-                       gofMCLT.KS(copula, x, N, method, M)
+                       gofMCLT.KS(copula, x, N=N, method=method, M=M)
                    }
                    else
-                       stop("Invalid estimation method")
+                       stop(sprintf("Invalid estimation method '%s'", method))
                },
                ## otherwise:
-               stop("Invalid simulation method"))
+               stop("Invalid simulation method ", match.arg(simulation)))
     class(gof) <- "gofCopula"
     gof
 }
@@ -73,7 +73,7 @@ print.gofCopula <- function(x, ...)
 ## copula is a copula of the desired family whose parameters, if necessary,
 ## will be used as starting values in fitCopula
 
-gofPB <- function(copula, x, N, method, print.every, optim.method)
+gofPB <- function(copula, x, N, method, print.every, optim.method, optim.control)
   {
     n <- nrow(x)
     p <- ncol(x)
@@ -83,7 +83,7 @@ gofPB <- function(copula, x, N, method, print.every, optim.method)
 
     ## fit the copula
     fcop <- fitCopula(copula, u, method, estimate.variance=FALSE,
-                      optim.method=optim.method)@copula
+                      optim.method=optim.method, optim.control=optim.control)@copula
 
     ## compute the test statistic
     s <- .C(cramer_vonMises,
@@ -105,7 +105,7 @@ gofPB <- function(copula, x, N, method, print.every, optim.method)
 
         ## fit the copula
         fcop0 <-  fitCopula(copula, u0, method, estimate.variance=FALSE,
-                            optim.method=optim.method)@copula
+                            optim.method=optim.method, optim.control=optim.control)@copula
 
         s0[i] <- .C(cramer_vonMises,
                     as.integer(n),
@@ -138,20 +138,21 @@ influ.add <- function(x0, y0, influ1, influ2)
 
 gofMCLT.KS <- function(cop, x, N, method, M)
   {
+    stopifnot(method %in% c("irho","itau"), is.matrix(x))
     n <- m <- nrow(x)
     p <- 2
 
     ## make pseudo-observations
     u <- apply(x,2,rank)/(n+1)
 
-    ## fit the copula
-    cop <- fitCopula(cop,u,method,estimate.variance=FALSE)@copula
+    ## fit the copula {*not* calling optim() ..}
+    cop <- fitCopula(cop, u, method=method, estimate.variance=FALSE)@copula
 
     ## grid points where to evaluate the process
     g <- u # pseudo-observations
     G <- n
 
-    pcop <- pcopula(cop,g)
+    pcop <- pcopula(cop, g)
 
     ## compute the test statistic
     stat <- .C(cramer_vonMises_2,
@@ -187,9 +188,9 @@ gofMCLT.KS <- function(cop, x, N, method, M)
              as.integer(N),
              s0 = double(N))$s0
 
-    return(list(statistic=stat, pvalue=(sum(s0 >= stat)+0.5)/(N+1),
-                parameters=cop@parameters))
-  }
+    list(statistic=stat, pvalue=(sum(s0 >= stat)+0.5)/(N+1),
+                parameters=cop@parameters)
+}
 
 
 ## Multivariate multipler gof based on MPL #####################################
@@ -216,6 +217,7 @@ influCoef <- function(cop,u,v)
     e <- crossprod(influ0)
     e <- e/M
 
+    ## MM: FIXME --- *after* we have testing code in ./tests/ !!!
     return(solve(e) %*% t(derPdfWrtParams(cop,u)/dcopwrap(cop,u) - add.influ(u,v,influ,q)))
 }
 
@@ -244,13 +246,12 @@ add.influ <- function(u, v, influ, q)
   return(out)
 }
 
-
 ## goodness-of-fit test
 
 ## cop is a copula of the desired family whose parameters, if necessary, will be used
 ## as starting values in fitCopula
 
-gofMCLT.PL <- function(cop, x, N, M, optim.method)
+gofMCLT.PL <- function(cop, x, N, M, optim.method, optim.control)
 {
     n <- m <- nrow(x)
     p <- ncol(x)
@@ -260,7 +261,7 @@ gofMCLT.PL <- function(cop, x, N, M, optim.method)
 
     ## fit the copula
     cop <- fitCopula(cop, u, method="mpl", estimate.variance=FALSE,
-                     optim.method=optim.method)@copula
+                     optim.method=optim.method, optim.control=optim.control)@copula
 
     ## grid points where to evaluate the process
     g <- u  ## pseudo-observations

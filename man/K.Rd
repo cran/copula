@@ -38,7 +38,7 @@ K(u, cop, d, n.MC=0)
 \references{
   Barbe, P., Genest, C., Ghoudi, K., and R\enc{é}{e}millard, B. (1996),
   On Kendall's Process,
-  \emph{Journal of Multivariate Analysis}, \bold{58}, 197--229.
+  \emph{Journal of Multivariate Analysis} \bold{58}, 197--229.
 
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011b),
   Likelihood inference for Archimedean copulas,

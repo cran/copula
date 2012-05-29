@@ -27,8 +27,8 @@ gtrafouni(u, method = c("chisq", "gamma", "Remillard", "Genest"))
   \item{n.bootstrap}{positive integer specifying the number of bootstrap replicates.}
   \item{estimation.method}{\code{\link{character}}
     string determining the estimation method; see
-    \code{\link{enacopula}}.  We currently only recommend \code{"mle"} (or maybe
-    \code{"smle"}).}
+    \code{\link{enacopula}}.  We currently only recommend the default
+  \code{"mle"} (or maybe \code{"smle"}).}
   \item{include.K}{logical indicating whether the last component, involving the
     Kendall distribution function \code{\link{K}}, is used in the transformation
     \code{\link{htrafo}} of Hering and Hofert (2011).  Note that this only
@@ -134,11 +134,11 @@ gtrafouni(u, method = c("chisq", "gamma", "Remillard", "Genest"))
 \references{
   Genest, C., R\enc{é}{e}millard, B., and Beaudoin, D. (2009),
   Goodness-of-fit tests for copulas: A review and a power study
-  \emph{Insurance: Mathematics and Economics}, \bold{44}, 199--213.
+  \emph{Insurance: Mathematics and Economics} \bold{44}, 199--213.
 
   Rosenblatt, M. (1952),
   Remarks on a Multivariate Transformation,
-  \emph{The Annals of Mathematical Statistics}, \bold{23}, 3, 470--472.
+  \emph{The Annals of Mathematical Statistics} \bold{23}, 3, 470--472.
 
   Hering, C. and Hofert, M. (2011),
   Goodness-of-fit tests for Archimedean copulas in large dimensions,
@@ -170,8 +170,7 @@ u <- pobs(x) # build pseudo-observations
 
 ## check if the data comes from a meta-Gumbel model (choose larger n.bootstrap
 ## in a realistic setup)
-res.H0.G <- gnacopula(u, cop=copG, n.bootstrap=10,
-                      estimation.method="mle")
+res.H0.G <- gnacopula(u, cop=copG, n.bootstrap=10)
 ## => uses the transformation of Hering and Hofert (2011), including
 ##    the Kendall distribution function K and the mapping to a univariate
 ##    setting via the chi-square distribution. The final test carried out

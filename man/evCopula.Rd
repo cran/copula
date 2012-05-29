@@ -35,8 +35,8 @@ tevCopula(param, df = 4, df.fixed = FALSE)
   \item{\dots}{ currently nothing. }
 }
 \value{
-  An object of class \code{"gumbelCopula"}, \code{"galambosCopula"},
-  \code{"huslerReissCopula"}, \code{"tawnCopula"}, or \code{"tevCopula"}.
+  An object of class \code{"\linkS4class{gumbelCopula}"}, \code{"\linkS4class{galambosCopula}"},
+  \code{"\linkS4class{huslerReissCopula}"}, \code{"\linkS4class{tawnCopula}"}, or \code{"\linkS4class{tevCopula}"}.
 }
 \note{
   The Gumbel copula is both an Archimedean and an extreme-value copula.

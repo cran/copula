@@ -8,7 +8,7 @@
 \usage{
 psiDabsMC(t, family, theta, degree = 1, n.MC,
           method = c("log", "direct", "pois.direct", "pois"),
-          log = FALSE)
+          log = FALSE, is.log.t = FALSE)
 }
 \arguments{
   \item{t}{\code{\link{numeric}} vector of evaluation points.}
@@ -28,6 +28,11 @@ psiDabsMC(t, family, theta, degree = 1, n.MC,
     }
   }
   \item{log}{if TRUE the logarithm of psiDabs is returned.}
+  \item{is.log.t}{if TRUE the argument \code{t} contains the logarithm of the
+    \dQuote{mathematical} \eqn{t}, i.e., conceptually,
+    \code{psi(t, *) == psi(log(t), *, is.log.t=TRUE)}, where the latter
+    may potentially be numerically accurate, e.g., for \eqn{t =
+      10^{500}}, where as the former would just return \eqn{psi(Inf, *) = 0}.}
 }
 \details{
   The absolute value of the \eqn{d}th derivative of the Laplace-Stieltjes transform
@@ -46,7 +51,7 @@ psiDabsMC(t, family, theta, degree = 1, n.MC,
   \code{\link{numeric}} vector of the same length as \code{t} containing
   the absolute values of the generator derivatives.
 }
-\author{Marius Hofert}
+\author{Marius Hofert (and Martin M.)}
 \references{
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011a),
   Estimators for Archimedean copulas in high dimensions: A comparison,
@@ -58,8 +63,17 @@ psiDabsMC(t, family, theta, degree = 1, n.MC,
 \examples{
 t <- c(0:100,Inf)
 set.seed(1)
-psiDabsMC(t, family="Gumbel", theta=2, degree=10, n.MC=10000, log=TRUE)
+(ps <- psiDabsMC(t, family="Gumbel", theta=2, degree=10, n.MC=10000, log=TRUE))
 ## Note: The absolute value of the derivative at 0 should be Inf for
 ## Gumbel, however, it is always finite for the Monte Carlo approximation
+set.seed(1)
+ps2 <- psiDabsMC(log(t), family="Gumbel", theta=2, degree=10, n.MC=10000, log=TRUE,
+                 is.log.t = TRUE)
+stopifnot(all.equal(ps[-1], ps2[-1], tol=1e-14))
+## Now is there an advantage of using "is.log.t" ?
+sapply(eval(formals(psiDabsMC)$method), function(MM)
+       psiDabsMC(780, family="Gumbel", method = MM,
+                 theta=2, degree=10, n.MC=10000, log=TRUE, is.log.t = TRUE))
+## not really better, yet...
 }
 \keyword{distribution}

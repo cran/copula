@@ -29,12 +29,12 @@ normalCopula(param, dim = 2, dispstr = "ex")
   \item{\dots}{ currently nothing. }
 }
 \value{
-  An elliptical copula object of class \code{"normalCopula"} or
-  \code{"tCopula"}.
+  An elliptical copula object of class \code{"\linkS4class{normalCopula}"} or
+  \code{"\linkS4class{tCopula}"}.
 }
 \note{
-  \code{"ellipCopula"} is a wrapper for \code{"normalCopula"} and
-  \code{"tCopula"}.
+  \code{ellipCopula()} is a wrapper for \code{normalCopula()} and
+  \code{tCopula()}.
 }
 \seealso{ \code{\link{archmCopula}}, \code{\link{fitCopula}}.
 }

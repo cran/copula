@@ -69,7 +69,7 @@ void J_m(int n, int p, const int b[], const double U[], const int R[],
 
 ******************************************************************************/
 
-void bootstrap(int *n, int *N, int *p, int *b, double *U, int *m,
+void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
 	       double *MA0, double *I0, int *subset, char **subset_char,
 	       int *pe)
 {
@@ -78,9 +78,6 @@ void bootstrap(int *n, int *N, int *p, int *b, double *U, int *m,
   double *J = Calloc((*n) * (*n) * (*p), double);
   double *K = Calloc((*n) * (*p), double);
   double *L = Calloc(*p, double);
-
-  /* for the random permutation */
-  int t1, t2;
 
   /* number of subsets */
   *sb = (int)sum_binom(*p,*m);
@@ -95,7 +92,7 @@ void bootstrap(int *n, int *N, int *p, int *b, double *U, int *m,
   GetRNGstate();
 
   /* N repetitions */
-  for (k=0;k<*N;k++) {
+  for (k=0; k<*N; k++) {
 
     if ((*pe > 0) && ((k+1) % (*pe) == 0))
       Rprintf("Simulation iteration %d\n",k+1);
@@ -112,10 +109,10 @@ void bootstrap(int *n, int *N, int *p, int *b, double *U, int *m,
 	  R[i + (*n) * j] = i;
 
 	/* random permutation */
-	for (i=*n-1;i>=0;i--)
+	for (i= *n-1; i >= 0; i--)
 	  {
-	    t1 = R[j * (*n) + i];
-	    t2 = (int)((i + 1) *  unif_rand());
+	    int t1 = R[j * (*n) + i],
+	      t2 = (int)((i + 1) *  unif_rand());
 	    R[j * (*n) + i] = R[j * (*n) + t2];
 	    R[j * (*n) + t2] = t1;
 	  }

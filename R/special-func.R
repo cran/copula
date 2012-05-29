@@ -26,13 +26,11 @@ polynEval <- function(coef, x) .Call(polyn_eval, coef, x)
 ##' @param cutoff  log(2) is optimal, see  Maechler (201x) .....
 ##' @return f(a) == log(1 - exp(-a)) == log1p(-exp(-a)) == log(-expm1(-a))
 ##' @author Martin Maechler, May 2002 .. Aug. 2011
-##' @references _TODO_
-##'  see <<log1mexpm>> in ../inst/doc/Frank-Rmpfr.Rnw  which has
-##' {log(-expm1(-theta))} ... underflows for
-##' large theta, and hence should be replaced by the generally accurate
-##' %% as shown by   Maechler (2011) --- FIXME: finally right that small paper!!
-##' %%               =========================  ~/R/MM/NUMERICS/log1-exp.R
-log1mexpm <- function(a, cutoff = log(2)) ## << log(2) is optimal >>
+##' @references Maechler(2012)
+##' Accurately Computing log(1 - exp(-|a|)) Assessed by the Rmpfr package.
+##' http://cran.r-project.org/web/packages/Rmpfr/vignettes/log1mexp-note.pdf
+##' MM: ~/R/Pkgs/Rmpfr/inst/doc/log1mexp-note.Rnw
+log1mexp <- function(a, cutoff = log(2)) ## << log(2) is optimal >>
 {
     if(has.na <- any(ina <- is.na(a))) {
 	y <- a
@@ -408,8 +406,8 @@ polylog <- function(z, s, method = c("sum", "negI-s-Stirling",
     } else {
 	## "negI"-methods:  s \in {1, 0, -1, -2, ....}	 "[neg]ative [I]nteger"
 	stopifnot(s == as.integer(s), s <= 1)
-	if(s == 1) { ## result = -log(1 -z) = -log(1 - exp(w)) = -log1mexpm(-w)
-	    r <- if(is.log..) -log1mexpm(-w) else -log1p(-z)
+	if(s == 1) { ## result = -log(1 -z) = -log(1 - exp(w)) = -log1mexp(-w)
+	    r <- if(is.log..) -log1mexp(-w) else -log1p(-z)
 	    return(if(logarithm) log(r) else r)
 	}
 	## s <= 0:
@@ -428,8 +426,8 @@ polylog <- function(z, s, method = c("sum", "negI-s-Stirling",
 	       p <- polynEval(fac.k * S.n1.k1, r)
 	       ## log(r) = log(z / (1-z)) = logit(z) = qlogis(z),  and if(is.log.z)
 	       ## log(r) = log(z / (1-z)) = log(z) - log(1-z) = w - log(1-exp(w)) =
-	       ##	 = w - log1mexpm(-w)
-	       if(logarithm) log(p) + if(is.log..) w - log1mexpm(-w) else qlogis(z)
+	       ##	 = w - log1mexp(-w)
+	       if(logarithm) log(p) + if(is.log..) w - log1mexp(-w) else qlogis(z)
 	       else r*p
 	   },
 	       "negI-s-Eulerian" =
@@ -440,7 +438,7 @@ polylog <- function(z, s, method = c("sum", "negI-s-Stirling",
 	       p <- polynEval(Eu.n, z)
 	       if(logarithm)
 		   log(p) +
-		       if(is.log..) w - (n+1)*log1mexpm(-w)
+		       if(is.log..) w - (n+1)*log1mexp(-w)
 		       else log(z) - (n+1)*log1p(-z)
 	       else z*p / i.z^(n+1)
 	   },
@@ -508,7 +506,8 @@ Bernoulli.all <-
                B <- numeric(n1)
                Bv <- 1/nn
            } else {
-               stopifnot(require("Rmpfr"), length(precBits) == 1, precBits >= 10)
+	       stopifnot(require("Rmpfr"),
+			 length(precBits) == 1, precBits >= 10)
                B <- mpfr(numeric(n1), precBits=precBits)
                Bv <- mpfr(1, precBits=precBits)/nn
            }

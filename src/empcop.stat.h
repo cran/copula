@@ -44,9 +44,9 @@ void J_u (int n, int p,        const double R[],                double *J);
 
 
 // empcopm.test.c  --- Independence test among random vectors ------------------
-void bootstrap(int *n, int *N, int *p, int *b, double *U, int *m,
-	       double *MA0, double *I0, int *subset, char **subset_char,
-	       int *pe);
+void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
+		    double *MA0, double *I0, int *subset, char **subset_char,
+		    int *pe);
 void empirical_copula_test_rv(double *U, int *n, int *p, int *b, int *m, double *MA0,
 			      double *I0, int *N, int *subset, double *MA, double *I,
 			      double *pval, double *fisher, double *tippett, double *Ipval);

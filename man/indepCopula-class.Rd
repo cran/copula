@@ -4,8 +4,8 @@
 \title{Class "indepCopula" }
 \description{Independence copula class.}
 \section{Objects from the Class}{
-  Objects can be created by calls of the form \code{new("indepCopula",
-    ...)} or by function \code{"indepCopula"}. Such objects can be
+  Objects can be created by calls of the form \code{new("indepCopula", ...)}
+  or by function \code{\link{indepCopula}()}.  Such objects can be
   useful as special cases of parametric copulas, bypassing
   copula-specific computations such as distribution, density, and sampler.
 }
@@ -41,7 +41,7 @@
 %   It is simpler than \code{"copula"}.
 % }
 \seealso{
-  \code{\link{indepCopula}}, 
+  \code{\link{indepCopula}},
   \code{\link{copula-class}}.
 }
 \keyword{classes}

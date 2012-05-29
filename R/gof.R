@@ -141,6 +141,9 @@ gtrafouni <- function(u, method = c("chisq", "gamma", "Remillard", "Genest"))
 ##' @author Marius Hofert
 rtrafo <- function(u, cop, m=d, n.MC=0)
 {
+    d. <- dim(u)
+    n <- d.[1]
+    d <- d.[2]
     stopifnot(is(cop, "outer_nacopula"), 2 <= m, m <= d)
     if(length(cop@childCops))
         stop("currently, only Archimedean copulas are provided")
@@ -149,9 +152,6 @@ rtrafo <- function(u, cop, m=d, n.MC=0)
     cop <- cop@copula
     th <- cop@theta
     stopifnot(cop@paraConstr(th))
-    dim. <- dim(u)
-    n <- dim.[1]
-    d <- dim.[2]
     psiI <- cop@psiInv(u, theta=th)
     psiI. <- t(apply(psiI, 1, cumsum))
     ## compute all conditional probabilities
@@ -273,19 +273,20 @@ apply the transformations yourself,  see ?gnacopula.")
                },
                stop("invalid 'trafo' argument"))
 
-    ## build test statistic function and string describing the method
-    string <- "Bootstrapped test of"
+    ## build test statistic function and 'meth' string describing the method
+    meth <- paste0("Bootstrapped (B =", n.bootstrap,") test of ")
+    meth2 <- paste0(method,", est.method = ", estimation.method)
     test.stat <-
-	switch(method, # define test statistic (and correct string describing the procedure)
+	switch(method,
 	       "chisq" =,
 	       "gamma" = {
-		   string <- paste0(string, "Anderson and Darling (with trafo = ",
-				    trafo, " and method = ", method, ")")
+		   meth <- paste0(meth, "Anderson and Darling (with trafo = ",
+				    trafo, " and method = ", meth2, ")")
 		   function(x) ad.test(x)$statistic
 	       },
 	       "Remillard" =,
 	       "Genest" = {
-		   string <- paste0(string, " ", method," (with trafo = ", trafo, ")")
+		   meth <- paste0(meth, meth2," (with trafo = ", trafo, ")")
 		   function(x) x
 	       },
 	       stop("wrong 'method' argument"))
@@ -294,7 +295,6 @@ apply the transformations yourself,  see ?gnacopula.")
 
     ## (1) estimate the parameter by the provided estimation method and
     ##	   define the estimated copula
-    if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
     theta.hat <- enacopula(u, cop, method=estimation.method, ...)
     cop.hat <- onacopulaL(cop@copula@name, list(theta.hat, 1:d)) # copula with theta.hat
 
@@ -335,7 +335,7 @@ apply the transformations yourself,  see ?gnacopula.")
     structure(class = "htest",
 	      list(p.value= mean(unlist(teststat.) > teststat),
                    statistic = teststat, data.name = u.name,
-		   method=string, estimator=theta.hat,
+		   method=meth, estimator=theta.hat,
 		   bootStats = list(estimator=theta.hat., statistic=teststat.)))
 
 }

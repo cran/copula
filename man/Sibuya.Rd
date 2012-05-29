@@ -42,7 +42,8 @@ dSibuya(x, alpha, log=FALSE)
 pSibuya(x, alpha, lower.tail=TRUE, log.p=FALSE)
 
 dsumSibuya(x, n, alpha,
-           method=c("log", "direct", "Rmpfr", "Rmpfr0", "RmpfrM", "diff", "exp.log"),
+           method=c("log", "direct", "diff", "exp.log",
+                    "Rmpfr", "Rmpfr0", "RmpfrM", "Rmpfr0M"),
            mpfr = list(minPrec = 21, fac = 1.25, verbose=TRUE),
            log=FALSE)
 }
@@ -68,11 +69,13 @@ dsumSibuya(x, n, alpha,
 	in a numerically stable way;}
       \item{\code{"direct"}}{directly evaluates the sum;}
       \item{\code{"Rmpfr*"}}{are as \code{method="direct"} but use
-        high-precision arithmetic; \code{"Rmpfr"} returns
-        \code{\link{double}}s whereas \code{"RmpfrM"} gives
-        \code{\link[Rmpfr]{mpfr}} high-precision numbers, each trying to
-        adapt to high enough precision, whereas \code{"Rmpfr0"} does no
-        adaption.\cr
+        high-precision arithmetic; \code{"Rmpfr"} and \code{"Rmpfr0"} return
+        \code{\link{double}}s whereas \code{"RmpfrM"} and \code{"Rmpfr0M"} give
+        \code{\link[Rmpfr]{mpfr}} high-precision numbers.
+	Whereas \code{"Rmpfr"} and \code{"RmpfrM"} each adapt to high
+        enough precision, the \code{"Rmpfr0*"} ones do not adapt.\cr
+%% FIXME --- when do we *compute* the precision (without adaption, but
+%% by pre() formula? --- exactly when 'alpha' is not an mpfr number
 	For all \code{"Rmpfr*"} methods, \code{alpha} can be set to a
         \code{\link[Rmpfr:mpfr-class]{mpfr}} number of specified precision and this
         will determine the precision of all parts of the internal

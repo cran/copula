@@ -27,7 +27,7 @@ measured for the following elements: uranium (U), Lithium (Li), cobalt
 \references{
 R. D. Cook & M. E. Johnson (1986). Generalized BurrParetologistic
 distributions with applications to a uranium exploration data
-set. \emph{Technometrics}, 28:123--131.
+set. \emph{Technometrics} \bold{28}, 123--131.
 }
 \examples{
 data(uranium)

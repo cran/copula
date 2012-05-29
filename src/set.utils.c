@@ -31,7 +31,7 @@
 
 /*****************************************************************************
 
-  Counts the number of bits equal to 1
+  Set Cardinality : Counts the number of bits equal to 1
 
 *****************************************************************************/
 
@@ -51,9 +51,8 @@ int card(int n)
 
 double sum_binom(int n, int k)
 {
-  int i;
-  double s = 1.0;
-  for (i=1;i<=k;i++)
+  double s = 1.;
+  for (int i=1; i <= k; i++)
     s += choose(n,i);
   return s;
 }
@@ -64,14 +63,12 @@ double sum_binom(int n, int k)
   in the "natural" order. Recursive function.
 
 *****************************************************************************/
-
+static
 void k_power_set_rec(int n, int k, int last, int *power_set, int *b)
 {
-  int i, istart;
-
   /* look for the leftmost 1 in b and start to fill blank cases
      with 1 left from this position */
-  istart = n;
+  int istart = n;
 
   if(*b > 0)
     while(!(*b & 1<<(istart-1)))
@@ -79,7 +76,7 @@ void k_power_set_rec(int n, int k, int last, int *power_set, int *b)
   else
     istart = 0;
 
-  for(i=istart; i<n; i++) {
+  for(int i=istart; i<n; i++) {
 
     last++;
     *(power_set+last) = *b + (1<<i);
@@ -110,12 +107,10 @@ void k_power_set(int *n, int *k, int *power_set)
 
 *****************************************************************************/
 
-void binary2subset(int n, int b, int *x)
+static void binary2subset(int n, int b, int *x)
 {
-  int i;
-  for(i=0; i<n; i++)
+  for(int i=0; i<n; i++)
     if(b & 1 << i) {
-
       *x = i;
       x++;
     }
@@ -131,25 +126,22 @@ void binary2subset(int n, int b, int *x)
 
 void k_power_set_char(int *n, int *sb, int *k_power_set, char **subset)
 {
-  int i, j;
-  int x[32];
-  char string[255];
-
+  subset[0] = (char *) R_alloc(3, sizeof(char));
   sprintf(subset[0],"{}");
 
-  for(i=1; i<*sb; i++) {
+  for(int i=1; i<*sb; i++) {
+    int j, x[32];
 
     for(j=0; j<*n; j++)
       x[j]=0;
 
-    binary2subset(*n,k_power_set[i],x);
+    binary2subset(*n, k_power_set[i], x);
 
     subset[i] = (char *) R_alloc(SET_MAX * (*n), sizeof(char));
-
     sprintf(subset[i],"{%d",x[0]+1);
 
-    for(j=1; j<card(k_power_set[i]); j++) {
-
+    for(j=1; j < card(k_power_set[i]); j++) {
+      char string[255];
       sprintf(string,",%d", x[j]+1);
       strcat(subset[i],string);
     }
@@ -165,10 +157,9 @@ void k_power_set_char(int *n, int *sb, int *k_power_set, char **subset)
 
 *****************************************************************************/
 
-void natural2binary(int *n, double *sf, int *power_set, double *sf_out) {
-
-  int i;
-  for(i=0; i<(1<<*n); i++)
+void natural2binary(int *n, double *sf, int *power_set, double *sf_out)
+{
+  for(int i=0; i<(1<<*n); i++)
     sf_out[power_set[i]] = sf[i];
 }
 

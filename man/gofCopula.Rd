@@ -15,12 +15,12 @@
 }
 \usage{
 gofCopula(copula, x, N = 1000, method = "mpl",
-          simulation = c("pb", "mult"),
-          print.every = 100, optim.method = "BFGS")
+          simulation = c("pb", "mult"), print.every = 100,
+          optim.method = "BFGS", optim.control = list(maxit=20))
 }
 
 \arguments{
-  \item{copula}{ object of class \code{"copula"} representing the
+  \item{copula}{ object of class \code{"\linkS4class{copula}"} representing the
     hypothesized copula family.}
   \item{x}{ a data matrix that will be transformed to pseudo-observations. }
   \item{N}{ number of bootstrap or multiplier iterations to be used to
@@ -35,7 +35,8 @@ gofCopula(copula, x, N = 1000, method = "mpl",
     \code{"pb"} (parametric bootstrap) or  \code{"mult"} (multiplier).}
   \item{print.every}{ progress is printed every \code{"print.every"}
     iterations. No progress is printed if it is nonpositive.}
-  \item{optim.method}{ the method for \code{\link{optim}()}.}
+  \item{optim.method, optim.control}{the \code{method} and
+    \code{control} arguments for \code{\link{optim}()}, see there.}
 }
 \details{
   If the parametric bootstrap is used, the dependence parameters of
@@ -98,7 +99,7 @@ gofCopula(copula, x, N = 1000, method = "mpl",
   last reference.
 }
 \seealso{
-  \code{\link{fitCopula}}, \code{\link{ellipCopula}}.
+  \code{\link{fitCopula}()}, \code{\link{ellipCopula}}.
 
   \code{\link{gnacopula}} for other goodness-of-fit tests for (nested)
   Archimedean copulas.
@@ -106,7 +107,7 @@ gofCopula(copula, x, N = 1000, method = "mpl",
 \examples{
 ## the following example is available in batch through
 ## demo(gofCopula)
-%% FIXME: We need some *run* examples, either here or in ../tests/ !!
+%% Note that  ../tests/gof-ex.R (at the end) has "proof-of-concept" tests
 \dontrun{
 ## A two-dimensional data example ----------------------------------
 x <- rcopula(claytonCopula(3), 200)

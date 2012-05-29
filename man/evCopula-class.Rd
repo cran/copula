@@ -10,7 +10,7 @@
 \description{Class representing extreme-value copulas.}
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("evCopula",
-    ...)} or by function \code{"evCopula"}.
+    ...)} or by function \code{\link{evCopula}}.
 }
 \section{Slots}{
   \describe{
@@ -39,14 +39,14 @@
   }
 }
 \section{Extends}{
-  Class \code{"evCopula"} extends class \code{"copula"}
+  Class \code{"evCopula"} extends class \code{"\linkS4class{copula}"}
   directly. Classes \code{"galambosCopula"}, \code{"huslerReissCopula"},
   \code{"tawnCopula"}, and \code{"tevCopula"} extend class \code{"evCopula"} directly.
 }
 \note{
   %The expressions of pdf are obtained by differentiating the cdf
   %expression using function \code{"deriv"}.
-  Objects of class \code{"gumbelCopula"} are also of class \code{"archmCopula"}.
+  Objects of class \code{"\linkS4class{gumbelCopula}"} are also of class \code{"\linkS4class{archmCopula}"}.
 }
 \seealso{
   \code{\link{evCopula}},

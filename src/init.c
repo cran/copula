@@ -101,7 +101,7 @@ static R_NativePrimitiveArgType exchtestCn_stat_t[] = {REALSXP, REALSXP, INTSXP,
 
 
 // ---- ./empcopm.test.c ------
-static R_NativePrimitiveArgType bootstrap_t[] = {INTSXP, INTSXP, INTSXP, INTSXP, REALSXP, INTSXP,
+static R_NativePrimitiveArgType bootstrap_MA_I_t[] = {INTSXP, INTSXP, INTSXP, INTSXP, REALSXP, INTSXP,
 	       REALSXP, REALSXP, INTSXP, STRSXP,
 	       INTSXP};
 static R_NativePrimitiveArgType empirical_copula_test_rv_t[] = {REALSXP, INTSXP, INTSXP, INTSXP, INTSXP, REALSXP,
@@ -171,7 +171,7 @@ static const R_CMethodDef CEntries[]  = {
     CDEF(evsymtest_stat),
     CDEF(exchtestCn),
     CDEF(exchtestCn_stat),
-    CDEF(bootstrap),
+    CDEF(bootstrap_MA_I),
     CDEF(empirical_copula_test_rv),
     CDEF(simulate_empirical_copula_serial),
     CDEF(empirical_copula_test_serial),

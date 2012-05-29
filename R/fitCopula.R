@@ -68,28 +68,22 @@ setMethod("summary", signature("fitCopula"), summaryFitCopula)
 
 ## Wrapper function ############################################################
 
-fitCopula <- function(copula, data,
-                      method = "mpl",
-                      start = NULL,
-                      lower = NULL, upper = NULL,
-                      optim.control = list(maxit=1000),
-                      optim.method = "BFGS",
-                      estimate.variance = TRUE,
-                      hideWarnings = TRUE)
+fitCopula <- function(copula, data, method = c("mpl","ml","itau","irho"),
+                      start = NULL, lower = NULL, upper = NULL,
+                      optim.method = "BFGS", optim.control = list(maxit=1000),
+                      estimate.variance = TRUE, hideWarnings = TRUE)
 {
-  switch(method,
+  switch(match.arg(method),
 	 "ml" =
-	 fitCopula.ml(data, copula, start, lower, upper, optim.control,
-		      optim.method, estimate.variance, hideWarnings),
+	 fitCopula.ml(copula, data, start=start, lower=lower, upper=upper,
+		      method=optim.method, optim.control=optim.control,
+		      estimate.variance=estimate.variance, hideWarnings=hideWarnings),
 	 "mpl" =
-	 fitCopula.mpl(copula, data, start, lower, upper, optim.control,
-		       optim.method, estimate.variance, hideWarnings),
-	 "itau" =
-	 fitCopula.itau(copula, data, estimate.variance),
-	 "irho" =
-	 fitCopula.irho(copula, data, estimate.variance),
-	 ## otherwise
-	 stop("Implemented methods are: ml, mpl, itau, and irho."))
+	 fitCopula.mpl(copula, data, start=start, lower=lower, upper=upper,
+		       optim.method=optim.method, optim.control=optim.control,
+		       estimate.variance=estimate.variance, hideWarnings=hideWarnings),
+	 "itau" = fitCopula.itau(copula, data, estimate.variance=estimate.variance),
+	 "irho" = fitCopula.irho(copula, data, estimate.variance=estimate.variance))
 }
 
 
@@ -97,8 +91,7 @@ fitCopula <- function(copula, data,
 
 fitCopula.mpl <- function(copula, data, start=NULL,
                           lower=NULL, upper=NULL,
-                          optim.control=list(NULL),
-                          optim.method=NULL,
+                          optim.method=NULL, optim.control=list(),
                           estimate.variance = TRUE,
                           hideWarnings = TRUE) {
   q <- length(copula@parameters)
@@ -111,9 +104,9 @@ fitCopula.mpl <- function(copula, data, start=NULL,
     else start <- copula@parameters
   }
 
-  fit <- fitCopula.ml(data, copula, start, lower, upper,
-                      optim.control, optim.method,
-                      estimate.variance=FALSE, hideWarnings)
+  fit <- fitCopula.ml(copula, data, start=start, lower=lower, upper=upper,
+        	      method=optim.method, optim.control=optim.control,
+                      estimate.variance=FALSE, hideWarnings=hideWarnings)
   var.est <- if(estimate.variance) varPL(fit@copula, data) / nrow(data) else matrix(NA, q, q)
   new("fitCopula",
       estimate = fit@estimate,
@@ -183,21 +176,23 @@ chkParamBounds <- function(copula) {
   param <- copula@parameters
   upper <- copula@param.upbnd
   lower <- copula@param.lowbnd
-  if (any(is.na(param) | param > upper | param < lower)) return(FALSE)
-  ## ("Parameter value out of bound")
-  else return(TRUE)
+  ### return TRUE  iff  ("Parameter value out of bound")
+  !(any(is.na(param) | param > upper | param < lower))
 }
 
 loglikCopula <- function(param, x, copula, hideWarnings=FALSE) {
   slot(copula, "parameters") <- param
   if (!chkParamBounds(copula)) return(NaN)
 
+## FIXME:  use suppressMessages() {and live without  "fitMessages"
   ## messageOut may be used for debugging
   if (hideWarnings) {
     messageOut <- textConnection("fitMessages", open="w", local=TRUE)
     sink(messageOut); sink(messageOut, type="message")
     options(warn = -1) ## ignore warnings; can be undesirable!
   }
+  ## FIXME: as soon as *ALL*  dcopula() methods have a  'log' argument which works {add tests !!}
+  ## loglik <- try(sum(dcopula(copula, x, log=TRUE)))
   loglik <- try(sum(log(dcopula(copula, x))))
 
   if (hideWarnings) {
@@ -208,10 +203,9 @@ loglikCopula <- function(param, x, copula, hideWarnings=FALSE) {
   loglik
 }
 
-fitCopula.ml <- function(data, copula, start=NULL,
+fitCopula.ml <- function(copula, data, start=NULL,
                          lower=NULL, upper=NULL,
-                         optim.control=list(NULL),
-                         method=NULL,
+                         method=NULL, optim.control=list(),
                          estimate.variance=TRUE,
                          hideWarnings=FALSE) {
   if (copula@dimension != ncol(data))

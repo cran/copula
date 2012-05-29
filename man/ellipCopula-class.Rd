@@ -8,7 +8,7 @@
   distributions. }
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("ellipCopula",
-    ...)}, or by function \code{"ellipCopula"}.
+    ...)}, or by function \code{\link{ellipCopula}}.
 }
 \section{Slots}{
   \describe{
@@ -29,7 +29,7 @@
   }
 }
 \section{Extends}{
-  Class \code{"ellipCopula"} extends class \code{"copula"} directly.
+  Class \code{"ellipCopula"} extends class \code{"\linkS4class{copula}"} directly.
   Class \code{"normalCopula"} and \code{"tCopula"} extends class
   \code{"ellipCopula"} directly.
 }
@@ -44,7 +44,7 @@
   }
 }
 \seealso{
-  \code{\link{ellipCopula}}, 
+  \code{\link{ellipCopula}},
   \code{\link{copula-class}}.
 }
 \keyword{classes}

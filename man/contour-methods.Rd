@@ -6,17 +6,17 @@
 \alias{contour,mvdc-method}
 \title{ Methods for function `contour' in package `copula' }
 \description{
- Methods for function \code{contour} in package \pkg{copula} 
+ Methods for function \code{contour} in package \pkg{copula}
 }
 \section{Methods}{
 \describe{
-  \item{x = "copula"}{ Contour plot for a \code{"copula"} or
-    \code{"indepCopula"} object. }
+  \item{x = "copula"}{ Contour plot for a \code{"\linkS4class{copula}"} or
+    \code{"\linkS4class{indepCopula}"} object. }
 
 \item{x = "mvdc"}{ Contour plot for a \code{"mvdc"} object. }
 }}
 \details{
-  When \code{x} is of class \code{"copula"}, the following arguments can be
+  When \code{x} is of class \code{"\linkS4class{copula}"}, the following arguments can be
   supplied:
   \describe{
     \item{fun}{the function to be plotted, i.e.,\code{"dcopula"} or \code{"pcopula"}.}

@@ -63,7 +63,7 @@ Afun(copula, w)
 AfunDer(copula, w)
 }
 \arguments{
-  \item{copula}{an object of class \code{"copula"}. }
+  \item{copula}{an object of class \code{"\linkS4class{copula}"}. }
   \item{u, s, w}{numerical vector at which these functions are to be
     evaluated. }
 }

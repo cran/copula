@@ -74,6 +74,9 @@ round(dcop, 3)
 
 
 ## normalCopula
+uB <- cbind(c(0:1, .5), (1:9)/10) # values at boundaries
+fC <- dcopula(normalCopula(0.55), uB)
+stopifnot(is.finite(fC), length(fC)==nrow(uB), fC[-3*(1:3)] == 0)
 theta.n <- calibKendallsTau(normalCopula(0), tau)
 dcop <- matrix(dcopula(normalCopula(param=theta.n, dim = 2), umat),
                n1, n2)
@@ -85,6 +88,8 @@ round(dcop, 3)
 
 
 ## tCopula
+fC <- dcopula(tCopula(0.55), uB)
+stopifnot(is.finite(fC), length(fC)==nrow(uB), fC[-3*(1:3)] == 0)
 (theta.t. <- calibKendallsTau(tCopula(0, df=10), tau))
 dcop <- matrix(dcopula(tCopula(param=theta.t., dim = 2, df=10), umat),
                n1, n2)

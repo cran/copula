@@ -141,10 +141,7 @@ rnacopula <- function(n, x, ...)
     j <- c(x@comp, unlist(lapply(childL, `[[`, "indCol")))
     ## extra check
     stopifnot(length(j) == ncol(mat))
-    m <- mat[,order(j), drop=FALSE] # permute data and return
-    ## extra checks
-    stopifnot(length(dm <- dim(m)) == 2, dm == dim(mat))
-    m
+    mat[, order(j), drop=FALSE] # permute data and return
 }
 
 ##' Returns a list with an (n x d)-matrix of random variates and a vector of

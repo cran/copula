@@ -7,7 +7,7 @@
 \title{Class "fitCopula" }
 \description{ Classes and summaries related to copula model fitting. }
 \section{Objects from the Class}{
-  Objects can be created by calls to \code{fitCopula}, \code{fitMvdc}
+  Objects can be created by calls to \code{\link{fitCopula}}, \code{\link{fitMvdc}}
   or to their \code{summary} method.
 }
 \section{Slots}{
@@ -21,7 +21,7 @@
     \item{\code{convergence}:}{ \code{numeric}, convergence code from
       \code{"optim"}. }
     \item{\code{nsample}:}{ \code{numeric}, integer representing the sample size. }
-    \item{\code{copula}:}{ Object of class \code{"copula"}. }
+    \item{\code{copula}:}{ Object of class \code{"\linkS4class{copula}"}. }
     \item{\code{mvdc}:}{ Object of class \code{"mvdc"}. }
   }
 }
@@ -29,7 +29,7 @@
 \references{
   C. Genest, K. Ghoudi and L.-P. Rivest (1995). A semiparametric
   estimation procedure of dependence parameters in multivariate
-  families of distributions. \emph{Biometrika}, 82, 543-552. 
+  families of distributions. \emph{Biometrika} \bold{82}, 543--552. 
 }
 
 \keyword{classes}

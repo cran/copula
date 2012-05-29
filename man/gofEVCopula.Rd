@@ -12,7 +12,7 @@
   in equation (5) of Genest, Kojadinovic, Nešlehová and Yan (2010).
   Approximate p-values for the test statistic are obtained using a
   parametric bootstrap.
-  
+
 }
 \usage{
 gofEVCopula(copula, x, N = 1000, method = "mpl",
@@ -21,7 +21,7 @@ gofEVCopula(copula, x, N = 1000, method = "mpl",
 }
 
 \arguments{
-  \item{copula}{ object of class \code{"evCopula"} representing the
+  \item{copula}{ object of class \code{"\linkS4class{evCopula}"} representing the
     hypothesized extreme-value copula family.}
   \item{x}{ a data matrix that will be transformed to pseudo-observations. }
   \item{N}{ number of bootstrap samples to be used to
@@ -63,7 +63,7 @@ gofEVCopula(copula, x, N = 1000, method = "mpl",
 
   C. Genest, I. Kojadinovic, J. Nešlehová and J. Yan (2011). A
   goodness-of-fit test for bivariate extreme-value copulas.
-  \emph{Bernoulli}, 17:1, pages 253-275.
+  \emph{Bernoulli} \bold{17}, 1, pages 253-275.
 }
 \seealso{ \code{\link{evCopula}}, \code{\link{evTestC}}, \code{\link{evTestA}},
   \code{\link{evTestK}}, \code{\link{gofCopula}}, \code{\link{Anfun}}. }
@@ -72,7 +72,7 @@ gofEVCopula(copula, x, N = 1000, method = "mpl",
 \dontrun{
 x <- rcopula(claytonCopula(3), 100)
 
-## Does the Gumbel family seem to be a good choice? 
+## Does the Gumbel family seem to be a good choice?
 gofEVCopula(gumbelCopula(1), x)
 
 ## The same with different estimation methods

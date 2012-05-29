@@ -132,7 +132,8 @@ loglikMvdc <- function(param, x, mvdc, suppressMessages=FALSE) {
 }
 
 fitMvdc <- function(data, mvdc, start,
-                    optim.control=list(NULL), method="BFGS") {
+                    optim.control=list(), method="BFGS")
+{
   copula <- mvdc@copula
   if (copula@dimension != ncol(data))
     stop("The dimension of the data and copula do not match.\n")
@@ -140,11 +141,11 @@ fitMvdc <- function(data, mvdc, start,
   if(mvdc@marginsIdentical){
     if(length(copula@parameters) + marNpar[1] != length(start))
       stop("The length of start and mvdc parameters do not match.\n")
-      }
-  else{
+  }
+  else {
     if(length(copula@parameters) + sum(marNpar) != length(start))
       stop("The length of start and mvdc parameters do not match.\n")
-    }
+  }
   control <- c(optim.control, fnscale=-1)
   notgood <- unlist(lapply(control, is.null))
   control <- control[!notgood]

@@ -47,11 +47,11 @@ rnacopula(n, x, ...)
 
   Hofert, M. (2012).
   Sampling exponentially tilted stable distributions.
-  \emph{ACM Transactions on Modeling and Computer Simulation}, \bold{22}, 1, page numbers: to be announced.
+  \emph{ACM Transactions on Modeling and Computer Simulation} \bold{22}, 1, nn--mm.% FIXME
 
   Hofert, M. and \enc{Mächler}{Maechler}, M. (2011).
   Nested Archimedean Copulas Meet R: The nacopula Package.
-  \emph{Journal of Statistical Software}, \bold{39}, 9, 1--20.
+  \emph{Journal of Statistical Software} \bold{39}, 9, 1--20.
 }
 \seealso{
   \code{\link{rnchild}}; classes \code{"\linkS4class{nacopula}"} and

@@ -111,6 +111,16 @@ importFrom("ADGofTest", ad.test)
 
 importFrom("stabledist", dstable)
 
+if(FALSE) {## currently do not "depend" on Rmpfr's correct installation:
+## As we use it in "bad cases" polyG(), dsumSibuya(),..:
+importFrom("Rmpfr",
+	   mpfr, chooseMpfr, chooseMpfr.all,
+	   getPrec, roundMpfr, sumBinomMpfr)
+## currently needed when Rmpfr is detached, as it influences "numeric" (e.g. in examples testing):
+importClassesFrom("Rmpfr",
+                  mpfr, atomicVector, array_or_vector, Mnumber)
+}
+
 exportClasses("acopula",
               "nacopula", "outer_nacopula",
               "interval", "maybeInterval"
@@ -135,14 +145,16 @@ export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        ,"opower"
        ,"prob"
        ,"timing"
-       ## Should we provide these in a separate (very small) R package ?
+       ## Should we provide these in a separate (very small) R pakage ?
        ,"sinc", "A..Z"
        ,"rstable1"
        ,"retstable", "retstableR"
        ,"dSibuya", "pSibuya", "dsumSibuya", "rSibuya", "rSibuyaR"
        ,"rlog", "rlogR", "rF01Frank", "rF01Joe", "rFFrank", "rFJoe"
-       ##,"logm1expm"
-       ,"polylog", "Bernoulli", "Bernoulli.all", "Eulerian", "Stirling1", "Stirling2", "Eulerian.all", "Stirling1.all", "Stirling2.all"
+       ,"log1mexp"
+       ,"polylog", "Bernoulli", "Bernoulli.all"
+       ,"Eulerian", "Stirling1", "Stirling2"
+       ,"Eulerian.all", "Stirling1.all", "Stirling2.all"
        ,"psiDabsMC"
        ,"setTheta"
        ,"tauAMH"
@@ -156,6 +168,3 @@ exportMethods(## for both own and "other" generics:
 	      "%in%", "dim",
 	      "format", "show"
 	      )
-
-if(getRversion() < "2.12")
-    export("adjustcolor")

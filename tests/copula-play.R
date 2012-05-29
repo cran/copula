@@ -291,8 +291,6 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     print(uT)
     cat0("check if lambdaUInv(lambdaU(thetavec))==lambdaUvec: ",
          all.equal(uT.I, lambdaUvec))
-    class(CT) <- "proc_time_list"
-    CT
 
     ### (11) dDiag
 
@@ -303,6 +301,8 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     stopifnot(is.numeric(dDiag.), all(dDiag. > 0))
     cat0("[Ok]")
 
+    class(CT) <- "proc_time_list"
+    CT
 }
 
 ##' print() method for the tstCop() results

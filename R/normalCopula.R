@@ -53,7 +53,8 @@ dnormalCopula <- function(copula, u, log=FALSE, ...) {
   x <- qnorm(u)
   ## work in log-scale [less over-/under-flow, then (maybe) transform:
   val <- dmvnorm(x, sigma = sigma, log=TRUE) - rowSums(dnorm(x, log=TRUE))
-  if(any(out <- !is.na(u) & (u <= 0 | u >= 1))) val[out] <- -Inf
+  if(any(out <- !is.na(u) & (u <= 0 | u >= 1)))
+    val[apply(out, 1, any)] <- -Inf
   if(log) val else exp(val)
 }
 

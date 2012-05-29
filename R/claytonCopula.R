@@ -113,15 +113,15 @@ pclaytonCopula <- function(copula, u) {
 }
 
 
-dclaytonCopula <- function(copula, u, log=FALSE, ...) {
+## Nowhere used (!)
+dclaytonCopula <- function(copula, u, ...) {
   dim <- copula@dimension
   if(!is.matrix(u)) u <- matrix(u, ncol = dim)
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
-  pdf <- copula@exprdist$pdf
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   if(log) stop("'log=TRUE' not yet implemented")
-  val <- c(eval(pdf))
+  val <- c(eval(copula@exprdist$pdf))
   val[apply(u, 1, function(v) any(v < 0))] <- 0
   val[apply(u, 1, function(v) any(v > 1))] <- 0
 ##   if (alpha < 0) {
@@ -132,13 +132,14 @@ dclaytonCopula <- function(copula, u, log=FALSE, ...) {
   val
 }
 
-dclaytonCopula.pdf <- function(copula, u) {
+dclaytonCopula.pdf <- function(copula, u, log=FALSE) {
   dim <- copula@dimension
   if (dim > 10) stop("Clayton copula PDF not implemented for dimension > 10.")
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
-  if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
+  if (abs(alpha) <= .Machine$double.eps^.9)
+    return(rep.int(if(log) 0 else 1, nrow(u)))
   val <- pmax(c(eval(claytonCopula.pdf.algr[dim])),0)
   ## clean up
   val[apply(u, 1, function(v) any(v < 0))] <- 0
@@ -148,7 +149,7 @@ dclaytonCopula.pdf <- function(copula, u) {
 
   ## if (alpha > 0)
   ## else
-  val
+  if(log) log(val) else val
 }
 
 

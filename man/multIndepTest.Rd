@@ -18,18 +18,18 @@ multIndepTest(x, d, m=length(d), N=1000, alpha=0.05, print.every = 100)
 }
 
 \arguments{
-  \item{x}{Data frame or data matrix containing realizations (one per
+  \item{x}{data frame (\code{\link{data.frame}}) or  matrix containing realizations (one per
     line) of the random vectors whose independence is to be tested.}
   \item{d}{Dimensions of the random vectors whose realizations are given
-    in \code{x}. It is required that \code{sum(d)=ncol(x)}.}
+    in \code{x}.  It is required that \code{sum(d) == ncol(x)}.}
   \item{m}{Maximum cardinality of the subsets of random vectors for
     which a test statistic is to be computed. It makes sense to consider
     \code{m << p} especially when \code{p} is large.}
-  \item{N}{Number of bootstrap/permutation samples.}
-  \item{alpha}{Significance level used in the computation of the
+  \item{N}{number of bootstrap/permutation samples.}
+  \item{alpha}{significance level used in the computation of the
     critical values for the test statistics.}
-  \item{print.every}{Progress is printed every \code{"print.every"}
-    iterations. No progress is printed if it is nonpositive.}
+  \item{print.every}{progress is printed every \code{"print.every"}
+    iterations.  No progress is printed if it is nonpositive.}
 }
 \details{
   See the references below for more details, especially the last one.
@@ -53,26 +53,26 @@ multIndepTest(x, d, m=length(d), N=1000, alpha=0.05, print.every = 100)
 \references{
   P. Deheuvels (1979). La fonction de dépendance empirique et ses
   propriétés: un test non paramétrique d'indépendance, \emph{Acad. Roy.
-    Belg. Bull. Cl. Sci.}, 5th Ser. 65:274--292.
-  
+    Belg. Bull. Cl. Sci.}, 5th Ser. \bold{65}, 274--292.
+
   P. Deheuvels (1981), A non parametric test for independence,
-  \emph{Publ. Inst. Statist. Univ. Paris}. 26:29--50.
-  
+  \emph{Publ. Inst. Statist. Univ. Paris}. \bold{26}, 29--50.
+
   C. Genest and B. Rémillard (2004), Tests of independence and
-  randomness based on the empirical copula process. \emph{Test}, 13:335--369.
-  
+  randomness based on the empirical copula process. \emph{Test} \bold{13}, 335--369.
+
   C. Genest, J.-F. Quessy and B. Rémillard (2006). Local
   efficiency of a Cramer-von Mises test of independence,
-  \emph{Journal of Multivariate Analysis}, 97:274--294.
-  
+  \emph{Journal of Multivariate Analysis} \bold{97}, 274--294.
+
   C. Genest, J.-F. Quessy and B. Rémillard (2007), Asymptotic
   local efficiency of Cramér-von Mises tests for multivariate
-  independence. \emph{The Annals of Statistics}, 35:166--191.
-  
+  independence. \emph{The Annals of Statistics} \bold{35}, 166--191.
+
   I. Kojadinovic and M. Holmes (2009), Tests of independence among
   continuous random vectors based on Cramér-von Mises functionals
   of the empirical copula process. \emph{Journal of Multivariate
-    Analysis}, 100:1137--1154.
+    Analysis} \bold{100}, 1137--1154.
 }
 
 \seealso{
@@ -92,10 +92,10 @@ y <- matrix(rnorm(6*n),n,6)
 y[,1] <- y[,2]/2 + sqrt(3)/2*y[,1]
 y[,3] <- y[,4]/2 + sqrt(3)/2*y[,3]
 y[,5] <- y[,6]/2 + sqrt(3)/2*y[,5]
-    
+
 nc <- normalCopula(0.3,dim=3)
 x <- cbind(y,rcopula(nc,n),rcopula(nc,n))
-       
+
 x[,1] <- abs(x[,1]) * sign(x[,3] * x[,5])
 x[,2] <- abs(x[,2]) * sign(x[,3] * x[,5])
 x[,7] <- x[,7] + x[,10]

@@ -21,7 +21,7 @@ Indemnity payment and allocated loss adjustment expense from an insurance compan
 }
 \references{
 Frees, E. and Valdez, E. (1998). Understanding relationships using
-copulas. \emph{North American Actuarial Journal}, 2:1--25.
+copulas. \emph{North American Actuarial Journal} \bold{2}, 1--25.
 }
 \examples{
 data(loss)

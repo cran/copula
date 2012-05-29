@@ -9,7 +9,7 @@
 \description{Archimedean copula class.}
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("archmCopula",
-    ...)} or by function \code{"archmCopula"}. Implemented families are
+    ...)} or by function \code{\link{archmCopula}}. Implemented families are
   Clayton, Gumbel, Frank, and Ali-Mikhail-Haq.
 }
 \section{Slots}{
@@ -48,16 +48,16 @@
   }
 }
 \section{Extends}{
-  Class \code{"archmCopula"} extends class \code{"copula"} directly.
+  Class \code{"archmCopula"} extends class \code{"\linkS4class{copula}"} directly.
   Class \code{"claytonCopula"}, \code{"frankCopula"},
   \code{"gumbelCopula"} and \code{"amhCopula"} extends class
   \code{"archmCopula"} directly.
 }
 \note{
-  \code{"gumbelCopula"} is also of class \code{"evCopula"}.
+  \code{"gumbelCopula"} is also of class \code{"\linkS4class{evCopula}"}.
 }
 \seealso{
-  \code{\link{archmCopula}}, 
+  \code{\link{archmCopula}},
   \code{\link{copula-class}}.
 }
 \keyword{classes}

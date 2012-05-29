@@ -56,8 +56,8 @@ setClass("asymExplicitCopula",
 
 asymExplicitCopula <- function(shapes, copula1, copula2) {
   d <- copula1@dimension
-  stopifnot(d == copula2@dimension)
-  stopifnot(length(shapes) == d)
+  stopifnot(d == copula2@dimension,
+            d == length(shapes))
   ## cdf
   getcdfchar <- function(cdf, om=FALSE) {
     ## WARNING: this only works up to dim 9; e.g., u10 could be replaced with u1^shp1

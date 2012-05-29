@@ -156,7 +156,7 @@ calibKendallsTauFgmCopula <- function(copula, tau) {
 calibSpearmansRhoFgmCopula <- function(copula, rho) {
   if (any(rho < -1/3 | rho > 1/3))
     warning("rho is out of the range [-1/3, 1/3]")
-  pmax(-1, pmin(1, r * rho))
+  pmax(-1, pmin(1, 3 * rho))
 }
 
 

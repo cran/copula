@@ -304,7 +304,7 @@ multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05,
     b <- c(0,cumsum(d))
 
     ## bootstrap
-    bootstrap <- .C(bootstrap,
+    bootstrap <- .C(bootstrap_MA_I,
                     n = as.integer(n),
                     N = as.integer(N),
                     p = as.integer(p),
@@ -349,8 +349,9 @@ multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05,
 
      structure(class = "indepTest",
 	       list(subsets=subsets,statistics=R $MA, critical.values=critical,
-		    pvalues = R $pval, fisher.pvalue=R $fisher, tippett.pvalue=R $tippett, alpha=alpha,
-		    beta=beta, global.statistic=R $I, global.statistic.pvalue=R $Ipval))
+		    pvalues = R $pval, fisher.pvalue=R $fisher, tippett.pvalue=R $tippett,
+		    alpha=alpha, beta=beta,
+		    global.statistic=R $I, global.statistic.pvalue=R $Ipval))
 }
 
 ################################################################################
