@@ -4,12 +4,13 @@
 \alias{rtrafo}
 \title{Goodness-of-Fit Testing Transformations for (Nested) Archimedean Copulas}
 \description{
-  \code{htrafo()} the transformation described in Hofert and Hering (2011).
+  \code{htrafo()} the transformation described in Hering and Hofert (2011).
 
   \code{rtrafo()} the transformation of Rosenblatt (1952).
 }
 \usage{
-htrafo(u, cop, include.K=TRUE, n.MC=0)
+htrafo(u, cop, include.K=TRUE, n.MC=0, inverse=FALSE,
+       method=formals(qK)$method, u.grid, ...)
 rtrafo(u, cop, m=d, n.MC=0)
 }
 \arguments{
@@ -27,10 +28,15 @@ rtrafo(u, cop, m=d, n.MC=0)
     \eqn{m}th given all with index smaller than \eqn{m}).}
   \item{n.MC}{parameter \code{n.MC} for \code{\link{K}} (for \code{htrafo})
     or for approximating the derivatives involved (for \code{rtrafo}).}
+  \item{inverse}{logical indicating whether the inverse of the
+    transformation is returned.}
+  \item{method}{method to compute \code{qK}.}
+  \item{u.grid}{argument of \code{qK} (for \code{method="discrete"}).}
+  \item{\dots}{additional arguments passed to \code{qK}.}
 }
 \details{
   \describe{
-    \item{\code{gnacopulatrafo}}{Given a \eqn{d}-dimensional random vector \eqn{\bm{U}} following an
+    \item{\code{htrafo}}{Given a \eqn{d}-dimensional random vector \eqn{\bm{U}} following an
       Archimedean copula \eqn{C} with generator \eqn{\psi}, Hering and
       Hofert (2011) showed that \eqn{\bm{U}^\prime\sim\mathrm{U}[0,1]^d}{U'~U[0,1]^d}, where
       \deqn{U_{j}^\prime=\left(\frac{\sum_{k=1}^{j}\psi^{-1}(U_{k})}{
@@ -39,7 +45,7 @@ rtrafo(u, cop, m=d, n.MC=0)
 	U'_j=((psi^{-1}(U_1)+...+psi^{-1}(U_j)) /
 	(psi^{-1}(U_1)+...+psi^{-1}(U_{j+1})))^j,  j in {1,...,d-1},
 	U'_d=K(C(U)).}
-      \code{gnacopulatrafo} applies this transformation row-wise to
+      \code{htrafo} applies this transformation row-wise to
       \code{u} and thus returns either an \eqn{n\times d}{n x d}- or an
       \eqn{n\times (d-1)}{n x (d-1)}-matrix, depending on whether the last
       component \eqn{U^\prime_d}{U'_d} which involves the (possibly

@@ -139,13 +139,16 @@ dgumbelCopula <- function(copula, u, log=FALSE, ...) {
   eval(pdf)
 }
 
-dgumbelCopula.pdf <- function(copula, u) {
+dgumbelCopula.pdf <- function(copula, u, log=FALSE) {
   dim <- copula@dimension
   if (dim > 10) stop("Gumbel copula PDF not implemented for dimension > 10.")
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
-  c(eval(gumbelCopula.pdf.algr[dim]))
+  ## FIXME: improve log-case
+  if(log)
+    log(c(eval(gumbelCopula.pdf.algr[dim])))
+  else  c(eval(gumbelCopula.pdf.algr[dim]))
 }
 
 kendallsTauGumbelCopula <- function(copula) {

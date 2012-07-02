@@ -16,6 +16,15 @@
 
 require(copula)
 (isLinux <- identical("Linux", Sys.info()[["sysname"]]))
+(doExtras <- interactive() || nzchar(Sys.getenv("R_copula_check_extra")))
+
+## From source(system.file("test-tools-1.R", package = "Matrix")) :
+showSys.time <- function(expr) {
+    ## prepend 'Time' for R CMD Rdiff
+    st <- system.time(expr)
+    writeLines(paste("Time", capture.output(print(st))))
+    invisible(st)
+}
 
 ### Stirling numbers of the 1st kind ###########################################
 
@@ -27,17 +36,17 @@ stopifnot(sapply(0:10, Stirling1, n=10) == S1.10,
 options(str = strOptions(vec.len = 10, digits.d = 20)) # for ls.str() below
 
 ls.str(copula:::.nacopEnv)
-system.time(S  <- Stirling1(30, 7))# updating table -> typically not zero
-system.time(S. <- Stirling1(30, 7))# lookup  -->  should be zero
+showSys.time(S  <- Stirling1(30, 7))# updating table -> typically not zero
+showSys.time(S. <- Stirling1(30, 7))# lookup  -->  should be zero
 stopifnot(identical(S, S.))
 
 ls.str(copula:::.nacopEnv)
 
-system.time(s1c <- Stirling1(100,10))
+showSys.time(s1c <- Stirling1(100,10))
 s1c
 (s1 <- system.time(for(i in 1:20) S. <- Stirling1(100, 10))[[1]])
 stopifnot(identical(S., s1c), !isLinux || s1 <= 0.020)
-system.time(s2c <- Stirling1(200,190)); s2c
+showSys.time(s2c <- Stirling1(200,190)); s2c
 (s2 <- system.time(for(i in 1:20) S. <- Stirling1(200,190))[[1]])
 stopifnot(identical(S., s2c), !isLinux || s2 <= 0.020)
 ## 0.010 occasionally barely fails (prints "0.010") on Martin's X201
@@ -51,8 +60,8 @@ stopifnot(sapply(0:10, Stirling2, n=10, method="direct") == S2.10,
           Stirling2.all(10) == S2.10[-1])
 
 ls.str(copula:::.nacopEnv)
-system.time(S  <- Stirling2(30, 7))# updating table -> typically not zero
-system.time(S. <- Stirling2(30, 7))# lookup  -->  should be zero
+showSys.time(S  <- Stirling2(30, 7))# updating table -> typically not zero
+showSys.time(S. <- Stirling2(30, 7))# lookup  -->  should be zero
 stopifnot(identical(S, S.),
           all.equal(S, Stirling2(30,7, method="direct"), tol=1e-15))
 
@@ -108,6 +117,56 @@ e120 <- p.Eul(120); all.equal(e120[,2],e120[,1])  ## 1 -- problem in center
 e150 <- p.Eul(150) ## clear problem in center -- close to overflow though
 e170 <- p.Eul(170) ## clear problem in center -- close to overflow though
 max(e170[,"E1"]) # 7.5964e+305 -- almost maximum
+dev.off()
+
+### Bernoulli  numbers =========================================================
+
+##--- see  example(Bernoulli)  --->  ../man/Bernoulli.Rd ------
+##---                                ~~~~~~~~~~~~~~~~~~~ ------
+
+## BUT -- the algorithm is *really* not accurate enough ...
+## ---> try to work with higher precision
+## ---> Use package "Rmpfr"  and its own  Bernoulli() / Bernoulli.all()
+
+## NB: The following does not print *unless* you evaluate it *outside*
+##     the if(..) clause
+if(doExtras && require("Rmpfr")) { ## note that it has its own Bernoulli() !
+    if(!dev.interactive(orNone=TRUE)) pdf("Bernoulli-ex.pdf")
+    ## Bernoulli.all(.. prec = <n> )  --> automatically uses 'Rmpfr' arithmetic
+    showSys.time(B100 <- Bernoulli.all(100)) # still less than a milli second
+    showSys.time(B100.250 <- as.numeric(Bernoulli.all(100, prec = 250)))
+    ## 0.75 sec [Core i5 (2010)]
+    re <- log(abs(1 - B100/B100.250))
+    m <- cbind(Bn = B100, Bn.250 = B100.250, "-log10(rel.Err)" =
+               -round(re/log(10), 2))
+    rownames(m) <- paste("n=",0:100, sep="")
+    m[1:5,]
+    print(m[2*(1:15) -1,]) ## for n=10: still 8 correct digits
+
+    showSys.time(B100.1k <- as.numeric(Bernoulli.all(100, prec = 1024)))
+    ## The first 34 are "the same", but after [41],
+    ## even 250 precBits were *not* sufficient:
+    print(round(log10(abs(1 - B100.250/B100.1k))[seq(1,99,by=2)], 2))
+
+    ## some accuracy investigation:
+    nn <- 8:100; nn <- nn[nn %% 2 == 0]; nn
+    B.asy  <- sapply(nn, copula::Bernoulli, method="asymp")
+    B.sumB <- sapply(nn, copula::Bernoulli, method="sumBin")
+    B.prec <- Rmpfr::Bernoulli(nn, precBits = 2048)
+    relErr <- as.numeric(1 - B.asy  / B.prec)
+    relE2 <-  as.numeric(1 - B.sumB / B.prec)
+
+    matplot(nn, abs(cbind(relErr, relE2)), pch=1:2,
+            main = "| rel.Error { Bernoulli(n) } |",
+            xlab = expression(n), axes=FALSE,
+            ylim = c(1e-15, 1e-4), log="y", type="b")
+    sfsmisc::eaxis(1); sfsmisc::eaxis(2)
+    legend("topright", c("asymp","sumBin"), bty="n", col=1:2, lty=1:2, pch=1:2)
+    ##--> an optimal "hybrid" method will use "asymp" from about n ~= 20
+
+    dev.off()
+} ## end if(require("Rmpfr"))
+
 
 
 ### Polylogarithm Function #####################################################

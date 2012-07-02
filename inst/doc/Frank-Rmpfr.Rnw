@@ -3,7 +3,7 @@
 %%%%%%%%%%%%
 %
 \author{Martin M\"achler \\ ETH Zurich%
-\\ May 2011 {\tiny (\LaTeX'ed \today)}%---- for now
+\\ May 2011 -- July 2012 {\tiny (\LaTeX'ed \today)}%---- for now
 }
 \title{Numerically Stable Frank Copula Functions via Multiprecision:
   \proglang{R} Package \pkg{Rmpfr}}
@@ -20,13 +20,22 @@
 %\VignetteDepends{Rmpfr}
 \SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=7,height=5,strip.white=true,keep.source=TRUE}
 
-
 %% an abstract and keywords
 \Abstract{
-  The package \pkg{copula} ....
-  ... Archimedean copulas
+  The package \pkg{copula} (formerly \texttt{nacopula}) has provided
+  functionality for Archimedean copulas, one of them the ``Frank copula''.
+  Recently, explicit formulas for the density of those copulas have allowed
+  for maximum likelihood estimation in high (e.g., $d=150)$) dimensions,
+  (\cite{hofertmaechlermcneil2012a}).
 
-  The package \pkg{Rmpfr} ....
+  However for non-small dimensions, the evaluation of these densities is
+  numerically challenging, and in some cases difficult.  Here, we use high
+  precision arithmetic from MPFR, via R package \pkg{Rmpfr} in order to get
+  accurate values for the diagonal density of the Frank copula.
+
+  Subsequently, judiciously analysing and circumventing the numerical
+  infelicities of the ``traditional'' evaluation, we gain accurate values
+  even with traditional (double precision) arithmetic.
 }
 
 \Keywords{Archimedean copulas, Frank Copula, Multiple Precision, R, MPFR, Rmpfr}
@@ -215,7 +224,7 @@ dDiagA <- function(u, th, d, psiInv, psiDabs, psiInvD1abs, log = FALSE) {
     }
 }
 @
-Now, for the Frank copula (see Hofert and M\"achler (2011)),% FIXME \cite{Hofert:Maechler:201....}
+Now, for the Frank copula (\cite{Hofert:Maechler:2010:JSSOBK:v39i09}),
 \begin{eqnarray}
   \psi_\theta(t) &=& - \frac{1}{\theta}\log\left(1 - (1 - e^{-\theta})e^{-t}\right),
   \label{eq:psiFrank}
@@ -254,7 +263,7 @@ First note that numerically, $e^{-a} - 1$ suffers from cancellation when $0
 instead of \code{exp(-a) - 1}.
 For this reason, in \pkg{copula}, I had replaced the original \code{psiInv.0(u, th)}
 for $\psi_\theta^{-1}(u)$ by \code{psiInv.1()}, making use of \code{expm1()}.
-These and the derivative (\ref{eq:psiDabs})
+These and the derivative (\ref{eq:psiInvD1})
 originally were
 <<def-orig-psi-func>>=
 psiInv.0 <- function(u,theta) -log( (exp(-theta*u)-1) / (exp(-theta)-1) )
@@ -262,7 +271,7 @@ psiInv.1 <- function(u,theta) -log(expm1(-u*theta) / expm1(-theta))
 psiInvD1abs.1 <- function(u, theta, log = FALSE)
   if(log) log(theta)-log(expm1(u*theta)) else theta/expm1(u*theta)
 @
-and the general $k$-th derivative (\ref{eq:psiInvD1}), simplified, for $k= 1$
+and the general $k$-th derivative (\ref{eq:psiDabs}), simplified, for $k= 1$
 (\code{degree = 1}),
 <<def-orig-psiDabs>>=
 require("copula")# for polylog()
@@ -313,14 +322,14 @@ legend("bottom", c("psiInv.0()","psiInv.1()"),col=c(4,2), lty=1, bty="n")
 @
 
 However, it's not hard to see that indeed our initial computation of Frank's
-$\psii$, i.e, (\ref{eq:psiInvFrank}),
+$\psiis{\theta}$, i.e, (\ref{eq:psiInvFrank}),
 $\psiis{\theta}(u) = -\log\left(\frac{1-e^{-u\theta}}{1-e^{-\theta}}\right)$,
 suffers from ``division cancellation'' for ``large'' $\theta$ ($\theta=38$
 in ex.) when computed directly with
 \code{psiInv.0()}, see above, and that the improvement of using
 \code{expm1(-t)} instead of \code{exp(-t) - 1}, as used in
 \code{psiInv.1()}, see above, helps only for $t\approx 0$.
-However, we can rewrite $\psii$ as
+However, we can rewrite $\psiis{\theta}$ as
 \begin{equation}
   \label{eq:psii:log:1}
   \psiis{\theta}(u) = -\log\left(1 -\frac{e^{-u\theta}-e^{-\theta}}{1-e^{-\theta}}\right),
@@ -425,7 +434,7 @@ options(op)
 where we have already tried to ensure that the \code{psiInv()} function is
 ok, but now can confirm it, e.g., for $\theta = 50$.  Further note, that using
 high-precision arithmetic, we can also ``partially afford'' to use the
-simplistic \code{psiInv.0()} function instead the more stable
+simplistic \code{psiInv.0()} function instead of the more stable
 \code{psiInv.2()} one:
 <<check-psiInv>>=
 stopifnot(all.equal(psiInv.2(U.,  50 ),
@@ -456,10 +465,10 @@ legend("top", c("double prec.", "mpfr(*, precBits = 200)"),
 Further investigation shows that the culprit is really the use of
 \code{log(-expm1(-theta))} inside \code{psiDabs.2()} which underflows for
 large theta, and hence should be replaced by the generally accurate
-%% as shown by   Maechler (2011) --- FIXME: finally right that small paper!!
+%% as shown by   Maechler (2011) --- FIXME: finally write that small paper!!
 %%               =========================  ~/R/MM/NUMERICS/log1-exp.R
 <<log1mexp>>=
-log1mexp <- function(a)
+log1mexp <- function(a) # accurately compute log(1-exp(-a))
 {
     stopifnot(a >= 0)
     r <- a
@@ -558,6 +567,6 @@ options(op.orig)
 
 \section{Conclusion}
 
-%\bibliography{nacopula}% Rmpfr
+\bibliography{nacopula}% Rmpfr
 
 \end{document}

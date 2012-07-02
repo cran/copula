@@ -67,11 +67,12 @@ ptawnCopula <- function(copula, u) {
 dtawnCopula <- function(copula, u, log=FALSE, ...) {
   dim <- copula@dimension
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-  if(log) stop("'log=TRUE' not yet implemented")
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
 
-  c(eval(tawnCopula.pdf.algr[dim]))
+  val <- c(eval(tawnCopula.pdf.algr[dim]))
+  ## FIXME: improve log-case
+  if(log) log(val) else val
 }
 
 kendallsTauTawnCopula <- function(copula) {

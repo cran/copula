@@ -1,14 +1,14 @@
 Package: copula
-Version: 0.99-2
-Date: $Date: 2012-05-29 22:54:35 +0200 (Tue, 29 May 2012) $
-Revision: $Revision: 695 $
+Version: 0.99-4
+Date: $Date: 2012-07-02 17:05:08 +0200 (Mon, 02 Jul 2012) $
+Revision: $Revision: 727 $
 Title: Multivariate Dependence with Copulas
 Author: Jun Yan <jun.yan@uconn.edu> and Ivan Kojadinovic
         <ivan.kojadinovic@univ-pau.fr>, Marius Hofert
         <marius.hofert@math.ethz.ch> and Martin Maechler
         <maechler@stat.math.ethz.ch>
 Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
-Depends: R (>= 2.14.0), methods, pspline
+Depends: R (>= 2.14.1), methods, pspline
 Imports: stats4, graphics, gsl, ADGofTest, stabledist (>= 0.6-4),
         mvtnorm
 Suggests: lattice, MASS, Matrix, KernSmooth, sfsmisc, bbmle,
@@ -47,11 +47,12 @@ Collate: AllClass.R Classes.R Copula.R Auxiliaries.R aux-acopula.R
         frankExpr.R galambosCopula.R galambosExpr-math.R galambosExpr.R
         gof.R gofEVTests.R gofTests.R graphics.R gumbelCopula.R
         gumbelExpr.R huslerReissCopula.R huslerReissExpr.R
-        indepCopula.R indepTests.R logseries.R mvdc.R normalCopula.R
-        nacopula.R plackettCopula.R plackettExpr.R rstable1.R
-        safeUroot.R special-func.R schlatherCopula.R stable.R timing.R
-        trafos.R tCopula.R tawnCopula.R tawnExpr.R tevCopula.R zzz.R
+        indepCopula.R indepTests.R K.R logseries.R mvdc.R
+        normalCopula.R nacopula.R plackettCopula.R plackettExpr.R
+        rstable1.R safeUroot.R special-func.R schlatherCopula.R
+        stable.R timing.R trafos.R tCopula.R tawnCopula.R tawnExpr.R
+        tevCopula.R zzz.R
 Encoding: UTF-8
-Packaged: 2012-05-29 20:56:52 UTC; maechler
+Packaged: 2012-07-03 16:59:05 UTC; maechler
 Repository: CRAN
-Date/Publication: 2012-05-30 06:10:57
+Date/Publication: 2012-07-03 18:00:51

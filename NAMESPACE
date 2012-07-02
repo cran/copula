@@ -1,3 +1,19 @@
+## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
+
+
 useDynLib(copula, .registration=TRUE)
 
 ### Part I: Former copula ######################################################
@@ -85,22 +101,6 @@ S3method(print, exchTest)
 
 ### Part II: Former nacopula ###################################################
 
-## Copyright (C) 2010--2011  Marius Hofert and Martin Maechler
-##
-## This program is free software; you can redistribute it and/or modify it under
-## the terms of the GNU General Public License as published by the Free Software
-## Foundation; either version 3 of the License, or (at your option) any later
-## version.
-##
-## This program is distributed in the hope that it will be useful, but WITHOUT
-## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
-## details.
-##
-## You should have received a copy of the GNU General Public License along with
-## this program; if not, see <http://www.gnu.org/licenses/>.
-
-
 ## Now  'Depend'  on  stats4 and bbmle :
 ##importFrom("stats4", mle)
 importMethodsFrom("stats4", coef,confint, logLik, AIC, BIC, summary, plot, profile)
@@ -136,7 +136,9 @@ export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        ,"beta.", "beta.hat", "pobs"
        ,"ebeta", "etau", "emde", "dDiag", "edmle", "emle", "enacopula"
        ## goodness-of-fit
-       ,"K", "gtrafouni", "rtrafo", "htrafo", "gnacopula"
+       ,"gofTstat", "rtrafo", "htrafo", "gnacopula"
+       ## Kendall distribution
+       ,"K", "pK", "qK", "dK", "rK"
        ## misc
        ,"onacopula", "onacopulaL", "nac2list", "nesdepth", rnacModel, nacPairthetas
        ,"polynEval"

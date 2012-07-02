@@ -13,6 +13,8 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
+## NB: run from ../tests/gof-ex.R --> keep "robust" (and quick) !
+##              ~~~~~~~~~~~~~~~~~  (MM: see ../tests/gof-ex.Rout.save )
 
 require(copula)
 
@@ -72,6 +74,10 @@ curveLogL <- function(cop, u, xlim, main, XtrArgs=list(), ...) {
     invisible(r)
 }
 
+(doExtras <- interactive() || nzchar(Sys.getenv("R_copula_check_extra")))
+## Want to see when "Rmpfr" methods are chosen automatically:
+options("copula:verboseUsingRmpfr" = TRUE)
+
 
 ### "Joe", tau = 0.2 ###########################################################
 
@@ -92,45 +98,51 @@ mLt3 <- sapply(th4, function(th) mLogL(th, cop@copula, U1, method="poly"))
 stopifnot(all.equal(mLt1, mL.tr, tol=5e-5),
           all.equal(mLt2, mL.tr, tol=5e-5),
           all.equal(mLt3, mL.tr, tol=5e-5))
-##--> Funktion für Gesamtplot:
+
 system.time(r1l  <- curveLogL(cop, U1, c(1, 2.5), X=list(method="log.poly")))
+if(doExtras) {
+mtext("all three polyJ() methods on top of each other")
 system.time(r1J  <- curveLogL(cop, U1, c(1, 2.5), X=list(method="poly"),
                               add=TRUE, col=adjustcolor("red", .4)))
 system.time(r1m  <- curveLogL(cop, U1, c(1, 2.5), X=list(method="log1p"),
                               add=TRUE, col=adjustcolor("blue",.5)))
+}
 
 U2 <- rnacopula(n,cop)
-enacopula(U2, cop, "mle") # 1.4399  -- no warning any more
 ## the density for the *correct* parameter looks okay
 summary(dnacopula(cop, U2))
 ## hmm:  max = 5.5e177
+if(doExtras)
 system.time(r2 <- curveLogL(cop, U2, c(1, 2.5)))
-
-mLogL(1.8, cop@copula, U2)# -4070.148 (was -Inf)
+stopifnot(all.equal(enacopula(U2, cop, "mle"), 1.43991422),
+          all.equal(mLogL(1.8, cop@copula, U2), -4070.14762))# (was -Inf)
 
 U3 <- rnacopula(n,cop)
-enacopula(U3, cop, "mle") # 1.44957
+enacopula(U3, cop, "mle") # 1.4495
+if(doExtras)
 system.time(r3 <- curveLogL(cop, U3, c(1, 2.5)))
 
 U4 <- rnacopula(n,cop)
-enacopula(U4, cop, "mle") # 1.451929  was 2.351..  "completely wrong"
+enacopula(U4, cop, "mle") # 1.4519  was 2.351..  "completely wrong"
 summary(dnacopula(cop, U4)) # ok (had one Inf)
+if(doExtras)
 system.time(r4 <- curveLogL(cop, U4, c(1, 2.5)))
 
 mLogL(2.2351, cop@copula, U4)
 mLogL(1.5,    cop@copula, U4)
 mLogL(1.2,    cop@copula, U4)
 
-system.time(r4. <- curveLogL(cop, U4, c(1, 1.01)))
-system.time(r4. <- curveLogL(cop, U4, c(1, 1.0001)))
-system.time(r4. <- curveLogL(cop, U4, c(1, 1.000001)))
-##--> limit goes *VERY* steeply  up to .. probably 0
+if(doExtras) # each curve takes almost 2 sec
+    system.time({
+        curveLogL(cop, U4, c(1, 1.01))
+        curveLogL(cop, U4, c(1, 1.0001))
+        curveLogL(cop, U4, c(1, 1.000001))
+        })
+##--> limit goes *VERY* steeply  up to  0
 
-mLogL(1.2,    cop@copula, U4)
 ##--> theta 1.164 is about the boundary:
-cop@copula@dacopula(U4[118,], theta=1.164, log = TRUE)
-##  600.5926  (was Inf)
-## now that we have  polyJ(...., log=TRUE)
+stopifnot(all.equal(600.59261959,
+  cop@copula@dacopula(U4[118,], theta=1.164, log = TRUE)))## was "Inf"
 
 
 ### "Joe", harder cases: d = 150, tau = 0.3 ####################################
@@ -140,8 +152,9 @@ d <- 150
 tau <- 0.3
 (theta <- copJoe@tauInv(tau))# 1.772
 (cop <- onacopulaL("Joe",list(theta,1:d)))
+set.seed(47)
 U. <- rnacopula(n,cop)
-enacopula(U., cop, "mle") # 1.776743
+enacopula(U., cop, "mle") # 1.784578
 system.time(r. <- curveLogL(cop, U., c(1.1, 3)))
 ## still looks very good
 
@@ -152,15 +165,16 @@ tau <- 0.4
 (theta <- copJoe@tauInv(tau))# 2.219
 (cop <- onacopulaL("Joe",list(theta,1:d)))
 U. <- rnacopula(n,cop)
-enacopula(U., cop, "mle") # 2.22666
+enacopula(U., cop, "mle") # 2.217582
+if(doExtras)
 system.time(r. <- curveLogL(cop, U., c(1.1, 4)))
 ## still looks very good
 
 
-### The same for Gumbel ########################################################
+### Similar for Gumbel ########################################################
 
 n <- 200
-d <- 100
+d <- 50 # smaller 'd' -- so as to not need 'Rmpfr' here
 tau <- 0.2
 (theta <- copGumbel@tauInv(tau))# 1.25
 (cop <- onacopulaL("Gumbel",list(theta,1:d)))
@@ -170,11 +184,12 @@ U1 <- rnacopula(n,cop)
 U2 <- rnacopula(n,cop)
 U3 <- rnacopula(n,cop)
 
-enacopula(U1, cop, "mle") # 1.241927
+enacopula(U1, cop, "mle") # 1.227659 (was 1.241927)
 ##--> Plots with "many" likelihood evaluations
 system.time(r1 <- curveLogL(cop, U1, c(1, 2.1)))
-system.time(r2 <- curveLogL(cop, U2, c(1, 2.1)))
-system.time(r3 <- curveLogL(cop, U3, c(1, 2.1)))
+mtext("and two other generated samples")
+system.time(r2 <- curveLogL(cop, U2, c(1, 2.1), add=TRUE))
+system.time(r3 <- curveLogL(cop, U3, c(1, 2.1), add=TRUE))
 
 ### "Gumbel", harder: d = 150, tau = 0.6 #######################################
 
@@ -188,26 +203,44 @@ U4 <- rnacopula(n,cG.5)
 U5 <- rnacopula(n,cG.5)
 U6 <- rnacopula(n,cG.5)
 
-enacopula(U4, cG.5, "mle") # 2.475672
-enacopula(U5, cG.5, "mle") # 2.484243
-enacopula(U6, cG.5, "mle") # 2.504111
+if(doExtras) { ## "Rmpfr" is used {2012-06-21}: -- therefore about 18 seconds!
+tol <- if(interactive()) 1e-12 else 1e-8
+system.time(
+ ee. <- c(enacopula(U4, cG.5, "mle", tol=tol),
+          enacopula(U5, cG.5, "mle", tol=tol),
+          enacopula(U6, cG.5, "mle", tol=tol)))
+dput(ee.)# in case the following fails
+## tol=1e-12 Linux nb-mm3 3.2.0-25-generic x86_64 (2012-06-23):
+##   c(2.47567251789004, 2.48424484287686, 2.50410767129408)
+##   c(2.475672518,      2.484244763,      2.504107671),
+stopifnot(all.equal(ee., c(2.475672518, 2.484244763, 2.504107671),
+		    tol= max(1e-7, 16*tol)))
+}
 
 ##--> Plots with "many" likelihood evaluations
 (th. <- seq(1, 3, by= 1/4))
-## each of these take about 3.3 seconds [nb-mm3]
-system.time(r4 <- sapply(th., mLogL, acop=cG.5@copula, u=U4))
-system.time(r5 <- sapply(th., mLogL, acop=cG.5@copula, u=U5))
-system.time(r6 <- sapply(th., mLogL, acop=cG.5@copula, u=U6))
+if(doExtras)## "default2012" (polyG default) partly uses Rmpfr here:
+system.time(r4   <- sapply(th., mLogL, acop=cG.5@copula, u=U4))## 25.6 sec
+## whereas this (polyG method) is very fast {and still ok}:
+system.time(r4.p <- sapply(th., mLogL, acop=cG.5@copula, u=U4, method="pois"))
 r4. <- c(0, -18375.33, -21948.033, -24294.995, -25775.502,
          -26562.609, -26772.767, -26490.809, -25781.224)
-stopifnot(all.equal(r4, r4., tol = 8e-8))
+stopifnot(!doExtras ||
+          all.equal(r4,   r4., tol = 8e-8),
+          all.equal(r4.p, r4., tol = 8e-8))
+##--> use fast method here as well:
+system.time(r5.p <- sapply(th., mLogL, acop=cG.5@copula, u=U5, method="pois"))
+system.time(r6.p <- sapply(th., mLogL, acop=cG.5@copula, u=U6, method="pois"))
 
 if(FALSE) ## for speed analysis, etc
     debug(copula:::polyG)
 mLogL(1.65, cG.5@copula, U4)# -23472.96
 
-dd <- cG.5@copula@dacopula(U4, 1.64, log = TRUE)
-summary(dd) ## no NaN's anymore
+dd <- cG.5@copula@dacopula(U4, 1.64, log = TRUE,
+			   method = if(doExtras)"default" else "pois")
+summary(dd)
+stopifnot(!is.na(dd), ## no NaN's anymore
+	  40 < range(dd), range(dd) < 710)
 
 
 ### "Frank", a case we found "hard" ############################################
@@ -222,15 +255,15 @@ U. <- rnacopula(n,cop)
 ## forget the true theta:
 cop@copula <- setTheta(cop@copula, NA)
 system.time(f.ML <- emle(U., cop)); f.ML ## --> fine: theta = 18.033, Log-lik = 314.01
-## with MC :
-system.time(f.mlMC <- emle(U., cop, n.MC = 1e4))## takes a long time
-## (7.5 sec on nb-mm3 2010)
+if(doExtras)## with MC :
+    system.time(f.mlMC <- emle(U., cop, n.MC = 1e4))## takes a while
+    ## (7.5 sec on nb-mm3 2010)
 stopifnot(
-	  all.equal(unname(coef(f.ML)), 18.03331, tol= 1e-6)
+          all.equal(unname(coef(f.ML)), 18.03331, tol= 1e-6)
 	  ,
 	  all.equal(f.ML@min, -314.0143, tol=1e-6)
 	  ,
-	  ## Simulate MLE (= SMLE) is "extra" random,  hmm...
+	  !doExtras || ## Simulate MLE (= SMLE) is "extra" random,  hmm...
 	  all.equal(unname(coef(f.mlMC)), 17.8, tol= 0.01)
 	  ##		   64-bit ubuntu: 17.817523
 	  ##		 ? 64-bit Mac:	  17.741
@@ -238,8 +271,8 @@ stopifnot(
 
 cop@copula <- setTheta(cop@copula, theta)# for the plot:
 r. <- curveLogL(cop, U., c(1, 200))
-## now looks fine (well, not really ..) -- with finite values much longer..
-## but still has -Inf: at end:
+## now looks fine
 tail(as.data.frame(r.), 15)
-stopifnot( is.finite( r.$y ) )
-
+stopifnot( is.finite( r.$y ),
+	  ## and is convex (everywhere):
+	  diff(r.$y, d=2) > 0)

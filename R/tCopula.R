@@ -20,7 +20,7 @@ tCopula <- function(param, dim = 2L, dispstr = "ex", df = 4, df.fixed = FALSE) {
   param.names <- paste("rho", 1:pdim, sep=".")
   param.lowbnd <- rep.int(-1, pdim)
   param.upbnd  <- rep.int( 1, pdim)
-  if (!df.fixed) {
+  if (!df.fixed) { ## df is another parameter __at end__
     parameters <- c(parameters, df)
     param.names <- c(param.names, "df")
     param.lowbnd <- c(param.lowbnd, 1e-6)

@@ -106,14 +106,14 @@ dhuslerReissCopula <- function(copula, u, log=FALSE, ...) {
   u1 <- u[,1]
   u2 <- u[,2]
   alpha <- copula@parameters[1]
-  if(log) stop("'log=TRUE' not yet implemented")
   ## Joe (1997, p.142)
   u1p <- -log(u1); u2p <- -log(u2); z <- u1p / u2p
   val <- 1/ (u1 * u2) * pcopula(copula, u) *
     (pnorm(1/alpha - 0.5 * alpha * log(z)) *
      pnorm(1/alpha + 0.5 * alpha * log(z)) +
      0.5 * alpha / u2p * dnorm(1/alpha + 0.5 * alpha * log(z)))
-  val
+  ## FIXME: improve log-case
+  if(log) log(val) else val
 }
 
 

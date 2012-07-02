@@ -486,29 +486,32 @@ coeffG <- function(d, alpha, method = c("sort", "horner", "direct", "dsumSibuya"
 ##'   "stirling"        uses the representation via Stirling numbers and once horner
 ##'   "stirling.horner" uses the representation via Stirling numbers and twice horner
 ##'    .....            all the method from coeffG(), see there
+##' @param verboseUsingRmpfr logical indicating if it should be "messaged" when Rmpfr is used
+##'   by the default method.
 ##' @param log boolean which determines if the logarithm is returned
 ##' @return \sum_{k=1}^d  a_{dk}(\theta)  x ^ k
 ##'       = \sum_{k=1}^d  a_{dk} *     exp(lx*k)
 ##'  where a_{dk}(theta)
 ##'       = (-1)^{d-k}\sum_{j=k}^d \theta^{-j} s(d,j) S(j,k)
 ##'       = (d!/k!)\sum_{l=1}^k (-1)^{d-l} \binom{k}{l}\binom{\alpha l}{d}
-##' @author Marius Hofert
+##' @author Marius Hofert and Martin Maechler
 polyG <- function(lx, alpha, d, method= c("default", "default2012", "default2011",
                                 "pois", "pois.direct", "stirling", "stirling.horner",
                                 coeffG.methods),
+                  verboseUsingRmpfr = isTRUE(getOption("copula:verboseUsingRmpfr")),
                   log=FALSE)
 {
     stopifnot(length(alpha)==1, 0 < alpha, alpha <= 1,
               d == as.integer(d), d >= 1)
     k <- 1:d
-    ## with a fixed match.arg(): method <- match.arg(method) ## -- R 2.15. ??
-    method <- match.arg(method, choices = eval(formals()[["method"]]))
+    allMeths <- eval(formals()[["method"]])
+    method <- match.arg(method, choices = allMeths)
     Meth <- if(method %in% coeffG.methods) "coeffG" else method
     switch(Meth,
 	   "default" =, "default2012" =
        {
-           ## "default2012" compiled by Yongcheng Wong (MSc thesis c/o M.Maechler, April 2012)
-           ## it switches to "Rmpfr" when the accuracy would be less than 5 digits
+	   ## "default2012" compiled by Yongcheng Wong (MSc thesis c/o M.Maechler, April 2012)
+	   ## it switches to "Rmpfr" when the accuracy would be less than 5 digits
 	   meth2012 <- function(d, alpha, lx) {
 	       if (d <= 30) "direct"
 	       else if (d <= 50) {
@@ -546,8 +549,15 @@ polyG <- function(lx, alpha, d, method= c("default", "default2012", "default2011
 	       }
 	       else "dsSib.Rmpfr"
 	   }
-	   Recall(lx, alpha = alpha, d = d,
-		  method = meth2012(d, alpha, lx), log = log)
+	   ## Each lx can -- in principle -- ask for another method ... --> split() by method
+	   meth.lx <- vapply(lx, function(lx) meth2012(d, alpha, lx), "")
+	   if(verboseUsingRmpfr && (lg <- length(grep("Rmpfr$", meth.lx))))
+	       message("Default method chose 'Rmpfr' ", if(lg > 1) paste(lg,"times") else "once")
+	   i.m <- split(seq_along(lx), factor(meth.lx))
+	   r <- lapply(names(i.m), function(meth)
+		       polyG(lx[i.m[[meth]]], alpha = alpha, d = d, method = meth, log = log))
+	   lx[unlist(i.m, use.names=FALSE)] <- unlist(r, use.names=FALSE)
+	   lx
        },
 
 	   "default2011" = ## first "old" default
@@ -636,7 +646,7 @@ polyG <- function(lx, alpha, d, method= c("default", "default2012", "default2011
        },
 	   stop(sprintf("unsupported method '%s' in polyG", method))
 	   ) # end{switch}
-}
+}## {polyG}
 
 
 ### Joe ########################################################################
@@ -1097,6 +1107,7 @@ circRat <- function(e, d)
 ##' @param n.MC Monte Carlo sample size
 ##' @param log if TRUE the logarithm of the conditional copula is returned
 ##' @author Marius Hofert
+
 cacopula <- function(u, cop, n.MC=0, log=FALSE) {
     stopifnot(is(cop, "outer_nacopula"))
     if(length(cop@childCops))

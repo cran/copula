@@ -94,18 +94,19 @@ enacopula(u, cop,
 \examples{
 tau <- 0.25
 (theta <- copGumbel@tauInv(tau)) # 4/3
-d <- 20
+d <- 12
 (cop <- onacopulaL("Gumbel", list(theta,1:d)))
 
 set.seed(1)
-n <- 200
+n <- 100
 U <- rnacopula(n, cop)
 
-(meths <- eval(formals(enacopula)$method)) # "mle", "smle", ...
-fun <- function(meth, u, cop, theta){
+meths <- eval(formals(enacopula)$method)
+\dontshow{meths <- meths[meths != "smle"]}% as that is slow..
+fun <- function(meth, u, cop, theta) {
 	run.time <- system.time(val <- enacopula(u, cop=cop, method=meth))
 	list(value=val, error=val-theta, utime.ms=1000*run.time[[1]])
 }
-(res <- sapply(meths, fun, u=U, cop=cop, theta=theta))
+t(res <- sapply(meths, fun, u=U, cop=cop, theta=theta))
 }
 \keyword{models}

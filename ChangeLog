@@ -1,3 +1,13 @@
+2012-07-02  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/fitCopula.R: t copulas now can be fit with and without fixed
+	'df'.  With varying df ('df.fixed=FALSE'), it no longer needs an
+	initial parameter estimate 'start'.
+
+2012-06-20  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.99-4 after fixing the gnacopula() bugs.
+
 2012-02-21  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Description): big merge of 'copula' + 'nacopula'

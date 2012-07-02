@@ -240,27 +240,27 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
 
     ## K for d = 2
     cat("\n(7) values of K for d = 2 at u01:\n")
-    CT <- c(CT, list(K = system.time(K. <- K(u01, cop, d = 2))))
+    CT <- c(CT, list(K = system.time(K. <- pK(u01, cop, d = 2))))
     check.K.u01( print(K.) )
     cat("check if K(0) = 0 and K(1) = 1: ")
-    stopifnot(K(0, cop, d = 2)==0,
-              K(1, cop, d = 2)==1)
+    stopifnot(pK(0, cop, d = 2)==0,
+              pK(1, cop, d = 2)==1)
     cat0("[Ok]")
     ## K for d = 10
     cat("\nvalues of K for d = 10 at u01:\n")
-    CT <- c(CT, list(K = system.time(K. <- K(u01, cop, d = 10))))
+    CT <- c(CT, list(K = system.time(K. <- pK(u01, cop, d = 10))))
     check.K.u01( print(K.) )
     cat("check if K(0) = 0 and K(1) = 1: ")
-    stopifnot(K(0, cop, d = 10)==0,
-              K(1, cop, d = 10)==1)
+    stopifnot(pK(0, cop, d = 10)==0,
+              pK(1, cop, d = 10)==1)
     cat0("[Ok]")
     ## K for d = 10 and MC
     cat("\nvalues of K for d = 10 and MC at u01:\n")
-    CT <- c(CT, list(K = system.time(K. <- K(u01, cop, d = 10, n.MC = 1000))))
+    CT <- c(CT, list(K = system.time(K. <- pK(u01, cop, d = 10, n.MC = 1000))))
     check.K.u01( print(K.) )
     cat("check if K(0)=0 and K(1)=1: ")
-    stopifnot(K(0, cop, d = 10, n.MC = 1000)==0,
-              K(1, cop, d = 10, n.MC = 1000)==1)
+    stopifnot(pK(0, cop, d = 10, n.MC = 1000)==0,
+              pK(1, cop, d = 10, n.MC = 1000)==1)
     cat0("[Ok]")
 
     ### (8) tau, tauInv
@@ -352,7 +352,7 @@ stopifnot(all.equal(tau.th, tau.F, tol = 0.0001),
           all.equal(myFrank@tauInv(tau.F, tol = 1e-14), thetavec, tol=1e-11))
 
 
-### copGumbel
+### copGumbel ##################################################################
 
 myGumbel <- setTheta(copGumbel, 1.25)
 thetavec <- c(1,2,4,6,10)

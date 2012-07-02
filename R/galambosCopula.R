@@ -122,11 +122,13 @@ pgalambosCopula <- function(copula, u) {
 dgalambosCopula <- function(copula, u, log=FALSE, ...) {
   dim <- copula@dimension
   alpha <- copula@parameters[1]
-  if(log) stop("'log=TRUE' not yet implemented")
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
-  c(eval(galambosCopula.algr$pdf))
+  ## FIXME: improve log-case
+  if(log)
+    log(c(eval(galambosCopula.algr$pdf)))
+  else  c(eval(galambosCopula.algr$pdf))
 }
 
 rgalambosCopula <- function(copula, n) {

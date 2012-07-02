@@ -167,7 +167,6 @@ dasymExplicitCopula <- function(copula, u, log=FALSE, ...) {
   u <- as.matrix(u)
   comps <- getAsymExplicitCopulaComps(copula)
   a <- comps$shapes
-  if(log) stop("'log=TRUE' not yet implemented")
   u1 <- t(t(u)^(1 - a))
   u2 <- t(t(u)^a)
   dg1 <- t((1 - a) * t(u)^(-a))
@@ -183,8 +182,9 @@ dasymExplicitCopula <- function(copula, u, log=FALSE, ...) {
     dens <- dens + part1 * part2
     ## print(part1); print(part2)
   }
-  dens
+  if(log) log(dens) else dens
 }
+
 
 rasymExplicitCopula <- function(copula, n) {
   comps <- getAsymExplicitCopulaComps(copula)

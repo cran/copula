@@ -81,9 +81,7 @@ emde(u, cop,
   \code{\link{enacopula}} (wrapper for different estimators),
   \code{\link{gnacopula}} (wrapper for different goodness-of-fit tests),
   \code{\link{htrafo}} (transformation to a multivariate uniform
-   distribution),
-  \code{\link{gtrafouni}} (transformation to a chi-square or Erlang
-  distribution), and
+   distribution), and
   \code{\link{K}} (Kendall distribution function).
 }
 \examples{

@@ -94,8 +94,6 @@ dtevCopula <- function(copula, u, log=FALSE, ...) {
   ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   u1 <- u[,1]; u2 <- u[,2]
 
-  if(log) stop("'log=TRUE' not yet implemented")
-
   C <- ptevCopula(copula, u)
   logu <- log(u1 * u2)
   w <- log(u2) / logu
@@ -113,7 +111,9 @@ dtevCopula <- function(copula, u, log=FALSE, ...) {
   pdf <- dCdu2 * (1 / u1 * A + logu * Ader1 * dwdu1) +
     C * (1 / u1 * Ader1 * dwdu2 + 1 / u2 * Ader1 * dwdu1 +
          logu * Ader2 * dwdu2 * dwdu1 + logu * Ader1 * d2wdu1du2)
-  pdf
+
+  ## FIXME: improve log-case
+  if(log) log(pdf) else pdf
 }
 
 derCdfWrtArgsSymEvCopula <- function(cop, u) {

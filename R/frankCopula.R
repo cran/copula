@@ -137,13 +137,16 @@ dfrankCopula <- function(copula, u, log=FALSE, ...) {
 ##   pdf
 ## }
 
-dfrankCopula.pdf <- function(copula, u) {
+dfrankCopula.pdf <- function(copula, u, log=FALSE) {
   dim <- copula@dimension
   if (dim > 6) stop("Frank copula PDF not implemented for dimension > 6.")
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
-  c(eval(frankCopula.pdf.algr[dim]))
+  ## FIXME: improve log-case
+  if(log)
+    log(c(eval(frankCopula.pdf.algr[dim])))
+  else  c(eval(frankCopula.pdf.algr[dim]))
 }
 
 kendallsTauFrankCopula <- function(copula) {

@@ -122,11 +122,11 @@ dfgmCopula <- function(copula, u, log=FALSE, ...) {
     dim <- copula@dimension
     if(!is.matrix(u)) u <- matrix(u, ncol = dim)
     param <- copula@parameters
-    if(log) stop("'log=TRUE' not yet implemented")
     pdf <- copula@exprdist$pdf
     for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
     for (i in (dim + 2):2^dim) assign(paste("alpha", i, sep=""), param[i - dim - 1])
-    eval(pdf)
+    ## FIXME: improve log-case
+    if(log) log(eval(pdf)) else eval(pdf)
 }
 
 ## Kendall's tau

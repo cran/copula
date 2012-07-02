@@ -102,18 +102,23 @@ dasymCopula <- function(copula, u, log=FALSE, ...) {
   ## See dC1du and dC2du; they don't distinguish u1 or u2.
   if(!is.matrix(u)) u <- matrix(u, ncol = 2)
   comps <- getCopulaComps(copula)
-  if(log) stop("'log=TRUE' not yet implemented")
   a1 <- comps$shape[1];  a2 <- comps$shape[2]
   copula1 <- comps$copula1; copula2 <- comps$copula2
   gu1 <- cbind(gfun(u[,1], 1 - a1), gfun(u[,2], 1 - a2))
   gu2 <- cbind(gfun(u[,1], a1), gfun(u[,2], a2))
   dC1du <- derCdfWrtArgs(copula1, gu1)
   dC2du <- derCdfWrtArgs(copula2, gu2)
-  part1 <- dcopula(copula1, gu1) * gfunDer(u[,1], 1 - a1) * gfunDer(u[,2], 1 - a2) * pcopula(copula2, gu2)
+  part1 <- dcopula(copula1, gu1) *
+      gfunDer(u[,1], 1 - a1) * gfunDer(u[,2], 1 - a2) *
+          pcopula(copula2, gu2)
   part2 <- dC1du[,1] * gfunDer(u[,1], 1 - a1) * gfunDer(u[,2], a2) * dC2du[,2]
   part3 <- dC1du[,2] * gfunDer(u[,2], 1 - a2) * gfunDer(u[,1], a1) * dC2du[,1]
-  part4 <- pcopula(copula1, gu1) * dcopula(copula2, gu2) * gfunDer(u[,2], a2) * gfunDer(u[,1], a1)
-  part1 + part2 + part3 + part4
+  part4 <- pcopula(copula1, gu1) * dcopula(copula2, gu2) *
+      gfunDer(u[,2], a2) * gfunDer(u[,1], a1)
+  ## FIXME: use lsum() and similar to get much better numerical accuracy for log - case
+  if(log)
+      log(part1 + part2 + part3 + part4)
+  else    part1 + part2 + part3 + part4
 }
 
 rasymCopula <- function(copula, n) {

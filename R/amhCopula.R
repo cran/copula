@@ -87,13 +87,14 @@ damhCopula <- function(copula, u, log = FALSE, ...) {
   dim <- copula@dimension
   if(!is.matrix(u)) u <- matrix(u, ncol = dim)
   alpha <- copula@parameters[1]
-  if(log) stop("'log=TRUE' not yet implemented")
-  if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
+  if (abs(alpha) <= .Machine$double.eps^.9) return (rep.int(if(log) 0 else 1, nrow(u)))
   ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   ## bivariate anyway
   u1 <- u[,1]
   u2 <- u[,2]
-  (-1 + alpha^2*(-1 + u1 + u2 - u1*u2) - alpha*(-2 + u1 + u2 + u1*u2)) / (-1 + alpha*(-1 + u1)*(-1 + u2))^3
+  r <- (-1 + alpha^2*(-1 + u1 + u2 - u1*u2) - alpha*(-2 + u1 + u2 + u1*u2)) /
+      (-1 + alpha*(-1 + u1)*(-1 + u2))^3
+  if(log) log(r) else r
 }
 
 

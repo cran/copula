@@ -70,7 +70,8 @@ ccop2 <- function(u2, u1, family, theta, ...) {
 pairwiseCcop <- function(u, cop, ...)
 {
     if(!is.matrix(u)) u <- rbind(u)
-    stopifnot((d <- ncol(u)) >= 2, 0 <= u, u <= 1)
+    stopifnot((d <- ncol(u)) >= 2, 0 <= u, u <= 1,
+	      d == dim(cop))
 
     ## (1) determine copula class and compute auxiliary results
     cls <- copClass(cop)
@@ -78,9 +79,10 @@ pairwiseCcop <- function(u, cop, ...)
            "elliptical"={
                ## build correlation matrix from vector of copula parameters
                P <- matrix(0, nrow=d, ncol=d)
-               P[lower.tri(P)] <- cop@parameters
+	       rho <- cop@parameters
+	       P[lower.tri(P)] <- if(cop@df.fixed) rho else rho[-length(rho)]
                P <- P + t(P)
-               diag(P) <- rep(1, d)
+               diag(P) <- rep.int(1, d)
            },
            "nArchimedean"={
                ## build "matrix" of dependence parameters

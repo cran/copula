@@ -69,7 +69,7 @@ rcopula(copula, n, \dots)
   \item{copula}{an \R object of class \code{"\linkS4class{Copula}"},
     (i.e., \code{"\linkS4class{copula}"} or  \code{"\linkS4class{nacopula}"}).}
   \item{u}{a vector of the copula dimension or a matrix with number of
-    rows being the copula dimension, giving the coordinates of the
+    columns being equal to the copula dimension, giving the coordinates of the
     points where the density or distribution function needs to be evaluated.
   }
   \item{log}{logical indicating if the \eqn{\log(f(\cdot))}{log(f(.))}

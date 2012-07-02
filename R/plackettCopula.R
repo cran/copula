@@ -51,9 +51,11 @@ dplackettCopula <- function(copula, u, log = FALSE, ...) {
   u2 <- u[,2]
   alpha <- copula@parameters[1]
   eta <- alpha - 1
-  if(log) stop("'log=TRUE' not yet implemented")
   ## Joe (1997, p.141)
-  ((1 + eta * (u1 + u2))^2 - 4 * alpha * eta * u1 * u2)^(- 3/2) * alpha * (1 + eta * (u1 + u2 - 2 * u1 * u2))
+  val <- ((1 + eta * (u1 + u2))^2 - 4 * alpha * eta * u1 * u2)^(- 3/2) * alpha *
+      (1 + eta * (u1 + u2 - 2 * u1 * u2))
+  ## FIXME: improve log-case
+  if(log) log(val) else val
 }
 
 
