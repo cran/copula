@@ -48,22 +48,29 @@ asCall <- function(fun, param)
 
 P0 <- function(...) paste(..., sep="")
 
-dmvdc <- function(mvdc, x) {
+dMvdc <- function(x, mvdc, log=FALSE) {
   dim <- mvdc@copula@dimension
-  densmarg <- 1
+  densmarg <- if(log) 0 else 1
   if (is.vector(x)) x <- matrix(x, nrow = 1)
   u <- x
   for (i in 1:dim) {
     cdf.expr <- asCall(P0("p", mvdc@margins[i]), mvdc@paramMargins[[i]])
     pdf.expr <- asCall(P0("d", mvdc@margins[i]), mvdc@paramMargins[[i]])
     u[,i] <- eval(cdf.expr, list(x = x[,i]))
-    densmarg <- densmarg * eval(pdf.expr, list(x = x[,i]))
+    densmarg <-
+	if(log)
+	    ## FIXME: user should be able to give density which has a log argument
+	    densmarg + log(eval(pdf.expr, list(x = x[,i])))
+	else
+	    densmarg * eval(pdf.expr, list(x = x[,i]))
   }
-  dcopula(mvdc@copula, u) * densmarg
+  if(log)
+      dCopula(u, mvdc@copula, log=TRUE) + densmarg
+  else
+      dCopula(u, mvdc@copula) * densmarg
 }
 
-
-pmvdc <- function(mvdc, x) {
+pMvdc <- function(x, mvdc) {
   dim <- mvdc@copula@dimension
   if (is.vector(x)) x <- matrix(x, nrow = 1)
   u <- x
@@ -71,13 +78,12 @@ pmvdc <- function(mvdc, x) {
     cdf.expr <- asCall(P0("p", mvdc@margins[i]), mvdc@paramMargins[[i]])
     u[,i] <- eval(cdf.expr, list(x = x[,i]))
   }
-  pcopula(mvdc@copula, u)
+  pCopula(u, mvdc@copula)
 }
 
-
-rmvdc <- function(mvdc, n) {
+rMvdc <- function(n, mvdc) {
   dim <- mvdc@copula@dimension
-  u <- rcopula(mvdc@copula, n)
+  u <- rCopula(n, mvdc@copula)
   x <- u
   for (i in 1:dim) {
     qdf.expr <- asCall(P0("q", mvdc@margins[i]), mvdc@paramMargins[[i]])
@@ -85,3 +91,8 @@ rmvdc <- function(mvdc, n) {
   }
   x
 }
+
+dmvdc <- function(mvdc, x, log=FALSE) { .Deprecated("dMvdc"); dMvdc(x, mvdc, log) }
+pmvdc <- function(mvdc, x) { .Deprecated("pMvdc"); pMvdc(x, mvdc) }
+rmvdc <- function(mvdc, n) { .Deprecated("rMvdc"); rMvdc(n, mvdc) }
+

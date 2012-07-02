@@ -14,30 +14,25 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-normalCopula <- function(param, dim = 2L, dispstr = "ex") {
-  pdim <- length(param)
-  dim <- as.integer(dim)
+normalCopula <- function(param = NA_real_, dim = 2L, dispstr = "ex") {
+  stopifnot((pdim <- length(param)) >= 1)
   new("normalCopula",
       dispstr = dispstr,
-      dimension = dim,
+      dimension = as.integer(dim),
       parameters = param,
       param.names = paste("rho", 1:pdim, sep="."),
       param.lowbnd = rep(-1, pdim),
       param.upbnd = rep(1, pdim),
-      message = "Normal copula family",
-      getRho = function(obj) {obj@parameters}
-      )
+      fullname = "Normal copula family",
+      getRho = function(obj) obj@parameters)
 }
 
 
-rnormalCopula <- function(copula, n) {
-  dim <- copula@dimension
-  sigma <- getSigma(copula)
-  pnorm(rmvnorm(n, sigma = sigma))
-}
+rnormalCopula <- function(n, copula)
+    pnorm(rmvnorm(n, sigma = getSigma(copula)))
 
 
-pnormalCopula <- function(copula, u) {
+pnormalCopula <- function(u, copula) {
   dim <- copula@dimension
   i.lower <- rep.int(-Inf, dim)
   sigma <- getSigma(copula)
@@ -46,7 +41,7 @@ pnormalCopula <- function(copula, u) {
         pmvnorm(lower = i.lower, upper = qu, sigma = sigma))
 }
 
-dnormalCopula <- function(copula, u, log=FALSE, ...) {
+dnormalCopula <- function(u, copula, log=FALSE, ...) {
   dim <- copula@dimension
   sigma <- getSigma(copula)
   if(!is.matrix(u)) u <- matrix(u, ncol = dim)
@@ -73,25 +68,28 @@ tailIndexNormalCopula <- function(copula) {
 }
 
 
-kendallsTauNormalCopula <- function(copula) {
+tauNormalCopula <- function(copula) {
   rho <- copula@parameters
   2 * asin(rho) /pi
 }
 
-spearmansRhoNormalCopula <- function(copula) {
+rhoNormalCopula <- function(copula) {
   rho <- copula@parameters
   asin(rho / 2) * 6 / pi
 }
 
-setMethod("rcopula", signature("normalCopula"), rnormalCopula)
-setMethod("pcopula", signature("normalCopula"), pnormalCopula)
-setMethod("dcopula", signature("normalCopula"), dnormalCopula)
+setMethod("rCopula", signature("numeric", "normalCopula"), rnormalCopula)
+
+setMethod("pCopula", signature("matrix", "normalCopula"), pnormalCopula)
+setMethod("pCopula", signature("numeric", "normalCopula"),pnormalCopula)
+setMethod("dCopula", signature("matrix", "normalCopula"), dnormalCopula)
+setMethod("dCopula", signature("numeric", "normalCopula"),dnormalCopula)
 
 setMethod("show", signature("normalCopula"), showNormalCopula)
 
-setMethod("kendallsTau", signature("normalCopula"), kendallsTauNormalCopula)
-setMethod("spearmansRho", signature("normalCopula"), spearmansRhoNormalCopula)
+setMethod("tau", signature("normalCopula"), tauNormalCopula)
+setMethod("rho", signature("normalCopula"), rhoNormalCopula)
 setMethod("tailIndex", signature("normalCopula"), tailIndexNormalCopula)
 
-setMethod("calibKendallsTau", signature("normalCopula"), calibKendallsTauEllipCopula)
-setMethod("calibSpearmansRho", signature("normalCopula"), calibSpearmansRhoEllipCopula)
+setMethod("iTau", signature("normalCopula"), iTauEllipCopula)
+setMethod("iRho", signature("normalCopula"), iRhoEllipCopula)

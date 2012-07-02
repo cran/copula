@@ -1,5 +1,5 @@
 \name{Stirling}
-\title{Eulerian and Stirling Numbers of First and Second Kind}
+\title{Eulerian and Stirling numbers of first and second kind}
 \alias{Eulerian}
 \alias{Stirling1}
 \alias{Stirling2}
@@ -53,7 +53,8 @@ Eulerian.all (n)
 \note{
   For typical double precision arithmetic,\cr
   \code{Eulerian*(n, *)} overflow (to \code{Inf}) for \eqn{n \ge 172},\cr
-  \code{Stirling1*(n, *)} overflow (to \eqn{\pm}{+/-}\code{Inf}) for \eqn{n \ge 171}, and\cr
+  \code{Stirling1*(n, *)} overflow (to \eqn{\pm}{+/-}\code{Inf}) for
+  \eqn{n \ge 171}, and\cr
   \code{Stirling2*(n, *)} overflow (to \code{Inf}) for \eqn{n \ge 220}.
 %% and it would be possible to implement Stirling*(n, log=TRUE) without
 %% overflow, but a bit tedious, as one should "log-scale arithmetic only

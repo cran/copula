@@ -1,7 +1,7 @@
 \name{indepCopula-class}
 \docType{class}
 \alias{indepCopula-class}
-\title{Class "indepCopula" }
+\title{Class "indepCopula"}
 \description{Independence copula class.}
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("indepCopula", ...)}
@@ -24,16 +24,16 @@
       parameter lower bounds. }
     \item{\code{param.upbnd}:}{Object of class \code{"numeric"},
       parameter upper bounds. }
-    \item{\code{message}:}{Object of class \code{"character"}, family names
+    \item{\code{fullname}:}{Object of class \code{"character"}, family names
       of the copula. }
   }
 }
 \section{Methods}{
   \describe{
-    \item{Afun}{\code{signature(copula = "indepCopula")}: ... }
-    \item{dcopula}{\code{signature(copula = "indepCopula")}: ... }
-    \item{pcopula}{\code{signature(copula = "indepCopula")}: ... }
-    \item{rcopula}{\code{signature(copula = "indepCopula")}: ... }
+    \item{A}{\code{signature(copula = "indepCopula")}: ... }
+    \item{dCopula}{\code{signature(copula = "indepCopula")}: ... }
+    \item{pCopula}{\code{signature(copula = "indepCopula")}: ... }
+    \item{rCopula}{\code{signature(copula = "indepCopula")}: ... }
   }
 }
 % \section{Extends}{

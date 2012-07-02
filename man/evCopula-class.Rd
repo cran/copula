@@ -5,48 +5,46 @@
 \alias{huslerReissCopula-class}
 \alias{tawnCopula-class}
 \alias{tevCopula-class}
-
-\title{Class "evCopula" }
-\description{Class representing extreme-value copulas.}
+\title{Classes Representing Extreme-Value Copulas}
+\description{
+  Class \code{evCopula} is the virtual (mother) class of all
+  extreme-value copulas. There currently are five subclasses,
+  \code{"galambosCopula"}, \code{"huslerReissCopula"},
+  \code{"tawnCopula"}, \code{"tevCopula"}, and \code{"gumbelCopula"},
+  the latter of which is also an Archimedean copula, see the page for
+  class \code{"\linkS4class{archmCopula}"}.
+}
 \section{Objects from the Class}{
-  Objects can be created by calls of the form \code{new("evCopula",
-    ...)} or by function \code{\link{evCopula}}.
+  \code{evCopula} is a virtual class: No objects may be created from it.
+  Objects of class \code{"galambosCopula"} etc, can be created by calls
+  of the form \code{new("galambosCopula", ...)}, but typically rather by
+  \code{\link{galambosCopula}()}, etc, see there.
 }
 \section{Slots}{
-  \describe{
-    \item{\code{dimension}:}{Object of class \code{"numeric"}, the
-      dimension of the copula. }
-    \item{\code{parameters}:}{Object of class \code{"numeric"},
-      parameter values. }
-    \item{\code{param.names}:}{Object of class \code{"character"},
-      parameter names. }
-    \item{\code{param.lowbnd}:}{Object of class \code{"numeric"},
-      parameter lower bound. }
-    \item{\code{param.upbnd}:}{Object of class \code{"numeric"},
-      parameter upper bound. }
-    \item{\code{message}:}{Object of class \code{"character"}, family names
-      of the copula. }
-  }
+  All slots are inherited from the mother class
+  \code{"\linkS4class{copula}"}, see there.
 }
 \section{Methods}{
   \describe{
-    \item{dcopula}{\code{signature(copula = "galambosCopula")}: ... }
-    \item{pcopula}{\code{signature(copula = "galambosCopula")}: ... }
-    \item{rcopula}{\code{signature(copula = "galambosCopula")}: ... }
-    \item{dcopula}{\code{signature(copula = "huslerReissCopula")}: ... }
-    \item{pcopula}{\code{signature(copula = "huslerReissCopula")}: ... }
-    \item{rcopula}{\code{signature(copula = "huslerReissCopula")}: ... }
+    \item{dCopula}{\code{signature(copula = "galambosCopula")}: ... }
+    \item{pCopula}{\code{signature(copula = "galambosCopula")}: ... }
+    \item{rCopula}{\code{signature(copula = "galambosCopula")}: ... }
+    \item{dCopula}{\code{signature(copula = "huslerReissCopula")}: ... }
+    \item{pCopula}{\code{signature(copula = "huslerReissCopula")}: ... }
+    \item{rCopula}{\code{signature(copula = "huslerReissCopula")}: ... }
   }
 }
 \section{Extends}{
   Class \code{"evCopula"} extends class \code{"\linkS4class{copula}"}
   directly. Classes \code{"galambosCopula"}, \code{"huslerReissCopula"},
-  \code{"tawnCopula"}, and \code{"tevCopula"} extend class \code{"evCopula"} directly.
+  \code{"tawnCopula"}, and \code{"tevCopula"} extend class
+  \code{"evCopula"} directly.
 }
 \note{
   %The expressions of pdf are obtained by differentiating the cdf
   %expression using function \code{"deriv"}.
-  Objects of class \code{"\linkS4class{gumbelCopula}"} are also of class \code{"\linkS4class{archmCopula}"}.
+  Objects of class \code{"\linkS4class{gumbelCopula}"} are also of class
+  \code{"\linkS4class{archmCopula}"}.
 }
 \seealso{
   \code{\link{evCopula}},

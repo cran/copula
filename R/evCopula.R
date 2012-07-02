@@ -16,34 +16,36 @@
 
 ### Extreme-value copulas ######################################################
 
-evCopula <- function(family, param, dim = 2L, ...) {
-  familiesImplemented <- c("galambos", "gumbel", "huslerReiss")
+evCopula <- function(family, param = NA_real_, dim = 2L, ...) {
+  familiesImplemented <- c("galambos", "gumbel", "huslerReiss", "tawn", "tev")
   fam <- pmatch(family, familiesImplemented, -1)
   if (fam == -1)
     stop("Valid family names are ",
          paste(familiesImplemented, collapse=", "))
 
   switch(fam,
-         galambosCopula   (param),
-         gumbelCopula     (param),
-         huslerReissCopula(param)
-         )
+	 galambosCopula	  (param),
+	 gumbelCopula	  (param),
+	 huslerReissCopula(param),
+	 tawnCopula	  (param),
+	 tevCopula	  (param),
+	 stop("family ", fam, "not yet available, at least via evCopula()"))
 }
 
 tailIndexEvCopula <- function(copula) {
   lower <- 0
-  upper <- 2 - 2 * Afun(copula, 0.5)
+  upper <- 2 - 2 * A(copula, 0.5)
   c(lower=lower, upper=upper)
 }
 
 
 hdensity <- function(copula, z) {
-  A <- Afun(copula, z)
-  ders <- AfunDer(copula, z)
+  A <- A(copula, z)
+  ders <- dAdu(copula, z)
   1 + (1 - 2 * z) * ders$der1 / A + z * (1 - z) * (ders$der2 * A - ders$der1^2) / A^2
 }
 
-revCopula <- function(copula, n) {
+revCopula <- function(n, copula) {
   ## Caperaa, Fougeres, and Genest (2000, Journal of Multivariate Analysis)
   ## This algorithm has low efficiency for high dependence, in which case,
   ## hdensity is pretty much centered around 0.5.
@@ -64,10 +66,10 @@ revCopula <- function(copula, n) {
     ndone <- ndone + ngood
     if (ndone == n) break
   }
-  ders <- AfunDer(copula, z)
-  Az <- Afun(copula, z)
+  ders <- dAdu(copula, z)
+  Az <- A(copula, z)
   pz <- z * (1 - z) * ders$der2 / hdensity(copula, z) / Az
-  w <- rep(NA, n)
+  w <- numeric(n)
   mix1 <- runif(n) <= pz
   nmix1 <- sum(mix1)
   if (any( mix1)) w[ mix1] <- runif(nmix1)
@@ -80,52 +82,18 @@ revCopula <- function(copula, n) {
 ### These one-dimensional numerical integrations are quite accurate.
 ### They are much better than two-dimensional integration based on function adapt.
 
-kendallsTauEvCopula <- function(copula) {
-  integrand <- function(x) x * (1 - x) / Afun(copula, x) * AfunDer(copula, x)$der2
+tauEvCopula <- function(copula) {
+  integrand <- function(x) x * (1 - x) / A(copula, x) * dAdu(copula, x)$der2
   integrate(integrand, 0, 1)$value
 }
 
-spearmansRhoEvCopula <- function(copula) {
-  integrand <- function(x) 1 / (Afun(copula, x) + 1)^2
+rhoEvCopula <- function(copula) {
+  integrand <- function(x) 1 / (A(copula, x) + 1)^2
   12 * integrate(integrand, 0, 1)$value - 3
 }
 
 setMethod("tailIndex", signature("evCopula"), tailIndexEvCopula)
-setMethod("rcopula", signature("evCopula"), revCopula)
-setMethod("kendallsTau", signature("evCopula"), kendallsTauEvCopula)
-setMethod("spearmansRho", signature("evCopula"), spearmansRhoEvCopula)
+setMethod("rCopula", signature("numeric", "evCopula"), revCopula)
+setMethod("tau", signature("evCopula"), tauEvCopula)
+setMethod("rho", signature("evCopula"), rhoEvCopula)
 
-
-### Nonparametric estimators of the Pickands dependence function ###############
-
-## Rank-based version of the Pickands and CFG estimator
-Anfun <- function(x, w, estimator = c("CFG", "Pickands"), corrected = TRUE)
-{
-    n <- nrow(x)
-    m <- length(w)
-
-    ## make pseudo-observations
-    u <- apply(x,2,rank)/(n+1)
-    mlu <- -log(u)
-
-  switch(match.arg(estimator),
-	 "CFG" =
-	 .C(A_CFG,
-	    as.integer(n),
-	    mlu[,1],
-	    mlu[,2],
-	    as.double(w),
-	    as.integer(m),
-	    as.integer(corrected),
-	    A = double(m))$A,
-	 "Pickands" =
-	 .C(A_Pickands,
-	    as.integer(n),
-	    mlu[,1],
-	    mlu[,2],
-	    as.double(w),
-	    as.integer(m),
-	    as.integer(corrected),
-	    A = double(m))$A,
-	 stop("invalid 'estimator' : ", estimator))
-}

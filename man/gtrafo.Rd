@@ -2,7 +2,7 @@
 \alias{gtrafo}
 \alias{htrafo}
 \alias{rtrafo}
-\title{Goodness-of-Fit Testing Transformations for (Nested) Archimedean Copulas}
+\title{Goodness-of-fit testing transformations for (nested) Archimedean copulas}
 \description{
   \code{htrafo()} the transformation described in Hering and Hofert (2011).
 
@@ -36,9 +36,10 @@ rtrafo(u, cop, m=d, n.MC=0)
 }
 \details{
   \describe{
-    \item{\code{htrafo}}{Given a \eqn{d}-dimensional random vector \eqn{\bm{U}} following an
-      Archimedean copula \eqn{C} with generator \eqn{\psi}, Hering and
-      Hofert (2011) showed that \eqn{\bm{U}^\prime\sim\mathrm{U}[0,1]^d}{U'~U[0,1]^d}, where
+    \item{\code{htrafo}}{Given a \eqn{d}-dimensional random vector
+      \eqn{\bm{U}} following an Archimedean copula \eqn{C} with
+      generator \eqn{\psi}, Hering and Hofert (2011) showed that
+      \eqn{\bm{U}^\prime\sim\mathrm{U}[0,1]^d}{U'~U[0,1]^d}, where
       \deqn{U_{j}^\prime=\left(\frac{\sum_{k=1}^{j}\psi^{-1}(U_{k})}{
 	  \sum_{k=1}^{j+1}\psi^{-1}(U_{k})}\right)^{j},\ j\in\{1,\dots,d-1\},\
 	U_{d}^\prime=K(C(\bm{U})).}{%
@@ -63,12 +64,13 @@ rtrafo(u, cop, m=d, n.MC=0)
 	C(u_j | u_1,...,u_{j-1}) = (psi^{(j-1)}(sum(k=1..j)  psi^{(-1)}(u_k))) /
         (psi^{(j-1)}(sum(k=1..j-1) psi^{(-1)}(u_k))).}
       This formula is either evaluated with the exact derivatives or, if
-      \code{n.MC} is positive, via Monte Carlo; see \code{\link{psiDabsMC}}.
+      \code{n.MC} is positive, via Monte Carlo; see \code{\link{absdPsiMC}}.
       Rosenblatt (1952) showed that
       \eqn{\bm{U}^\prime\sim\mathrm{U}[0,1]^m}{U'~U[0,1]^m}, where
       \eqn{U_1^\prime=U_1}{U'_1=U_1},
       \eqn{U_2^\prime=C(U_2\,|\,U_1)}{U'_2=C(U_2|U_1)}, ..., and
-      \eqn{U_m^\prime=C(U_m\,|\,U_1,\dots,U_{m-1})}{U'_m=C(U_m|U_1,...,U_{m-1})}.
+      \eqn{U_m^\prime=C(U_m\,|\,U_1,\dots,U_{m-1})}
+      {U'_m=C(U_m|U_1,...,U_{m-1})}.
       \code{rtrafo} applies this transformation row-wise to
       \code{u} (with default \eqn{m=d}) and thus returns an
       \eqn{n\times m}{n x m}-matrix.

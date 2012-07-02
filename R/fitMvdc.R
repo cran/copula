@@ -13,15 +13,10 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
-setClass("fitMvdc",
-         representation(estimate = "numeric",
-                        var.est = "matrix",
-                        loglik = "numeric",
-                        convergence = "integer",
-                        nsample = "integer",
-                        mvdc = "mvdc"),
-         validity = function(object) TRUE
-         )
+setClass("fitMvdc", representation(mvdc = "mvdc"),
+	 contains="fittedMV" #-> ./Classes.R
+	 ## FIXME , validity = function(object) TRUE
+	 )
 
 
 setClass("summaryFitMvdc",
@@ -121,7 +116,7 @@ loglikMvdc <- function(param, x, mvdc, suppressMessages=FALSE) {
     options(warn = -1) ## ignore warnings; can be undesirable!
   }
 
-  loglik <- try(sum(log(dmvdc(mvdc, x))))
+  loglik <- try(sum(log(dMvdc(x, mvdc))))
 
   if (suppressMessages) {
     options(warn = 0)
@@ -134,38 +129,51 @@ loglikMvdc <- function(param, x, mvdc, suppressMessages=FALSE) {
 fitMvdc <- function(data, mvdc, start,
                     optim.control=list(), method="BFGS")
 {
-  copula <- mvdc@copula
-  if (copula@dimension != ncol(data))
-    stop("The dimension of the data and copula do not match.\n")
-  marNpar <- unlist(lapply(mvdc@paramMargins, length))
-  if(mvdc@marginsIdentical){
-    if(length(copula@parameters) + marNpar[1] != length(start))
-      stop("The length of start and mvdc parameters do not match.\n")
-  }
-  else {
-    if(length(copula@parameters) + sum(marNpar) != length(start))
-      stop("The length of start and mvdc parameters do not match.\n")
-  }
-  control <- c(optim.control, fnscale=-1)
-  notgood <- unlist(lapply(control, is.null))
-  control <- control[!notgood]
+    copula <- mvdc@copula
+    if (copula@dimension != ncol(data))
+        stop("The dimension of the data and copula do not match.\n")
+    marNpar <- unlist(lapply(mvdc@paramMargins, length))
+    if(mvdc@marginsIdentical){
+        if(length(copula@parameters) + marNpar[1] != length(start))
+            stop("The length of start and mvdc parameters do not match.\n")
+    }
+    else {
+        if(length(copula@parameters) + sum(marNpar) != length(start))
+            stop("The length of start and mvdc parameters do not match.\n")
+    }
+    control <- c(optim.control, fnscale=-1)
+    notgood <- unlist(lapply(control, is.null))
+    control <- control[!notgood]
 
-  fit <- optim(start, loglikMvdc,  method=method, mvdc=mvdc, x = data, suppressMessages=TRUE, control=control)
-  if (fit$convergence > 0)
-    warning("possible convergence problem: optim gave code=", fit$convergence)
-  loglik <- fit$val
+    fit <- optim(start, loglikMvdc,
+		 ## loglikMvdc args :
+		 mvdc=mvdc, x=data, suppressMessages=TRUE,
+		 ## optim args:
+		 method = method, control= control)
 
-  fit.last <- optim(fit$par, loglikMvdc, method=method, mvdc=mvdc, x =data, suppressMessages=TRUE, control=c(control, maxit=1), hessian=TRUE)
+    if (fit$convergence > 0)
+        warning("possible convergence problem: optim gave code=", fit$convergence)
+    loglik <- fit$val
 
-  var.est <- try(solve(-fit.last$hessian))
-  if (inherits(var.est, "try-error"))
-    warning("Hessian matrix not invertible")
+    fit.last <- optim(fit$par, loglikMvdc,
+                      ## loglikMvdc args :
+                      mvdc=mvdc, x=data, suppressMessages=TRUE,
+                      ## optim args:
+                      method = method,
+                      control=c(control, maxit=1), hessian=TRUE)
 
-  new("fitMvdc",
-             estimate = fit$par,
-             var.est = var.est,
-             loglik = loglik,
-             convergence = fit$convergence,
-             nsample = nrow(data),
-             mvdc = mvdc)
+    var.est <- try(solve(-fit.last$hessian))
+    if (inherits(var.est, "try-error"))
+        warning("Hessian matrix not invertible")
+
+    new("fitMvdc",
+	estimate = fit$par,
+	var.est = var.est,
+	loglik = loglik,
+	convergence = fit$convergence,
+	method = method,
+	optimOpts = control,
+	nsample = nrow(data),
+	## this contains 'copula':
+	mvdc = mvdc)
 }

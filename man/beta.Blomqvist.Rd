@@ -1,17 +1,18 @@
 \name{beta.Blomqvist}
-\title{Blomqvist's Beta for Archimedean Copula, Sample and Population}
+\title{Blomqvist's beta for Archimedean copula, sample and population}
 \alias{beta.}
-\alias{beta.hat}
+\alias{betan}
+\alias{beta.hat}%deprecated
 \description{
   Compute the population (\code{beta.()}) and sample
-  (\code{beta.hat()}) version of Blomqvist's beta for an Archimedean
+  (\code{betan()}) version of Blomqvist's beta for an Archimedean
   copula.
 
   See the reference below for definitions and formulas.
 }
 \usage{
 beta.(cop, theta, d, scaling=FALSE)
-beta.hat(u, scaling=FALSE)
+betan(u, scaling=FALSE)
 }
 \arguments{
   \item{cop}{an Archimedean copula (of dimension \eqn{d}) to be
@@ -20,7 +21,7 @@ beta.hat(u, scaling=FALSE)
   \item{d}{dimension.}
   \item{scaling}{logical, if true, the factors 2^(d-1)/(2^(d-1)-1) and
     2^(1-d) in Blomqvist's beta are omitted.}
-  \item{u}{For \code{beta.hat}: 	(\eqn{n\times d}{n x d})-matrix of
+  \item{u}{For \code{betan}: 	(\eqn{n\times d}{n x d})-matrix of
       d-dimensional observations distributed according to the copula.}
 }
 \value{
@@ -28,7 +29,8 @@ beta.hat(u, scaling=FALSE)
     \item{\code{beta.}:}{a number, being the population version of
       Blomqvist's beta for the corresponding
       \ifelse{latex}{Archi-medean}{Archimedean} copula;}
-    \item{\code{beta.hat}:}{a number, being the sample version of Blomqvist's beta for the given data.}
+    \item{\code{betan}:}{a number, being the sample version of
+      Blomqvist's beta for the given data.}
   }
 }
 \references{

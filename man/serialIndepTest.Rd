@@ -1,10 +1,8 @@
 \name{serialIndepTest}
 \alias{serialIndepTest}
 \alias{serialIndepTestSim}
-
 \title{Serial independence test for continuous time series based
   on the empirical copula process}
-
 \description{
   Serial independence test based on the empirical copula process as
   proposed in Ghoudi et al. (2001) and Genest and Rémillard (2004). The
@@ -19,36 +17,34 @@
   serial independence, if any. More details can be found in the articles
   cited in the reference section.
 }
-
 \usage{
-serialIndepTestSim(n, lag.max, m=lag.max+1, N=1000, print.every = 100)
-serialIndepTest(x, d, alpha=0.05)
+  serialIndepTestSim(n, lag.max, m=lag.max+1, N=1000, verbose = TRUE,
+                     print.every = NULL)
+  serialIndepTest(x, d, alpha=0.05)
 }
-
 \arguments{
-  \item{n}{Length of the time series when simulating the distribution of
+  \item{n}{ length of the time series when simulating the distribution of
     the test statistics under serial independence.}
-  \item{lag.max}{Maximum lag.}
-  \item{m}{Maximum cardinality of the subsets of 'lags' for which a test
+  \item{lag.max}{ maximum lag.}
+  \item{m}{ maximum cardinality of the subsets of 'lags' for which a test
     statistic is to be computed. It makes sense to consider \code{m <<
       lag.max+1} especially when \code{lag.max} is large.}
-  \item{N}{Number of repetitions when simulating under serial
+  \item{N}{ number of repetitions when simulating under serial
     independence.}
-  \item{print.every}{Progress is printed every \code{"print.every"}
-    iterations. No progress is printed if it is nonpositive.}
-  \item{x}{Numeric vector containing the time series whose serial
+   \item{print.every}{ is deprecated in favor of \code{verbose}.}
+   \item{verbose}{ a logical specifying if progress
+    should be displayed via \code{\link[utils]{txtProgressBar}}.}
+  \item{x}{ numeric vector containing the time series whose serial
     independence is to be tested.}
-  \item{d}{Object of class \code{serialIndepTestDist} as returned by the
+  \item{d}{ object of class \code{serialIndepTestDist} as returned by the
     function \code{serialIndepTestSim}. It can be regarded as the
     empirical distribution of the test statistics under serial
     independence.}
-  \item{alpha}{Significance level used in the computation of the
+  \item{alpha}{ significance level used in the computation of the
     critical values for the test statistics.}
 }
-
 \details{See the references below for more details, especially the third
   and fourth ones.}
-
 \value{The function \code{"serialIndepTestSim"} returns an object of class
    \code{"serialIndepTestDist"} whose attributes are: \code{sample.size},
   \code{lag.max}, \code{max.card.subsets}, \code{number.repetitons},
@@ -74,34 +70,32 @@ serialIndepTest(x, d, alpha=0.05)
   empirical copula process --- see last reference p 175) and
   \code{global.statistic.pvalue} (corresponding p-value).
 }
-
 \references{
-  P. Deheuvels (1979). La fonction de dépendance empirique et ses
+  Deheuvels, P. (1979). La fonction de dépendance empirique et ses
   propriétés: un test non paramétrique d'indépendance, \emph{Acad. Roy.
     Belg. Bull. Cl. Sci.}, 5th Ser. 65:274--292.
 
-  P. Deheuvels (1981), A non parametric test for independence,
+  Deheuvels, P. (1981), A non parametric test for independence,
   \emph{Publ. Inst. Statist. Univ. Paris}. 26:29--50.
 
-  C. Genest and B. Rémillard (2004), Tests of independence and
-  randomness based on the empirical copula process. \emph{Test} \bold{13}, 335--369.
+  Genest, C. and R\enc{é}{e}millard, B. (2004), Tests of independence and
+  randomness based on the empirical copula process. \emph{Test}
+  \bold{13}, 335--369.
 
-  C. Genest, J.-F. Quessy and B. Rémillard (2006). Local
+  Genest, C., Quessy, J.-F., and R\enc{é}{e}millard, B. (2006). Local
   efficiency of a Cramer-von Mises test of independence,
   \emph{Journal of Multivariate Analysis} \bold{97}, 274--294.
 
-  C. Genest, J.-F. Quessy and B. Rémillard (2007), Asymptotic
+  Genest, C., Quessy, J.-F., and R\enc{é}{e}millard, B. (2007), Asymptotic
   local efficiency of Cramér-von Mises tests for multivariate
   independence. \emph{The Annals of Statistics} \bold{35}, 166--191.
 }
-
 \seealso{
   \code{\link{indepTest}},
   \code{\link{multIndepTest}},
   \code{\link{multSerialIndepTest}},
   \code{\link{dependogram}}
 }
-
 \examples{
 ## AR 1 process
 
@@ -134,6 +128,4 @@ dependogram(test,print=TRUE)
 
 ## NB: In order to save d for future use, the save function can be used.
 }
-
-\encoding{UTF-8}
 \keyword{htest}

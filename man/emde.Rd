@@ -1,6 +1,6 @@
 \name{emde}
 \alias{emde}
-\title{Minimum Distance Estimators for (Nested) Archimedean Copulas}
+\title{Minimum distance estimators for (nested) Archimedean copulas}
 \description{
   Compute minimum distance estimators for (nested) Archimedean copulas.
 }
@@ -33,10 +33,11 @@ emde(u, cop,
     The four methods are described in Hofert et al. (2011a); see also the
     \sQuote{Details} section.}
   \item{interval}{bivariate vector denoting the interval where
-    optimization takes place.  The default is computed as described in Hofert et al.(2011a).}
+    optimization takes place.  The default is computed as described in
+    Hofert et al.(2011a).}
   \item{include.K}{logical indicating whether the last component, the
-    (possibly numerically challenging) Kendall distribution function \eqn{K}, is used
-    (\code{include.K=TRUE}) or not.  Note that the default is
+    (possibly numerically challenging) Kendall distribution function
+    \eqn{K}, is used (\code{include.K=TRUE}) or not.  Note that the default is
     \code{\link{FALSE}} here, where it is \code{TRUE} in the underlying
     \code{\link{htrafo}()} function.}
   \item{repara}{logical indicating whether the distance function to be
@@ -45,9 +46,10 @@ emde(u, cop,
   \item{\dots}{additional arguments passed to \code{\link{optimize}}.}
 }
 \details{
-   First, \code{\link{htrafo}} is applied to map the \eqn{n\times d}{n x d}-matrix
-   of given realizations to a \eqn{n\times d}{n x d}-matrix or
-   \eqn{n\times (d-1)}{n x (d-1)}-matrix, depending on whether the last
+  First, \code{\link{htrafo}} is applied to map the
+  \eqn{n\times d}{n x d}-matrix of given realizations to a
+  \eqn{n\times d}{n x d}-matrix or \eqn{n\times (d-1)}{n x
+    (d-1)}-matrix, depending on whether the last
    component is included (\code{include.K=TRUE}) or not.  Second, using
    either the sum of squares of the standard normal quantile function
    (\code{method="mde.chisq.CvM"} and
@@ -71,7 +73,7 @@ emde(u, cop,
 \references{
    Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011a),
    Estimators for Archimedean copulas in high dimensions: A comparison,
-   to be submitted.
+   submitted.
 
    Hering, C. and Hofert, M. (2011),
 	Goodness-of-fit tests for Archimedean copulas in large dimensions,

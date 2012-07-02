@@ -1,6 +1,6 @@
 \name{splom2}
 \alias{splom2}
-\title{Scatterplot Matrix [SPLOM] With Nice Variable Names}
+\title{Scatterplot matrix (splom) with nice variable names}
 \description{
   A version of \pkg{lattice}'s \code{\link{splom}} function,
   particularly useful for visualizing multivariate data sampled from
@@ -19,9 +19,11 @@ splom2(data, varnames=NULL, Vname="U", xlab="",
   \item{Vname}{character string to become the "base name" of the variables}
   \item{xlab}{x-axis label}
   \item{col.mat}{matrix of colors for the plot symbols (the default is the
-   setting as obtained from \code{\link[lattice]{trellis.par.get}("plot.symbol")$col}).}
+    setting as obtained from
+    \code{\link[lattice]{trellis.par.get}("plot.symbol")$col}).}
   \item{bg.col.mat}{matrix of colors for the background (the default is the
-    setting as obtained from \code{\link[lattice]{trellis.par.get}("background")$col}).}
+    setting as obtained from
+    \code{\link[lattice]{trellis.par.get}("background")$col}).}
   \item{\dots}{further arguments, passed to \code{\link[lattice]{splom}()}.}
 }
 \value{from \code{\link{splom}()}, an \R object of class \code{"trellis"}.

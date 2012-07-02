@@ -27,14 +27,14 @@ influ.terms <- function(u, influ, q)
 {
   p <- ncol(u)
   n <- nrow(u)
-  
+
   o <- ob <- matrix(0,n,p)
   for (i in 1:p)
     {
       o[,i] <- order(u[,i], decreasing=TRUE)
       ob[,i] <- rank(u[,i])
     }
-  
+
   out <- matrix(0,n,q)
   for (i in 1:p)
       out <- out + rbind(rep(0,q),apply(influ[[i]][o[,i],,drop=FALSE],2,cumsum))[n + 1 - ob[,i],,drop=FALSE] / n
@@ -48,9 +48,9 @@ varPL <- function(cop,u)
   {
     p <- cop@dimension
     n <- nrow(u)
-    
+
     ## influence: second part
-    ## integrals computed from the original pseudo-obs u by Monte Carlo 
+    ## integrals computed from the original pseudo-obs u by Monte Carlo
 
     dcop <- dcopwrap(cop,u) ## wrapper
     influ0 <- scale(derPdfWrtParams(cop,u)/dcop,scale=FALSE)
@@ -64,7 +64,7 @@ varPL <- function(cop,u)
     q <- length(cop@parameters)
     e <- crossprod(influ0)
     e <- e/n
-    
+
     return(var((influ0 - influ.terms(u,influ,q)) %*% solve(e)))
   }
 
@@ -78,7 +78,7 @@ varPL <- function(cop,u)
 
 varKendall <- function(cop,u)
 {
-  return(var(4 * (2 * pcopula(cop,u) - u[,1] - u[,2]) / tauDer(cop)))
+  return(var(4 * (2 * pCopula(u, cop) - u[,1] - u[,2]) / dTau(cop)))
 }
 
 varKendallNP <- function(cop,u)
@@ -87,10 +87,10 @@ varKendallNP <- function(cop,u)
   ec <- numeric(n)
   for (i in 1:n)
     ec[i] <- sum(u[,1] <= u[i,1] & u[,2] <= u[i,2])/n
-  
-  return(var(4 * (2 * ec - u[,1] - u[,2]) / tauDer(cop)))
-} 
-  
+
+  return(var(4 * (2 * ec - u[,1] - u[,2]) / dTau(cop)))
+}
+
 ##############################################################################
 
 ## variance of the estimator based on Spearman's rho
@@ -113,7 +113,7 @@ add.terms <- function(u)
 
 varSpearman <- function(cop,u)
   {
-    return(var((12 * (u[,1] * u[,2] + add.terms(u))) / rhoDer(cop)))
+    return(var((12 * (u[,1] * u[,2] + add.terms(u))) / dRho(cop)))
   }
 
 ##############################################################################

@@ -5,59 +5,53 @@
 \alias{frankCopula-class}
 \alias{gumbelCopula-class}
 \alias{amhCopula-class}
+\alias{joeCopula-class}
 \title{Class "archmCopula" }
 \description{Archimedean copula class.}
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("archmCopula",
-    ...)} or by function \code{\link{archmCopula}}. Implemented families are
-  Clayton, Gumbel, Frank, and Ali-Mikhail-Haq.
+    ...)} or by function \code{\link{archmCopula}}.  Implemented
+  families are Clayton, Gumbel, Frank, Joe, and Ali-Mikhail-Haq.
 }
 \section{Slots}{
   \describe{
     \item{\code{exprdist}:}{Object of class \code{"expression"}:
       expressions of the cdf and pdf of the copula. These expressions
-      are used in function 'pcopula' and 'dcopula'. }
-    \item{\code{dimension}:}{Object of class \code{"numeric"}, dimension
-    of the copula. }
-    \item{\code{parameters}:}{Object of class \code{"numeric"},
-      parameter values. }
-    \item{\code{param.names}:}{Object of class \code{"character"},
-      parameter names. }
-    \item{\code{param.lowbnd}:}{Object of class \code{"numeric"},
-      parameter lower bounds. }
-    \item{\code{param.upbnd}:}{Object of class \code{"numeric"},
-      parameter upper bounds. }
-    \item{\code{message}:}{Object of class \code{"character"}, family names
-      of the copula. }
+      are used in function \code{\link{pCopula}} and \code{\link{dCopula}}. }
+    \item{\code{dimension, parameters}, etc:}{all inherited from the
+      super class \code{\linkS4class{copula}}.}
   }
 }
 \section{Methods}{
   \describe{
-    \item{dcopula}{\code{signature(copula = "claytonCopula")}: ... }
-    \item{pcopula}{\code{signature(copula = "claytonCopula")}: ... }
-    \item{rcopula}{\code{signature(copula = "claytonCopula")}: ... }
-    \item{dcopula}{\code{signature(copula = "frankCopula")}: ... }
-    \item{pcopula}{\code{signature(copula = "frankCopula")}: ... }
-    \item{rcopula}{\code{signature(copula = "frankCopula")}: ... }
-    \item{dcopula}{\code{signature(copula = "gumbelCopula")}: ... }
-    \item{pcopula}{\code{signature(copula = "gumbelCopula")}: ... }
-    \item{rcopula}{\code{signature(copula = "gumbelCopula")}: ... }
-    \item{dcopula}{\code{signature(copula = "amhCopula")}: ... }
-    \item{pcopula}{\code{signature(copula = "amhCopula")}: ... }
-    \item{rcopula}{\code{signature(copula = "amhCopula")}: ... }
+    \item{dCopula}{\code{signature(copula = "claytonCopula")}: ... }
+    \item{pCopula}{\code{signature(copula = "claytonCopula")}: ... }
+    \item{rCopula}{\code{signature(copula = "claytonCopula")}: ... }
+    \item{dCopula}{\code{signature(copula = "frankCopula")}: ... }
+    \item{pCopula}{\code{signature(copula = "frankCopula")}: ... }
+    \item{rCopula}{\code{signature(copula = "frankCopula")}: ... }
+    \item{dCopula}{\code{signature(copula = "gumbelCopula")}: ... }
+    \item{pCopula}{\code{signature(copula = "gumbelCopula")}: ... }
+    \item{rCopula}{\code{signature(copula = "gumbelCopula")}: ... }
+    \item{dCopula}{\code{signature(copula = "amhCopula")}: ... }
+    \item{pCopula}{\code{signature(copula = "amhCopula")}: ... }
+    \item{rCopula}{\code{signature(copula = "amhCopula")}: ... }
+    \item{dCopula}{\code{signature(copula = "joeCopula")}: ... }
+    \item{pCopula}{\code{signature(copula = "joeCopula")}: ... }
+    \item{rCopula}{\code{signature(copula = "joeCopula")}: ... }
   }
 }
 \section{Extends}{
-  Class \code{"archmCopula"} extends class \code{"\linkS4class{copula}"} directly.
-  Class \code{"claytonCopula"}, \code{"frankCopula"},
-  \code{"gumbelCopula"} and \code{"amhCopula"} extends class
-  \code{"archmCopula"} directly.
+  Class \code{"archmCopula"} extends class \code{"\linkS4class{copula}"}
+  directly.  Class \code{"claytonCopula"}, \code{"frankCopula"},
+  \code{"gumbelCopula"}, \code{"amhCopula"} and \code{"joeCopula"}
+  extends class \code{"archmCopula"} directly.
 }
 \note{
   \code{"gumbelCopula"} is also of class \code{"\linkS4class{evCopula}"}.
 }
 \seealso{
-  \code{\link{archmCopula}},
+  \code{\link{archmCopula}}, for constructing such copula objects;
   \code{\link{copula-class}}.
 }
 \keyword{classes}

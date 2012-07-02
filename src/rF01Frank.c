@@ -23,11 +23,12 @@
 
 /**
  * Sample V01 ~ F01 with Laplace-Stieltjes transform
- * Used, e.g., for sampling F01 for Joe and for sampling F01 for Frank.
+ * Used, for example, for sampling F01 for Joe and for sampling F01 for Frank.
  * Note: The caller of this function must use GetRNGstate() and PutRNGstate().
  *       The commented part also includes the algorithm of Hofert (2011)
  *       "Efficiently sampling nested Archimedean copulas", but does not improve
  *       run time.
+ *
  * @param V0 parameter V0
  * @param theta_0 parameter theta0 in (0,infinity)
  * @param theta_1 parameter theta1 in [theta0, infinity)
@@ -81,6 +82,7 @@ double rF01Frank(double V0, double theta0, double theta1, double p0, double p1,
  * Generate a vector of variates V01 ~ F01 with Laplace-Stieltjes transform
  * ((1-(1-exp(-t)*(1-e^(-theta1)))^alpha)/(1-e^(-theta0)))^V0. Vectorized version
  * of rF01Frank.
+ *
  * @param V01 vector of random variates from F01 (result)
  * @param V0 vector of random variates from F0
  * @param n length of the vectors V0 and V01
@@ -108,7 +110,8 @@ void rF01Frank_vec(double *V01, const double *V0, int n, double theta0,
 /**
  * Generate a vector of variates V01 ~ F01 with Laplace-Stieltjes transform
  * ((1-(1-exp(-t)*(1-e^(-theta1)))^alpha)/(1-e^(-theta0)))^V0. Bridge to R. Used,
- * e.g., to draw several variates from rF01Frank.
+ * for example, to draw several variates from rF01Frank.
+ *
  * @param V0_ vector of random variates from F0
  * @param theta_0_ parameter theta0 in (0,infinity)
  * @param theta_1_ parameter theta1 in [theta0, infinity)

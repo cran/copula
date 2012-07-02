@@ -1,15 +1,16 @@
 \name{rF01FrankJoe}
 \alias{rF01Frank}
 \alias{rF01Joe}
-\title{Sample Univariate Distributions involved in nested Frank and Joe Copulas}
+\title{Sample univariate distributions involved in nested Frank and Joe copulas}
 \description{
   \code{rF01Frank}:
   Generate a vector of random variates \eqn{V_{01}\sim F_{01}}{V01 ~ F01}
   with Laplace-Stieltjes transform
   \deqn{\psi_{01}(t;V_0)=
-    \Bigl(\frac{1-(1-\exp(-t)(1-e^{-\theta_1}))^{\theta_0/\theta_1}}{1-e^{-\theta_0}}
-    \Bigr)^{V_0}.}{%
-    psi01(t;V0) = ((1-(1-exp(-t)*(1-e^-theta1))^(theta0/theta1))/(1-e^-theta0))^V0.
+    \Bigl(\frac{1-(1-\exp(-t)(1-e^{-\theta_1}))^{\theta_0/\theta_1}}{%
+      1-e^{-\theta_0}}\Bigr)^{V_0}.}{%
+    psi01(t;V0) = ((1-(1-exp(-t)*(1-e^-theta1))^(theta0/theta1))/
+    (1-e^-theta0))^V0.
   }
   for the given	realizations \eqn{V_0}{V0} of Frank's \eqn{F_0}{F0} and the
   parameters \eqn{\theta_0,\theta_1\in(0,\infty)}{theta0, theta1 in (0,Inf)}
@@ -48,7 +49,8 @@ rF01Joe(V0, alpha, approx)
 }
 \arguments{
   \item{V0}{a vector of random variates from \eqn{F_0}{F0}.}
-  \item{theta0, theta1, alpha}{parameters \eqn{\theta_0,\theta_1}{theta0, theta1}
+  \item{theta0, theta1, alpha}{parameters
+    \eqn{\theta_0,\theta_1}{theta0, theta1}
     and \eqn{\alpha}{alpha} as described above.}
   \item{rej}{parameter value as described above.}
   \item{approx}{parameter value as described above.}

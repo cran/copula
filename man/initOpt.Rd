@@ -1,6 +1,7 @@
 \name{initOpt}
 \alias{initOpt}
-\title{Initial Interval or Value for Archimedean Copula Estimation}
+\title{Initial interval or value for parameter estimation of Archimedean
+  copulas}
 \description{
   Compute an initial interval or initial value for optimization/estimation
   routines (only a heuristic; if this fails, choose your own interval or value).
@@ -17,7 +18,8 @@ initOpt(family, tau.range=NULL, interval = TRUE, u,
   \item{interval}{\code{\link{logical}} indicating whether an initial interval
     (the default) or an initial value should be returned.}
   \item{u}{matrix of realizations following the copula family specified
-    by \code{family}.  Note that \code{u} can be omitted if \code{interval=TRUE}.}
+    by \code{family}.  Note that \code{u} can be omitted if
+    \code{interval=TRUE}.}
   \item{method}{a \code{\link{character}} string specifying the method to be
     used to compute an estimate of Kendall's tau.  This has to be one (or a
     unique abbreviation) of

@@ -14,13 +14,13 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-AfunGumbel <- function(copula, w) {
+AGumbel <- function(copula, w) {
   alpha <- copula@parameters[1]
   A <- (w^alpha + (1 - w)^alpha)^(1/alpha)
   ifelse(w == 0 | w == 1, 1, A)
 }
 
-AfunDerGumbel <- function(copula, w) {
+dAduGumbel <- function(copula, w) {
   alpha <- copula@parameters[1]
   ## deriv(expression((w^alpha + (1 - w)^alpha)^(1/alpha)), "w", hessian=TRUE)
   value <- eval(expression({
@@ -50,26 +50,17 @@ AfunDerGumbel <- function(copula, w) {
   data.frame(der1=der1, der2=der2)
 }
 
-genFunGumbel <- function(copula, u) {
+iPsiGumbel <- function(copula, u) {
   alpha <- copula@parameters[1]
   ( - log(u))^alpha
 }
 
-genInvGumbel <- function(copula, s) {
+psiGumbel <- function(copula, s) {
   alpha <- copula@parameters[1]
   exp( -s^(1 / alpha) )
 }
 
-genFunDer1Gumbel <- function(copula, u) {
-  eval(gumbelCopula.genfunDer.expr[1], list(u=u, alpha=copula@parameters[1]))
-}
-
-
-genFunDer2Gumbel <- function(copula, u) {
-  eval(gumbelCopula.genfunDer.expr[2], list(u=u, alpha=copula@parameters[1]))
-}
-
-gumbelCopula <- function(param, dim = 2L) {
+gumbelCopula <- function(param = NA_real_, dim = 2L) {
   ## get expressions of cdf and pdf
   cdfExpr <- function(n) {
     expr <- "( - log(u1))^alpha"
@@ -98,23 +89,23 @@ gumbelCopula <- function(param, dim = 2L) {
              param.names = "param",
              param.lowbnd = 1,
              param.upbnd = Inf,
-             message = "Gumbel copula family; Archimedean copula; Extreme value copula")
+             fullname = "Gumbel copula family; Archimedean copula; Extreme value copula")
 }
 
 
-rgumbelCopula <- function(copula, n) {
+rgumbelCopula <- function(n, copula) {
   ## frailty is stable(1,0,0) with 1/alpha
   dim <- copula@dimension
   alpha <- copula@parameters[1]
   ## reduce to indepCopula
-  if (alpha - 1 < .Machine$double.eps ^(1/3) ) return(rcopula(indepCopula(dim=dim), n))
+  if (alpha - 1 < .Machine$double.eps ^(1/3) ) return(rCopula(n, indepCopula(dim=dim)))
   b <- 1/alpha
   ## stable (b, 1), 0 < b < 1, Chambers, Mallows, and Stuck 1976, JASA, p.341
   fr <- rPosStable(n, b)
   fr <- matrix(fr, nrow=n, ncol=dim)
   ## now gumbel copula
   val <- matrix(runif(dim * n), nrow = n)
-  genInv(copula, - log(val) / fr)
+  psi(copula, - log(val) / fr)
 }
 
 
@@ -122,14 +113,13 @@ pgumbelCopula <- function(copula, u) {
   dim <- copula@dimension
   if(!is.matrix(u)) u <- matrix(u, ncol = dim)
   cdf <- copula@exprdist$cdf
-  dim <- copula@dimension
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   alpha <- copula@parameters[1]
   val <- eval(cdf)
   pmax(val, 0)
 }
 
-dgumbelCopula <- function(copula, u, log=FALSE, ...) {
+dgumbelCopula <- function(u, copula, log=FALSE, ...) {
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   pdf <- copula@exprdist$pdf
   dim <- copula@dimension
@@ -139,7 +129,7 @@ dgumbelCopula <- function(copula, u, log=FALSE, ...) {
   eval(pdf)
 }
 
-dgumbelCopula.pdf <- function(copula, u, log=FALSE) {
+dgumbelCopula.pdf <- function(u, copula, log=FALSE) {
   dim <- copula@dimension
   if (dim > 10) stop("Gumbel copula PDF not implemented for dimension > 10.")
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
@@ -151,7 +141,7 @@ dgumbelCopula.pdf <- function(copula, u, log=FALSE) {
   else  c(eval(gumbelCopula.pdf.algr[dim]))
 }
 
-kendallsTauGumbelCopula <- function(copula) {
+tauGumbelCopula <- function(copula) {
   alpha <- copula@parameters[1]
   1 - 1/alpha
 }
@@ -163,7 +153,7 @@ tailIndexGumbelCopula <- function(copula, ...) {
 }
 
 
-calibKendallsTauGumbelCopula <- function(copula, tau) {
+iTauGumbelCopula <- function(copula, tau) {
   if (any(tau < 0)) warning("tau is out of the range [0, 1]")
   ifelse(tau <= 0, 1, 1/(1 - tau))
 }
@@ -188,13 +178,13 @@ gumbelRhoDer <- function(alpha) {
   c(valFun(theta, 1)) * forwardDer(alpha, ss)
 }
 
-spearmansRhoGumbelCopula <- function(copula) {
+rhoGumbelCopula <- function(copula) {
   alpha <- copula@parameters[1]
   gumbelRhoFun(alpha)
 }
 
 
-calibSpearmansRhoGumbelCopula <- function(copula, rho) {
+iRhoGumbelCopula <- function(copula, rho) {
   if (any(rho < 0)) warning("rho is out of the range [0, 1]")
   gumbelRhoInv <- approxfun(x = .gumbelRho$assoMeasFun$fm$ysmth,
                             y = .gumbelRho$assoMeasFun$fm$x, rule = 2)
@@ -205,34 +195,61 @@ calibSpearmansRhoGumbelCopula <- function(copula, rho) {
 }
 
 
-tauDerGumbelCopula <- function(copula) {
+dTauGumbelCopula <- function(copula) {
   return( 1 / copula@parameters^2 )
 }
 
-rhoDerGumbelCopula <- function(copula) {
+dRhoGumbelCopula <- function(copula) {
   alpha <- copula@parameters[1]
   gumbelRhoDer(alpha)
 }
 
-setMethod("rcopula", signature("gumbelCopula"), rgumbelCopula)
-setMethod("pcopula", signature("gumbelCopula"), pgumbelCopula)
-setMethod("dcopula", signature("gumbelCopula"), dgumbelCopula.pdf)
+setMethod("rCopula", signature("numeric", "gumbelCopula"), rgumbelCopula)
 
-setMethod("Afun", signature("gumbelCopula"), AfunGumbel)
-setMethod("AfunDer", signature("gumbelCopula"), AfunDerGumbel)
+setMethod("pCopula", signature("matrix", "gumbelCopula"),
+	  ## was  pgumbelCopula
+	  function(u, copula, ...) .pacopula(u, copGumbel, theta=copula@parameters))
+setMethod("pCopula", signature("numeric", "gumbelCopula"),
+	  ## was  pgumbelCopula
+	  function(u, copula, ...) pacopula(u, copGumbel, theta=copula@parameters))
 
-setMethod("genFun", signature("gumbelCopula"), genFunGumbel)
-setMethod("genInv", signature("gumbelCopula"), genInvGumbel)
+setMethod("dCopula", signature("matrix", "gumbelCopula"),
+	  ## was  dgumbelCopula.pdf
+	  function (u, copula, log = FALSE, ...)
+	  copGumbel@dacopula(u, theta=copula@parameters, log=log, ...))
+setMethod("dCopula", signature("numeric", "gumbelCopula"),
+	  function (u, copula, log = FALSE, ...)
+	  copGumbel@dacopula(matrix(u, ncol=dim(copula)), theta=copula@parameters, log=log, ...))
 
-setMethod("genFunDer1", signature("gumbelCopula"), genFunDer1Gumbel)
-setMethod("genFunDer2", signature("gumbelCopula"), genFunDer2Gumbel)
 
-setMethod("kendallsTau", signature("gumbelCopula"), kendallsTauGumbelCopula)
-setMethod("spearmansRho", signature("gumbelCopula"), spearmansRhoGumbelCopula)
+setMethod("A", signature("gumbelCopula"), AGumbel)
+setMethod("dAdu", signature("gumbelCopula"), dAduGumbel)
+
+setMethod("iPsi", signature("gumbelCopula"), iPsiGumbel)
+## FIXME {negative tau}
+## setMethod("iPsi", signature("gumbelCopula"),
+## 	  function(copula, u) copGumbel@iPsi(u, theta=copula@parameters))
+setMethod("psi", signature("gumbelCopula"), psiGumbel)
+## FIXME {negative tau}
+## setMethod("psi", signature("gumbelCopula"),
+## 	  function(copula, s) copGumbel@psi(t=s, theta=copula@parameters))
+
+setMethod("diPsi", signature("gumbelCopula"),
+	  function(copula, u, degree=1, log=FALSE, ...)
+      {
+	  s <- if(log || degree %% 2 == 0) 1. else -1.
+	  s* copGumbel@absdiPsi(u, theta=copula@parameters, degree=degree, log=log, ...)
+      })
+
+
+
+
+setMethod("tau", signature("gumbelCopula"), tauGumbelCopula)
+setMethod("rho", signature("gumbelCopula"), rhoGumbelCopula)
 setMethod("tailIndex", signature("gumbelCopula"), tailIndexGumbelCopula)
 
-setMethod("calibKendallsTau", signature("gumbelCopula"), calibKendallsTauGumbelCopula)
-setMethod("calibSpearmansRho", signature("gumbelCopula"), calibSpearmansRhoGumbelCopula)
+setMethod("iTau", signature("gumbelCopula"), iTauGumbelCopula)
+setMethod("iRho", signature("gumbelCopula"), iRhoGumbelCopula)
 
-setMethod("rhoDer", signature("gumbelCopula"), rhoDerGumbelCopula)
-setMethod("tauDer", signature("gumbelCopula"), tauDerGumbelCopula)
+setMethod("dRho", signature("gumbelCopula"), dRhoGumbelCopula)
+setMethod("dTau", signature("gumbelCopula"), dTauGumbelCopula)

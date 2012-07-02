@@ -14,24 +14,27 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-archmCopula <- function(family, param, dim = 2L, ...) {
-  familiesImplemented <- c("clayton", "frank", "gumbel", "amh")
-  fam <- pmatch(family, familiesImplemented, -1)
-  if (fam == -1)
-    stop(paste("Valid family names are", familiesImplemented))
-  dim <- as.integer(dim)
-  switch(fam,
-         claytonCopula(param, dim = dim),
-         frankCopula  (param, dim = dim),
-         gumbelCopula (param, dim = dim),
-         amhCopula    (param, dim = 2L)
-         )
+archmCopula <- function(family, param = NA_real_, dim = 2L, ...) {
+    family <- tolower(family)
+    dim <- as.integer(dim)
+    if(family == "amh" && dim != 2L)
+	stop("'amh' is not yet available for dim > 2")
+    switch(family,
+	   "clayton" = claytonCopula(param, dim = dim),
+	   "frank"   = frankCopula  (param, dim = dim),
+	   "amh"     = amhCopula    (param, dim = dim),
+	   "gumbel"  = gumbelCopula (param, dim = dim),
+	   "joe"     = joeCopula    (param, dim = dim),
+	   ## otherwise:
+	   { fams <- sub("Copula$", '', names(getClass("archmCopula")@subclasses))
+	     stop("Valid family names are ", paste(dQuote(fams), collapse=", "))
+	 })
 }
 
 
-kendallsTauArchmCopula <- function(copula) {
-  integrand <- function(x) genFun(copula, x) / genFunDer1(copula, x)
+tauArchmCopula <- function(copula) {
+  integrand <- function(x) iPsi(copula, x) / diPsi(copula, x)
   1 + 4 * integrate(integrand, 0, 1)$value
 }
 
-setMethod("kendallsTau", signature("archmCopula"), kendallsTauArchmCopula)
+setMethod("tau", signature("archmCopula"), tauArchmCopula)

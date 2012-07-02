@@ -1,6 +1,6 @@
 \name{safeUroot}
 \alias{safeUroot}
-\title{One Dimensional Root (Zero) Finding - Extra "Safety" for Convenience}
+\title{One dimensional root (zero) finding - extra "safety" for convenience}
 \usage{
 safeUroot(f, interval, \dots,
        lower = min(interval), upper = max(interval),

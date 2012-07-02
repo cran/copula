@@ -32,10 +32,10 @@ psi.GIG <- function(t, theta)
 ##       modified Bessel functions of the third kind (besselK) given in
 ##       Paris (1984) ("An inequality for the Bessel function J_v(vx)",
 ##       SIAM J. Math. Anal. 15, 203--205)
-psiInv.GIG <- function(t, theta, upper=NULL, ...){
+iPsi.GIG <- function(t, theta, upper=NULL, ...){
     if(is.null(upper)){
 	if(theta[1] > -0.5) upper <- function(x) (1-log(x)/theta[2])^2-1 else
-        stop("initial interval for psiInv.GIG fails")
+        stop("initial interval for iPsi.GIG fails")
     }
     res <- numeric(length(t))
     is0 <- t==0
@@ -53,7 +53,7 @@ psiInv.GIG <- function(t, theta, upper=NULL, ...){
 }
 
 ## generator derivatives
-psiDabs.GIG <- function(t, theta, degree=1, n.MC=0, log=FALSE){
+absdPsi.GIG <- function(t, theta, degree=1, n.MC=0, log=FALSE){
     res <- numeric(length(t))
     iInf <- is.infinite(t)
     res[iInf] <- -Inf # log(0)
@@ -73,10 +73,9 @@ psiDabs.GIG <- function(t, theta, degree=1, n.MC=0, log=FALSE){
     if(is.matrix(t)) matrix(r, ncol=ncol(t)) else r
 }
 
-## derivative of the generator inverse
-psiInvD1abs.GIG <- function(t, theta, log=FALSE){
-    res <- -psiDabs.GIG(psiInv.GIG(t, theta=theta), theta=theta, log=TRUE)
-    if(log) res else exp(res)
+## absolute value of the derivative of the generator inverse -- NOWHERE USED !!
+absdiPsi.GIG <- function(t, theta, log=FALSE) {
+    absdPsi.GIG(iPsi.GIG(t, theta=theta), theta=theta, log=log)
 }
 
 ## density of the GIG copula
@@ -89,12 +88,12 @@ dacopula.GIG <- function(u, theta, n.MC=0, log=FALSE){
     if(!any(n01)) return(res)
     ## auxiliary results
     u. <- u[n01,, drop=FALSE]
-    psiI <- psiInv.GIG(u., theta=theta) # this is costly if d is large
+    psiI <- iPsi.GIG(u., theta=theta) # this is costly if d is large
     psiI.sum <- rowSums(psiI)
     ## main part
     if(n.MC > 0){ # Monte Carlo
-        res[n01] <- psiDabs.GIG(psiI.sum, theta=theta, degree=d, n.MC=n.MC, log=TRUE) -
-            rowSums(psiDabs.GIG(psiI, theta=theta, log=TRUE))
+        res[n01] <- absdPsi.GIG(psiI.sum, theta=theta, degree=d, n.MC=n.MC, log=TRUE) -
+            rowSums(absdPsi.GIG(psiI, theta=theta, log=TRUE))
     }else{ # explicit
         ## auxiliary function for density evaluation
         h <- function(t, k, theta, log=FALSE){

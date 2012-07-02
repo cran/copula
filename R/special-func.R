@@ -610,3 +610,17 @@ Bernoulli <- function(n, method = c("sumBin", "sumRamanujan", "asymptotic"),
 ##---> Free Python implementations are here
 ##>> http://en.literateprograms.org/Bernoulli_numbers_%28Python%29
 ##--> MM: see ../misc/Bernoulli_numbers_(Python)/
+
+
+debye1 <- function(x) {
+    d <- debye_1(abs(x))
+    ## ifelse(x >= 0, d, d - x / 2) ## k = 1, Frees & Valdez 1998, p.9
+    d - (x<0) * x / 2
+}
+
+
+debye2 <- function(x) {
+    d <- debye_2(abs(x))
+    ## ifelse(x >= 0, d, d - x * 2/3) ## k = 2, Frees & Valdez 1998, p.9
+    d - (x<0) * x * 2/3
+}

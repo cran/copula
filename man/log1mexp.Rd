@@ -1,6 +1,7 @@
 \name{log1mexp}
 \alias{log1mexp}
-\title{Compute  f(a) = log(1 - exp(-a))  Numerically Optimally}
+\title{Compute  f(a) = \eqn{\mathrm{log}}{log}(1 - \eqn{\mathrm{exp}}{exp}(-a))
+  numerically optimally}
 \description{
   Compute f(a) = log(1 - exp(-a)) stably
 }
@@ -49,6 +50,5 @@ tail(fa)# log1p() works here
 
 matplot(a, -fa, type = "l", log = "xy")# don't see the big difference
 legend("left", fExpr, col=1:4, lty=1:4, bty="n")
-
 }
 \keyword{math}

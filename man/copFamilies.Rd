@@ -1,5 +1,5 @@
 \name{copFamilies}
-\title{Specific Archimedean Copula Families ("acopula" Objects)}
+\title{Specific Archimedean copula families ("acopula" objects)}
 \concept{Copula Family}
 \alias{acopula-families}
 \alias{copAMH}
@@ -98,7 +98,7 @@ copJoe
   Efficiently sampling nested Archimedean copulas,
   \emph{Computational Statistics & Data Analysis} \bold{55}, 57--70.
 
-  Marius Hofert and Martin \enc{Mächler}{Maechler} (2011),
+  Hofert, M. and \enc{Mächler}{Maechler}, M. (2011),
   Nested Archimedean Copulas Meet R: The nacopula Package.,
   \emph{Journal of Statistical Software} \bold{39}(9), 1--20.
   \url{http://www.jstatsoft.org/v39/i09/}.

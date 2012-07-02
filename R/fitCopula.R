@@ -17,16 +17,10 @@
 ### Class fitCopula ############################################################
 
 setClass("fitCopula",
-         representation(estimate = "numeric",
-                        var.est = "matrix",
-                        method = "character",
-                        loglik = "numeric",
-                        convergence = "integer",
-                        optimOpts = "list",
-                        nsample = "integer",
-                        copula = "copula")
-         ## FIXME validity = function(object) TRUE
-         )
+	 representation(copula = "copula"),
+	 contains="fittedMV" #-> ./Classes.R
+	 ## FIXME , validity = function(object) TRUE
+	 )
 
 setClass("summaryFitCopula",
          representation(method = "character",
@@ -89,7 +83,7 @@ fitCopula <- function(copula, data, method = c("mpl","ml","itau","irho"),
 
 fitCopStart <- function(copula, data, hideWarnings, default = copula@parameters)
 {
-  if (hasMethod("calibKendallsTau", clc <- class(copula))) {
+  if (hasMethod("iTau", clc <- class(copula))) {
     start <- fitCopula.itau(copula, data, FALSE)@estimate
     if(extends(clc, "tCopula") && !copula@df.fixed)
       ## add starting value for 'df'
@@ -206,8 +200,8 @@ loglikCopula <- function(param, x, copula, hideWarnings=FALSE) {
     options(warn = -1) ## ignore warnings; can be undesirable!
   }
 
-  loglik <- try(sum(dcopula(copula, x, log=TRUE)))
-  ##old: loglik <- try(sum(log(dcopula(copula, x))))
+  loglik <- try(sum(dCopula(x, copula, log=TRUE)))
+  ##old: loglik <- try(sum(log(dCopula(x, copula))))
 
   if (hideWarnings) {
     options(warn = 0)
@@ -312,7 +306,7 @@ fitSpearman <- function(cop,rho)  {
   for (j in 1:(p-1))
     for (i in (j+1):p)
       {
-        sigma[i,j] <- calibSpearmansRho(cop,rho[i,j])
+        sigma[i,j] <- iRho(cop,rho[i,j])
         sigma[j,i] <- sigma[i,j]
       }
 
@@ -330,7 +324,7 @@ fitKendall <- function(cop,tau) {
   for (j in 1:(p-1))
     for (i in (j+1):p)
       {
-        sigma[i,j] <- calibKendallsTau(cop,tau[i,j])
+        sigma[i,j] <- iTau(cop,tau[i,j])
         sigma[j,i] <- sigma[i,j]
       }
 
@@ -350,26 +344,27 @@ influ.terms <- function(u, influ, q)
   n <- nrow(u)
 
   o <- ob <- matrix(0,n,p)
-  for (i in 1:p)
-    {
+  for (i in 1:p) {
       o[,i] <- order(u[,i], decreasing=TRUE)
       ob[,i] <- rank(u[,i])
-    }
+  }
 
+  ## integral wrt empirical copula (-> sum):
   out <- matrix(0,n,q)
   for (i in 1:p)
-      out <- out + rbind(rep(0,q),apply(influ[[i]][o[,i],,drop=FALSE],2,cumsum))[n + 1 - ob[,i],,drop=FALSE] / n
-  return(out)
+      out <- out + rbind(rep(0,q),
+                         apply(influ[[i]][o[,i],,drop=FALSE],2,cumsum))[n + 1 - ob[,i],,drop=FALSE]
+  return(out / n)
 }
 
 ## cop is the FITTED copula
 ## u are the available pseudo-observations
 varPL <- function(cop,u)
   {
+    q <- length(cop@parameters)
     ## check if variance can be computed
     if (!hasMethod("dcopwrap", class(cop))) {
       warning("The variance estimate cannot be computed for this copula.")
-      q <- length(cop@parameters)
       return(matrix(NA, q, q))
     }
 
@@ -378,15 +373,18 @@ varPL <- function(cop,u)
 
     ## influence: second part
     ## integrals computed from the original pseudo-obs u by Monte Carlo
-    dcop <- dcopwrap(cop,u) ## wrapper
-    influ0 <- derPdfWrtParams(cop,u)/dcop
-    derArg <- derPdfWrtArgs(cop,u)/dcop
+    dcop <- dcopwrap(cop,u) ## wrapper: either dCopula() or '1' (for ellip.)
+    ## New    dcop <- dCopula(u,cop) ## in some cases
+    ## influ0 <- score (cop,u, dcop)
+    ## derArg <- score2(cop,u, dcop)
+    influ0 <- derPdfWrtParams(cop,u) / dcop # c. / c  = of dim.  n x q  {== cop<foo>@score()}
+    derArg <- derPdfWrtArgs(cop,u)   / dcop #         = of dim.  n x p  { missing in copFoo -- TODO}
 
+    ## TODO: use  array instead of list (and change influ.terms() accordingly)
     influ <- vector("list",p)
     for (i in 1:p)
         influ[[i]] <- influ0 * derArg[,i]
 
-    q <- length(cop@parameters)
     inve <- solve(var(influ0))
 
     return(inve %*% var(influ0 - influ.terms(u,influ,q)) %*% inve)
@@ -460,7 +458,7 @@ varInfluAr1 <- function(cop, v, L, der) {
   sigma <- getSigma(cop) # assuming cop is the fitted copula
   ## influ for log(r)
   r <- sigma[lower.tri(sigma)]
-  der <- if (der == "tau") tauDerFun(cop)(r) else rhoDerFun(cop)(r)
+  der <- if (der == "tau") dTauFun(cop)(r) else dRhoFun(cop)(r)
   D <- diag(x = 1 / r / der, pp)
   v <- v %*% D
   ## influ for log(theta)
@@ -471,10 +469,11 @@ varInfluAr1 <- function(cop, v, L, der) {
   v %*% theta
 }
 
+##' See Kojadinovic & Yan (2010) Comparison of three semiparametric ... IME 47, 52--63
 varKendall <- function(cop,u) {
   ## check if variance can be computed
-  if (!hasMethod("tauDer", class(cop))) {
-    warning("The variance estimate cannot be computed for this copula.")
+  if (!hasMethod("dTau", class(cop))) {
+    warning("The variance estimate cannot be computed for a copula of class", class(cop))
     q <- length(cop@parameters)
     return(matrix(NA, q, q))
   }
@@ -497,7 +496,7 @@ varKendall <- function(cop,u) {
   X <- getXmat(cop)
   L <- t(solve(crossprod(X), t(X)))
   ## Caution: diag(0.5) is not a 1x1 matrix of 0.5!!! check it out.
-  D <- if (length(cop@parameters) == 1) 1 / tauDer(cop) else diag(1 / tauDer(cop))
+  D <- if (length(cop@parameters) == 1) 1 / dTau(cop) else diag(1 / dTau(cop))
   if (is(cop, "ellipCopula") && cop@dispstr == "ar1") { ## special treatment
     v <- varInfluAr1(cop, v, L, "tau")
     return(16 * var(v))
@@ -506,12 +505,16 @@ varKendall <- function(cop,u) {
 
 
 ## variance of the estimator based on Spearman's rho ###########################
-
-## cop is the FITTED copula
-## u are the available pseudo-observations
+##' See Kojadinovic & Yan (2010) Comparison of three seimparametirc ... IME 47, 52--63
+##'
+##' @title variance of the estimator based on Spearman's rho
+##' @param cop  the FITTED copula
+##' @param u the available pseudo-observations
+##' @return
+##' @author
 varSpearman <- function(cop,u)  {
   ## check if variance can be computed
-  if (!hasMethod("rhoDer", class(cop))) {
+  if (!hasMethod("dRho", class(cop))) {
     warning("The variance estimate cannot be computed for this copula.")
     q <- length(cop@parameters)
     return(matrix(NA, q, q))
@@ -541,7 +544,7 @@ varSpearman <- function(cop,u)  {
       144 * var(v)
   } else {
       ## Caution: diag(0.5) is not a 1x1 matrix of 0.5!!! check it out.
-      D <- if (length(cop@parameters) == 1) 1 / rhoDer(cop) else diag(1 / rhoDer(cop))
+      D <- if (length(cop@parameters) == 1) 1 / dRho(cop) else diag(1 / dRho(cop))
       144 * var(v %*% L %*% D)
   }
 }

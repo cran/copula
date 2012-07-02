@@ -1,13 +1,11 @@
 \name{acopula-class}
 \Rdversion{1.1}
-\title{Class "acopula" of Archimedean Copula Families}
+\title{Class "acopula" of Archimedean copula families}
 \docType{class}
 \alias{acopula-class}
 \alias{acopula}
-%
 \alias{initialize,acopula-method}
 \alias{show,acopula-method}
-%
 \description{
   This class \code{"acopula"} of Archimedean Copula Families
   is mainly used for providing objects of known Archimedean families
@@ -26,29 +24,29 @@
       "Frank" ("F"), "Gumbel" ("G"), or "Joe" ("J").}
     \item{\code{theta}:}{Parameter value, a \code{\link{numeric}}, where
       \code{NA} means \dQuote{unspecified}.}
-    \item{\code{psi}, \code{psiInv}:}{The (Archimedean) generator
+    \item{\code{psi}, \code{iPsi}:}{The (Archimedean) generator
       \eqn{\psi}{psi} (with \eqn{\psi}{psi}(t)=\eqn{\exp}{exp}(-t) being the
       generator of the independence copula) and its inverse
-      (\code{\link{function}}). \code{psiInv} has an optional argument
+      (\code{\link{function}}). \code{iPsi} has an optional argument
       \code{log} which, if \code{TRUE} returns the logarithm of inverse of the
       generator.}
-    \item{\code{psiDabs}:}{A \code{\link{function}} which computes the absolute
+    \item{\code{absdPsi}:}{A \code{\link{function}} which computes the absolute
       value of the derivative of the generator \eqn{\psi}{psi} for the given
       parameter \code{theta} and of the given \code{degree} (defaults to 1).
       Note that there is no informational loss by computing the absolute value
       since the derivatives alternate in sign (the generator derivative
-      is simmply (-1)^\code{degree} times \code{psiDabs}).  The
+      is simply (-1)^\code{degree}\eqn{*}\code{absdPsi}).  The
       number \code{n.MC} denotes the sample size for a Monte Carlo evaluation
       approach.  If \code{n.MC} is zero (the default), the
       generator derivatives are evaluated with their exact formulas.  The
       optional parameter \code{log} (defaults to \code{FALSE}) indicates whether
       or not the logarithmic value is returned.}
-    \item{\code{psiInvD1abs}:}{a \code{\link{function}} computing the
+    \item{\code{absdiPsi}:}{a \code{\link{function}} computing the
       absolute value of the derivative of the generator inverse
-      (\code{psiInv()}) for the given parameter \code{theta}.  The optional
+      (\code{iPsi()}) for the given parameter \code{theta}.  The optional
       parameter \code{log} (defaults to \code{FALSE}) indicates whether
       the logarithm of the absolute value of the first derivative of
-      \code{psiInv()} is returned.}
+      \code{iPsi()} is returned.}
     \item{\code{dDiag}:}{a \code{\link{function}} computing the density of the
       diagonal of the Archimedean copula at \code{u} with parameter
       \code{theta}.  The parameter \code{log} is as described before.}
@@ -56,8 +54,9 @@
       of the Archimedean copula at \code{u} with parameter \code{theta}.  The
       meanings of the parameters \code{n.MC} and \code{log} are as
       described before.}
-    \item{\code{score}:}{a \code{\link{function}} computing the \emph{derivative}
-      of the density with respect to the parameter \eqn{\theta}{theta}.}
+    \item{\code{score}:}{a \code{\link{function}} computing the
+      \emph{derivative} of the density with respect to the parameter
+      \eqn{\theta}{theta}.}
     \item{\code{paraInterval}:}{Either \code{\link{NULL}} or an object of class
       \code{"\linkS4class{interval}"}, which is typically obtained from a call
       such as \code{\link{interval}("[a,b)")}.}
@@ -96,12 +95,13 @@
       corresponding to the distribution function \eqn{F_{01}}{F01}.
 
       Arguments are the evaluation point(s) \code{x}, the value(s) \code{V0},
-      and the parameters \code{theta0} and \code{theta1}.  As for \code{dV0}, the
-      optional argument \code{log} can be specified (defaults to \code{FALSE}).
-      Note that if \code{x} is a vector, \code{V0} must either have
-      length one (in which case \code{V0} is the same for every component of
-      \code{x}) or \code{V0} must be of the same length as \code{x} (in which
-      case the components of \code{V0} correspond to the ones of \code{x}).}
+      and the parameters \code{theta0} and \code{theta1}.  As for
+      \code{dV0}, the optional argument \code{log} can be specified
+      (defaults to \code{FALSE}). Note that if \code{x} is a vector,
+      \code{V0} must either have length one (in which case \code{V0} is
+      the same for every component of \code{x}) or \code{V0} must be of
+      the same length as \code{x} (in which case the components of
+      \code{V0} correspond to the ones of \code{x}).}
     \item{\code{tau}, \code{tauInv}:}{Compute Kendall's tau of the bivariate
       Archimedean copula with generator \eqn{\psi}{psi} as a
       \code{\link{function}} of \code{theta}, respectively, \code{theta} as a

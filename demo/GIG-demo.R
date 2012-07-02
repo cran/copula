@@ -156,7 +156,7 @@ system.time(ml2 <- mle2(nlogl.GIG, data=list(u=U), method="L-BFGS-B",
 summary(ml2)
 str(ml2@details)
 
-## Note: run time is mainly determined by the evaluations of psiInv.GIG
+## Note: run time is mainly determined by the evaluations of iPsi.GIG
 
 
 ### plots ######################################################################

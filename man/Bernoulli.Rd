@@ -1,14 +1,14 @@
 \name{Bernoulli}
 \alias{Bernoulli}
 \alias{Bernoulli.all}
-\title{Compute Bernoulli Numbers}
+\title{Compute Bernoulli numbers}
 \description{
   Compute the \eqn{n}th Bernoulli number, or
   generate all Bernoulli numbers up to the \eqn{n}th,
   using diverse \code{method}s, that is, algorithms.
 
   \bold{NOTE} the current default methods will be changed -- to get
-  better accuracy !
+  better accuracy!
 %%--> ../R/special-func.R
 }
 \usage{
@@ -21,7 +21,8 @@ Bernoulli.all(n, method = c("A-T", "sumBin", "sumRamanujan", "asymptotic"),
   \item{n}{positive integer, indicating the index of the largest (and
     last) of the Bernoulli numbers needed.}
   \item{method}{character string, specifying which method should be
-    applied.  The default for \code{Bernoulli.all()}, \code{"A-T"} stands for the Akiyama-Tanigawa algorithm
+    applied. The default for \code{Bernoulli.all()}, \code{"A-T"}
+    stands for the Akiyama-Tanigawa algorithm
     which is nice and simple but has bad numerical properties.  It can
     however work with high precision "mpfr"-numbers, see \code{precBits}.
     \code{"sumRamanujan"} is somewhat more efficient but not yet implemented.}
@@ -71,6 +72,6 @@ stopifnot(identical(B.1c, B1c.))
 if(FALSE)## reset the cache:
 assign("Bern.tab", list(), envir = copula:::.nacopEnv)
 
-## More experiments in the *source* of the copula package  ../tests/Stirling-etc.R
+## More experiments in the source of the copula package ../tests/Stirling-etc.R
 }
 \keyword{arithmetic}

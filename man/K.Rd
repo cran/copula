@@ -4,15 +4,16 @@
 \alias{qK}
 \alias{dK}
 \alias{rK}
-\title{Kendall Distribution Function for Archimedean Copulas}
+\title{Kendall distribution function for Archimedean copulas}
 \description{
   The distribution function of the \emph{Kendall distribution} of an Archimedean
   copula is defined as
-  \deqn{K(u) = P(C(U_1,U_2,\dots,U_d) \le u),}{K(u) = P(C(U1,U2,\dots,Ud) <= u),}
+  \deqn{K(u) = P(C(U_1,U_2,\dots,U_d) \le u),}{K(u) = P(C(U[1],U[2],
+    \dots,U[d]) <= u),}
   where \eqn{u \in [0,1]}{u in [0,1]}, and the \eqn{d}-dimensional
-  \eqn{(U_1,U_2,\dots,U_d)}{(U1,U2,\dots,Ud)} is distributed according
+  \eqn{(U_1,U_2,\dots,U_d)}{(U[1],U[2],\dots,U[d])} is distributed according
   to the copula \eqn{C}. Note that the random variable
-  \eqn{C(U_1,U_2,\dots,U_d)}{C(U_1,U_2,...,U_d)} is known as
+  \eqn{C(U_1,U_2,\dots,U_d)}{C(U[1],U[2],...,U[d])} is known as
   \emph{probability integral transform}. Its distribution function
   \eqn{K} is equal to the identity if \eqn{d = 1}, but is non-trivial for
   \eqn{d \ge 2}{d >= 2}.
@@ -35,7 +36,8 @@ rK(n, cop, d)
   \item{u}{evaluation point(s) (have to be in \eqn{[0,1]}).}
   \item{cop}{\code{\linkS4class{acopula}} with specified parameter, or
     (currently for \code{rK} only) a \code{\linkS4class{outer_nacopula}}.}
-  \item{d}{dimension (not used when \code{cop} is an \code{\linkS4class{outer_nacopula}}).}
+  \item{d}{dimension (not used when \code{cop} is an
+    \code{\linkS4class{outer_nacopula}}).}
   \item{n.MC}{\code{\link{integer}}, if positive, a Monte Carlo approach
     is applied with sample size equal to \code{n.MC} to evaluate the
     generator derivatives involved; otherwise
@@ -48,7 +50,8 @@ rK(n, cop, d)
     \describe{
       \item{"default"}{The default method. Currently chooses
 	\code{method="monoH.FC"} with \code{u.grid=0:128/128}.}
-      \item{"simple"}{Straightforward root finding based on \code{\link{uniroot}}.}
+      \item{"simple"}{Straightforward root finding based on
+	\code{\link{uniroot}}.}
       \item{"sort"}{Root finding based on \code{\link{uniroot}} but
 	first sorting \code{u}.}
       \item{"discrete"}{First, \eqn{K} is evaluated at the given grid
@@ -72,9 +75,11 @@ rK(n, cop, d)
   For a completely monotone Archimedean generator \eqn{\psi}{psi},
   \deqn{K(u)=\sum_{k=0}^{d-1}
     \frac{\psi^{(k)}(\psi^{-1}(u))}{k!} (-\psi^{-1}(u))^k,\ u\in[0,1];}{%
-    K(u)=sum(k=0,...,d-1) psi^{(k)}(psi^{-1}(u))/k! (-psi^{-1}(u))^k, u in [0,1];}
+    K(u)=sum(k=0,...,d-1) psi^{(k)}(psi^{-1}(u))/k! (-psi^{-1}(u))^k, u
+    in [0,1];}
   see Barbe et al. (1996).  The corresponding density is
-  \deqn{\frac{(-1)^d\psi^{(d)}(\psi^{-1}(u))}{(d-1)!}(-(psi^{-1})'(u))(\psi^{-1}(u))^{d-1}}{%
+  \deqn{\frac{(-1)^d\psi^{(d)}(\psi^{-1}(u))}{(d-1)!}
+    (-(\psi^{-1})'(u))(\psi^{-1}(u))^{d-1}}{%
     (-1)^d psi^{(d)}(psi^{-1}(u))(-(psi^{-1})'(u))(psi^{-1}(u))^{d-1}/(d-1)!}
 }
 \value{The distribution function, quantile function, density, and random
@@ -131,8 +136,10 @@ cop <- onacopulaL("Gumbel", list(theta = 2, 1:d))
 
 system.time(Ku1 <- qK(u, cop=cop@copula, d=d, method="simple"))
 system.time(Ku2 <- qK(u, cop=cop@copula, d=d, method="sort"))
-system.time(Ku3 <- qK(u, cop=cop@copula, d=d, method="discrete", u.grid=0:1e4/1e4))
-system.time(Ku4 <- qK(u, cop=cop@copula, d=d, method="monoH.FC", u.grid=0:5e2/5e2))
+system.time(Ku3 <- qK(u, cop=cop@copula, d=d, method="discrete",
+                      u.grid=0:1e4/1e4))
+system.time(Ku4 <- qK(u, cop=cop@copula, d=d, method="monoH.FC",
+                      u.grid=0:5e2/5e2))
 
 cols <- adjustcolor(c("gray80", "light blue", "royal blue", "purple3"), 0.6)
 matplot(u, cbind(Ku1,Ku2,Ku3,Ku4), type="l", lwd=2*4:1, lty = 1:4, col= cols,

@@ -1,7 +1,6 @@
 \name{fgmCopula-class}
 \docType{class}
 \alias{fgmCopula-class}
-
 \title{Class "fgmCopula" }
 \description{Multivariate multiparameter Farlie-Gumbel-Morgenstern
   copula.}
@@ -13,7 +12,7 @@
   \describe{
     \item{\code{exprdist}:}{Object of class \code{"expression"},
       expressions for the cdf and pdf of the copula. These expressions
-      are used in function \code{"pcopula"} and \code{"dcopula"}. }
+      are used in function \code{pCopula()} and \code{dCopula()}.}
      \item{\code{dimension}:}{Object of class \code{"numeric"}, the
       dimension of the copula. }
     \item{\code{parameters}:}{Object of class \code{"numeric"},
@@ -24,25 +23,23 @@
       parameter lower bound. }
     \item{\code{param.upbnd}:}{Object of class \code{"numeric"},
       parameter upper bound. }
-    \item{\code{message}:}{Object of class \code{"character"}, family names
+    \item{\code{fullname}:}{Object of class \code{"character"}, family names
       of the copula. }
   }
 }
 \section{Methods}{
   \describe{
-    \item{dcopula}{\code{signature(copula = "fgmCopula")}: ... }
-    \item{pcopula}{\code{signature(copula = "fgmCopula")}: ... }
-    \item{rcopula}{\code{signature(copula = "fgmCopula")}: ... }
+    \item{dCopula}{\code{signature(copula = "fgmCopula")}: ... }
+    \item{pCopula}{\code{signature(copula = "fgmCopula")}: ... }
+    \item{rCopula}{\code{signature(copula = "fgmCopula")}: ... }
   }
 }
 \section{Extends}{
   Class \code{"fgmCopula"} extends class \code{"\linkS4class{copula}"} directly.
 }
-
 \references{
-  R.B. Nelsen (2006), \emph{An introduction to Copulas}, Springer, New York.
+  Nelsen, R. B. (2006), \emph{An introduction to Copulas}, Springer, New York.
 }
-
 \note{
   The verification of the validity of the parameter values is of high
   complexity and may not work for high dimensional copulas.

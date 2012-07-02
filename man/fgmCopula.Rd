@@ -1,7 +1,6 @@
 \name{fgmCopula}
 \alias{fgmCopula}
-
-\title{ Construction of a fgmCopula class object}
+\title{Construction of a fgmCopula class object}
 \description{
   Constructs a multivariate multiparameter Farlie-Gumbel-Morgenstern
   copula class object with its corresponding parameters and dimension.
@@ -9,14 +8,14 @@
 \usage{
 fgmCopula(param, dim = 2)
 }
-
 \arguments{
   \item{param}{a numeric vector specifying the parameter values.}
   \item{dim}{the dimension of the copula.}
   \item{\dots}{ currently nothing. }
 }
 \value{
-  A Farlie-Gumbel-Morgenstern copula object of class \code{"\linkS4class{fgmCopula}"}.
+  A Farlie-Gumbel-Morgenstern copula object of class
+  \code{"\linkS4class{fgmCopula}"}.
 }
 \note{
   The verification of the validity of the parameter values is of high
@@ -25,11 +24,9 @@ fgmCopula(param, dim = 2)
   The random number generation needs to be properly tested, especially
   for dimensions higher than 2.
 }
-
 \references{
-  R.B. Nelsen (2006), \emph{An introduction to Copulas}, Springer, New York.
+  Nelsen, R. B. (2006), \emph{An introduction to Copulas}, Springer, New York.
 }
-
 \seealso{
   \code{\link{Copula}}, \code{\link{copula-class}},
   \code{\link{fitCopula}}.
@@ -37,13 +34,13 @@ fgmCopula(param, dim = 2)
 \examples{
 ## a bivariate example
 fgm.cop <- fgmCopula(1)
-x <- rcopula(fgm.cop, 1000)
+x <- rCopula(1000, fgm.cop)
 cor(x, method = "kendall")
-kendallsTau(fgm.cop)
+tau(fgm.cop)
 cor(x, method = "spearman")
-spearmansRho(fgm.cop)
-persp(fgm.cop, dcopula)
-contour(fgm.cop, dcopula)
+rho(fgm.cop)
+persp  (fgm.cop, dCopula)
+contour(fgm.cop, dCopula)
 
 ## a trivariate example with wrong parameter values
 ## fgm2.cop <- fgmCopula(c(1,1,1,1), dim = 3)

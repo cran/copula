@@ -1,6 +1,6 @@
 \name{opower}
 \alias{opower}
-\title{Outer Power Transformation of Archimedean Copulas}
+\title{Outer power transformation of Archimedean copulas}
 \usage{
 opower(copbase, thetabase)
 }
@@ -21,11 +21,12 @@ opower(copbase, thetabase)
   \code{theta}, so one obtains a parametric Archimedean family object as
   return value.
 
-  The \code{\link{environment}} of all function slots contains objects \code{cOP}
-  (which is the outer power copula itself), \code{copbase}, and \code{thetabase}.
+  The \code{\link{environment}} of all function slots contains objects
+  \code{cOP} (which is the outer power copula itself), \code{copbase},
+  and \code{thetabase}.
 }
 \author{Marius Hofert}
-\references{ 
+\references{
   Hofert, M. (2010),
   \emph{Sampling Nested Archimedean Copulas with Applications to CDO Pricing},
   Suedwestdeutscher Verlag fuer Hochschulschriften AG & Co. KG.
@@ -35,12 +36,12 @@ opower(copbase, thetabase)
   family objects in \code{\link{acopula-families}}.
 }
 \examples{
-## Construct an outer power Clayton copula with parameter thetabase such 
+## Construct an outer power Clayton copula with parameter thetabase such
 ## that Kendall's tau equals 0.2
 thetabase <- copClayton@tauInv(0.2)
 opC <- opower(copClayton, thetabase) # "acopula" obj. (unspecified theta)
 
-## Construct a 3d nested Archimedean copula based on opC, that is, a nested 
+## Construct a 3d nested Archimedean copula based on opC, that is, a nested
 ## outer power Clayton copula.  The parameters theta are chosen such that
 ## Kendall's tau equals 0.4 and 0.6 for the outer and inner sector,
 ## respectively.

@@ -23,8 +23,8 @@
 
 void cramer_vonMises(int *n, int *p, double *U, double *Ctheta,
 		     double *stat);
-void cramer_vonMises_2(int *p, double *U, int *n, double *V, int *m,
-		       double *Ctheta, double *stat);
+void cramer_vonMises_grid(int *p, double *U, int *n, double *V, int *m,
+			  double *Ctheta, double *stat);
 
 void multiplier(int *p, double *u0, int *m, double *u, int *n,
 		double *influ, int *N, double *s0);

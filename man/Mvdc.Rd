@@ -1,9 +1,12 @@
 \name{Mvdc}
 \alias{Mvdc}
 \alias{mvdc}
-\alias{dmvdc}
-\alias{pmvdc}
-\alias{rmvdc}
+\alias{dMvdc}
+\alias{pMvdc}
+\alias{rMvdc}
+\alias{dmvdc}%deprecated
+\alias{pmvdc}%deprecated
+\alias{rmvdc}%deprecated
 \title{Multivariate distributions constructed from copulas}
 \description{
   Density, distribution function, and random generator for a
@@ -11,9 +14,9 @@
 }
 \usage{
 mvdc(copula, margins, paramMargins, marginsIdentical = FALSE)
-dmvdc(mvdc, x)
-pmvdc(mvdc, x)
-rmvdc(mvdc, n)
+dMvdc(x, mvdc, log=FALSE)
+pMvdc(x, mvdc)
+rMvdc(n, mvdc)
 }
 \arguments{
   \item{copula}{ an object of \code{"\linkS4class{copula}"}. }
@@ -24,11 +27,13 @@ rmvdc(mvdc, n)
     distributions. See details below.}
   \item{marginsIdentical}{ logical variable restricting the marginal
     distributions to be identical. }
-  \item{mvdc}{ a \code{"mvdc"} object. }
+  \item{mvdc}{a \code{"\linkS4class{mvdc}"} object. }
   \item{x}{ a vector of the copula dimension or a matrix with number of
     columns being the copula dimension, giving the coordinates of the
     points where the density or distribution function needs to be
     evaluated.}
+  \item{log}{logical indicating if the \code{\link{log}} density should
+    be returned.}
   \item{n}{ number of observations to be generated. }
 }
 \details{
@@ -44,15 +49,15 @@ rmvdc(mvdc, n)
 
   Each component list in argument \code{paramMargins} is a list with
   named components which are used to specify the parameters of the
-  marginal distributions. For example,
-  \code{paramMargins = list(list(mean = 0, sd = 2), list(rate = 2))}
+  marginal distributions. For example, the list
+  \deqn{\code{paramMargins = list(list(mean = 0, sd = 2), list(rate = 2))}}
   can be used to specify that the first margin is normal with mean 0 and
   standard deviation 2, and the second margin is exponential with rate 2.
 }
 \value{
-  \code{"mvdc"} constructs an object of class \code{"mvdc"}.
-  \code{"dmvdc"} gives the density, \code{"pmvdc"} gives the distribution
-  function, and \code{"rmvdc"} generates random variates.
+  \code{mvdc()} constructs an object of class \code{"\linkS4class{mvdc}"}.
+  \code{dMvdc()} gives the density, \code{pMvdc()} gives the cumulative
+  distribution function, and \code{rMvdc()} generates random variates.
 }
 % \references{
 %   Yan (2007). Enjoy the joy of copulas. \emph{Journal of Statistical
@@ -60,20 +65,21 @@ rmvdc(mvdc, n)
 % }
 \seealso{
   \code{\link{ellipCopula}},
-  \code{\link{archmCopula}},
-  \code{\link{mvdc-class}},
-  \code{\link{copula-class}}.
+  \code{\link{archmCopula}};
+  the classes \code{\linkS4class{mvdc}} and \code{\linkS4class{copula}}.
 }
 \examples{
 ## construct a bivariate distribution whose marginals
 ## are normal and exponential respectively, coupled
 ## together via a normal copula
-x <- mvdc(normalCopula(0.75), c("norm", "exp"),
-          list(list(mean = 0, sd =2), list(rate = 2)))
-x.samp <- rmvdc(x, 100)
-dmvdc(x, x.samp)
-pmvdc(x, x.samp)
-persp(x, dmvdc, xlim = c(-4, 4), ylim=c(0, 1))
+mv.NE <- mvdc(normalCopula(0.75), c("norm", "exp"),
+              list(list(mean = 0, sd =2), list(rate = 2)))
+x.samp <- rMvdc(100, mv.NE)
+dMvdc(x.samp, mv.NE)
+pMvdc(x.samp, mv.NE)
+persp  (mv.NE, dMvdc, xlim = c(-4, 4), ylim=c(0, 1), main = "dMvdc(mv.NE)")
+persp  (mv.NE, pMvdc, xlim = c(-4, 4), ylim=c(0, 1), main = "pMvdc(mv.NE)")
+contour(mv.NE, dMvdc, xlim = c(-4, 4), ylim=c(0, 1))
 }
-\keyword{ distribution }% at least one, from doc/KEYWORDS
-\keyword{ multivariate }% __ONLY ONE__ keyword per line
+\keyword{distribution}
+\keyword{multivariate}

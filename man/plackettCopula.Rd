@@ -15,7 +15,7 @@ plackettCopula(param)
   A Plackett copula object of class \code{"\linkS4class{plackettCopula}"}.
 }
 \references{
-  R.L. Plackett (1965). A Class of Bivariate Distributions.
+  Plackett, R. L. (1965). A Class of Bivariate Distributions.
   \emph{Journal of the American Statistical Association} \bold{60}, 516--522.
 }
 \seealso{

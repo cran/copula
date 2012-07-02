@@ -1,16 +1,15 @@
 Package: copula
-Version: 0.99-4
-Date: $Date: 2012-07-02 17:05:08 +0200 (Mon, 02 Jul 2012) $
-Revision: $Revision: 727 $
+Version: 0.999-0
+Date: $ $
+Revision: $Revision: 827 $
 Title: Multivariate Dependence with Copulas
-Author: Jun Yan <jun.yan@uconn.edu> and Ivan Kojadinovic
-        <ivan.kojadinovic@univ-pau.fr>, Marius Hofert
-        <marius.hofert@math.ethz.ch> and Martin Maechler
-        <maechler@stat.math.ethz.ch>
+Author: Marius Hofert <marius.hofert@math.ethz.ch>, Ivan Kojadinovic
+        <ivan.kojadinovic@univ-pau.fr>, Martin Maechler
+        <maechler@stat.math.ethz.ch>, and Jun Yan <jun.yan@uconn.edu>
 Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
-Depends: R (>= 2.14.1), methods, pspline
+Depends: R (>= 2.14.1), methods
 Imports: stats4, graphics, gsl, ADGofTest, stabledist (>= 0.6-4),
-        mvtnorm
+        mvtnorm, pspline
 Suggests: lattice, MASS, Matrix, KernSmooth, sfsmisc, bbmle,
         scatterplot3d, Rmpfr, mvnormtest, tseries, zoo
 SuggestsComments: packages mvnormtest, tseries, zoo are only used in
@@ -40,19 +39,19 @@ Description: Classes (S4) of commonly used copulas including elliptical
         and Eulerian numbers.
 License: GPL (>= 3)
 Collate: AllClass.R Classes.R Copula.R Auxiliaries.R aux-acopula.R
-        cop_objects.R derCdfPdf.R amhCopula.R amhExpr.R archmCopula.R
-        asymCopula.R asymExplicitCopula.R claytonCopula.R claytonExpr.R
-        debye.R ellipCopula.R estimation.R evCopula.R evTests.R
-        exchTests.R fgmCopula.R fitCopula.R fitMvdc.R frankCopula.R
-        frankExpr.R galambosCopula.R galambosExpr-math.R galambosExpr.R
-        gof.R gofEVTests.R gofTests.R graphics.R gumbelCopula.R
-        gumbelExpr.R huslerReissCopula.R huslerReissExpr.R
-        indepCopula.R indepTests.R K.R logseries.R mvdc.R
-        normalCopula.R nacopula.R plackettCopula.R plackettExpr.R
-        rstable1.R safeUroot.R special-func.R schlatherCopula.R
-        stable.R timing.R trafos.R tCopula.R tawnCopula.R tawnExpr.R
-        tevCopula.R zzz.R
+        special-func.R cop_objects.R nacopula.R derCdfPdf.R amhCopula.R
+        amhExpr.R An.R archmCopula.R asymCopula.R asymExplicitCopula.R
+        claytonCopula.R claytonExpr.R ellipCopula.R empcop.R
+        estimation.R evCopula.R evTests.R exchTests.R fgmCopula.R
+        fitCopula.R fitMvdc.R frankCopula.R frankExpr.R
+        galambosCopula.R galambosExpr-math.R galambosExpr.R gof.R
+        gofEVTests.R gofTests.R graphics.R gumbelCopula.R gumbelExpr.R
+        huslerReissCopula.R huslerReissExpr.R indepCopula.R
+        indepTests.R joeCopula.R K.R logseries.R mvdc.R normalCopula.R
+        plackettCopula.R plackettExpr.R rstable1.R safeUroot.R
+        schlatherCopula.R stable.R timing.R trafos.R tCopula.R
+        tawnCopula.R tawnExpr.R tevCopula.R zzz.R
 Encoding: UTF-8
-Packaged: 2012-07-03 16:59:05 UTC; maechler
+Packaged: 2012-07-28 12:09:13 UTC; maechler
 Repository: CRAN
-Date/Publication: 2012-07-03 18:00:51
+Date/Publication: 2012-07-30 17:25:12

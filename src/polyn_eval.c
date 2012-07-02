@@ -18,6 +18,14 @@
 
 #include "nacopula.h"
 
+/**
+ * Polynomial evaluation via Horner scheme
+ *
+ * @param coef coefficients
+ * @param x evaluation point(s)
+ * @return values
+ * @author Marius Hofert
+ */
 SEXP polyn_eval(SEXP coef, SEXP x)
 {
  SEXP result;

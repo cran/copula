@@ -1,16 +1,18 @@
 \name{retstable}
 \alias{retstable}
 \alias{retstableR}
-\title{Sampling Exponentially Tilted Stable Distributions}
+\title{Sampling exponentially tilted stable distributions}
 \description{
   Generating random variates of an exponentially tilted stable
   distribution of the form
   \deqn{\tilde{S}(\alpha, 1, (\cos(\alpha\pi/2)V_0)^{1/\alpha},
     V_0\mathbf{1}_{\{\alpha=1\}}, h\mathbf{1}_{\{\alpha\ne 1\}}; 1),
-  }{tS(alpha, 1, (cos(alpha*pi/2)V0)^(1/alpha), V0*1_(alpha==1), h*1_(alpha!=1)),}
+  }{tS(alpha, 1, (cos(alpha*pi/2)V0)^(1/alpha), V0*1_(alpha==1),
+    h*1_(alpha!=1)),}
   with parameters
   \eqn{\alpha\in(0,1]}{alpha in (0,1]}, \eqn{V_0\in(0,\infty)}{V0 in (0,Inf)},
-  and \eqn{h\in[0,\infty)}{h in [0,Inf)} and corresponding Laplace-Stieltjes transform
+  and \eqn{h\in[0,\infty)}{h in [0,Inf)} and corresponding
+  Laplace-Stieltjes transform
   \deqn{\exp(-V_0((h+t)^\alpha-h^\alpha)),\ t\in[0,\infty];
   }{exp(-V0((h+t)^alpha-h^alpha)), t in [0,Inf];}
   see the references for more details about this distribution.
@@ -28,8 +30,9 @@ retstableR(alpha, V0, h = 1)
   \item{h}{parameter in \eqn{[0,\infty)}{[0,Inf)}.}
   \item{method}{a character string denoting the method to use, currently
     either \code{"MH"} (Marius Hofert's algorithm) or \code{"LD"} (Luc Devroye's
- 	 algorithm).  By default, when \code{NULL}, a smart choice is made to use the
-    fastest of these methods depending on the specific values of \eqn{V_0}{V0}.}
+ 	 algorithm).  By default, when \code{NULL}, a smart choice is
+	 made to use the fastest of these methods depending on the
+	 specific values of \eqn{V_0}{V0}.}
 }
 \details{
   \code{retstableR} is a pure \R version of \code{"MH"}, however, not as fast as
@@ -37,7 +40,8 @@ retstableR(alpha, V0, h = 1)
   recommended in simulations when run time matters.
 }
 \value{
-  A vector of variates from \eqn{\tilde{S}(\alpha, 1, .....)}{tS(alpha, 1, .....)}; see above.
+  A vector of variates from \eqn{\tilde{S}(\alpha, 1, .....)}{%
+    tS(alpha, 1, .....)}; see above.
 }
 \author{Marius Hofert, Martin Maechler}
 \seealso{

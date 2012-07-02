@@ -1,7 +1,7 @@
 \name{fitCopula}
 \alias{fitCopula}
 \alias{loglikCopula}
-\title{ Estimation of the parameters in copula models }
+\title{Estimation of the parameters in copula models}
 \description{
   Fits a copula model to multivariate data belonging to the unit
   hypercube. The data can be pseudo-observations constructed from
@@ -21,7 +21,8 @@ fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
   \item{copula}{ a \code{"\linkS4class{copula}"} object. }
   \item{hideWarnings}{logical; if TRUE, warning messages from
     evaluating the loglikelihood at invalid parameter values are suppressed.}
-  \item{method}{a \code{\link{character}} string specifying the method; can be either
+  \item{method}{a \code{\link{character}} string specifying the method;
+    can be either
     \code{"ml"} (maximum likelihood),
     \code{"mpl"} (maximum pseudo-likelihood),
     \code{"itau"} (inversion of Kendall's tau), and
@@ -39,48 +40,49 @@ fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
     estimated.}
 }
 \value{
-  \code{loglikCopula()} returns the log likelihood evaluated at the given value of \code{"param"}.
+  \code{loglikCopula()} returns the log likelihood evaluated at the
+  given value of \code{"param"}.
 
   The return value of \code{fitCopula()} is an object of class
   \code{"\linkS4class{fitCopula}"} containing slots (among others):
   \item{estimate}{ the estimate of the parameters. }
-  \item{var.est}{ estimate of the asymptotic variance estimate of the parameter estimator. }
+  \item{var.est}{ estimate of the asymptotic variance estimate of the
+    parameter estimator. }
   \item{method}{ the estimation method. }
   \item{loglik}{ loglikelihood at \code{"estimate"}. }
   \item{copula}{ the fitted copula. }
 }
 \references{
-  C. Genest (1987). Frank's family of bivariate distributions.
+  Genest, C. (1987). Frank's family of bivariate distributions.
   \emph{Biometrika} \bold{74}, 549--555.
 
-  C. Genest and L.-P. Rivest (1993). Statistical inference procedures
+  Genest, C. and Rivest, L.-P. (1993). Statistical inference procedures
   for bivariate Archimedean copulas.
   \emph{Journal of the American Statistical Association} \bold{88}, 1034--1043.
 
-  P. Rousseeuw and G. Molenberghs (1993). Transformation of nonpositive
+  Rousseeuw, P. and Molenberghs, G. (1993). Transformation of nonpositive
   semidefinite correlation matrices.
   \emph{Communications in Statistics: Theory and Methods} \bold{22}, 965--984.
 
-  C. Genest, K. Ghoudi and L.-P. Rivest (1995). A semiparametric
+  Genest, C., Ghoudi, K., and Rivest, L.-P. (1995). A semiparametric
   estimation procedure of dependence parameters in multivariate
   families of distributions. \emph{Biometrika} \bold{82}, 543--552.
 
-  H. Joe (2005). Asymptotic efficiency of the two-stage estimation
+  Joe, H. (2005). Asymptotic efficiency of the two-stage estimation
   method for copula-based models.
   \emph{Journal of Multivariate Analysis} \bold{94}, 401--419.
 
-  S. Demarta and A. McNeil (2005). The t copula and related copulas.
+  Demarta, S. and McNeil, A. J. (2005). The t copula and related copulas.
   \emph{International Statistical Review} \bold{73}, 111--129.
 
-  C. Genest and A.-C. Favre (2007). Everything you always wanted to know about
+  Genest, C. and Favre, A.-C. (2007). Everything you always wanted to know about
   copula modeling but were afraid to ask.
   \emph{Journal of Hydrologic Engineering} \bold{12}, 347--368.
 
-  I. Kojadinovic and J. Yan (2010). Comparison of three semiparametric methods
+  Kojadinovic, I. and Yan, J. (2010). Comparison of three semiparametric methods
   for estimating dependence parameters in copula models.
   \emph{Insurance: Mathematics and Economics} \bold{47}, 52--63.
 }
-
 \note{
   In the multiparameter elliptical case and when the estimation is based
   on Kendall's tau or Spearman's rho, the
@@ -119,12 +121,11 @@ fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
   \emph{including} the margins aka \dQuote{meta copula}s;
   \code{\link{gofCopula}}.
 }
-
 \examples{
 gumbel.cop <- gumbelCopula(3, dim=2)
 
 n <- 200
-x <- rcopula(gumbel.cop, n)## "true" observations
+x <- rCopula(n, gumbel.cop)## "true" observations
 u <- pobs(x)               ## pseudo-observations
 ## inverting Kendall's tau
 fit.tau <- fitCopula(gumbel.cop, u, method="itau")
@@ -141,7 +142,7 @@ fit.ml
 
 ## a multiparameter example
 normal.cop <- normalCopula(c(0.6,0.36, 0.6),dim=3,dispstr="un")
-x <- rcopula(normal.cop, n) ## "true" observations
+x <- rCopula(n, normal.cop) ## "true" observations
 u <- pobs(x)                ## pseudo-observations
 ## inverting Kendall's tau
 fit.tau <- fitCopula(normal.cop, u, method="itau")
@@ -187,7 +188,7 @@ fit.ml
 ## a t copula with variable df  (df.fixed=FALSE):
 (tCop <- tCopula(c(0.2,0.4,0.6), dim=3, dispstr="un", df=5))
 set.seed(101)
-x <- rcopula(tCop, n) ## "true" observations
+x <- rCopula(n, tCop) ## "true" observations
 u <- pobs(x)          ## pseudo-observations
 ## maximum likelihood;   start := (rho[1:3], df)
 (tc.ml  <- fitCopula(tCop, x, method="ml", start=c(0,0,0, 10)))
@@ -208,7 +209,8 @@ stopifnot(all.equal(tc.ml , tc.ml., tol= .005),
 stopifnot(all.equal(tcF.ml,tcF.ml., tol= 4e-4))
 
 ## maximum pseudo-likelihood; the asymptotic variance cannot be estimated
-(tcF.mpl <- fitCopula(tC.f, u, method="mpl", estimate.variance=FALSE, start=c(0,0,0)))
+(tcF.mpl <- fitCopula(tC.f, u, method="mpl", estimate.variance=FALSE,
+                      start=c(0,0,0)))
 (tcF.mp. <- fitCopula(tC.f, u, method="mpl", estimate.variance=FALSE))
 stopifnot(all.equal(tcF.mpl,tcF.mp., tol= 1e-5))
 }

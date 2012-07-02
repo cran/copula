@@ -2,10 +2,8 @@
 \alias{indepTest}
 \alias{indepTestSim}
 \alias{dependogram}
-
 \title{Independence test among continuous random variables based
   on the empirical copula process}
-
 \description{
   Multivariate independence test based on the empirical
   copula process as proposed by Christian Genest and Bruno
@@ -19,40 +17,39 @@
   understand the type of departure from independence, if any. More details can
   be found in the articles cited in the reference section.
 }
-
 \usage{
-indepTestSim(n, p, m = p, N = 1000, print.every = 100)
+indepTestSim(n, p, m = p, N = 1000, verbose = TRUE, print.every = NULL)
 indepTest(x, d, alpha=0.05)
 dependogram(test, pvalues = FALSE, print = FALSE)
 }
-
 \arguments{
-  \item{n}{Sample size when simulating the distribution of the test
+  \item{n}{ sample size when simulating the distribution of the test
     statistics under independence.}
-  \item{p}{Dimension of the data when simulating the distribution of the test
+  \item{p}{ dimension of the data when simulating the distribution of the test
     statistics under independence.}
-  \item{m}{Maximum cardinality of the subsets of variables for which a test statistic
-    is to be computed. It makes sense to consider \code{m << p} especially when
-    \code{p} is large.}
-  \item{N}{Number of repetitions when simulating under independence.}
-  \item{print.every}{Progress is printed every \code{"print.every"}
-    iterations. No progress is printed if it is nonpositive.}
-  \item{x}{Data frame or data matrix containing realizations (one per
+  \item{m}{ maximum cardinality of the subsets of variables for which a
+    test statistic is to be computed. It makes sense to consider \code{m
+<< p} especially when \code{p} is large.}
+  \item{N}{ number of repetitions when simulating under independence.}
+  \item{print.every}{ is deprecated in favor of \code{verbose}.}
+  \item{verbose}{ a logical specifying if progress
+    should be displayed via \code{\link[utils]{txtProgressBar}}.}
+  \item{x}{ data frame or data matrix containing realizations (one per
     line) of the random vector whose independence is to be tested.}
-  \item{d}{Object of class \code{"indepTestDist"} as returned by
-  the function \code{"indepTestSim"}. It can be regarded as the empirical distribution
-  of the test statistics under independence.}
-  \item{alpha}{Significance level used in the computation of the critical values for
-    the test statistics.}
-  \item{test}{Object of class \code{"indepTest"} as return by the function \code{indepTest}.}
-  \item{pvalues}{Logical indicating whether the dependogram should be
+  \item{d}{ object of class \code{"indepTestDist"} as returned by
+  the function \code{"indepTestSim"}. It can be regarded as the
+  empirical distribution of the test statistics under independence.}
+  \item{alpha}{ significance level used in the computation of the
+    critical values for the test statistics.}
+  \item{test}{ object of class \code{"indepTest"} as return by the
+    function \code{indepTest}.}
+  \item{pvalues}{ logical indicating whether the dependogram should be
     drew from test statistics or the corresponding p-values.}
-  \item{print}{Logical indicating whether details should be printed.}
+  \item{print}{ logical indicating whether details should be printed.}
 }
 \details{See the references below for more details, especially the third
   one.
 }
-
 \value{The function \code{"indepTestSim"} returns an object of class
   \code{"indepTestDist"} whose attributes are: \code{sample.size},
   \code{data.dimension}, \code{max.card.subsets},
@@ -79,27 +76,26 @@ dependogram(test, pvalues = FALSE, print = FALSE)
   process - see last reference p. 175) and
   \code{global.statistic.pvalue} (corresponding p-value).
 }
-
 \references{
-  P. Deheuvels (1979). La fonction de dépendance empirique et ses
+  Deheuvels, P. (1979). La fonction de dépendance empirique et ses
   propriétés: un test non paramétrique d'indépendance, \emph{Acad. Roy.
     Belg. Bull. Cl. Sci.}, 5th Ser. \bold{65}, 274--292.
 
-  P. Deheuvels (1981), A non parametric test for independence,
+  Deheuvels, P. (1981), A non parametric test for independence,
   \emph{Publ. Inst. Statist. Univ. Paris}. \bold{26}, 29--50.
 
-  C. Genest and B. Rémillard (2004), Tests of independence and
-  randomness based on the empirical copula process. \emph{Test} \bold{13}, 335--369.
+  Genest, C. and R\enc{é}{e}millard, B. (2004), Tests of independence and
+  randomness based on the empirical copula process. \emph{Test}
+  \bold{13}, 335--369.
 
-  C. Genest, J.-F. Quessy and B. Rémillard (2006). Local
+  Genest, C., Quessy, J.-F., and R\enc{é}{e}millard, B. (2006). Local
   efficiency of a Cramer-von Mises test of independence,
   \emph{Journal of Multivariate Analysis} \bold{97}, 274--294.
 
-  C. Genest, J.-F. Quessy and B. Rémillard (2007), Asymptotic
+  Genest, C., Quessy, J.-F., and R\enc{é}{e}millard, B. (2007), Asymptotic
   local efficiency of Cramér-von Mises tests for multivariate
   independence. \emph{The Annals of Statistics} \bold{35}, 166--191.
 }
-
 \seealso{
   \code{\link{serialIndepTest}},
   \code{\link{multIndepTest}},
@@ -146,6 +142,4 @@ dependogram(test,print=TRUE)
 
 ## NB: In order to save d for future use, the save function can be used.
 }
-
-\encoding{UTF-8}
 \keyword{htest}

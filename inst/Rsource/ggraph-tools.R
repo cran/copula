@@ -48,9 +48,9 @@ ccop2 <- function(u2, u1, family, theta, ...) {
                ## cacopula(u, cop=onacopulaL(family, list(theta, 1:2)))
                cop <- getAcop(family)
                u <- cbind(u1, u2)
-               psiI <- cop@psiInv(u, theta=theta)
-	       exp(cop@psiDabs(rowSums(psiI), theta=theta, log=TRUE) -
-		   cop@psiDabs(psiI[,1], theta=theta, log=TRUE))
+               psiI <- cop@iPsi(u, theta=theta)
+	       exp(cop@absdPsi(rowSums(psiI), theta=theta, log=TRUE) -
+		   cop@absdPsi(psiI[,1], theta=theta, log=TRUE))
            },
            stop("family ", family, " not yet supported"))
 }

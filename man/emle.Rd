@@ -1,5 +1,5 @@
 \name{emle}
-\title{Maximum Likelihood Estimators for (Nested) Archimedean Copulas}
+\title{Maximum likelihood estimators for (nested) Archimedean copulas}
 \alias{emle}
 \alias{.emle}
 \description{
@@ -19,7 +19,8 @@ emle(u, cop, n.MC=0, optimizer="optimize", method,
     value in \eqn{[0,1]}) from the copula, with \eqn{n} the sample size
     and \eqn{d} the dimension.}
   \item{cop}{\code{\linkS4class{outer_nacopula}} to be estimated
-    (currently only non-nested, that is, \ifelse{latex}{Archi-medean}{Archimedean} copulas are admitted).}
+    (currently only non-nested, that is,
+    \ifelse{latex}{Archi-medean}{Archimedean} copulas are admitted).}
   \item{n.MC}{\code{\link{integer}}, if positive, \emph{simulated} maximum
     likelihood estimation (SMLE) is used with sample size equal to
     \code{n.MC}; otherwise (\code{n.MC=0}), MLE.  In SMLE, the \eqn{d}th
@@ -54,10 +55,10 @@ emle(u, cop, n.MC=0, optimizer="optimize", method,
    because of their numerical feasibility, might break down in much
    smaller dimensions.
 
-   Note: SMLE for Clayton currently faces serious numerical issues and is 
+   Note: SMLE for Clayton currently faces serious numerical issues and is
    due to further research.  This is only interesting from a theoretical point
    of view, since the exact derivatives are known and numerically non-critical
-   to evaluate. 
+   to evaluate.
 }
 \value{
   \describe{
@@ -74,7 +75,7 @@ emle(u, cop, n.MC=0, optimizer="optimize", method,
 \references{
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011a).
   Estimators for Archimedean copulas in high dimensions: A comparison;
-  to be submitted.
+  submitted.
 
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011b).
   Likelihood inference for Archimedean copulas;
@@ -102,8 +103,10 @@ system.time(efm <- emle(U, cop))
 summary(efm)
 
 ## Profile likelihood plot
+if(getRversion() >= "2.15.0") { # otherwise, need  'stats4::' everywhere
 pfm <- profile(efm)
-(ci <- confint(pfm, level=0.95))
+ci  <- confint(pfm, level=0.95)
+print(ci)
 stopifnot(ci[1] <= theta, theta <= ci[2])
 plot(pfm)               # |z| against theta, |z| = sqrt(deviance)
 plot(pfm, absVal=FALSE, #  z  against theta
@@ -126,5 +129,6 @@ axis(1, at=c(theta, efm@coef), padj = c(-0.5, -0.8), hadj = -0.2,
 abline(v=ci, col="gray30", lwd=2, lty=3)
 text(ci[2], extendrange(par("usr")[3:4], f= -.04)[1],
      "95\% conf. int.", col="gray30", adj = -0.1)
+}#-- only in R >= 2.15.0
 }
 \keyword{models}

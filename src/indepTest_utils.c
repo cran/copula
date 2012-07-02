@@ -15,24 +15,22 @@
   this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
+/**
+ * @file   indepTest_utils.c
+ * @author Ivan Kojadinovic
+ * @date   December 2007
+ *
+ * @brief  Utility functions for multivariate and "vectorial" 
+ *         tests of independence and serial independence based 
+ *         on the empirical copula process
+ *
+ */
 
-/*****************************************************************************
+#include <R.h>
+#include "indepTests.h"
 
-  Multivariate serial independence test based on the empirical
-  copula process
 
-  Ivan Kojadinovic, December 2007
-
-*****************************************************************************/
-
-#include "empcop.stat.h"
-
-/*****************************************************************************
-
-  Arrays K, L
-
-************************************************************************/
-
+/// Temporary array K
 void K_array(int n, int p, const double J[], double *K)
 {
   int m=0, n2 = n * n;
@@ -46,8 +44,7 @@ void K_array(int n, int p, const double J[], double *K)
       }
 }
 
-/************************************************************************/
-
+/// Temporary array L
 void L_array(int n, int p, const double K[], double *L)
 {
   for (int j=0; j < p; j++)
@@ -59,13 +56,17 @@ void L_array(int n, int p, const double K[], double *L)
     }
 }
 
-
-/*****************************************************************************
-
-  Computation of the global Cramer-von Mises statistic.
-
-******************************************************************************/
-
+/**
+ * Computation of the global Cramer-von Mises statistic.
+ *
+ * @param n sample size
+ * @param p dimension
+ * @param J temporary array
+ * @param K temporary array
+ * @param L temporary array
+ * @return the global Cramer-von Mises statistic
+ * @author Ivan Kojadinovic
+ */
 double I_n(int n, int p, double *J, double *K, double *L)
 {
   int i, j, l, n2 = n * n;
@@ -104,13 +105,19 @@ double I_n(int n, int p, double *J, double *K, double *L)
   return In;
 }
 
-/*****************************************************************************
-
-  Computation of the subset Cramer-von Mises statistics.
-  One statistic per subset A of {1,...,p}, |A|>1, A \ni 1.
-
-******************************************************************************/
-
+/**
+ * Computes the Cramer-von Mises statistics for
+ * subset A of {1,...,p}, |A|>1 (A \ni 1?)
+ *
+ * @param n sample size
+ * @param p dimension
+ * @param J temporary array
+ * @param K temporary array
+ * @param L temporary array
+ * @param A the subset A
+ * @return the Cramer-von Mises statistic for subset A
+ * @author Ivan Kojadinovic
+ */
 double M_A_n(int n, int p, double *J, double *K, double *L, int A)
 {
   int i, j ,l, n2 = n * n;
@@ -130,4 +137,40 @@ double M_A_n(int n, int p, double *J, double *K, double *L, int A)
   return MAn/(double)n;
 }
 
-/*****************************************************************************/
+
+/** 
+ * Text progress bar for k=1 to N loops
+ * 
+ * @param k current iteration
+ * @param N maximum number of iteration
+ * @param w width of the bar in characters
+ * @author Ivan Kojadinovic 
+ */
+inline void progressBar(int k, int N, int w) {
+  if (k < N-1) {
+    /// length of one of "block" 
+    int b = N/w;
+    
+    /// update only r times
+    if ( k % b != 0 ) return;
+    
+    /// percentage done
+    double percent = k / (double)N;
+    int c = percent * w;
+  
+    /// display the bar
+    Rprintf("  |");
+    for (int i=0; i<c; i++)
+      Rprintf("=");
+    for (int i=c; i<w; i++)
+      Rprintf(" ");
+    Rprintf("| %3d%%", (int)(percent*100) );
+    Rprintf("\r");
+  }
+  else { /// display the bar for last k (= N-1)
+    Rprintf("  |");
+    for (int i=0; i<w; i++)
+      Rprintf("=");
+    Rprintf("| 100%%\n");
+  }
+}

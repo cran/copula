@@ -1,6 +1,6 @@
 \name{nacPairthetas}
 \alias{nacPairthetas}
-\title{Pairwise thetas of Nested Archimedean Copula}
+\title{Pairwise thetas of nested Archimedean copula}
 \description{
   Return a \eqn{d * d} matrix of pairwise thetas for a nested Archimedean
   copula (\code{\linkS4class{nacopula}}) of dimension \eqn{d}.
@@ -42,9 +42,10 @@ m1 <- rnacModel("Gumbel", d=15, pr.comp = 1/8, order="seq")
 stopifnot(isSymmetric(PT <- nacPairthetas(m1)))
 m1; PT
 
-%%___ FIXME __: This shows that rnacModel() should  choose  'nkids' less aggressively..
+%%___ FIXME __: This shows that rnacModel() should  choose  'nkids' less
+%% aggressively..
 m100 <- rnacModel("Gumbel", d= 100, pr.comp = 1/16, order="seq")
-system.time(PT <- nacPairthetas(m100))# how slow {non-optimal algorithm} ??
+system.time(PT <- nacPairthetas(m100))# how slow {non-optimal algorithm}?
 ##-- very fast, still!
 stopifnot(isSymmetric(PT))
 m100

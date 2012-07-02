@@ -475,7 +475,7 @@ coeffG <- function(d, alpha, method = c("sort", "horner", "direct", "dsumSibuya"
 ##'
 ##' @title Polynomial involved in the generator derivatives and density for Gumbel
 ##' @param lx = log(x); where x: evaluation point (vector);
-##'        e.g., for copGumbel@dacopula, lx = alpha*log(rowSums(psiInv(u)))
+##'        e.g., for copGumbel@dacopula, lx = alpha*log(rowSums(iPsi(u)))
 ##'        where u = (u_1,..,u_d) is the evaluation point of the density of Joe's copula)
 ##' @param alpha parameter in (0,1]   alpha := 1/theta = 1 - tau
 ##' @param d number of summands, >= 1
@@ -510,7 +510,7 @@ polyG <- function(lx, alpha, d, method= c("default", "default2012", "default2011
     switch(Meth,
 	   "default" =, "default2012" =
        {
-	   ## "default2012" compiled by Yongcheng Wong (MSc thesis c/o M.Maechler, April 2012)
+	   ## "default2012" compiled by Yongsheng Wang (MSc thesis c/o M.Maechler, April 2012)
 	   ## it switches to "Rmpfr" when the accuracy would be less than 5 digits
 	   meth2012 <- function(d, alpha, lx) {
 	       if (d <= 30) "direct"
@@ -1099,6 +1099,21 @@ circRat <- function(e, d)
 
 ### Misc #######################################################################
 
+## Determine the \dQuote{implied} copula dimension from \code{u}.
+## in the same sense that many copula functions use
+##  if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
+
+
+##' @title Implied copula dim()ension
+##' @param u
+##' @return integer
+##' @author Martin Maechler
+dimU <- function(u) {
+    if(!is.null(d <- dim(u))) d[2L] else length(u)
+}
+
+
+
 ##' Conditional copula function C(u[,d]|u[,1],...,u[,d-1])
 ##'
 ##' @title Conditional copula function
@@ -1107,7 +1122,6 @@ circRat <- function(e, d)
 ##' @param n.MC Monte Carlo sample size
 ##' @param log if TRUE the logarithm of the conditional copula is returned
 ##' @author Marius Hofert
-
 cacopula <- function(u, cop, n.MC=0, log=FALSE) {
     stopifnot(is(cop, "outer_nacopula"))
     if(length(cop@childCops))
@@ -1121,16 +1135,16 @@ cacopula <- function(u, cop, n.MC=0, log=FALSE) {
     dim. <- dim(u)
     n <- dim.[1]
     d <- dim.[2]
-    psiI <- cop@copula@psiInv(u, theta=th)
+    psiI <- cop@copula@iPsi(u, theta=th)
     arg.denom <- rowSums(psiI[,1:(d-1), drop=FALSE])
     arg.num <- arg.denom + psiI[,d]
-    logD <- cop@copula@psiDabs(c(arg.num, arg.denom), theta=th, degree=d-1,
+    logD <- cop@copula@absdPsi(c(arg.num, arg.denom), theta=th, degree=d-1,
                                n.MC=n.MC, log=TRUE)
     res <- logD[1:n]-logD[(n+1):(2*n)]
     if(log) res else exp(res)
 }
 
-##' Function which computes psiDabs via Monte Carlo
+##' Function which computes absdPsi via Monte Carlo
 ##'
 ##' @title Computing the absolute value of the generator derivatives via Monte Carlo
 ##' @param t evaluation points
@@ -1143,12 +1157,12 @@ cacopula <- function(u, cop, n.MC=0, log=FALSE) {
 ##'        direct:      direct evaluation of the sum
 ##'        pois.direct: directly uses the Poisson density
 ##'        pois:        intelligently uses the Poisson density with lsum
-##' @param log if TRUE the log of psiDabs is returned
+##' @param log if TRUE the log of absdPsi is returned
 ##' @param is.log.t if TRUE, the argument t contains log(<mathematical t>)
 ##' @author Marius Hofert, Martin Maechler
-##' Note: psiDabsMC(0) is always finite, although, theoretically, psiDabs(0) may
+##' Note: absdPsiMC(0) is always finite, although, theoretically, absdPsi(0) may
 ##'       be Inf (e.g., for Gumbel and Joe)
-psiDabsMC <- function(t, family, theta, degree=1, n.MC,
+absdPsiMC <- function(t, family, theta, degree=1, n.MC,
                       method=c("log", "direct", "pois.direct", "pois"),
                       log = FALSE, is.log.t = FALSE)
 {
@@ -1199,31 +1213,76 @@ psiDabsMC <- function(t, family, theta, degree=1, n.MC,
                }
                if(log) res else exp(res)
            },
-	   stop(sprintf("unsupported method '%s' in psiDabsMC", method)))
+	   stop(sprintf("unsupported method '%s' in absdPsiMC", method)))
 }
 
+psiDabsMC <- function(t, family, theta, degree=1, n.MC,
+                      method=c("log", "direct", "pois.direct", "pois"),
+                      log = FALSE, is.log.t = FALSE)
+{
+    .Deprecated("absdPsiMC")
+    absdPsiMC(t, family=family, theta=theta, degree=degree, n.MC=n.MC,
+                      method=method, log=log, is.log.t)
+}
 
 ### Non-numerics ###############################################################
 
-##' @title Setting the parameter in an acopula
+
+setGeneric("setTheta", function(x, value, ...) standardGeneric("setTheta"))
+
+##' @title Setting the parameter in a copula
 ##' @param x acopula
 ##' @param value parameter value
 ##' @param na.ok logical indicating if NA values are ok for theta
+##' @param noCheck logical indicating if parameter constraints should be checked
 ##' @return acopula with theta set to value
 ##' @author Martin Maechler
-setTheta <- function(x, value, na.ok = TRUE) {
-    stopifnot(is(x, "acopula"),
-              is.numeric(value) | (ina <- is.na(value)))
-    if(ina) {
-        if(!na.ok) stop("NA value, but 'na.ok' is not TRUE")
-        value <- NA_real_
-    }
-    if(ina || x@paraConstr(value)) ## parameter constraints are fulfilled
-        x@theta <- value
-    else
-        stop("theta (=", format(value), ") does not fulfill paraConstr()")
-    x
-}
+setMethod("setTheta", "acopula",
+	  function(x, value, na.ok = TRUE, noCheck = FALSE, ...)
+      {
+	  stopifnot(is.numeric(value) | (ina <- is.na(value)))
+	  if(ina) {
+	      if(!na.ok) stop("NA value, but 'na.ok' is not TRUE")
+	      value <- NA_real_
+	  }
+	  if(ina || noCheck || x@paraConstr(value)) ## parameter constraints are fulfilled
+	      x@theta <- value
+	  else
+	      stop("theta (=", format(value), ") does not fulfill paraConstr()")
+	  x
+      })
+setMethod("setTheta", signature(x="outer_nacopula", value="numeric"),
+	  function(x, value, na.ok = TRUE, noCheck = FALSE, ...) {
+	      x@copula <- setTheta(x@copula, value, na.ok=na.ok, noCheck=noCheck)
+	      x
+	  })
+
+## TODO: setTheta - using a list of thetas
+## setMethod("setTheta", signature(x="outer_nacopula", value="list"),
+## 	  function(x, value, na.ok = TRUE, noCheck = FALSE) {
+##               ... x@copula <- setTheta(x@copula, value, na.ok=na.ok, noCheck=noCheck)
+##           })
+
+## FIXME: This is "wrong" for  tCopula(df.fixed = FALSE) :  value should encompass (rho,df)
+setMethod("setTheta", "copula",
+	  function(x, value, na.ok = TRUE, noCheck = FALSE, ...)
+      {
+	  stopifnot(is.numeric(value) | (ina <- is.na(value)))
+	  if(any(ina)) {
+	      if(!na.ok) stop("NA value, but 'na.ok' is not TRUE")
+	      ## vectorized (and partial)  value <- NA_real_
+	      if(!is.double(value)) storage.mode(value) <- "double"
+	  }
+	  ##if(ina || noCheck || x@paraConstr(value)) ## parameter constraints are fulfilled
+	  if(all(ina) || noCheck || {
+	      all(is.na(value) | (x@param.lowbnd <= value & value <= x@param.upbnd))
+	  }) ## parameter constraints are fulfilled
+	      x@parameters[seq_along(value)] <- value
+	  else
+	      stop("theta (=", format(value), ") is not inside parameter bounds")
+	  x
+      })
+
 
 
 ##' Construct "paraConstr" function from an "interval"

@@ -16,10 +16,12 @@
 
 ## constructor #################################################################
 
-fgmCopula <- function(param, dim = 2L) {
+fgmCopula <- function(param = NA_real_, dim = 2L) {
     if (!is.numeric(dim) || (dim <- as.integer(dim)) < 2)
         stop("dim should be an integer of at least 2")
-    if (!is.numeric(param) && length(param) != 2^dim - dim - 1)
+    npar <- 2^dim - dim - 1
+    if(is.na(param)) param <- rep(param, length.out = npar)
+    else if (!is.numeric(param) && length(param) != npar)
         stop("wrong parameters")
 
     ## power set of {1,...,dim} in integer notation
@@ -80,20 +82,20 @@ fgmCopula <- function(param, dim = 2L) {
                param.names = paste("param",subsets.char[(dim+2):2^dim],sep=""),
                param.lowbnd = rep(-1, 2^dim - dim - 1),
                param.upbnd = rep(1, 2^dim - dim - 1),
-               message = "Farlie-Gumbel-Morgenstern copula family")
+               fullname = "Farlie-Gumbel-Morgenstern copula family")
 }
 
 
 ### random number generation ###################################################
 
-rfgmCopula <- function(copula, n) {
+rfgmCopula <- function(n, copula) {
     dim <- copula@dimension
     alpha <- copula@parameters
     if (dim > 2)
         warning("random generation needs to be properly tested")
     val <- .C(rfgm,
               as.integer(dim),
-              as.double(c(rep(0,dim+1),alpha)),
+	      c(rep.int(0., dim+1), alpha),
               as.integer(n),
               out = double(n * dim))$out
     matrix(val, n, dim, byrow=TRUE)
@@ -102,7 +104,7 @@ rfgmCopula <- function(copula, n) {
 
 ### cdf of the copula ##########################################################
 
-pfgmCopula <- function(copula, u) {
+pfgmCopula <- function(u, copula) {
     if (any(u < 0) || any(u > 1))
         stop("u values should lie between 0 and 1")
     dim <- copula@dimension
@@ -116,7 +118,7 @@ pfgmCopula <- function(copula, u) {
 
 ## pdf of the copula ###########################################################
 
-dfgmCopula <- function(copula, u, log=FALSE, ...) {
+dfgmCopula <- function(u, copula, log=FALSE, ...) {
     if (any(u < 0) || any(u > 1))
         stop("u values should lie between 0 and 1")
     dim <- copula@dimension
@@ -131,21 +133,21 @@ dfgmCopula <- function(copula, u, log=FALSE, ...) {
 
 ## Kendall's tau
 
-kendallsTauFgmCopula <- function(copula) {
+tauFgmCopula <- function(copula) {
     alpha <- copula@parameters[1]
     2 * alpha / 9
 }
 
 ## Spearman's rho
 
-spearmansRhoFgmCopula <- function(copula) {
+rhoFgmCopula <- function(copula) {
     alpha <- copula@parameters[1]
     1 * alpha / 3
 }
 
 ## calibration via tau
 
-calibKendallsTauFgmCopula <- function(copula, tau) {
+iTauFgmCopula <- function(copula, tau) {
   if (any(tau < -2/9 | tau > 2/9))
     warning("tau is out of the range [-2/9, 2/9]")
   pmax(-1, pmin(1, 9 * tau / 2))
@@ -153,7 +155,7 @@ calibKendallsTauFgmCopula <- function(copula, tau) {
 
 ## calibration via rho
 
-calibSpearmansRhoFgmCopula <- function(copula, rho) {
+iRhoFgmCopula <- function(copula, rho) {
   if (any(rho < -1/3 | rho > 1/3))
     warning("rho is out of the range [-1/3, 1/3]")
   pmax(-1, pmin(1, 3 * rho))
@@ -162,10 +164,14 @@ calibSpearmansRhoFgmCopula <- function(copula, rho) {
 
 ################################################################################
 
-setMethod("rcopula", signature("fgmCopula"), rfgmCopula)
-setMethod("pcopula", signature("fgmCopula"), pfgmCopula)
-setMethod("dcopula", signature("fgmCopula"), dfgmCopula)
-setMethod("kendallsTau", signature("fgmCopula"), kendallsTauFgmCopula)
-setMethod("spearmansRho", signature("fgmCopula"), spearmansRhoFgmCopula)
-setMethod("calibKendallsTau", signature("fgmCopula"), calibKendallsTauFgmCopula)
-setMethod("calibSpearmansRho", signature("fgmCopula"), calibSpearmansRhoFgmCopula)
+setMethod("rCopula", signature("numeric", "fgmCopula"), rfgmCopula)
+
+setMethod("pCopula", signature("numeric", "fgmCopula"),pfgmCopula)
+setMethod("pCopula", signature("matrix", "fgmCopula"), pfgmCopula)
+setMethod("dCopula", signature("numeric", "fgmCopula"),dfgmCopula)
+setMethod("dCopula", signature("matrix", "fgmCopula"), dfgmCopula)
+
+setMethod("tau", signature("fgmCopula"), tauFgmCopula)
+setMethod("rho", signature("fgmCopula"), rhoFgmCopula)
+setMethod("iTau", signature("fgmCopula"), iTauFgmCopula)
+setMethod("iRho", signature("fgmCopula"), iRhoFgmCopula)

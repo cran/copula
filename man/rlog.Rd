@@ -1,7 +1,7 @@
 \name{rlog}
 \alias{rlog}
 \alias{rlogR}
-\title{Sampling Logarithmic Distributions}
+\title{Sampling logarithmic distributions}
 \description{
   Generating random variates from a Log(p) distribution with probability
   mass function

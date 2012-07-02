@@ -16,8 +16,8 @@
 
 __BEGIN_DECLS
 
-enum { 
-  GSL_SUCCESS  = 0, 
+enum {
+  GSL_SUCCESS  = 0,
   GSL_FAILURE  = -1,
   GSL_CONTINUE = -2,  /* iteration has not converged */
   GSL_EDOM     = 1,   /* input domain error, e.g sqrt(-1) */
@@ -56,22 +56,17 @@ enum {
 
 
 /* define gsl_sf_result; from specfunc/gsl_sf_result.h */
-
 struct gsl_sf_result_struct {
   double val;
   double err;
 };
-
 typedef struct gsl_sf_result_struct gsl_sf_result;
 
 /* check for underflow; from specfunc/check.h */
-
 #define CHECK_UNDERFLOW(r) if (fabs((r)->val) < GSL_DBL_MIN) GSL_ERROR("underflow", GSL_EUNDRFLW);
-
 
 /* my own definition of GSL_ERROR */
 /* GSL_ERROR: call the error handler, and return the error code */
-
 #define GSL_ERROR(reason, gsl_errno) \
        do { \
        Rprintf("ERROR: %d\n", gsl_errno); \
@@ -80,7 +75,6 @@ typedef struct gsl_sf_result_struct gsl_sf_result;
 
 /* from specfunc/error.h */
 #define DOMAIN_ERROR(result) do { (result)->val = GSL_NAN; (result)->err = GSL_NAN; GSL_ERROR ("domain error", GSL_EDOM); } while(0)
-
 
 /* from gsl_nan.h and gsl_div.c infnan.c */
 #ifdef INFINITY

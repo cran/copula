@@ -36,7 +36,7 @@ getSigma <- function(copula) {
   sigma
 }
 
-ellipCopula <- function(family, param, dim = 2L, dispstr = "ex", df = 4, ...) {
+ellipCopula <- function(family, param = NA_real_, dim = 2L, dispstr = "ex", df = 4, ...) {
   familiesImplemented <- c("normal", "t")
   fam <- pmatch(family, familiesImplemented, -1)
   if (fam == -1)
@@ -47,35 +47,35 @@ ellipCopula <- function(family, param, dim = 2L, dispstr = "ex", df = 4, ...) {
          )
 }
 
-calibKendallsTauEllipCopula <- function(copula, tau) {
+iTauEllipCopula <- function(copula, tau) {
   sin((tau * pi) / 2)
 }
 
-calibSpearmansRhoEllipCopula <- function(copula, rho) {
+iRhoEllipCopula <- function(copula, rho) {
   sin (pi * rho / 6) * 2
 }
 
-tauDerEllipCopula <- function(copula)  {
+dTauEllipCopula <- function(copula)  {
   return( 2 / (pi * sqrt(1 - copula@parameters^2)) )
 }
 
-tauDerFunEllipCopula <- function(copula)  {
+dTauFunEllipCopula <- function(copula)  {
   function(x) return( 2 / (pi * sqrt(1 - x^2)) )
 }
 
-rhoDerEllipCopula <- function(copula) {
+dRhoEllipCopula <- function(copula) {
   return( 6 / (pi * sqrt(4 - copula@parameters^2)) )
 }
 
-rhoDerFunEllipCopula <- function(copula) {
+dRhoFunEllipCopula <- function(copula) {
   function(x) return( 6 / (pi * sqrt(4 - x^2)) )
 }
 
-setMethod("calibKendallsTau", signature("ellipCopula"), calibKendallsTauEllipCopula)
-setMethod("calibSpearmansRho", signature("ellipCopula"), calibSpearmansRhoEllipCopula)
+setMethod("iTau", signature("ellipCopula"), iTauEllipCopula)
+setMethod("iRho", signature("ellipCopula"), iRhoEllipCopula)
 
-setMethod("tauDer", signature("ellipCopula"), tauDerEllipCopula)
-setMethod("rhoDer", signature("ellipCopula"), rhoDerEllipCopula)
+setMethod("dTau", signature("ellipCopula"), dTauEllipCopula)
+setMethod("dRho", signature("ellipCopula"), dRhoEllipCopula)
 
-setMethod("tauDerFun", signature("ellipCopula"), tauDerFunEllipCopula)
-setMethod("rhoDerFun", signature("ellipCopula"), rhoDerFunEllipCopula)
+setMethod("dTauFun", signature("ellipCopula"), dTauFunEllipCopula)
+setMethod("dRhoFun", signature("ellipCopula"), dRhoFunEllipCopula)

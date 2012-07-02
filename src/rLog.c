@@ -24,11 +24,12 @@
 /**
  * Sample a Log(p) distribution with the algorithm "LK" of Kemp (1981).
  * Note: The caller of this function must use GetRNGstate() and PutRNGstate().
+ *
  * @param p in (0,1)
  * @param Ip = 1 - p_ (possibly more accurate)
  * @return a random variate from Log(p)
  * @author Marius Hofert, Martin Maechler
-*/
+ */
 double rLog(double p, double Ip) {
     if(p <= 0. ||  p > 1.) {
 	error("rLog(): p must be inside (0,1)");
@@ -68,12 +69,13 @@ double rLog(double p, double Ip) {
 /**
  * Generate a vector of variates from a Log(p) distribution with the algorithm
  * "LK" of Kemp (1981).
+ *
  * @param n_ sample size
  * @param p_ parameter p in (0,1)
  * @param Ip_ = 1 - p_ (possibly more accurate)
  * @return vector of random variates from Log(p)
  * @author Martin Maechler
-*/
+ */
 SEXP rLog_vec_c(SEXP n_, SEXP p_, SEXP Ip_) {
     int n = asInteger(n_);
     double p = asReal(p_),Ip = asReal(Ip_);

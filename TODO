@@ -1,60 +1,188 @@
-#### Major (to fix before next release) ########################################
+##-*- org -*-->  Emacs .. [Tab] key + [Org] menu; C-c C-o to follow links
+* Very Short Term
+** mvdc() -- fitMvdc() and generate data from fit -- currently wrong on help page
+ - see FIXMEs in R/fitMvdc.R  man/fitMvdc.Rd and man/fitCopula-class.Rd -- think of
+   class slots etc
+* Short Term
+** DONE persp(), contour() should work with pCopula / dCopula
+** getAcop(class(gumbelCopula())) should work => we could then write general methods for all Archimedean objects... possible problem (for now): negative concordance case for AMH, Clayton, and Frank
+** DONE (MH) LICENCE etc
+CLOSED: [2012-07-17 Tue 11:25]
+MM: Einstein's rule: Keep it as simple as possible (but not simpler)
+All the Copyright headers in R/*.R  src/*.c etc need to be streamlined;
+typically containing all 4 names.
+MH: I can do that (once Ivan and Jun agree)
+JY: I agree
+IK: Me too
+=> MH: done on 2012-03-25 (for simplicity, I used "2012" everywhere)
+** Renaming of current "base" functions see [[file:feature-table.org][Feature table]]
+ e.g.  iTau to iTau
 
-(*) rtrafo() {and probably htrafo()} --- "fail" (are *wrong*!) for n = 1
+** Rebuild R-forge structure nacopula -> copula
+** Deprecation of Old Stuff /  towards more consistency / Cleanup
+- with warning
+- on help pages
+*** NAC Archimedean families <--> archmCopula  unification
+- The NAC Archimedean families are partly 'better' and partly "worse" than
+  archmCop: need 'uscore'
+-Write testing code that compares the two classes numerically.
+**** TODO (MM): Make  pcopula(<archm>) and dcopula(<archm>)
+ use the the numerically good formulae rather than the "exprDist".
+**** d=2 is special: allows negative tau, MH-code does not yet
+*** "copula" class:  slot re-definitions
+**** 'message' --> 'name' (or ??)
+**** 'param.lowbnd' / 'param.upbnd' --- use "interval" as in nacopula
 
-(*) bug fixes for estimation methods!
+*** nparam() "wrapper" for  length(.@parameters)
+*** dTau() = tau'() and dRho() = rho'() -- to get S.Err. for  "itau" and "irho"
+**** these are *one* of the things where IJ-archmCopula' are better
+*** dAduGalambos() and similar: Use  list() instead of data.frame() as return value  (?)
 
-(*) bug fixes for estimation methods!  {still relevant ??}
+** TODO MM: former nacopula  c_longNames etc  --> rename to .ac_longNames *and* export
+(ac = Archimedean copula)
 
-#### Intermediate #####################################################################
+** Exporting a bit more of hidden internal functions:
+*** JY: Ivan, I think we should export an empCopula function. I always
+thought it was unnecessary because it can be obtained with R package mecdf.
+But people have asked for it.
+*** MM: Also, look at ./man/copula-internal.Rd :
+**** schlatherCopula:  JY: The implementation of schlatherCopula is not ready for release.
+ More ev copulas will come from max-stable processes.
+**** asymCopula (-class) -- *.Rd document properly (incl some examples)
+** DONE New(?) (Super)classes for "merging the class structure"
+- new class "Copula" := {copula, nacopula}
 
-(MM) opower() --> either produce acopula with parameter *vector*, or
-     --- maybe in any case ---
-     produce an object of class 'opacopula' ("outer power Archimedean copula")
-     which is just 'acopula' with a new show method ("thetabase" at least!),
-     possibly a new slot ...
-  Longer term: want to *estimate* those correctly [MLE at least].
+** C code
+*** DONE [src/init.c] enable registration for the old 'copula' part
+*** DONE JY: gsl - Debye ===> Should use them and then *not* carry gsl-source code anymore.
+JY: Agree.
 
+*** IK: in all *.c files from former copula: use Doxygen
+instead of hand made function header documentation.
+** Miscellaneous Functions (bugs etc)
+*** DONE (MH) rtrafo() {and probably htrafo()} --- "fail" (are *wrong*!) for n = 1
+*** DONE (MH) copFrank@psi(1/1e20, theta=200) == Inf instead of 1
 
-(MM) please take a look at gtrafouni() in ./R/gof.R: Can "Remillard" (and "Genest")
- be made faster? Especially "Remillard" is slow (although B Remillard told me that his
- method is faster than C. Genest's.)
+*** see TODO in  R/tCopula.R :  ndim() utility function; test pos.def.
+*** tCopula() / normalCopula() allow alternative specification of cor.matrix
+   at least for the "un" dispersion structure
+*** opower() and GIG --> either produce acopula with parameter *vector*, or
+--- maybe in any case ---
+produce an object of class 'opacopula' ("outer power Archimedean copula")
+which is just 'acopula' with a new show method ("thetabase" at least!),
+possibly a new slot ...
+Longer term: want to *estimate* those correctly [MLE at least].
+*** rtrafo() is now "available" for "t" and "normal"
+thanks to the Master thesis of Yongsheng Wang.  (--> ...../function-gof.R )
+--> implement it, and  write a better wrapper for  gnacopula()/gofCopula()
+MH: Maybe we should provide Rosenblatt's transformation in general?
 
-(MM) rtrafo() is now "available" for "t" and "normal" thanks to the Master
-     thesis of Yongsheng Wang.  (--> ...../function-gof.R )
-     --> enable that, and  write a better wrapper for  gnacopula() / gofCopula()
+** New Wrapper functions or rather extending one or the other function names
+*** distribution/density/ ... functions
+**** DONE dcopula(), pcopula(), rcopula()  (for "nacopula")
+**** DONE dCopula(x, cop), pCopula(x, cop), rCopula(n, cop)  {swapping args for "standard R" usage}
+**** DONE d*():  allow  log=TRUE and use that in loglikCopula()
+**** fitCopula() should encompass all methods of enacopula()
 
-#### Minor #####################################################################
-
-(*) write nice little function that provides confidence intervals for tau and lambda's
-(*) fix:
-    cop <- onacopulaL("Frank", list(200, 1:2)); rnacopula(100, cop)
-    maybe use limit copulas also for other families (upper frechet bound)
-(*) add an ASCII-plot for the hierarchical structure;
-    Actually, define setAs("nacopula", "dendrogram", ....) and then use
-    dendrogram print()ing.
-(*) design a function that gets an outer nacopula and returns a matrix of
-    numbers which correspond to the different sectors; this can be used, e.g.,
-    for building a [default] color-matrix for splom2 or for estimation purposes etc.
-(*) it would be good to have tryCatch.W.E in the package [call it tryCatchWE --
-    easier to type]
-    Maybe one can also directly return a list with "value", "error", and "warning"?
-    [So far, "value" can also contain the errors => a bit unhandy, but maybe the
-    only "elegant" general solution]
-
-(*) From time to time (well, whenever Marius has.. ;-)) check the .Rd files
-    for overlong lines, i.e. apply
-      for f in *Rd; do printf '%20s: ' $f ; printf '%4d\n' `maxcol $f` ; done
-
-
-#### Long-term maybe ###########################################################
-
-(*) implement Khoudraji or Liebscher trafo incl. density etc.
-(*) allow families to have outer power parameters (outer power families)
-(*) be compatible with package copula
-(*) include pairwise estimators for nACs
-(*) FIXME in enacopula (in estimation.R): return an object?
-(*) can we create a function for the GIG generator similar to opower()?
-
+*** TODO MMMH: Use new rCopula() in ggraph *instead* of wrappers
 
 
+
+* Mid Term
+
+** DONE R/sysdata.rda:
+CLOSED: [2012-07-17 Tue 11:10]
+MM, MH: Please tell us more about this,
+notably about how it is computed {so it can be recomputed, in case
+pspline changes ...}.
+JY: Sorry for having to use this. The objects stored here are used to
+return Kendall's tau and Spearman's rho and their inverse functions
+for copulas for which explicit formulas are not available. We used
+simulation over a grid of (possibly transformed) parameter values
+and smoothed the results with pspline. Some details can be found
+in the appendix of Kojadinovic and Yan (2010, IME). The R scripts
+that generated sysdata.rda were moved out of the package source.
+We can put them back. The best place is under inst?
+=> JY: done on 2012-07-12. The R scripts are under inst/docs/tauRho/.
+***  R code for inspection:
+ attach("~/R/Pkgs/copula/R/sysdata.rda")
+ ls.str(pos=2, all=TRUE)
+ ## or even
+ print(ls.str(pos=2, all=TRUE), max.level = 3)
+
+** Deprecation of Old Stuff / more consistency / Cleanup
+*** loglikCopula() --- try(), hidemessages should "go" eventually
+*** varPL(): TODO's there
+*** dTau() = tau'() and dRho() = rho'() -- to get S.Err. for  "itau" and "irho"
+**** these are *one* of the things where IJ-archmCopula' are better
+*** dCdthetaEvCopula() cannot work (as dAdtheta() has no methods) and is used nowhere
+
+** rCopula() for archmCopula's should allow to use MH's racopula()
+*but* for back compatibility allow *global* options(....) to still get old
+random numbers.
+
+** C code
+*** DONE [src/init.c] enable registration for the old 'copula' part
+*** use 'static' "everywhere" +  attribute_hidden "otherwise"/sometimes
+
+** Documentation etc
+- DONE inst/doc/nacopula-pkg.Rnw  -- keep file name, maybe rewrite including
+ *Title*  (s/nacopula package/Nested Archimedean Copulas in the copula package/)
+- \link{} between  old-copula and old-nacopula  functionality
+- small vignette with table of function names providing the same functionality (nacopula / old_copula)
+*** DONE (MH) fixed long lines in all .Rd
+
+** Miscellaneous functions
+*** iTau(): must use tau.checker() [R/estimation.R]
+*** MM, MH: indepTest()  takes a while {ok}, *BUT* cannot be interrupted (quickly enough)
+    - shouldn't it {and all other tests} return a (valid) object of class
+    "htest" (maybe "htest" in addition to the specific S3 class)?
+    --> we would probably not need extra print() methods, and just use print.htest()
+*** DONE MH: @ Jun, Ivan: file R/E.R  only defines E <- exp(1). Reason(MM): work around silly 'CMD check' warnings.
+But we should move that to another R/*.R
+
+*** makeposdef() -- think of using a version of sfsmisc::posdefify()
+*** t / normal : allow  "block" dispersion structure {including  fitCopula() working}
+
+**** --> e-mail and example: /u/maechler/R/MM/Pkg-ex/copula/mvdc-ex.R
+
+*** function(outer_nacopula) -> matrix of 'comp' (in {1:d})
+which corresponds to the different sectors.
+This can be used, e.g., for building a [default] color-matrix for splom2 or
+for estimation purposes etc. Note: look at nacPairthetas
+*** nice little function that provides confidence intervals for tau and lambda's (from \theta_{MLE})
+*** IK: d-dimensional versions of rank-based estimators of the Pickands dependence function
+*** setTheta(): write methods for "copula"s !
+** Testing: ./tests/  must grow, notably for "Jun-Ivan functions"
+*** maybe take  ./tests/copula-play.R  as sophisticated role model.
+
+** Programming Style (unification)
+*** *naming* function arguments after 2nd or 3rd:
+- call functions like f(x, foo=1, bar=2) instead of f(x, 1, 2).
+  This makes the code more readable and more error-prone (naming all
+  arguments except the first one).
+
+
+* Long Term
+** ChiPlot(), KPlot() [in R/graphics.R]: Export and document ?
+** copula code which is not used --- moved to ./misc/
+MM: the previous file (+directory) names were:
+    - R/mult.R
+    - src/mult.c
+    - src/mygsl_util.c
+** C code
+*** DONE [src/init.c] enable registration for the old 'copula' part
+*** Move  from .C() towards .Call() -- only very long term
+JY: Agree. Quite a few them. Can it wait?  MM: Definitely; Actually, I
+think it's not worth the effort; particularly now that I've spent all the
+effort writing src/init.c for registration of all of the .C(..) routines.
+
+
+
+** Miscellaneous functions.
+*** include pairwise estimators for nACs
+*** add an ASCII-plot for the hierarchical structure;
+Actually, define setAs("nacopula", "dendrogram", ....) and then use
+dendrogram print()ing.
+*** Khoudraji d + p + r (see asymCopula.R)
+*** IK: add d-dimensional EV copulas corresponding to max-stable processes and corresponding "composite densities"

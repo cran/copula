@@ -34,7 +34,7 @@ eep.fun <- function(family, alpha, d, n.MC=5000){
            switch(family,
                   "Gumbel" =
               {
-                  mean(rowSums(cop@copula@psiInv(U, th))^alph)
+                  mean(rowSums(cop@copula@iPsi(U, th))^alph)
               },
                   "Joe" =
               {

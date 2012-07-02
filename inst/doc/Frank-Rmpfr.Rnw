@@ -203,9 +203,9 @@ writeLines(head(capture.output(print(
 @
 where the three functions
 \begin{align}
-\mathtt{psiDabs(t,thet)} &= \bigl|\psi_\theta^\prime(t)\bigr|,\label{def:psiDabs}\\
-\mathtt{psiInv(u,thet)} &= \psi_\theta^{-1}(u), \ \mathrm{and}\label{def:psiInv}\\
-\mathtt{psiInvD1abs(u,thet)} &= \bigl|[\psi_\theta^{-1}]^\prime(u) \bigr| \label{def:psiInvD1abs}
+\mathtt{absdPsi(t,thet)} &= \bigl|\psi_\theta^\prime(t)\bigr|,\label{def:absdPsi}\\
+\mathtt{iPsi(u,thet)} &= \psi_\theta^{-1}(u), \ \mathrm{and}\label{def:iPsi}\\
+\mathtt{absdiPsi(u,thet)} &= \bigl|[\psi_\theta^{-1}]^\prime(u) \bigr| \label{def:absdiPsi}
 \end{align}
 are all provided by the slots of the corresponding Archimedean copula family.
 
@@ -213,14 +213,14 @@ For the following explorations,  we need a definition of \code{dDiagA} which
 is more flexible as it does not work with the copula family object but gets the three
 functions as arguments,
 <<my-dDiagA>>=
-dDiagA <- function(u, th, d, psiInv, psiDabs, psiInvD1abs, log = FALSE) {
-    stopifnot(is.finite(th), d > 0, is.function(psiInv),
-              is.function(psiDabs), is.function(psiInvD1abs))
+dDiagA <- function(u, th, d, iPsi, absdPsi, absdiPsi, log = FALSE) {
+    stopifnot(is.finite(th), d > 0, is.function(iPsi),
+              is.function(absdPsi), is.function(absdiPsi))
     if(log) {
-        log(d) + psiDabs(d*psiInv(u,th), th, log = TRUE) +
-            psiInvD1abs(u, th, log = TRUE)
+        log(d) + absdPsi(d*iPsi(u,th), th, log = TRUE) +
+            absdiPsi(u, th, log = TRUE)
     } else {
-        d* psiDabs(d*psiInv(u,th), th) * psiInvD1abs(u,th)
+        d* absdPsi(d*iPsi(u,th), th) * absdiPsi(u,th)
     }
 }
 @
@@ -232,18 +232,18 @@ Now, for the Frank copula (\cite{Hofert:Maechler:2010:JSSOBK:v39i09}),
   \ \ \mathrm{\ \ hence,}
   \\
   \psi_\theta^{-1}(u) &=& - \log\left(\frac{e^{-u\theta} - 1}{e^{-\theta} - 1}\right),
-  \label{eq:psiInvFrank}
+  \label{eq:iPsiFrank}
   \ \ \mathrm{\ \ and}
   \\
-  %% psiDabs(t,thet)
+  %% absdPsi(t,thet)
   (-1)^k {\psi_\theta}^{(k)}(t) = \bigl|{\psi_\theta}^{(k)}(t)\bigr| &=&
   \frac{1}{\theta} \Li{k-1}((1-e^{-\theta})e^{-t}),
-  \label{eq:psiDabs}
+  \label{eq:absdPsi}
   \ \ \ \ \ \ \mathrm{and}
   \\
-  %% psiInvD1abs.1(u,theta)
+  %% absdiPsi.1(u,theta)
   \bigl|[\psi_\theta^{-1}]^\prime(u) \bigr| &=& \theta/(e^{u\cdot\theta} - 1),
-  \label{eq:psiInvD1}
+  \label{eq:iPsiD1}
 \end{eqnarray}
 where $\Li{s}(z)$ is the \emph{polylogarithm of order} $s$ at $z$, defined
 as (analytic continuation of) $\sum_{k=1}^\infty \frac{z^k}{k^s}$. When $s
@@ -261,21 +261,21 @@ $ - {\psi_\theta}^\prime(t) = \left|{\psi_\theta}^\prime(t)\right|$, and hence o
 First note that numerically, $e^{-a} - 1$ suffers from cancellation when $0
 < a \ll 1 $, and the \R\ (and C) function \code{expm1(-a)} is advisably used
 instead of \code{exp(-a) - 1}.
-For this reason, in \pkg{copula}, I had replaced the original \code{psiInv.0(u, th)}
-for $\psi_\theta^{-1}(u)$ by \code{psiInv.1()}, making use of \code{expm1()}.
-These and the derivative (\ref{eq:psiInvD1})
+For this reason, in \pkg{copula}, I had replaced the original \code{iPsi.0(u, th)}
+for $\psi_\theta^{-1}(u)$ by \code{iPsi.1()}, making use of \code{expm1()}.
+These and the derivative (\ref{eq:iPsiD1})
 originally were
 <<def-orig-psi-func>>=
-psiInv.0 <- function(u,theta) -log( (exp(-theta*u)-1) / (exp(-theta)-1) )
-psiInv.1 <- function(u,theta) -log(expm1(-u*theta) / expm1(-theta))
-psiInvD1abs.1 <- function(u, theta, log = FALSE)
+iPsi.0 <- function(u,theta) -log( (exp(-theta*u)-1) / (exp(-theta)-1) )
+iPsi.1 <- function(u,theta) -log(expm1(-u*theta) / expm1(-theta))
+absdiPsi.1 <- function(u, theta, log = FALSE)
   if(log) log(theta)-log(expm1(u*theta)) else theta/expm1(u*theta)
 @
-and the general $k$-th derivative (\ref{eq:psiDabs}), simplified, for $k= 1$
+and the general $k$-th derivative (\ref{eq:absdPsi}), simplified, for $k= 1$
 (\code{degree = 1}),
-<<def-orig-psiDabs>>=
+<<def-orig-absdPsi>>=
 require("copula")# for polylog()
-psiDabs.1 <- function(t, theta, log=FALSE) {
+absdPsi.1 <- function(t, theta, log=FALSE) {
   p <- -expm1(-theta)
   Li. <- polylog(log(p) - t, s = 0, log=log,
                  method="negI-s-Eulerian", is.log.z=TRUE)
@@ -285,8 +285,8 @@ psiDabs.1 <- function(t, theta, log=FALSE) {
 where we however now assume that the \code{polylog()} function for
 \code{s=0} would basically use the direct formula (\ref{eq:polylog-0}),
 such that we use
-<<simpler-psiDabs>>=
-psiDabs.2 <- function(t, theta, log=FALSE) {
+<<simpler-absdPsi>>=
+absdPsi.2 <- function(t, theta, log=FALSE) {
   w <- log(-expm1(-theta)) - t
   Li. <- if(log) w - log(-expm1(w)) else -exp(w)/expm1(w)
   if(log) Li. - log(theta) else Li. / theta
@@ -310,25 +310,25 @@ numerical problems, at first already in evaluating the logarithm of the diagonal
 $\log f^D = \log f^D_\theta(u)$\code{= dDiag(u, theta, *, log=TRUE)}
 for non-small $\theta$ and ``large'' $u$, i.e., $u \approx 1$:
 <<dDiag-probl-big-theta, fig=TRUE>>=
-curve(dDiagA(x, th = 38, d = 2, psiInv = psiInv.0,
-             psiDabs=psiDabs.1, psiInvD1abs=psiInvD1abs.1, log = TRUE),
+curve(dDiagA(x, th = 38, d = 2, iPsi = iPsi.0,
+             absdPsi=absdPsi.1, absdiPsi=absdiPsi.1, log = TRUE),
       ylab = "dDiagA(x, theta= 38, *, log=TRUE)",
       0, 1, col = 4, n = 1000)
-## and using the slightly better   psiInv.1  does not help here:
-curve(dDiagA(x, th = 38, d = 2, psiInv = psiInv.1,
-             psiDabs=psiDabs.2, psiInvD1abs=psiInvD1abs.1, log = TRUE),
+## and using the slightly better   iPsi.1  does not help here:
+curve(dDiagA(x, th = 38, d = 2, iPsi = iPsi.1,
+             absdPsi=absdPsi.2, absdiPsi=absdiPsi.1, log = TRUE),
       add = TRUE, col = 2, n=1000)
-legend("bottom", c("psiInv.0()","psiInv.1()"),col=c(4,2), lty=1, bty="n")
+legend("bottom", c("iPsi.0()","iPsi.1()"),col=c(4,2), lty=1, bty="n")
 @
 
 However, it's not hard to see that indeed our initial computation of Frank's
-$\psiis{\theta}$, i.e, (\ref{eq:psiInvFrank}),
+$\psiis{\theta}$, i.e, (\ref{eq:iPsiFrank}),
 $\psiis{\theta}(u) = -\log\left(\frac{1-e^{-u\theta}}{1-e^{-\theta}}\right)$,
 suffers from ``division cancellation'' for ``large'' $\theta$ ($\theta=38$
 in ex.) when computed directly with
-\code{psiInv.0()}, see above, and that the improvement of using
+\code{iPsi.0()}, see above, and that the improvement of using
 \code{expm1(-t)} instead of \code{exp(-t) - 1}, as used in
-\code{psiInv.1()}, see above, helps only for $t\approx 0$.
+\code{iPsi.1()}, see above, helps only for $t\approx 0$.
 However, we can rewrite $\psiis{\theta}$ as
 \begin{equation}
   \label{eq:psii:log:1}
@@ -336,14 +336,14 @@ However, we can rewrite $\psiis{\theta}$ as
 \end{equation}
 which when using \code{log1p(e)} for $\log(1+e)$ is much better numerically:
 <<dDiag-ok-big-theta, fig=TRUE>>=
-psiInv.2 <- function(u,theta) -log1p((exp(-u*theta)-exp(-theta)) / expm1(-theta))
-curve(dDiagA(x, th = 38, d = 2, psiInv = psiInv.2,
-             psiDabs=psiDabs.2, psiInvD1abs=psiInvD1abs.1, log = TRUE),
+iPsi.2 <- function(u,theta) -log1p((exp(-u*theta)-exp(-theta)) / expm1(-theta))
+curve(dDiagA(x, th = 38, d = 2, iPsi = iPsi.2,
+             absdPsi=absdPsi.2, absdiPsi=absdiPsi.1, log = TRUE),
       ylab = "dDiagA(x, theta= 38, *, log=TRUE)",
       0, 1, col = 4, n = 1000)
 ## previously
-curve(dDiagA(x, th = 38, d = 2, psiInv = psiInv.1,
-             psiDabs=psiDabs.2, psiInvD1abs=psiInvD1abs.1, log = TRUE),
+curve(dDiagA(x, th = 38, d = 2, iPsi = iPsi.1,
+             absdPsi=absdPsi.2, absdiPsi=absdiPsi.1, log = TRUE),
       add = TRUE, col = "darkgray", lwd=2, lty=3, n=1000)
 @
 
@@ -357,8 +357,8 @@ set.seed(1); for(l in 1:4) U <- rnacopula(n = 100, cop)
 U. <- sort(apply(U, 1, max)) # build the max
 <<negLogL>>=
 mlogL <- function(theta)
-    -sum(dDiagA(U., theta, d=d, psiInv = psiInv.2,
-                psiDabs=psiDabs.2, psiInvD1abs=psiInvD1abs.1,
+    -sum(dDiagA(U., theta, d=d, iPsi = iPsi.2,
+                absdPsi=absdPsi.2, absdiPsi=absdiPsi.1,
                 log = TRUE))
 @
 Now, plot this negative log likelihood function in an interval $\theta$,
@@ -422,48 +422,48 @@ $\log(d)$, $d=5$), only the sum of the two terms
 <<empty-prompt, echo=FALSE>>=
 op <- options(prompt = " ")
 <<mlogL_2terms, eval=FALSE>>=
-   psiDabs(d*psiInv(u,th), th, log = TRUE) +
-   psiInvD1abs(u,          th, log = TRUE)
+   absdPsi(d*iPsi(u,th), th, log = TRUE) +
+   absdiPsi(u,          th, log = TRUE)
 @
 currently, with the three functions
 <<3f, eval=false>>=
-psiInv = psiInv.2; psiDabs = psiDabs.2; psiInvD1abs = psiInvD1abs.1
+iPsi = iPsi.2; absdPsi = absdPsi.2; absdiPsi = absdiPsi.1
 <<reset-prompt, echo=FALSE>>=
 options(op)
 @
-where we have already tried to ensure that the \code{psiInv()} function is
+where we have already tried to ensure that the \code{iPsi()} function is
 ok, but now can confirm it, e.g., for $\theta = 50$.  Further note, that using
 high-precision arithmetic, we can also ``partially afford'' to use the
-simplistic \code{psiInv.0()} function instead of the more stable
-\code{psiInv.2()} one:
-<<check-psiInv>>=
-stopifnot(all.equal(psiInv.2(U.,  50 ),
-                    psiInv.2(U., mpfr(50, 96))),
-          all.equal(psiInv.0(U., mpfr(50, 200)),
-            pI.U <- psiInv.2(U., mpfr(50, 200)), tol=1e-50) )
+simplistic \code{iPsi.0()} function instead of the more stable
+\code{iPsi.2()} one:
+<<check-iPsi>>=
+stopifnot(all.equal(iPsi.2(U.,  50 ),
+                    iPsi.2(U., mpfr(50, 96))),
+          all.equal(iPsi.0(U., mpfr(50, 200)),
+            pI.U <- iPsi.2(U., mpfr(50, 200)), tol=1e-50) )
 @
-However, we can observe dramatic differences in \code{psiDabs.2()} ($=
+However, we can observe dramatic differences in \code{absdPsi.2()} ($=
 |\psi^\prime(.)|$):
-<<plot-psiDabs-2, fig=TRUE>>=
-psD.n <-            psiDabs.2(as.numeric(pI.U), 40)
-psD.M <- as.numeric(psiDabs.2(pI.U,        mpfr(40, 200)))
+<<plot-absdPsi-2, fig=TRUE>>=
+psD.n <-            absdPsi.2(as.numeric(pI.U), 40)
+psD.M <- as.numeric(absdPsi.2(pI.U,        mpfr(40, 200)))
 matplot(U., cbind(psD.n, psD.M), type="l", log="y")
 legend("top", c("double prec.", "mpfr(*, precBits = 200)"),
        col= 1:2, lty=1:2, bty="n")
 @
 where we see a very large difference (note the \emph{$\log$} scale!) for
 $u \approx 1$, i.e., for very small \linebreak[3]
-\code{pI.U= psiInv.2(U., theta)}$ = \psi_\theta^{-1}(u)$.
-<<plot-psiDabs-zero, fig=TRUE>>=
+\code{pI.U= iPsi.2(U., theta)}$ = \psi_\theta^{-1}(u)$.
+<<plot-absdPsi-zero, fig=TRUE>>=
 u0 <- 2^-(100:1)
-psD.n <-            psiDabs.2(u0, 40)
-psD.M <- as.numeric(psiDabs.2(u0, mpfr(40, 200)))
+psD.n <-            absdPsi.2(u0, 40)
+psD.M <- as.numeric(absdPsi.2(u0, mpfr(40, 200)))
 matplot(u0, cbind(psD.n, psD.M), type="l", log="xy")
 legend("top", c("double prec.", "mpfr(*, precBits = 200)"),
        col= 1:2, lty=1:2, bty="n")
 @
 Further investigation shows that the culprit is really the use of
-\code{log(-expm1(-theta))} inside \code{psiDabs.2()} which underflows for
+\code{log(-expm1(-theta))} inside \code{absdPsi.2()} which underflows for
 large theta, and hence should be replaced by the generally accurate
 %% as shown by   Maechler (2011) --- FIXME: finally write that small paper!!
 %%               =========================  ~/R/MM/NUMERICS/log1-exp.R
@@ -479,8 +479,8 @@ log1mexp <- function(a) # accurately compute log(1-exp(-a))
 }
 @
 so that we rather compute $|\psi^\prime(.)|$ via
-<<psiDabs.3>>=
-psiDabs.3 <- function(t, theta, log=FALSE) {
+<<absdPsi.3>>=
+absdPsi.3 <- function(t, theta, log=FALSE) {
   w <- log1mexp(theta) - t
   Li. <- if(log) w - log1mexp(-w) else -exp(w)/expm1(w)
   if(log) Li. - log(theta) else Li. / theta
@@ -491,11 +491,11 @@ We investigate via the graphic
 <<nlogL-2-plot, fig=TRUE>>=
 p.mlogL(th = seq(11, 99, by = 1/4),
         mlogL = (mlogL2 <- function(theta)
-                 -sum(dDiagA(U., theta, d=d, psiInv = psiInv.2,
-                            psiDabs = psiDabs.3, psiInvD1abs=psiInvD1abs.1,
+                 -sum(dDiagA(U., theta, d=d, iPsi = iPsi.2,
+                            absdPsi = absdPsi.3, absdiPsi=absdiPsi.1,
                             log = TRUE))), lwd = 2)
 @
-Yes, indeed, using a numerically stable version for \code{psiDabs()}
+Yes, indeed, using a numerically stable version for \code{absdPsi()}
 did solve the numerical problem of computing, the ``diagonal likelihood'',
 and hence the \code{dmle()} (``diagonal MLE'').
 
@@ -511,21 +511,21 @@ abline(v = th0, col="red2", lty="15", lwd=2)
 where we see that for $\theta > \Sexpr{th0}$, \code{mlogL()} is not finite,
 e.g.,
 <<dDiag-large-thet>>=
-dDiagA(0.999, 715, d = d, psiInv = psiInv.2, psiDabs = psiDabs.3,
-                          psiInvD1abs = psiInvD1abs.1, log = TRUE)
+dDiagA(0.999, 715, d = d, iPsi = iPsi.2, absdPsi = absdPsi.3,
+                          absdiPsi = absdiPsi.1, log = TRUE)
 @
-which after closer inspection is from  the \code{psiInvD1abs(u, th, log =
-TRUE)} part of \code{dDiagA()} and that, see (\ref{def:psiInvD1abs}), uses
+which after closer inspection is from  the \code{absdiPsi(u, th, log =
+TRUE)} part of \code{dDiagA()} and that, see (\ref{def:absdiPsi}), uses
 \code{log(theta)-log(expm1(u*theta))},
 where clearly already \code{expm1(u*theta)) = expm1(0.999 * 715)} numerically overflows to \code{Inf}:
 <<psiID1-large-thet>>=
-psiInvD1abs.1(0.999, th = 715, log=TRUE)
+absdiPsi.1(0.999, th = 715, log=TRUE)
 @
 However, as $\log(\mathrm{expm1}(y)) = \log(e^y -1) = \log(e^y(1 - e^{-y}))
 = y + \log(1 - e^{-y})$, the ``numerical stable'' solution is to replace
 \code{log(expm1(y))} by \code{y + log1mexp(y)}, such that we will use
-<<def-psiInvD1abs-2>>=
-psiInvD1abs.2 <- function(u, theta, log = FALSE)
+<<def-absdiPsi-2>>=
+absdiPsi.2 <- function(u, theta, log = FALSE)
   if(log) log(theta)- {y <- u*theta; y + log1mexp(y)} else theta/expm1(u*theta)
 @
 Unfortunately, this improves the situation for large $\theta$ only slightly:
@@ -535,24 +535,24 @@ plot(nll ~ thet, xlab=expression(theta),
      type = "l", col="red2", lwd=2)
 abline(v = th0, col="red2", lty="15", lwd=2)
 nll3 <- p.mlogL(thet, mlogL = function(theta)
-                 -sum(dDiagA(U., theta, d=d, psiInv= psiInv.2, psiDabs= psiDabs.3,
-                             psiInvD1abs = psiInvD1abs.2, log = TRUE)),
+                 -sum(dDiagA(U., theta, d=d, iPsi= iPsi.2, absdPsi= absdPsi.3,
+                             absdiPsi = absdiPsi.2, log = TRUE)),
                 col = "blue2", lwd=3, lty=2, add = TRUE)
 nll3[thet == 800]
 @
 where we can see, that this time, the numerical overflow to $-\infty$
-happens in \code{psiDabs(d*psiInv(u,th), th, log = TRUE)}, as
-\code{psiInv(u,th) = psiInv(0.999, th=800)}$=$\Sexpr{format(psiInv.2(u=0.999,th=800))}
+happens in \code{absdPsi(d*iPsi(u,th), th, log = TRUE)}, as
+\code{iPsi(u,th) = iPsi(0.999, th=800)}$=$\Sexpr{format(iPsi.2(u=0.999,th=800))}
 underflows to zero --- by necessity: the correct value is smaller than the
 smallest representable double precision number:
-<<true-psiInv-small>>=
-pI <- psiInv.2(u=0.999, th= mpfr(800, 200))
+<<true-iPsi-small>>=
+pI <- iPsi.2(u=0.999, th= mpfr(800, 200))
 cat(sapply(list(pI, .Machine$double.xmin),
            format, digits = 7), "\n")
 @
 The only solution here is to allow passing the \emph{logarithm}
-$\log(t)$ instead of $t$ to \code{psiDabs()}, i.e., we start computing
-\code{log(psiInv(.))} directly (evading the underflow to 0 there).
+$\log(t)$ instead of $t$ to \code{absdPsi()}, i.e., we start computing
+\code{log(iPsi(.))} directly (evading the underflow to 0 there).
 
 \dots \dots to be continued.
 

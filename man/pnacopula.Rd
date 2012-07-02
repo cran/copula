@@ -1,6 +1,6 @@
 \name{pnacopula}
 \alias{pnacopula}
-\title{Evaluation of (Nested) Archimedean Copulas}
+\title{Evaluation of (nested) Archimedean copulas}
 \description{
   \code{pnacopula} evaluates a (nested) Archimedean copula (object of class
   \code{\linkS4class{nacopula}}) at the given vector or matrix \code{u}.
@@ -12,8 +12,8 @@ pnacopula(x, u)
   \item{x}{(nested) Archimedean copula of dimension \eqn{d}, that is, an
     object of class \code{\linkS4class{nacopula}}, typically from
     \code{\link{onacopula}(..)}.}
-  \item{u}{a \code{\link{numeric}} vector of length \eqn{d} or matrix with \eqn{d}
-    columns.}
+  \item{u}{a \code{\link{numeric}} vector of length \eqn{d} or matrix
+    with \eqn{d} columns.}
 }
 \details{
   The value of an Archimedean copula \eqn{C} with generator \eqn{\psi}{psi} at

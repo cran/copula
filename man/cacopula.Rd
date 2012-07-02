@@ -1,6 +1,6 @@
 \name{cacopula}
 \alias{cacopula}
-\title{Conditional Copula Function}
+\title{Conditional copula function}
 \description{
   Compute the conditional copula function
   \eqn{C(u_d\,|\,u_1,\dots,u_{d-1})}{C(u[d]|u[1],...,u[d-1])}
@@ -11,11 +11,12 @@ cacopula(u, cop, n.MC=0, log=FALSE)
 }
 \arguments{
   \item{u}{\eqn{n\times d}{n x d}-matrix; the conditioning is done on the values
-in the first \eqn{d-1} columns.}
+    in the first \eqn{d-1} columns.}
   \item{cop}{\code{"\linkS4class{outer_nacopula}"} with specified
     parameters (only Archimedean copulas are currently provided).}
   \item{n.MC}{Monte Carlo sample size.}
-  \item{log}{if TRUE the logarithm of the conditional copula function is returned.}
+  \item{log}{if TRUE the logarithm of the conditional copula function is
+    returned.}
 }
 \value{
   \code{\link{numeric}} vector of length \eqn{n} containing the

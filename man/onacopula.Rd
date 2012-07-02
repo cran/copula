@@ -3,7 +3,7 @@
 \alias{onacopulaL}
 \alias{nacopula}
 \alias{nac2list}
-\title{Constructing (Outer) Nested Archimedean Copulas}
+\title{Constructing (outer) nested Archimedean copulas}
 \description{
   Constructing (outer) nested Archimedean copulas (class
   \code{\linkS4class{outer_nacopula}}) is most conveniently done via

@@ -188,6 +188,9 @@ d <- 6 ; theta <- 2
 (cop <- onacopula("Clayton", C(theta, 1:d)))
 set.seed(1)
 U <- rnacopula(n, cop)
+## Show that 'racopula()' is indeed identical {and faster for the case of non-nested}
+stopifnot(identical(U,
+                {set.seed(1); copula:::racopula(n, copClayton, theta=theta, d=d)}))
 
 rr <- sapply(estMeth, function(e) {
     enacopula(U, cop, e, n.MC = if(e == "smle") 1000 else 0)

@@ -15,154 +15,121 @@
   this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
+/**
+ * @file   gof.c
+ * @author Ivan Kojadinovic
+ * @date   2008
+ *
+ * @brief  Goodness-of-fit tests for copulas and EV copulas
+ *         based on the parametric bootstrap and on a multiplier
+ *         bootstrap
+ *
+ */
 
-/*****************************************************************************
-
-  Goodness-of-fit tests for copulas
-
-*****************************************************************************/
 
 #include <R.h>
 #include <Rmath.h>
 
-#include "Anfun.h"
+#include "An.h"
 #include "gof.h"
+#include "empcop.h"
 
-/***********************************************************************
-
-  Computes the empirical copula
-  U contains the pseudo-obs that define the empirical copula
-  V[k + m * j], j=1...p, is the value at which the empirical copula
-  is to be computed
-  m is the number of lines of V
-
-***********************************************************************/
-// FIXME: provide  R interface
-double empcop(int n, int p, double *U,
-	      double *V, int m, int k)
-{
-    double ec = 0.;
-    for (int i=0; i < n; i++) {
-	int ind = 1;
-	for (int j=0; j < p; j++)
-	    ind *= (U[i + n * j] <= V[k + m * j]);
-	ec += (double)ind;
-    }
-    return ec/(double)n;
-}
-
-/***********************************************************************
-
-  Computes the Cramer-von Mises test statistic
-  U contains the pseudo-obs that define the empirical copula
-  FU are observations simulated from a copula fitted from U
-  m is the size of the sample used to approximate the test statistic
-
-***********************************************************************/
-
+/**
+ * Cramer-von Mises test statistic
+ *
+ * @param n sample size
+ * @param p dimension
+ * @param U pseudo-observations
+ * @param Ctheta values of the fitted copula at U
+ * @param stat value of the test statistic
+ * @author Ivan Kojadinovic
+ */
 void cramer_vonMises(int *n, int *p, double *U, double *Ctheta,
-		     double *stat)
-{
+		     double *stat) {
   double s = 0.;
-  for(int k=0; k < *n; k++) {
-      double diff = empcop(*n,*p,U, U,*n,k) - Ctheta[k];
-      s += diff * diff;
+  for(int k = 0; k < *n; k++) {
+    double diff = multCn(U, *n, *p, U, *n, k, 0.0) - Ctheta[k];
+    s += diff * diff;
   }
   *stat = s;
 }
 
-void cramer_vonMises_2(int *p, double *U, int *n, double *V, int *m,
-		       double *Ctheta, double *stat)
-{
-    double s = 0.;
-    for (int k=0; k < *m; k++) {
-	double diff = empcop(*n,*p,U,V,*m,k) - Ctheta[k];
-	s +=  diff * diff;
-    }
-    *stat = s * (*n) / (*m);
-}
-
-/***********************************************************************
-
- Empirical copula (for the multiplier)
-
-***********************************************************************/
-
-double ecopula(double *U, int n, int p, double *u)
-{
-  double res = 0.;
-  for (int i = 0; i < n; i++) {
-      double ind = 1.;
-      for (int j = 0; j < p; j++)
-	  ind *= (U[i + n * j] <= u[j]);
-      res += ind;
+/**
+ * Cramer-von Mises test statistic (grid version)
+ *
+ * @param p dimension
+ * @param U pseudo-observations
+ * @param n sample size
+ * @param V grid
+ * @param m grid size
+ * @param Ctheta values of the fitted copula at V
+ * @param stat value of the test statistic
+ * @author Ivan Kojadinovic
+ */
+void cramer_vonMises_grid(int *p, double *U, int *n, double *V, int *m,
+			  double *Ctheta, double *stat) {
+  double s = 0.;
+  for (int k = 0; k < *m; k++) {
+    double diff = multCn(U, *n, *p, V, *m, k, 0.0) - Ctheta[k];
+    s +=  diff * diff;
   }
-  return res/n;
+  *stat = s * (*n) / (*m);
 }
 
-/***********************************************************************
-
- Derivative from the empirical copula (for the multiplier)
-
-***********************************************************************/
-
-double derecopula(double *U, int n, int p, double *u, double *v)
-{
-  return (ecopula(U, n, p, u) - ecopula(U, n, p, v)) *  sqrt(n) / 2.0;
-}
-
-/***********************************************************************
-
-  Influence matrice and simulation (multiplier CLT)
-  u0 is m x p (the data)
-  u is n x p (the grid points)
-  influ is n x m
-  s0 is N
-
-***********************************************************************/
-
-
-void multiplier(int *p, double *u0, int *m, double *u, int *n,
+/**
+ * Multiplier bootstrap for the GoF testing
+ *
+ * @param p dimension
+ * @param U pseudo-observations (n x p)
+ * @param n sample size
+ * @param G grid (g x p)
+ * @param g grid size
+ * @param influ influence matrix (g x n)
+ * @param N number of multiplie replications
+ * @param s0 N replications of the test statistic
+ * @author Ivan Kojadinovic
+ */
+void multiplier(int *p, double *U, int *n, double *G, int *g,
 		double *influ, int *N, double *s0)
 {
   int i, j, k, l, ind;
-  double *influ_mat = Calloc((*m) * (*n), double);
-  double *random = Calloc(*m, double);
+  double *influ_mat = Calloc((*n) * (*g), double);
+  double *random = Calloc(*n, double);
   double *v1 = Calloc(*p, double);
   double *v2 = Calloc(*p, double);
   double *der = Calloc(*p, double);
-  double mean, process, invsqrtm = 1.0/sqrt(*m);
+  double mean, process, invsqrtn = 1.0/sqrt(*n);
 
   /* influence matrix */
-  for (j = 0; j < *n; j++) /* loop over the grid points */
+  for (j = 0; j < *g; j++) /* loop over the grid points */
     {
       /* derivatives wrt args */
       for (k = 0; k < *p; k++)
 	{
-	  v1[k] = u[j + k * (*n)];
+	  v1[k] = G[j + k * (*g)];
 	  v2[k] = v1[k];
 	}
       for (k = 0; k < *p; k++)
 	{
-	  v1[k] += invsqrtm;
-	  v2[k] -= invsqrtm;
-	  der[k] = derecopula(u0, *m, *p, v1, v2);
-	  v1[k] -= invsqrtm;
-	  v2[k] += invsqrtm;
+	  v1[k] += invsqrtn;
+	  v2[k] -= invsqrtn;
+	  der[k] = der_multCn(U, *n, *p, v1, v2, 2 * invsqrtn);
+	  v1[k] -= invsqrtn;
+	  v2[k] += invsqrtn;
 	}
 
-      for (i = 0; i < *m; i++) /* loop over the data */
+      for (i = 0; i < *n; i++) /* loop over the data */
 	{
-	  influ_mat[i + j * (*m)] = 0.0;
+	  influ_mat[i + j * (*n)] = 0.0;
 	  ind = 1;
 	  for (k = 0; k < *p; k++)
 	    {
-	      ind *= (u0[i + k * (*m)] <= u[j + k * (*n)]);
-	      influ_mat[i + j * (*m)] -= der[k] * (u0[i + k * (*m)] <= u[j + k * (*n)]);
+	      ind *= (U[i + k * (*n)] <= G[j + k * (*g)]);
+	      influ_mat[i + j * (*n)] -= der[k] * (U[i + k * (*n)] <= G[j + k * (*g)]);
 	    }
-	  influ_mat[i + j * (*m)] += ind; /* - influ[j + i * (*n)];*/
-	  influ[j + i * (*n)] *= invsqrtm;
-	  influ_mat[i + j * (*m)] *= invsqrtm;
+	  influ_mat[i + j * (*n)] += ind; /* - influ[j + i * (*g)];*/
+	  influ[j + i * (*g)] *= invsqrtn;
+	  influ_mat[i + j * (*n)] *= invsqrtn;
 	}
     }
 
@@ -171,26 +138,26 @@ void multiplier(int *p, double *u0, int *m, double *u, int *n,
   /* generate N approximate realizations */
   for (l=0;l<*N;l++)
     {
-      /* generate m variates */
+      /* generate n variates */
       mean = 0.0;
-      for (i=0;i<*m;i++)
+      for (i=0;i<*n;i++)
 	{
 	  random[i] = norm_rand(); /*(unif_rand() < 0.5) ? -1.0 : 1.0 ;*/
 	  mean += random[i];
 	}
-      mean /= *m;
+      mean /= *n;
 
       /* realization number l */
       s0[l] = 0.0;
-      for (j=0;j<*n;j++)
+      for (j=0;j<*g;j++)
 	{
 	  process = 0.0;
-	  for (i=0;i<*m;i++)
-	    process += (random[i] - mean) * influ_mat[i + j * (*m)]
-	      - random[i] * influ[j + i * (*n)];
+	  for (i=0;i<*n;i++)
+	    process += (random[i] - mean) * influ_mat[i + j * (*n)]
+	      - random[i] * influ[j + i * (*g)];
 	  s0[l] += process * process;
 	}
-      s0[l] /= *n;
+      s0[l] /= *g;
     }
 
   PutRNGstate();
@@ -202,77 +169,88 @@ void multiplier(int *p, double *u0, int *m, double *u, int *n,
   Free(der);
 }
 
-/*****************************************************************************
+/// Goodness-of-fit tests for extreme-value copulas
 
-  Goodness-of-fit tests for extreme-value copulas
-
-*****************************************************************************/
-
-/***********************************************************************
-
-  Computes the Cramer-von Mises test statistics
-  n: sample size
-  m: size of the grid
-  stat = n/m \sum_{i=0}^{m-1} [An(i/m) - A_{theta_n}(i/m)]^2
-
-***********************************************************************/
-
-/* Pickands estimator */
+/**
+ * Cramer-von Mises test statistic based on the Pickands estimator
+ * used in the GOF for EV copulas
+ * stat = n/m \sum_{i=0}^{m-1} [An(i/m) - A_{theta_n}(i/m)]^2
+ *
+ * @param n sample size
+ * @param m grid size
+ * @param S unit Fréchet pseudo-observations
+ * @param T unit Fréchet pseudo-observations
+ * @param Atheta values of the fitted A at the grid points
+ * @param stat value of the test statistic
+ * @author Ivan Kojadinovic
+ */
 void cramer_vonMises_Pickands(int *n, int *m, double *S,
 			      double *T, double *Atheta,
-			      double *stat)
-{
-  int i;
+			      double *stat) {
   double t, Ac, Au, dc, du,
-    invA0 = inv_A_Pickands(*n, S, T, 0.0),
-    invA1 = inv_A_Pickands(*n, S, T, 1.0);
+    invA0 = biv_invAP(*n, S, T, 0.0);
 
   stat[0] = 0.0; stat[1] = 0.0;
-  for (i=0;i<*m;i++)
-    {
+  for (int i = 0; i < *m; i++) {
       t = (double)i/(double)(*m);
-      Au = inv_A_Pickands(*n, S, T, t);
-      Ac = Au - (1.0 - t) * (invA0 - 1.0) - t * (invA1 - 1.0); // correction
+      Au = biv_invAP(*n, S, T, t);
+      Ac = Au - invA0 + 1.0; // correction
       du = 1 / Au - Atheta[i];
-      // dAinv =  Ac - 1 / Atheta[i];
       dc = 1 / Ac - Atheta[i];
       stat[0] += dc * dc;
       stat[1] += du * du;
-      // stat[1] += dAinv * dAinv;
     }
-  stat[0] = stat[0] * (double)(*n)/(double)(*m);
-  stat[1] = stat[1] * (double)(*n)/(double)(*m);
+  stat[0] = stat[0] * (double)(*n) / (double)(*m);
+  stat[1] = stat[1] * (double)(*n) / (double)(*m);
 }
 
-/* CFG estimator */
+/**
+ * Cramer-von Mises test statistic based on the CFG estimator
+ * used in the GOF for EV copulas
+ * stat = n/m \sum_{i=0}^{m-1} [An(i/m) - A_{theta_n}(i/m)]^2
+ *
+ * @param n sample size
+ * @param m grid size
+ * @param S unit Fréchet pseudo-observations
+ * @param T unit Fréchet pseudo-observations
+ * @param Atheta values of the fitted A at the grid points
+ * @param stat value of the test statistic
+ * @author Ivan Kojadinovic
+ */
 void cramer_vonMises_CFG(int *n, int *m, double *S,
 			 double *T, double *Atheta,
-			 double *stat)
-{
-  int i;
+			 double *stat) {
   double t, Au, Ac, dc, du,
-    logA0 = log_A_CFG(*n, S, T, 0.0),
-    logA1 = log_A_CFG(*n, S, T, 1.0);
+    logA0 = biv_logACFG(*n, S, T, 0.0);
 
   stat[0] = 0.0; stat[1] = 0.0;
-  for (i=0;i<*m;i++)
-    {
+  for (int i = 0; i < *m; i++) {
       t = (double) i / (double) (*m);
-      Au = log_A_CFG(*n, S, T, t);
-      Ac = Au - (1.0 - t) * logA0 - t * logA1; // endpoint corrected
+      Au = biv_logACFG(*n, S, T, t);
+      Ac = Au - logA0; // correction
       dc = exp(Ac) - Atheta[i];
       du = exp(Au) - Atheta[i];
-      // dlogA = Ac - log(Atheta[i]);
       stat[0] += dc * dc;
       stat[1] += du * du;
-      // stat[1] += dlogA * dlogA;
     }
   stat[0] = stat[0] * (double)(*n)/(double)(*m);
   stat[1] = stat[1] * (double)(*n)/(double)(*m);
 }
 
-
-/* wrapper */
+/**
+ * Wrapper for the Cramer-von Mises test statistics
+ * used in the GOF for EV copulas
+ * stat = n/m \sum_{i=0}^{m-1} [An(i/m) - A_{theta_n}(i/m)]^2
+ *
+ * @param n sample size
+ * @param m grid size
+ * @param S unit Fréchet pseudo-observations
+ * @param T unit Fréchet pseudo-observations
+ * @param Atheta values of the fitted A at the grid points
+ * @param stat value of the test statistic
+ * @param CFG if > 0 then CFG, else Pickands
+ * @author Ivan Kojadinovic
+ */
 void cramer_vonMises_Afun(int *n, int *m, double *S,
 			  double *T, double *Atheta,
 			  double *stat, int *CFG)

@@ -21,12 +21,13 @@
 #include "nacopula.h"
 
 /**
- * Sample S0 ~ S(alpha, 1, (cos(alpha*pi/2))^{1/alpha}, I_{alpha == 1}; 1)
+ * Sample S_0 ~ S(alpha, 1, (cos(alpha*pi/2))^{1/alpha}, I_{alpha == 1}; 1)
  * with Laplace-Stieltjes transform exp(-t^alpha) via the algorithm as described
- * in Chambers, Mallows, Stuck (1976) (S0 = S(alpha,1) in this reference), see
+ * in Chambers, Mallows, Stuck (1976) (S_0 = S(alpha,1) in this reference), see
  * Nolan's book for the parametrization.
+ *
  * @param alpha parameter in (0,1]
- * @return S0
+ * @return S_0
  * @author Marius Hofert, Martin Maechler
  */
 double rstable0(double alpha){
@@ -44,6 +45,7 @@ double rstable0(double alpha){
  * Sample S ~ S(alpha, 1, 1, (1/cos(alpha*pi/2))*I_{alpha == 1}; 1)
  * with Laplace-Stieltjes transform exp(-(1/cos(alpha*pi/2))*t^alpha),
  * see Nolan's book for the parametrization.
+ *
  * @param alpha parameter in (0,1]
  * @return S
  * @author Marius Hofert, Martin Maechler
@@ -60,6 +62,7 @@ double rstable(double alpha){
  * S ~ S(alpha, 1, 1, (1/cos(alpha*pi/2))*I_{alpha == 1}; 1)
  * with Laplace-Stieltjes transform exp(-(1/cos(alpha*pi/2))*t^alpha),
  * see Nolan's book for the parametrization.
+ *
  * @param S vector of stable random variates (result)
  * @param n length of the vector S
  * @param alpha parameter in (0,1]
@@ -82,11 +85,12 @@ void rstable_vec(double S[], const int n, const double alpha){
  * S ~ S(alpha, 1, 1, (1/cos(alpha*pi/2))*I_{alpha == 1}; 1)
  * with Laplace-Stieltjes transform exp(-(1/cos(alpha*pi/2))*t^alpha),
  * see Nolan's book for the parametrization.
+ *
  * @param n sample size
  * @param alpha parameter in (0,1]
  * @return vector of random variates S
  * @author Martin Maechler
-*/
+ */
 SEXP rstable_c(SEXP n, SEXP alpha)
 {
     int nn = asInteger(n);
@@ -103,6 +107,7 @@ SEXP rstable_c(SEXP n, SEXP alpha)
  * with Laplace-Stieltjes transform exp(-V_0((h+t)^alpha-h^alpha)),
  * see Nolan's book for the parametrization, via the "fast rejection algorithm",
  * see Hofert (2012).
+ *
  * @param St vector of random variates (result)
  * @param V0 vector of random variates V0
  * @param h parameter in [0,infinity)
@@ -110,7 +115,7 @@ SEXP rstable_c(SEXP n, SEXP alpha)
  * @param n length of St
  * @return none
  * @author Marius Hofert, Martin Maechler
-*/
+ */
 void retstable_MH(double *St, const double V0[], double h, double alpha, int n){
     /**
      * alpha == 1 => St corresponds to a point mass at V0 with Laplace-Stieltjes
@@ -168,10 +173,11 @@ void retstable_MH(double *St, const double V0[], double h, double alpha, int n){
 }
 
 /**
- * Fast and accurate evaluation of sinc(x) := sin(x)/x, including the limit x=0.
+ * Fast and accurate evaluation of sinc(x) := sin(x)/x, including the limit x=0
+ *
  * @param x any (double precision) number
  * @return sinc(x)
- * @author Martin Maechler; 28 Apr 2010
+ * @author Martin Maechler (2010-04-28)
 */
 double sinc_MM(double x) {
     double ax = fabs(x);
@@ -202,11 +208,12 @@ SEXP sinc_c(SEXP x_) {
 /**
  * Evaluation of Zolotarev's function, see Devroye (2009), to the power 1-alpha.
  * The 3-arg. version allows more precision for  alpha ~=~ 1
+ *
  * @param x argument
  * @param alpha parameter in (0,1]
  * @return sin(alpha*x)^alpha * sin((1-alpha)*x)^(1-alpha) / sin(x)
- * @author Martin Maechler; 28 Apr 2010
-*/
+ * @author Martin Maechler (2010-04-28)
+ */
 #define _A_3(_x, _alpha_, _I_alpha)				\
     pow(_I_alpha* sinc_MM(_I_alpha*_x), _I_alpha) *		\
     pow(_alpha_ * sinc_MM(_alpha_ *_x), _alpha_ ) / sinc_MM(_x)
@@ -234,11 +241,12 @@ SEXP A__c(SEXP x_, SEXP alpha, SEXP I_alpha) {
 
 /**
  * Evaluation of B(x)/B(0), see Devroye (2009).
+ *
  * @param x argument
  * @param alpha parameter in (0,1]
  * @return sinc(x) / (sinc(alpha*x)^alpha * sinc((1-alpha)*x)^(1-alpha))
- * @author Martin Maechler; 28 Apr 2010
-*/
+ * @author Martin Maechler (2010-04-28)
+ */
 double BdB0(double x,double alpha) {
     double Ialpha = 1.-alpha;
     double den = pow(sinc_MM(alpha*x),alpha) * pow(sinc_MM(Ialpha*x),Ialpha);
@@ -251,6 +259,7 @@ double BdB0(double x,double alpha) {
  * with Laplace-Stieltjes transform exp(-V_0((h+t)^alpha-h^alpha)),
  * see Nolan's book for the parametrization, via double rejection,
  * see Devroye (2009).
+ *
  * @param St vector of random variates (result)
  * @param V0 vector of random variates V0
  * @param h parameter in [0,infinity)
@@ -258,7 +267,7 @@ double BdB0(double x,double alpha) {
  * @param n length of St
  * @return none
  * @author Marius Hofert, Martin Maechler
-*/
+ */
 void retstable_LD(double *St, const double V0[], double h, double alpha, int n)
 {
    /**
@@ -373,6 +382,7 @@ void retstable_LD(double *St, const double V0[], double h, double alpha, int n)
  * with Laplace-Stieltjes transform exp(-V_0((h+t)^alpha-h^alpha)),
  * see Nolan's book for the parametrization, via the algorithms of
  * Devroye (2009) and Hofert (2012).
+ *
  * @param V0_ R vector of type numeric(n) containing the random variates V0
  * @param h R parameter of type numeric(1)
  * @param alpha R parameter in (0,1] of type numeric(1)

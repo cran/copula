@@ -16,7 +16,8 @@
 
 require(copula)
 (isLinux <- identical("Linux", Sys.info()[["sysname"]]))
-(doExtras <- interactive() || nzchar(Sys.getenv("R_copula_check_extra")))
+(doExtras <- interactive() || nzchar(Sys.getenv("R_copula_check_extra")) ||
+ identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING"))))
 
 ## From source(system.file("test-tools-1.R", package = "Matrix")) :
 showSys.time <- function(expr) {

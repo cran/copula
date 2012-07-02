@@ -35,12 +35,12 @@ assertError <- function(expr) {
 }
 numTailIndexLower <- function(copula, u) {
   ## u is a vector approaching 0
-  pcopula(copula, cbind(u, u, deparse.level = 0)) / u
+  pCopula(cbind(u, u, deparse.level = 0), copula) / u
 }
 
 numTailIndexUpper <- function(copula, u) {
   # u is a vector approaching 1
-  (1 - 2 * u + pcopula(copula, cbind(u, u, deparse.level = 0))) / (1 - u)
+  (1 - 2 * u + pCopula(cbind(u, u, deparse.level = 0), copula)) / (1 - u)
 }
 
 (u.0 <- sort(outer(c(1,2,5), 10^-(1:5)), decreasing=TRUE)[-(1:2)])
@@ -76,7 +76,7 @@ if(tryfCop) { ## Rmetrics
 
 S <- cbind(u.0,u.0)
 # R/Copula:
-## C  <- pcopula(copula = gumbelCopula(param=20, dim = 2), S)
+## C  <- pCopula(dim = 2, copula = gumbelCopula(param=20), S)
 ## (C1  <- C/u.0)
 (lt20 <- numTailIndexLower(gumbC20, u.0))
 
@@ -105,7 +105,7 @@ stopifnot(
 ,
   (tu2 <- numTailIndexUpper(Frank2, 1-1e-6)) < 3e-6
 ,
-  all.equal(tu2, numTailIndexLower(Frank2, 1e-6), tol=1e-10)
+  all.equal(tu2, numTailIndexLower(Frank2, 1e-6), tol= 1e-4)
 )
 
 
@@ -118,12 +118,12 @@ u2 <- cbind(u.0,u.1)
 (t.9.2 <- tCopula(0.9, df=2, dim = 2))
 
 t.frac <- tCopula(0.9, df=2.5, dim = 2)
-## fractional df  currently (must) *fail* for pcopula
-assertError(pcopula(t.frac, cbind(u.0,u.1)))
+## fractional df  currently (must) *fail* for pCopula
+assertError(pCopula(cbind(u.0,u.1), t.frac))
 
 stopifnot( {
-    ft <- dcopula(t.frac, u2)
-    all.equal(ft, dcopula(t.frac, u2[,2:1]), tol=1e-15)
+    ft <- dCopula(u2, t.frac)
+    all.equal(ft, dCopula(u2[,2:1], t.frac), tol=1e-15)
  },
  !is.unsorted(ft)
  ,
@@ -144,7 +144,7 @@ stopifnot( {
 
 if(tryfCop && .r(fCopulae)) { ## Rmetrics
     p.fC <- pellipticalCopula(u = u.1, v = u.1, rho = 0.7, param = c(nu=3))
-    p. <- pcopula(t.7.3, u = cbind(u.1, u.1))
+    p. <- pCopula(u = cbind(u.1, u.1), t.7.3)
     ## they are really not "so equal"
     stopifnot(
     all.equal(p.fC, p., check.attr=FALSE, tol= 0.002)

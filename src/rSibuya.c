@@ -26,6 +26,7 @@
  * n in IN, with Laplace-Stieltjes transform 1-(1-exp(-t))^alpha via the
  * algorithm of Hofert (2011).
  * Note: The caller of this function must use GetRNGstate() and PutRNGstate().
+ *
  * @param alpha parameter theta0/theta1 in (0,1]
  * @param gamma_1_a Gamma(1-alpha)
  * @return a random variate from F
@@ -49,6 +50,7 @@ double rSibuya(double alpha, double gamma_1_a /**< == Gamma(1 - alpha) */){
 /**
  * Sample an n-fold sum of i.i.d. V ~ Sibuya(alpha). Sum-version of rSibuya.
  * Note: The caller of this function must use GetRNGstate() and PutRNGstate().
+ *
  * @param alpha parameter theta0/theta1 in (0,1]
  * @param gamma_1_a Gamma(1-alpha)
  * @return n-fold sum of i.i.d. V ~ F
@@ -64,6 +66,7 @@ double rSibuya_sum(int n, double alpha, double gamma_1_a /**< == Gamma(1 - alpha
 
 /**
  * Generate a vector of variates from a Sibuya(alpha) distribution.
+ *
  * @param V vector of random variates from F (result)
  * @param n length of the vector V
  * @param alpha parameter theta0/theta1 in (0,1]
@@ -86,6 +89,7 @@ void rSibuya_vec(double* V, int n, double alpha){
 
 /**
  * Generate a vector of variates from a Sibuya(alpha) distribution. Bridge to R.
+ *
  * @param n sample size
  * @param alpha parameter theta0/theta1 in (0,1]
  * @return vector of random variates

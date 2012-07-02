@@ -32,28 +32,30 @@ setClassUnion("maybeInterval", c("interval", "NULL"))
 setClass("acopula",
 	 representation(name = "character",
                         psi = "function",         # of (t, theta) -- the generator
-                        psiInv = "function",      # of (u, theta, log=FALSE) -- (log-)psi_inverse: \psi^{-1}(u)=t
+                        iPsi = "function",      # of (u, theta, log=FALSE) -- (log-)psi_inverse: \psi^{-1}(u)=t
 			## when theta is one-dimensional, specifying the interval is more convenient:
                         paraInterval = "maybeInterval", # [.,.]  (.,.], etc .. parameter interval
-                        psiDabs = "function",     # of (t, theta, degree=1, n.MC=0, log=FALSE) -- (-1)^d * the degree-th generator derivative
+                        absdPsi = "function",     # of (t, theta, degree=1, n.MC=0, log=FALSE) -- (-1)^d * the degree-th generator derivative
                         theta = "numeric",        # value of theta or  'NA'  (for unspecified)
                         paraConstr = "function",  # of (theta) ; constr(theta) |--> TRUE: "fulfilled"
-                        psiInvD1abs = "function", # of (t, theta, log=FALSE) -- computes the absolute value of the first derivative of psiInv
+                        absdiPsi = "function", # of (t, theta, log=FALSE) -- absolute value of first derivative of iPsi
                         dDiag = "function",       # of (u, theta, log=FALSE) -- compute the density of the diagonal
-                        dacopula = "function",    # of (u, theta, n.MC=0, log=FALSE) -- computes the (log-)density of the Archimedean copula with parameter theta at the vector/matrix u (n.MC > 0: apply Monte Carlo with sample size n.MC)
-                        score = "function",       # of (u, theta) -- computes the score function
-                        V0 = "function",	  # of (n,theta) -- RNGenerator
-			dV0 = "function",         # of (x,theta,log=FALSE) -- density of F=LS^{-1}[psi]
-                        tau = "function",	  # of (theta)
-                        tauInv = "function",      # of (tau)
-                        lambdaL = "function",     # of (theta) lower bound  \lambda_l
-                        lambdaLInv = "function",  # of (lambda) - Inverse of \lambda_l
-                        lambdaU = "function",     # of (theta)  - upper bound  \lambda_u
-                        lambdaUInv = "function",  # of (lambda) - Inverse of \lambda_u
-                        ## Nesting properties if the child copulas are of the same family :
-                        nestConstr = "function",  # of (th0, th1) ; TRUE <==> "fulfilled"
-                        V01= "function",	  # of (V0,theta0,theta1) -- RNGenerator
-			dV01= "function"           # of (x,(V0),theta0,theta1,log=FALSE) -- density *related to* F01=LS^{-1}[psi_0^{-1}(psi_1(t))] (see the specific families)
+			dacopula = "function",	  # of (u, theta, n.MC=0, log=FALSE) -- computes the (log-)density of the Archimedean
+					# copula with parameter theta at the vector/matrix u (n.MC > 0: apply Monte Carlo with sample size n.MC)
+			score = "function",	  # of (u, theta) -- computes the score function
+			V0 = "function",	  # of (n,theta) -- RNGenerator
+			dV0 = "function",	  # of (x,theta,log=FALSE) -- density of F=LS^{-1}[psi]
+			tau = "function",	  # of (theta)
+			tauInv = "function",	  # of (tau)
+			lambdaL = "function",	  # of (theta) lower bound  \lambda_l
+			lambdaLInv = "function",  # of (lambda) - Inverse of \lambda_l
+			lambdaU = "function",	  # of (theta)	- upper bound  \lambda_u
+			lambdaUInv = "function",  # of (lambda) - Inverse of \lambda_u
+			## Nesting properties if the child copulas are of the same family :
+			nestConstr = "function",  # of (th0, th1) ; TRUE <==> "fulfilled"
+			V01= "function",	  # of (V0,theta0,theta1) -- RNGenerator
+			dV01= "function"	   # of (x,(V0),theta0,theta1,log=FALSE) -- density
+					# *related to* F01=LS^{-1}[psi_0^{-1}(psi_1(t))] (see the specific families)
                         ),
          prototype = prototype(theta = NA_real_),
 	 validity = function(object) {
@@ -85,7 +87,7 @@ setClass("acopula",
 	     } ## {checkFun}
 
              if(!isTRUE(tt <- checkFun("psi", 2)))	return(tt)
-             if(!isTRUE(tt <- checkFun("psiInv", 2)))	return(tt)
+             if(!isTRUE(tt <- checkFun("iPsi", 2)))	return(tt)
              if(!isTRUE(tt <- checkFun("tau", 1)))	return(tt)
              if(!isTRUE(tt <- checkFun("paraConstr", 1, chkVect=FALSE))) return(tt)
              if(!isTRUE(tt <- checkFun("nestConstr", 2, chkVect=FALSE))) return(tt)
@@ -176,8 +178,8 @@ setClass("outer_nacopula", contains = "nacopula",
              d <- dim(object)
              ic <- object@comp
              allC <- allComp(object)
-             if(length(allC) != d)
-                 return("must have d coordinates (from 'comp' and 'childCops')")
+             ## if(length(allC) != d)
+             ##     return("must have d coordinates (from 'comp' and 'childCops')")
              if(!all(sort(allC) == 1:d))
                  return(paste("The implicit coordinates are not identical to 1:d; instead\n  ",
                               paste(allC, collapse=", ")))

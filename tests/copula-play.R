@@ -96,60 +96,60 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
 
     ### (2) generator
 
-    ### (2.1) psi and psiInv
+    ### (2.1) psi and iPsi
 
     cat("\n(2) values of psi at i10:\n")
     CT <- c(CT, list(psi = system.time(p.i <- cop@psi(i10,theta = theta0))))
     print(p.i)
-    checkifnot(identical(numeric(0), cop@psiInv(numeric(0), theta = theta0)))
-    checkifnot(cop@psiInv(0, theta = theta0) == Inf)
-    cat0("\nvalues of psiInv at u01:")
+    checkifnot(identical(numeric(0), cop@iPsi(numeric(0), theta = theta0)))
+    checkifnot(cop@iPsi(0, theta = theta0) == Inf)
+    cat0("\nvalues of iPsi at u01:")
     CT <- c(CT, list(psiI = system.time(pi.t <-
-                     cop@psiInv(u01, theta = theta0))))
+                     cop@iPsi(u01, theta = theta0))))
     print(pi.t)
     CT[["psiI"]] <- CT[["psiI"]] +
-        system.time(pi.pi <- cop@psiInv(p.i,theta = theta0))
+        system.time(pi.pi <- cop@iPsi(p.i,theta = theta0))
     CT[["psi" ]] <- CT[["psi" ]] +
         system.time(p.pit <- cop@psi(pi.t, theta = theta0))
-    cat0("check if psiInv(psi(i10))==i10: ", all.equal(pi.pi, i10))
-    cat0("check if psi(psiInv(u01))==u01: ", all.equal(p.pit, u01))
+    cat0("check if iPsi(psi(i10))==i10: ", all.equal(pi.pi, i10))
+    cat0("check if psi(iPsi(u01))==u01: ", all.equal(p.pit, u01))
 
-    ### (2.2) psiDabs
+    ### (2.2) absdPsi
 
-    ## psiDabs with degree = 10
-    cat0("\nvalues of psiDabs with degree=10 at i10:")
-    CT <- c(CT, list(psiDabs = system.time(p.D <- cop@psiDabs(i10,theta = theta0,
+    ## absdPsi with degree = 10
+    cat0("\nvalues of absdPsi with degree=10 at i10:")
+    CT <- c(CT, list(absdPsi = system.time(p.D <- cop@absdPsi(i10,theta = theta0,
                      degree = 10))))
     print(p.D)
     cat0("check if all values are nonnegative")
     stopifnot(is.vector(p.D), all(p.D >= 0))
-    cat("check psiDabs(Inf,theta,degree=10) = 0 and the class of psiDabs(0,theta,degree=10): ")
-    at.0 <- cop@psiDabs(0, theta = theta0, degree = 10)
-    stopifnot(cop@psiDabs(Inf, theta = theta0, degree = 10) == 0,
+    cat("check absdPsi(Inf,theta,degree=10) = 0 and the class of absdPsi(0,theta,degree=10): ")
+    at.0 <- cop@absdPsi(0, theta = theta0, degree = 10)
+    stopifnot(cop@absdPsi(Inf, theta = theta0, degree = 10) == 0,
               is.numeric(at.0), !is.nan(at.0))
     cat0("[Ok]")
-    ## psiDabs with degree = 10 and MC
-    cat("\nvalues of psiDabs with degree=10 and MC at i10:\n")
-    CT <- c(CT, list(psiDabs = system.time(p.D <- cop@psiDabs(i10,theta = theta0,
+    ## absdPsi with degree = 10 and MC
+    cat("\nvalues of absdPsi with degree=10 and MC at i10:\n")
+    CT <- c(CT, list(absdPsi = system.time(p.D <- cop@absdPsi(i10,theta = theta0,
                      degree = 10, n.MC = 1000))))
     print(p.D)
     cat0("check if all values are nonnegative")
     stopifnot(all(p.D >= 0))
-    cat("check psiDabs(Inf,theta,degree=10,n.MC=1000) = 0 and the class of psiDabs(0,theta,degree=10,n.MC=1000): ")
-    at.0 <- cop@psiDabs(0, theta = theta0, degree = 10, n.MC = 1000)
-    stopifnot(cop@psiDabs(Inf, theta = theta0, degree = 10, n.MC = 1000)==0,
+    cat("check absdPsi(Inf,theta,degree=10,n.MC=1000) = 0 and the class of absdPsi(0,theta,degree=10,n.MC=1000): ")
+    at.0 <- cop@absdPsi(0, theta = theta0, degree = 10, n.MC = 1000)
+    stopifnot(cop@absdPsi(Inf, theta = theta0, degree = 10, n.MC = 1000)==0,
               is.numeric(at.0), !is.nan(at.0))
     cat0("[Ok]")
 
-    ### (2.3) psiInvD1abs
+    ### (2.3) absdiPsi
 
-    cat0("\nvalues of psiInvD1abs at u01:")
-    CT <- c(CT, list(psiInvD1abs. = system.time(psiInvD1abs. <-
-                     cop@psiInvD1abs(u01, theta = theta0))))
-    print(psiInvD1abs.)
-    stopifnot(all(psiInvD1abs. >= 0, is.numeric(psiInvD1abs.), !is.nan(psiInvD1abs.)))
-    cat("check the class of psiInvD1abs(0,theta): ")
-    at.0 <- cop@psiInvD1abs(0, theta = theta0)
+    cat0("\nvalues of absdiPsi at u01:")
+    CT <- c(CT, list(absdiPsi. = system.time(absdiPsi. <-
+                     cop@absdiPsi(u01, theta = theta0))))
+    print(absdiPsi.)
+    stopifnot(all(absdiPsi. >= 0, is.numeric(absdiPsi.), !is.nan(absdiPsi.)))
+    cat("check the class of absdiPsi(0,theta): ")
+    at.0 <- cop@absdiPsi(0, theta = theta0)
     stopifnot(is.numeric(at.0),!is.nan(at.0))
     cat0("[Ok]")
 
@@ -356,7 +356,7 @@ stopifnot(all.equal(tau.th, tau.F, tol = 0.0001),
 
 myGumbel <- setTheta(copGumbel, 1.25)
 thetavec <- c(1,2,4,6,10)
-tstCop(myGumbel,2, thetavec, lambdaL = NA, lambdaU = thetavec)
+(tG <- tstCop(myGumbel,2, thetavec, lambdaL = NA, lambdaU = thetavec))
 u <- seq(0,1, length=32 + 1)[-c(1,32+1)]
 u <- as.matrix(expand.grid(u,u))
 myGumbel@dacopula(u, theta=1.25)

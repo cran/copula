@@ -74,7 +74,8 @@ curveLogL <- function(cop, u, xlim, main, XtrArgs=list(), ...) {
     invisible(r)
 }
 
-(doExtras <- interactive() || nzchar(Sys.getenv("R_copula_check_extra")))
+if(!exists("doExtras") || !is.logical(doExtras))
+    print(doExtras <- interactive() || nzchar(Sys.getenv("R_copula_check_extra")))
 ## Want to see when "Rmpfr" methods are chosen automatically:
 options("copula:verboseUsingRmpfr" = TRUE)
 
@@ -141,8 +142,16 @@ if(doExtras) # each curve takes almost 2 sec
 ##--> limit goes *VERY* steeply  up to  0
 
 ##--> theta 1.164 is about the boundary:
-stopifnot(all.equal(600.59261959,
-  cop@copula@dacopula(U4[118,], theta=1.164, log = TRUE)))## was "Inf"
+stopifnot(identical(setTheta(cop, 1.164), onacopula(cop@copula, C(1.164, 1:100))),
+	  all.equal(600.59261959,
+		    cop@copula@dacopula(U4[118,,drop=FALSE],
+					theta=1.164, log = TRUE)))## was "Inf"
+## FIXME find a way to use dCopula(U4[118,], ......)
+## this is *not* it :
+## stopifnot(all.equal(600.59261959,
+##                     dCopula(U4[118,], onacopula(cop@copula, C(1.164, 1:100)),
+##                             log = TRUE)))## was "Inf"
+
 
 
 ### "Joe", harder cases: d = 150, tau = 0.3 ####################################
@@ -236,8 +245,8 @@ if(FALSE) ## for speed analysis, etc
     debug(copula:::polyG)
 mLogL(1.65, cG.5@copula, U4)# -23472.96
 
-dd <- cG.5@copula@dacopula(U4, 1.64, log = TRUE,
-			   method = if(doExtras)"default" else "pois")
+dd <- dCopula(U4, setTheta(cG.5, 1.64), log = TRUE,
+              method = if(doExtras)"default" else "pois")
 summary(dd)
 stopifnot(!is.na(dd), ## no NaN's anymore
 	  40 < range(dd), range(dd) < 710)

@@ -1,12 +1,13 @@
-\name{psiDabsMC}
+\name{absdPsiMC}
+\alias{absdPsiMC}
 \alias{psiDabsMC}
-\title{Absolute Value of Generator Derivatives via Monte Carlo}
+\title{Absolute value of generator derivatives via Monte Carlo}
 \description{
   Computes the absolute values of the \eqn{d}th generator derivative
   \eqn{\psi^{(d)}}{psi^{(d)}} via Monte Carlo simulation.
 }
 \usage{
-psiDabsMC(t, family, theta, degree = 1, n.MC,
+absdPsiMC(t, family, theta, degree = 1, n.MC,
           method = c("log", "direct", "pois.direct", "pois"),
           log = FALSE, is.log.t = FALSE)
 }
@@ -27,7 +28,7 @@ psiDabsMC(t, family, theta, degree = 1, n.MC,
 	the logarithm of the Poisson density in a numerically stable way.}
     }
   }
-  \item{log}{if TRUE the logarithm of psiDabs is returned.}
+  \item{log}{if TRUE the logarithm of absdPsi is returned.}
   \item{is.log.t}{if TRUE the argument \code{t} contains the logarithm of the
     \dQuote{mathematical} \eqn{t}, i.e., conceptually,
     \code{psi(t, *) == psi(log(t), *, is.log.t=TRUE)}, where the latter
@@ -35,11 +36,13 @@ psiDabsMC(t, family, theta, degree = 1, n.MC,
       10^{500}}, where as the former would just return \eqn{psi(Inf, *) = 0}.}
 }
 \details{
-  The absolute value of the \eqn{d}th derivative of the Laplace-Stieltjes transform
+  The absolute value of the \eqn{d}th derivative of the
+  Laplace-Stieltjes transform
   \eqn{\psi=\mathcal{LS}[F]}{psi=LS[F]} can be approximated via
   \deqn{(-1)^d\psi^{(d)}(t)=\int_0^\infty
-    x^d\exp(-tx)\,dF(x)\approx\frac{1}{N}\sum_{k=1}^NV_k^d\exp(-V_kt),\ t > 0,}{%
-    (-1)^d psi^{(d)}(t) = int_0^Inf x^d exp(-tx) dF(x) ~= (1/N) sum(k=1..N)V_k^d exp(-V_k t), t > 0,}
+    x^d\exp(-tx)\,dF(x)\approx\frac{1}{N}\sum_{k=1}^NV_k^d\exp(-V_kt),\
+    t> 0,}{(-1)^d psi^{(d)}(t) = int_0^Inf x^d exp(-tx) dF(x) ~= (1/N)
+    sum(k=1..N)V_k^d exp(-V_k t), t > 0,}
   where \eqn{V_k\sim F,\ k\in\{1,\dots,N\}}{V_k ~ F, k in {1,...,N}}.
   This approximation is used where \eqn{d=}\code{degree} and
   \eqn{N=}\code{n.MC}.  Note that this is comparably fast even if
@@ -55,7 +58,7 @@ psiDabsMC(t, family, theta, degree = 1, n.MC,
 \references{
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011a),
   Estimators for Archimedean copulas in high dimensions: A comparison,
-  to be submitted.
+  submitted.
 }
 \seealso{
   \code{\link{acopula-families}}.
@@ -63,16 +66,16 @@ psiDabsMC(t, family, theta, degree = 1, n.MC,
 \examples{
 t <- c(0:100,Inf)
 set.seed(1)
-(ps <- psiDabsMC(t, family="Gumbel", theta=2, degree=10, n.MC=10000, log=TRUE))
+(ps <- absdPsiMC(t, family="Gumbel", theta=2, degree=10, n.MC=10000, log=TRUE))
 ## Note: The absolute value of the derivative at 0 should be Inf for
 ## Gumbel, however, it is always finite for the Monte Carlo approximation
 set.seed(1)
-ps2 <- psiDabsMC(log(t), family="Gumbel", theta=2, degree=10, n.MC=10000, log=TRUE,
-                 is.log.t = TRUE)
+ps2 <- absdPsiMC(log(t), family="Gumbel", theta=2, degree=10,
+                 n.MC=10000, log=TRUE, is.log.t = TRUE)
 stopifnot(all.equal(ps[-1], ps2[-1], tol=1e-14))
 ## Now is there an advantage of using "is.log.t" ?
-sapply(eval(formals(psiDabsMC)$method), function(MM)
-       psiDabsMC(780, family="Gumbel", method = MM,
+sapply(eval(formals(absdPsiMC)$method), function(MM)
+       absdPsiMC(780, family="Gumbel", method = MM,
                  theta=2, degree=10, n.MC=10000, log=TRUE, is.log.t = TRUE))
 ## not really better, yet...
 }

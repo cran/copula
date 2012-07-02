@@ -1,7 +1,7 @@
 \name{gnacopula}
 \alias{gnacopula}
 \alias{gofTstat}
-\title{Goodness-of-Fit Testing for (Nested) Archimedean Copulas}
+\title{Goodness-of-fit testing for (nested) Archimedean copulas}
 \description{
   \code{gnacopula()} conducts a goodness-of-fit test for the given
   (\eqn{H_0}-)copula \code{cop} based on the (copula-)data \code{u}.
@@ -21,7 +21,8 @@ gofTstat(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
   \item{cop}{\eqn{H_0}-\code{"\linkS4class{outer_nacopula}"} with specified
     parameters to be tested for (currently only Archimedean copulas are
     provided).}
-  \item{n.bootstrap}{positive integer specifying the number of bootstrap replicates.}
+  \item{n.bootstrap}{positive integer specifying the number of bootstrap
+    replicates.}
   \item{estimation.method}{\code{\link{character}}
     string determining the estimation method; see
     \code{\link{enacopula}}.  We currently only recommend the default
@@ -57,20 +58,23 @@ gofTstat(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
 	  pchisq((Phi^{-1}(u_{i1}))^2+...+(Phi^{-1}(u_{id}))^2, df=d)}
 	is computed (via \code{ADGofTest::ad.test}), where
 	\eqn{\Phi^{-1}}{Phi^{-1}} denotes the quantile function
-	of the standard normal distribution function, \eqn{\chi_d^2}{pchisq(.,df=d)}
-	denotes the distribution function of the chi-square distribution with \eqn{d}
-	degrees of freedom, and \eqn{u_{ij}} is the \eqn{j}th component
-	in the \eqn{i}th row of \code{u}.}
+	of the standard normal distribution function,
+	\eqn{\chi_d^2}{pchisq(.,df=d)} denotes the distribution function
+	of the chi-square distribution with \eqn{d} degrees of freedom,
+	and \eqn{u_{ij}} is the \eqn{j}th component in the \eqn{i}th row
+	of \code{u}.}
 
       \item{\code{"AnGamma"}}{similar to \code{method="AnChisq"} but
 	based on the variates
 	\deqn{\Gamma_d\Bigl(\sum_{j=1}^d(-\log u_{ij})\Bigr),}{%
 	  pgamma(-log(u_{i1})-...-log(u_{id}), shape=d),}
-	where \eqn{\Gamma_d}{pgamma(.,shape=d)} denotes the distribution function of
-	the gamma distribution with shape parameter \eqn{d} and shape parameter one
-	(being equal to an Erlang(\eqn{d}) distribution function).}
+	where \eqn{\Gamma_d}{pgamma(.,shape=d)} denotes the distribution
+	function of the gamma distribution with shape parameter \eqn{d}
+	and shape parameter one	(being equal to an
+	Erlang(\eqn{d}) distribution function).}
       \item{\code{"SnB"}}{for computing the test statistic
-	\eqn{\mathrm{S_n^{(B)}}}{S[n]^(B)} from Genest, R\enc{é}{e}millard, Beaudoin (2009).}
+	\eqn{\mathrm{S_n^{(B)}}}{S[n]^(B)} from Genest,
+	R\enc{é}{e}millard, Beaudoin (2009).}
       \item{\code{"SnC"}}{for computing the test statistic
 	\eqn{\mathrm{S_n^{(C)}}}{S[n]^(C)} from Genest et al.(2009).}
   }}
@@ -114,10 +118,12 @@ gofTstat(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
 }
 \value{
   \code{gnacopula} returns an \R object of class \code{"htest"}.
-  This object contains a list with the bootstrap results including the components
+  This object contains a list with the bootstrap results including the
+  components
   \describe{
     \item{\code{p.value}:}{the bootstrapped p-value;}
-    \item{\code{statistic}:}{the value of the test statistic computed for the data \code{u};}
+    \item{\code{statistic}:}{the value of the test statistic computed
+      for the data \code{u};}
     \item{\code{data.name}:}{the name of \code{u};}
     \item{\code{method}:}{a \code{\link{character}} describing the
       goodness-of-fit test applied;}
@@ -193,7 +199,8 @@ qq1dtrafo <- function(uh, ur) {
                       pgamma(rowSums(-log(uh)), shape=d), ## Gamma -> U[0,1]
                       pchisq(rowSums(qnorm(ur)^2), d),    ## Chi^2 -> U[0,1]
                       pgamma(rowSums(-log(ur)), shape=d)), ## Gamma -> U[0,1]
-                      method = rep(c("H.chi2", "H.gam", "R.chi2", "R.gam"), each=n))
+                      method = rep(c("H.chi2", "H.gam", "R.chi2",
+                                     "R.gam"), each=n))
     qqmath(~ z | method, data = d.z, distribution = qunif,
            aspect = "xy", prepanel = prepanel.qqmathline,
            panel = function(x, ...) {

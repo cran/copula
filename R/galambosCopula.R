@@ -14,13 +14,13 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-AfunGalambos <- function(copula, w) {
+AGalambos <- function(copula, w) {
   alpha <- copula@parameters[1]
   A <- 1 - (w^(-alpha) + (1 - w)^(-alpha))^(-1/alpha)
   ifelse(w == 0 | w == 1, 1, A)
 }
 
-AfunDerGalambos <- function(copula, w) {
+dAduGalambos <- function(copula, w) {
   alpha <- copula@parameters[1]
   ## deriv(expression(1 - (w^(-alpha) + (1 - w)^(-alpha))^(-1/alpha)), "w", hessian=TRUE)
   value <- eval(expression({
@@ -51,7 +51,7 @@ AfunDerGalambos <- function(copula, w) {
   data.frame(der1 = der1, der2 = der2)
 }
 
-derAfunWrtParamGalambos <- function(copula, w) {
+dAdthetaGalambos <- function(copula, w) {
   alpha <- copula@parameters[1]
   ## deriv(expression(1 - (w^(-alpha) + (1 - w)^(-alpha))^(-1/alpha)), "alpha", hessian=TRUE)
   value <- eval(expression({
@@ -95,11 +95,11 @@ derAfunWrtParamGalambos <- function(copula, w) {
 }
 
 
-galambosCopula <- function(param) {
+galambosCopula <- function(param = NA_real_) {
   dim <- 2L
   cdf <- expression( exp(log(u1 * u2) *  (1 - ((log(u2) / log(u1 * u2))^(-alpha) + (1 - (log(u2) / log(u1 * u2)))^(-alpha))^(-1/alpha))) )
-  derCdfWrtU1 <- D(cdf, "u1")
-  pdf <- D(derCdfWrtU1, "u2")
+  dCdU1 <- D(cdf, "u1")
+  pdf <- D(dCdU1, "u2")
 
   new("galambosCopula",
              dimension = dim,
@@ -108,10 +108,10 @@ galambosCopula <- function(param) {
              param.names = "param",
              param.lowbnd = 0,
              param.upbnd = Inf,
-             message = "Galambos copula family; Extreme value copula")
+             fullname = "Galambos copula family; Extreme value copula")
 }
 
-pgalambosCopula <- function(copula, u) {
+pgalambosCopula <- function(u, copula) {
   dim <- copula@dimension
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
@@ -119,7 +119,7 @@ pgalambosCopula <- function(copula, u) {
   c(eval(galambosCopula.algr$cdf))
 }
 
-dgalambosCopula <- function(copula, u, log=FALSE, ...) {
+dgalambosCopula <- function(u, copula, log=FALSE, ...) {
   dim <- copula@dimension
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
@@ -131,7 +131,7 @@ dgalambosCopula <- function(copula, u, log=FALSE, ...) {
   else  c(eval(galambosCopula.algr$pdf))
 }
 
-rgalambosCopula <- function(copula, n) {
+rgalambosCopula <- function(n, copula) {
   u1 <- runif(n)
   v <- runif(n)
   alpha <- copula@parameters[1]
@@ -158,12 +158,12 @@ galambosTauFun <- function(alpha) {
   valFun(theta)
 }
 
-kendallsTauGalambosCopula <- function(copula) {
+tauGalambosCopula <- function(copula) {
   alpha <- copula@parameters[1]
   galambosTauFun(alpha)
 }
 
-calibKendallsTauGalambosCopula <- function(copula, tau) {
+iTauGalambosCopula <- function(copula, tau) {
   if (any(tau < 0)) warning("tau is out of the range [0, 1]")
   galambosTauInv <- approxfun(x = .galambosTau$assoMeasFun$fm$ysmth,
                               y = .galambosTau$assoMeasFun$fm$x, rule = 2)
@@ -184,7 +184,7 @@ galambosTauDer <- function(alpha) {
   valFun(theta, 1) * forwardDer(alpha, ss)
 }
 
-tauDerGalambosCopula <- function(copula) {
+dTauGalambosCopula <- function(copula) {
   alpha <- copula@parameters[1]
   galambosTauDer(alpha)
 }
@@ -198,12 +198,12 @@ galambosRhoFun <- function(alpha) {
   valFun(theta)
 }
 
-spearmansRhoGalambosCopula <- function(copula) {
+rhoGalambosCopula <- function(copula) {
   alpha <- copula@parameters[1]
   galambosRhoFun(alpha)
 }
 
-calibSpearmansRhoGalambosCopula <- function(copula, rho) {
+iRhoGalambosCopula <- function(copula, rho) {
   if (any(rho < 0)) warning("rho is out of the range [0, 1]")
   galambosRhoInv <- approxfun(x = .galambosRho$assoMeasFun$fm$ysmth,
                               y = .galambosRho$assoMeasFun$fm$x, rule = 2)
@@ -223,26 +223,29 @@ galambosRhoDer <- function(alpha) {
   valFun(theta, 1) * forwardDer(alpha, ss)
 }
 
-rhoDerGalambosCopula <- function(copula) {
+dRhoGalambosCopula <- function(copula) {
   alpha <- copula@parameters[1]
   galambosRhoDer(alpha)
 }
 
 ################################################################################
 
-setMethod("pcopula", signature("galambosCopula"), pgalambosCopula)
-setMethod("dcopula", signature("galambosCopula"), dgalambosCopula)
+setMethod("pCopula", signature("numeric", "galambosCopula"),pgalambosCopula)
+setMethod("pCopula", signature("matrix", "galambosCopula"), pgalambosCopula)
+setMethod("dCopula", signature("numeric", "galambosCopula"),dgalambosCopula)
+setMethod("dCopula", signature("matrix", "galambosCopula"), dgalambosCopula)
+
 ## revCopula is much faster
-## setMethod("rcopula", signature("galambosCopula"), rgalambosCopula)
+## setMethod("rCopula", signature("galambosCopula"), rgalambosCopula)
 
-setMethod("Afun", signature("galambosCopula"), AfunGalambos)
-setMethod("AfunDer", signature("galambosCopula"), AfunDerGalambos)
+setMethod("A", signature("galambosCopula"), AGalambos)
+setMethod("dAdu", signature("galambosCopula"), dAduGalambos)
 
-setMethod("kendallsTau", signature("galambosCopula"), kendallsTauGalambosCopula)
-setMethod("spearmansRho", signature("galambosCopula"), spearmansRhoGalambosCopula)
+setMethod("tau", signature("galambosCopula"), tauGalambosCopula)
+setMethod("rho", signature("galambosCopula"), rhoGalambosCopula)
 
-setMethod("calibKendallsTau", signature("galambosCopula"), calibKendallsTauGalambosCopula)
-setMethod("calibSpearmansRho", signature("galambosCopula"), calibSpearmansRhoGalambosCopula)
+setMethod("iTau", signature("galambosCopula"), iTauGalambosCopula)
+setMethod("iRho", signature("galambosCopula"), iRhoGalambosCopula)
 
-setMethod("tauDer", signature("galambosCopula"), tauDerGalambosCopula)
-setMethod("rhoDer", signature("galambosCopula"), rhoDerGalambosCopula)
+setMethod("dTau", signature("galambosCopula"), dTauGalambosCopula)
+setMethod("dRho", signature("galambosCopula"), dRhoGalambosCopula)

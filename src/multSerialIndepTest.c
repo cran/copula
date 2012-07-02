@@ -15,27 +15,23 @@
   this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
+/**
+ * @file   multSerialIndepTest.c
+ * @author Ivan Kojadinovic
+ * @date   December 2007
+ *
+ * @brief Multivariate serial independence test based on the empirical
+ *        copula process -- see AISM paper
+ *
+ */
 
-/*****************************************************************************
-
-  Multivariate serial independence test based on the empirical
-  copula process
-
-  Ivan Kojadinovic, December 2007
-
-*****************************************************************************/
 
 #include <R.h>
 #include <Rmath.h>
-#include "set.utils.h"
-#include "empcop.stat.h"
+#include "set_utils.h"
+#include "indepTests.h"
 
-/*****************************************************************************
-
-  Array J
-
-******************************************************************************/
-
+/// Temporary array J
 void J_sm(int n, int p, int q, const double U[], const int B[], double *J)
 {
   int i, j, k, l, m, np = n + p - 1;
@@ -52,25 +48,27 @@ void J_sm(int n, int p, int q, const double U[], const int B[], double *J)
 	}
 }
 
-/*****************************************************************************
-
-  Bootstrap/permutation of the MAn, up to subsets of cardinality p containing 1
-  and of In
-  n + p - 1: sample size
-  N: number of repetitions
-  p: number of lags + 1
-  m: max. card. of A
-  MA0: bootstrap values of MAn under serial independence (N repetitions)
-  I0: bootstrap values of In under serial independence (N repetitions)
-  subset: subsets of {1,...,p} in binary notation (int) whose card. is
-  between 2 and m in "natural" order and that contain 1
-  subset_char: similar, for printing
-
-******************************************************************************/
-
+/**
+ * Bootstrap/permutation of the MAn, up to subsets of cardinality p
+ * containing 1 and of In
+ *
+ * @param n n+p-1 is the available sample size
+ * @param N number of repetitions
+ * @param p number of lags + 1
+ * @param q number of columns of U
+ * @param U pseudo-observations
+ * @param m max. card. of A
+ * @param MA0 bootstrap values of MAn under serial independence (N repetitions)
+ * @param I0 bootstrap values of In under serial independence (N repetitions)
+ * @param subset subsets of {1,...,p} in binary notation (int) whose card. is
+ *               between 2 and m in "natural" order and that contain 1
+ * @param subset_char similar, for printing
+ * @param verbose display progress bar if > 0
+ * @author Ivan Kojadinovic
+ */
 void bootstrap_serial(int *n, int *N, int *p, int *q, double *U, int *m,
 		      double *MA0, double *I0, int *subset, char **subset_char,
-		      int *pe)
+		      int *verbose)
 {
   int i, k, np = *n + *p - 1, p1[1], m1[1], sb[1];
   int *B = Calloc(np, int);
@@ -102,9 +100,6 @@ void bootstrap_serial(int *n, int *N, int *p, int *q, double *U, int *m,
   /* N repetitions */
   for (k=0;k<*N;k++) {
 
-    if ((*pe > 0) && ((k+1) % (*pe) == 0))
-      Rprintf("Simulation iteration %d\n",k+1);
-
     /* identity row selection */
     for (i=0;i<np;i++)
       B[i] = i;
@@ -130,6 +125,9 @@ void bootstrap_serial(int *n, int *N, int *p, int *q, double *U, int *m,
 
     /* global statistic */
     I0[k] = I_n(*n, *p, J, K, L);
+
+    if (*verbose)
+      progressBar(k, *N, 70);
   }
   PutRNGstate();
 
@@ -140,26 +138,28 @@ void bootstrap_serial(int *n, int *N, int *p, int *q, double *U, int *m,
   Free(L);
 }
 
-/*****************************************************************************
-
-  Compute MAn for subsets of cardinality 2 to p containing 1
-  U: ranks/np (pseudo-obs)
-  n + p - 1: sample size
-  p: number of lags + 1
-  q: dimension of the time series
-  m: max. cardinality of subsets of {1,...,p}
-  MA0: simulated values of TA under independence (size: N * (sb - 1))
-  where sb = sum_binom(p-1,m-1)
-  N: number of repetitions (nrows MA0, fisher0, tippett0)
-  subset: subsets of {1,...,p} in binary notation (int) whose card. is
-  between 2 and m in "natural" and order containing 1
-  MA: test statistics (size: sum.bin. - 1)
-  pval: corresponding p-values (size = sum.bin. - 1)
-  fisher: pvalue à la Fisher
-  tippett: pvalue à la Tippett
-
-******************************************************************************/
-
+/**
+ * Compute the MAn for subsets of cardinality 2 up to p containing 1, as
+ * well as the global statistic I
+ *
+ * @param U pseudo-observations
+ * @param n n+p-1 is the available sample size
+ * @param p number of lags + 1
+ * @param q dimension of the time series
+ * @param m max. cardinality of subsets of {1,...,p}
+ * @param MA0 simulated values of MA under independence (size: N * (sb - 1))
+ * @param I0 simulated values of I under independence
+ * @param N number of repetitions (nrows MA0, fisher0, tippett0)
+ * @param subset subsets of {1,...,p} in binary notation (int) whose card. is
+ *               between 2 and m in "natural" and order containing 1
+ * @param MA test statistics (size: sum.bin. - 1)
+ * @param I global test statistic
+ * @param pval p-values for the MA (size = sum.bin. - 1)
+ * @param fisher pvalue à la Fisher
+ * @param tippett pvalue à la Tippett
+ * @param Ipval pvalue for I
+ * @author Ivan Kojadinovic
+ */
 void empirical_copula_test_rv_serial(double *U, int *n, int *p, int *q, int *m, double *MA0,
 				     double *I0, int *N, int *subset, double *MA, double *I,
 				     double *pval, double *fisher, double *tippett, double *Ipval)

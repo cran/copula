@@ -13,7 +13,12 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
-tCopula <- function(param, dim = 2L, dispstr = "ex", df = 4, df.fixed = FALSE) {
+### TODO:  {also for "normalCopula"}
+##  1) allow "param = NA" --
+##  2) ndim(dim, dispstr, df.fixed) |-->  "dimension" (length) of param
+##  3) validity should check  pos.definiteness for "un"structured (maybe "toeplitz"
+##
+tCopula <- function(param = NA_real_, dim = 2L, dispstr = "ex", df = 4, df.fixed = FALSE) {
   dim <- as.integer(dim)
   stopifnot((pdim <- length(param)) >= 1, is.numeric(param))
   parameters <- param
@@ -36,7 +41,7 @@ tCopula <- function(param, dim = 2L, dispstr = "ex", df = 4, df.fixed = FALSE) {
              param.names = param.names,
              param.lowbnd = param.lowbnd,
              param.upbnd = param.upbnd,
-             message = paste("t copula family",
+             fullname = paste("t copula family",
                if(df.fixed) paste("df fixed at", df) else NULL),
              getRho = function(obj) {
                if (df.fixed) obj@parameters
@@ -51,20 +56,18 @@ getdf <- function(object) {
       object@parameters[length(object@parameters)]
 }
 
-rtCopula <- function(copula, n) {
-  dim <- copula@dimension
+rtCopula <- function(n, copula) {
   df <- getdf(copula)
-  sigma <- getSigma(copula)
-  pt(rmvt(n, sigma = sigma, df = df), df = df)
+  pt(rmvt(n, sigma = getSigma(copula), df = df), df = df)
 }
 
 
-ptCopula <- function(copula, u) {
+ptCopula <- function(u, copula) {
   dim <- copula@dimension
   sigma <- getSigma(copula)
   df <- getdf(copula)
   if(df != as.integer(df))
-    stop("'df' is not integer; therefore, pcopula() cannot be computed yet")
+    stop("'df' is not integer; therefore, pCopula() cannot be computed yet")
   if(!is.matrix(u)) u <- matrix(u, ncol = dim)
   u[u < 0] <- 0
   u[u > 1] <- 1
@@ -78,7 +81,7 @@ ptCopula <- function(copula, u) {
 
 }
 
-dtCopula <- function(copula, u, log = FALSE, ...) {
+dtCopula <- function(u, copula, log = FALSE, ...) {
   dim <- copula@dimension
   sigma <- getSigma(copula)
   df <- getdf(copula)
@@ -107,25 +110,30 @@ tailIndexTCopula <- function(copula) {
   c(upper=upper, lower=lower)
 }
 
-kendallsTauTCopula <- function(copula) {
+tauTCopula <- function(copula) {
   rho <- copula@getRho(copula)
   2 * asin(rho) /pi
 }
 
-spearmansRhoTCopula <- function(copula) {
+rhoTCopula <- function(copula) {
   rho <- copula@getRho(copula)
   asin(rho / 2) * 6 / pi
 }
 
-setMethod("rcopula", signature("tCopula"), rtCopula)
-setMethod("pcopula", signature("tCopula"), ptCopula)
-setMethod("dcopula", signature("tCopula"), dtCopula)
+setMethod("rCopula", signature("numeric", "tCopula"), rtCopula)
+
+setMethod("pCopula", signature("matrix", "tCopula"), ptCopula)
+setMethod("pCopula", signature("numeric", "tCopula"),ptCopula)
+setMethod("dCopula", signature("matrix", "tCopula"), dtCopula)
+setMethod("dCopula", signature("numeric", "tCopula"),dtCopula)
+
+
 
 setMethod("show", signature("tCopula"), showTCopula)
 
-setMethod("kendallsTau", signature("tCopula"), kendallsTauTCopula)
-setMethod("spearmansRho", signature("tCopula"), spearmansRhoTCopula)
+setMethod("tau", signature("tCopula"), tauTCopula)
+setMethod("rho", signature("tCopula"), rhoTCopula)
 setMethod("tailIndex", signature("tCopula"), tailIndexTCopula)
 
-setMethod("calibKendallsTau", signature("tCopula"), calibKendallsTauEllipCopula)
-setMethod("calibSpearmansRho", signature("tCopula"), calibSpearmansRhoEllipCopula)
+setMethod("iTau", signature("tCopula"), iTauEllipCopula)
+setMethod("iRho", signature("tCopula"), iRhoEllipCopula)

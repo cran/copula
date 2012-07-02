@@ -1,6 +1,6 @@
 \name{getAcop}
 \alias{getAcop}
-\title{Get "acopula" Family Object by Name}
+\title{Get "acopula" family object by name}
 \description{
   Get one of our "acopula" family objects (see \link{acopula-families} by name.
 }

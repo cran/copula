@@ -15,28 +15,22 @@
   this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-
-/*****************************************************************************
-
-  Independence test among random vectors based on the empirical
-  copula process
-
-  Ivan Kojadinovic, December 2007
-
-*****************************************************************************/
+/**
+ * @file   multIndepTest.c
+ * @author Ivan Kojadinovic
+ * @date   December 2007
+ *
+ * @brief  Independence test among random vectors based on the empirical
+ *         copula process -- see JMVA 2009 paper
+ *
+ */
 
 #include <R.h>
 #include <Rmath.h>
+#include "set_utils.h"
+#include "indepTests.h"
 
-#include "set.utils.h"
-#include "empcop.stat.h"
-
-/*****************************************************************************
-
-  Array J
-
-******************************************************************************/
-
+/// Temporary array J
 void J_m(int n, int p, const int b[], const double U[], const int R[],
 	 double *J)
 {
@@ -53,25 +47,27 @@ void J_m(int n, int p, const int b[], const double U[], const int R[],
 	}
 }
 
-/*****************************************************************************
-
-  Bootstrap of the MAn, up to subsets of cardinality p
-  and of In
-  n: sample size
-  N: number of repetitions
-  p: dimension of data
-  m: max. card. of A
-  MA0: bootstrap values of MAn under independence (N repetitions)
-  I0: bootstrap values of In under independence (N repetitions)
-  subset: subsets of {1,...,p} in binary notation (int) whose card. is
-  between 2 and m in "natural" order
-  subset_char: similar, for printing
-
-******************************************************************************/
-
+/**
+ * Bootstrap of the MAn, up to subsets of cardinality p,
+ * and of In
+ *
+ * @param n sample size
+ * @param N number of repetitions
+ * @param p number of random vectors
+ * @param b vector of vector dimensions
+ * @param U pseudo-observations
+ * @param m max. card. of A
+ * @param MA0 bootstrap values of MAn under independence (N repetitions)
+ * @param I0 bootstrap values of In under independence (N repetitions)
+ * @param subset subsets of {1,...,p} in binary notation (int) whose card. is
+ *        between 2 and m in "natural" order
+ * @param subset_char similar, for printing
+ * @param verbose display progress bar if > 0
+ * @author Ivan Kojadinovic
+ */
 void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
-	       double *MA0, double *I0, int *subset, char **subset_char,
-	       int *pe)
+		    double *MA0, double *I0, int *subset, char **subset_char,
+		    int *verbose)
 {
   int i, j, k, sb[1];
   int *R = Calloc((*n) * (*p), int);
@@ -93,10 +89,6 @@ void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
 
   /* N repetitions */
   for (k=0; k<*N; k++) {
-
-    if ((*pe > 0) && ((k+1) % (*pe) == 0))
-      Rprintf("Simulation iteration %d\n",k+1);
-
     /* generate row selection within the blocks */
     /* for (j=0;j<*p;j++)
       for (i=0;i<*n;i++)
@@ -128,6 +120,9 @@ void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
       MA0[k + (*N) * (i - *p - 1)] =  M_A_n(*n, *p, J, K, L, subset[i]);
     /* global statistic */
     I0[k] = I_n(*n, *p, J, K, L);
+    
+    if (*verbose)
+      progressBar(k, *N, 70);
   }
   PutRNGstate();
 
@@ -157,6 +152,28 @@ void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
 
 ******************************************************************************/
 
+/**
+ * Compute the MAn for subsets of cardinality 2 to up to p as well as
+ * the global statistic I
+ *
+ * @param U pseudo-observations
+ * @param n sample size
+ * @param p number of random vectors
+ * @param b vector of vector dimensions
+ * @param m max. cardinality of subsets of {1,...,p}
+ * @param MA0 simulated values of TA under independence (size: N * (sb - p - 1))
+ * @param I0 simulated values of I under independence
+ * @param N number of repetitions (nrows MA0, fisher0, tippett0)
+ * @param subset subsets of {1,...,p} in binary notation (int) whose card. is
+ *               between 2 and m in "natural" order
+ * @param MA test statistics (size: sum.bin. - p - 1)
+ * @param I global test statistic
+ * @param pval p-values corresponding to MA (size = sum.bin. - p - 1)
+ * @param fisher pvalue à la Fisher
+ * @param tippett pvalue à la Tippett
+ * @param Ipval pvalue of I
+ * @author Ivan Kojadinovic
+ */
 void empirical_copula_test_rv(double *U, int *n, int *p, int *b, int *m, double *MA0,
 			      double *I0, int *N, int *subset, double *MA, double *I,
 			      double *pval, double *fisher, double *tippett, double *Ipval)

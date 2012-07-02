@@ -14,12 +14,14 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-##------- FIXME{MM}: Shouldn't all these inherit from "htest" (and use its print() method)?
-##        and ditto for all other ./*Tests.R  !!!
-
-
-### EV test based on Cn ########################################################
-
+##' Test of extreme-value dependence based on the empirical copula
+##' See CJS paper for more details
+##'
+##' @title Test of EV dependence based on the empirical copula
+##' @param x the data
+##' @param N number of multiplier replications
+##' @return an object of class 'htest'
+##' @author Ivan Kojadinovic
 evTestC <- function(x, N = 1000)
 {
   ## make pseudo-observations
@@ -82,21 +84,23 @@ evTestC <- function(x, N = 1000)
   s0 <- matrix(out$s0, ncol = nr, byrow = TRUE)
   comb.s <- sum(out$stat)
   comb.pval <- ( sum( apply(s0, 1, sum) >= comb.s ) + 0.5 ) / (N + 1)
-  evt <- list(statistic=comb.s,pvalue=comb.pval)
-  class(evt) <- "evTest"
-  evt
+
+  structure(class = "htest",
+	    list(method = "Max-stability based test of extreme-value dependence for multivariate copulas",
+                 statistic = c(statistic = comb.s),
+                 p.value = comb.pval,
+                 data.name = deparse(substitute(x))))
+
 }
 
-print.evTest <- function(x, ...)
-{
-  cat("Statistic:", x$statistic,
-      "with p-value", x$pvalue, "\n\n")
-  invisible(x)
-}
-
-
-### EV test based on An ########################################################
-
+##' Test of bivariate extreme-value dependence based on the CFG estimator
+##'
+##' @title Test of bivariate extreme-value dependence based on the CFG estimator
+##' @param x the data
+##' @param N number of multiplier replications
+##' @param derivatives can be either "An" or "Cn"
+##' @return an object of class 'htest'
+##' @author Ivan Kojadinovic
 evTestA <- function(x, N = 1000, derivatives = "An")
 {
   ## make pseudo-observations
@@ -123,82 +127,44 @@ evTestA <- function(x, N = 1000, derivatives = "An")
           stat = double(1),
           as.double(offset))$stat
 
-  if (derivatives == "Cn")
-    s0 <- .C(evtestA,
-             as.double(u[,1]),
-             as.double(u[,2]),
-             as.integer(n),
-             as.double(g[,1]),
-             as.double(g[,2]),
-             as.integer(m),
-             as.integer(estimator == "CFG"),
-             as.integer(N),
-             s0 = double(N))$s0
+  s0 <- if (derivatives == "Cn")
+      .C(evtestA,
+         as.double(u[,1]),
+         as.double(u[,2]),
+         as.integer(n),
+         as.double(g[,1]),
+         as.double(g[,2]),
+         as.integer(m),
+         as.integer(estimator == "CFG"),
+         as.integer(N),
+         s0 = double(N))$s0
   else
-    s0 <- .C(evtestA_derA,
-             as.double(u[,1]),
-             as.double(u[,2]),
-             as.integer(n),
-             as.double(g[,1]),
-             as.double(g[,2]),
-             as.integer(m),
-             as.integer(estimator == "CFG"),
-             as.integer(N),
-             s0 = double(N))$s0
+      .C(evtestA_derA,
+         as.double(u[,1]),
+         as.double(u[,2]),
+         as.integer(n),
+         as.double(g[,1]),
+         as.double(g[,2]),
+         as.integer(m),
+         as.integer(estimator == "CFG"),
+         as.integer(N),
+         s0 = double(N))$s0
 
-  evt <- list(statistic=s, pvalue=(sum(s0 >= s)+0.5)/(N+1))
-  class(evt) <- "evTest"
-  evt
+  structure(class = "htest",
+	    list(method = paste("Test of bivariate extreme-value dependence based on the CFG estimator with argument 'derivatives' set to '",
+                 derivatives, "'", sep=""),
+                 statistic = c(statistic = s),
+                 p.value = (sum(s0 >= s)+0.5)/(N+1),
+                 data.name = deparse(substitute(x))))
+
 }
 
-
-### EV test based on An CFG - An Pickands ######################################
-
-evTestAA <- function(x, N = 1000,  derivatives = "Cn", m = 100)
-{
-  ## make pseudo-observations
-  n <- nrow(x)
-  u <- apply(x,2,rank)/(n+1)
-
-  ## make grid
-  g <- seq(1/m, 1 - 1/m, len = m)
-
-  ## compute the test statistic
-  s <- .C(evTestAA_stat,
-          as.double(-log(u[,1])),
-          as.double(-log(u[,2])),
-          as.integer(n),
-          as.double(g),
-          as.integer(m),
-          stat = double(1))$stat
-
-  if (derivatives == "Cn")
-    s0 <- .C(evTestAA,
-             as.double(u[,1]),
-             as.double(u[,2]),
-             as.integer(n),
-             as.double(g),
-             as.integer(m),
-             as.integer(N),
-             s0 = double(N))$s0
-  else
-    s0 <- .C(evTestAA_derA,
-             as.double(u[,1]),
-             as.double(u[,2]),
-             as.integer(n),
-             as.double(g),
-             as.integer(m),
-             as.integer(N),
-             s0 = double(N))$s0
-
-  structure(class = "evTest",
-            list(statistic=s, pvalue=(sum(s0 >= s)+0.5)/(N+1),s0=s0))
-}
-
-
+####################################################################
+### IN THE REMAINING OF THE FILE:
 ### EV test based on K - Ben Ghorbal, Neslehova and Genest (2009)
 ### Canadian Journal of Statistics, volume 37
-### Code provided by Johanna Neslehova
+### Code generously provided by Johanna Neslehova
+####################################################################
 
 ## internal functions
 I <- function(X,i,j)
@@ -364,9 +330,14 @@ GKRstatistic <- function(X, variance=c("fsample","asymptotic","all"))
   return(list(Sn=Sn,tau=tau,mu=mu,psi=psi,var=var))
 }
 
-
-### Test function: GKR test ####################################################
-
+##' Test of bivariate extreme-value dependence based on Kendall's process
+##' See article of Ben Ghorbal, Genest and Neslehova in CJS 2009
+##'
+##' @title Test of bivariate extreme-value dependence based on Kendall's process
+##' @param x the data
+##' @param method one of "fsample","asymptotic","jackknife"
+##' @return an object of class 'htest'
+##' @author Johanna Neslehova
 evTestK <- function(x, method = c("fsample","asymptotic","jackknife"))
 {
   method <- match.arg(method)
@@ -393,7 +364,11 @@ evTestK <- function(x, method = c("fsample","asymptotic","jackknife"))
   ##calpha <- qnorm((1-alpha/2))
   ##reject <- (abs(Tn)>calpha)
   p.value <- pnorm(-abs(Tn))+pnorm(abs(Tn),lower.tail=FALSE)
-  evt <- list(statistic=Tn, pvalue=p.value, negvar=negvar, method=method)
-  class(evt) <- "evTest"
-  evt
+
+  structure(class = "htest",
+	    list(method = paste("Test of bivariate extreme-value dependence based on Kendall's process with argument 'method' set to '",
+                 method, "'", sep = ""),
+                 statistic = c(statistic = Tn),
+                 p.value = p.value,
+                 data.name = deparse(substitute(x))))
 }

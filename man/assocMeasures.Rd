@@ -1,44 +1,54 @@
 \name{AssocMeasures}
 % \docType{methods}
+\alias{tau}
+\alias{rho}
 \alias{kendallsTau}
 \alias{spearmansRho}
-\alias{tailIndex}
+\alias{iTau}
+\alias{iRho}
 \alias{calibKendallsTau}
 \alias{calibSpearmansRho}
+\alias{tailIndex}
 
-\alias{kendallsTau-methods}
-\alias{kendallsTau,ANY-method}
-\alias{kendallsTau,copula-method}
-\alias{kendallsTau,archmCopula-method}
-\alias{kendallsTau,amhCopula-method}
-\alias{kendallsTau,claytonCopula-method}
-\alias{kendallsTau,frankCopula-method}
-\alias{kendallsTau,gumbelCopula-method}
-\alias{kendallsTau,normalCopula-method}
-\alias{kendallsTau,tCopula-method}
-\alias{kendallsTau,fgmCopula-method}
-\alias{kendallsTau,plackettCopula-method}
-\alias{kendallsTau,galambosCopula-method}
-\alias{kendallsTau,huslerReissCopula-method}
-\alias{kendallsTau,tawnCopula-method}
-\alias{kendallsTau,tevCopula-method}
-\alias{kendallsTau,evCopula-method}
+\alias{tau-methods}
+\alias{tau,ANY-method}
+\alias{tau,copula-method}
+\alias{tau,archmCopula-method}
+\alias{tau,amhCopula-method}
+\alias{tau,claytonCopula-method}
+\alias{tau,frankCopula-method}
+\alias{tau,gumbelCopula-method}
+\alias{tau,joeCopula-method}
+\alias{tau,normalCopula-method}
+\alias{tau,tCopula-method}
+\alias{tau,fgmCopula-method}
+\alias{tau,plackettCopula-method}
+\alias{tau,galambosCopula-method}
+\alias{tau,huslerReissCopula-method}
+\alias{tau,tawnCopula-method}
+\alias{tau,tevCopula-method}
+\alias{tau,evCopula-method}
+\alias{tau,acopula-method}
+\alias{tau,nacopula-method}
 
-\alias{spearmansRho-methods}
-\alias{spearmansRho,ANY-method}
-\alias{spearmansRho,copula-method}
-\alias{spearmansRho,normalCopula-method}
-\alias{spearmansRho,tCopula-method}
-\alias{spearmansRho,claytonCopula-method}
-\alias{spearmansRho,gumbelCopula-method}
-\alias{spearmansRho,frankCopula-method}
-\alias{spearmansRho,fgmCopula-method}
-\alias{spearmansRho,plackettCopula-method}
-\alias{spearmansRho,galambosCopula-method}
-\alias{spearmansRho,huslerReissCopula-method}
-\alias{spearmansRho,tawnCopula-method}
-\alias{spearmansRho,tevCopula-method}
-\alias{spearmansRho,evCopula-method}
+\alias{rho-methods}
+\alias{rho,ANY-method}
+\alias{rho,copula-method}
+\alias{rho,normalCopula-method}
+\alias{rho,tCopula-method}
+\alias{rho,claytonCopula-method}
+\alias{rho,frankCopula-method}
+\alias{rho,gumbelCopula-method}
+\alias{rho,amhCopula-method}
+\alias{rho,fgmCopula-method}
+\alias{rho,plackettCopula-method}
+\alias{rho,galambosCopula-method}
+\alias{rho,huslerReissCopula-method}
+\alias{rho,tawnCopula-method}
+\alias{rho,tevCopula-method}
+\alias{rho,evCopula-method}
+\alias{rho,acopula-method}
+\alias{rho,nacopula-method}
 
 \alias{tailIndex-methods}
 \alias{tailIndex,ANY-method}
@@ -47,60 +57,66 @@
 \alias{tailIndex,claytonCopula-method}
 \alias{tailIndex,frankCopula-method}
 \alias{tailIndex,gumbelCopula-method}
+\alias{tailIndex,amhCopula-method}
+\alias{tailIndex,joeCopula-method}
 \alias{tailIndex,normalCopula-method}
 \alias{tailIndex,tCopula-method}
+\alias{tailIndex,acopula-method}
+\alias{tailIndex,nacopula-method}
 
-\alias{calibKendallsTau-methods}
-\alias{calibKendallsTau,ANY-method}
-\alias{calibKendallsTau,copula-method}
-\alias{calibKendallsTau,ellipCopula-method}
-\alias{calibKendallsTau,normalCopula-method}
-\alias{calibKendallsTau,tCopula-method}
-\alias{calibKendallsTau,amhCopula-method}
-\alias{calibKendallsTau,claytonCopula-method}
-\alias{calibKendallsTau,frankCopula-method}
-\alias{calibKendallsTau,gumbelCopula-method}
-\alias{calibKendallsTau,plackettCopula-method}
-\alias{calibKendallsTau,fgmCopula-method}
-\alias{calibKendallsTau,galambosCopula-method}
-\alias{calibKendallsTau,huslerReissCopula-method}
-\alias{calibKendallsTau,tawnCopula-method}
-\alias{calibKendallsTau,tevCopula-method}
+\alias{iTau-methods}
+\alias{iTau,ANY-method}
+\alias{iTau,copula-method}
+\alias{iTau,ellipCopula-method}
+\alias{iTau,normalCopula-method}
+\alias{iTau,tCopula-method}
+\alias{iTau,amhCopula-method}
+\alias{iTau,claytonCopula-method}
+\alias{iTau,frankCopula-method}
+\alias{iTau,gumbelCopula-method}
+\alias{iTau,joeCopula-method}
+\alias{iTau,plackettCopula-method}
+\alias{iTau,fgmCopula-method}
+\alias{iTau,galambosCopula-method}
+\alias{iTau,huslerReissCopula-method}
+\alias{iTau,tawnCopula-method}
+\alias{iTau,tevCopula-method}
+\alias{iTau,nacopula-method}
 
-\alias{calibSpearmansRho-methods}
-\alias{calibSpearmansRho,ANY-method}
-\alias{calibSpearmansRho,copula-method}
-\alias{calibSpearmansRho,ellipCopula-method}
-\alias{calibSpearmansRho,normalCopula-method}
-\alias{calibSpearmansRho,tCopula-method}
-\alias{calibSpearmansRho,claytonCopula-method}
-\alias{calibSpearmansRho,frankCopula-method}
-\alias{calibSpearmansRho,gumbelCopula-method}
-\alias{calibSpearmansRho,galambosCopula-method}
-\alias{calibSpearmansRho,huslerReissCopula-method}
-\alias{calibSpearmansRho,tawnCopula-method}
-\alias{calibSpearmansRho,tevCopula-method}
-\alias{calibSpearmansRho,plackettCopula-method}
-\alias{calibSpearmansRho,fgmCopula-method}
-
-
+\alias{iRho-methods}
+\alias{iRho,ANY-method}
+\alias{iRho,copula-method}
+\alias{iRho,ellipCopula-method}
+\alias{iRho,normalCopula-method}
+\alias{iRho,tCopula-method}
+\alias{iRho,claytonCopula-method}
+\alias{iRho,frankCopula-method}
+\alias{iRho,gumbelCopula-method}
+\alias{iRho,galambosCopula-method}
+\alias{iRho,huslerReissCopula-method}
+\alias{iRho,tawnCopula-method}
+\alias{iRho,tevCopula-method}
+\alias{iRho,plackettCopula-method}
+\alias{iRho,fgmCopula-method}
+\alias{iRho,nacopula-method}
 \title{Dependence measures for copulas}
 \description{
-  These functions compute Kendall's Tau, Spearman's Rho, and the tail
-  dependence index for bivariate copulas. Calibration is the inverse function: it
-  calibrates the copula parameter given the value of Kendall's Tau or Spearman's Rho.
+  These functions compute Kendall's tau, Spearman's rho, and the tail
+  dependence index for bivariate copulas. Calibration is the inverse
+  function: it calibrates the copula parameter given the value of
+  Kendall's tau or Spearman's rho.
 }
 \usage{
-kendallsTau (copula)
-spearmansRho(copula)
+tau (copula, \dots)
+rho (copula, \dots)
 tailIndex(copula, \dots)
-calibKendallsTau (copula, tau)
-calibSpearmansRho(copula, rho)
+iTau (copula, tau, \dots)
+iRho (copula, rho, \dots)
 }
 \arguments{
   \item{copula}{an \R object of class \code{"\linkS4class{copula}"}.}
-  \item{tau}{ a numerical value of Kendall's Tau in [-1, 1]. }
-  \item{rho}{ a numerical value of Spearman's Rho in [-1, 1]. }
+  \item{tau}{ a numerical value of Kendall's tau in [-1, 1]. }
+  \item{rho}{ a numerical value of Spearman's rho in [-1, 1]. }
   \item{\dots}{ currently nothing. }
 }
 \details{
@@ -119,40 +135,41 @@ calibSpearmansRho(copula, rho)
   Understanding relationships using copulas.
   \emph{North American Actuarial Journal} \bold{2}, 1--25.
 
-  I. Kojadinovic and J. Yan (2010). Comparison of three semiparametric methods
-  for estimating dependence parameters in copula models.
+  Iwan Kojadinovic and Jun Yan (2010)
+  Comparison of three semiparametric methods for estimating dependence
+  parameters in copula models.
   \emph{Insurance: Mathematics and Economics} \bold{47}, 52--63.
 }
 \seealso{
   The \code{\linkS4class{acopula}} class objects have slots,
   \code{tau}, \code{lambdaL}, and \code{lambdaU} providing functions for
-  \code{kendallsTau()}, and the two tail indices \code{tailIndex()},
-  and slot \code{tauInv} for \code{calibKendallsTau()}, see the
+  \code{tau()}, and the two tail indices \code{tailIndex()},
+  and slot \code{tauInv} for \code{iTau()}, see the
   examples, and \code{\link{copGumbel}}, etc.
 }
 \examples{
 gumbel.cop <- gumbelCopula(3)
-kendallsTau(gumbel.cop)
-spearmansRho(gumbel.cop)
+tau(gumbel.cop)
+rho(gumbel.cop)
 tailIndex(gumbel.cop)
-
-stopifnot(all.equal(kendallsTau(gumbel.cop), copGumbel@tau(3)),
+iTau(joeCopula(), 0.5)
+%%--- more "tests" are in ../tests/moments.R
+stopifnot(all.equal(tau(gumbel.cop), copGumbel@tau(3)),
 
           all.equal(tailIndex(gumbel.cop),
                     c(copGumbel@lambdaL(3), copGumbel@lambdaU(3)),
                     check.attr=FALSE),
 
-          all.equal(calibKendallsTau (gumbel.cop, 0.681),
+          all.equal(iTau (gumbel.cop, 0.681),
                     copGumbel@tauInv(0.681))
 )
 
-
 ## let us compute the sample versions
-x <- rcopula(gumbel.cop, 200)
+x <- rCopula(200, gumbel.cop)
 cor(x, method = "kendall")
 cor(x, method = "spearman")
 ## compare with the true parameter value 3
-calibKendallsTau (gumbel.cop, cor(x, method="kendall")[1,2])
-calibSpearmansRho(gumbel.cop, cor(x, method="spearman")[1,2])
+iTau (gumbel.cop, cor(x, method="kendall")[1,2])
+iRho(gumbel.cop, cor(x, method="spearman")[1,2])
 }
 \keyword{multivariate}

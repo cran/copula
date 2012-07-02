@@ -16,10 +16,10 @@
 
 ### partial derivatives of the CDF wrt arguments ###############################
 
-setGeneric("derCdfWrtArgs", function(cop, u) standardGeneric("derCdfWrtArgs"))
+setGeneric("dCdu", function(cop, u) standardGeneric("dCdu"))
 
 ## Warning: This function assumes symmetry in u
-derCdfWrtArgsExplicitCopula <- function(cop, u)
+dCduExplicitCopula <- function(cop, u)
   {
     p <- cop@dimension
     alpha <- cop@parameters
@@ -36,7 +36,7 @@ derCdfWrtArgsExplicitCopula <- function(cop, u)
   }
 
 ## this function is used for Khoudraji's device
-derCdfWrtArgsIndepCopula <- function(cop, u) {
+dCduIndepCopula <- function(cop, u) {
   p <- cop@dimension
   mat <- matrix(0, nrow(u), p)
   for (j in 1:p) {
@@ -45,13 +45,13 @@ derCdfWrtArgsIndepCopula <- function(cop, u) {
   mat
 }
 
-setMethod("derCdfWrtArgs", signature("archmCopula"), derCdfWrtArgsExplicitCopula)
-setMethod("derCdfWrtArgs", signature("plackettCopula"), derCdfWrtArgsExplicitCopula)
-setMethod("derCdfWrtArgs", signature("evCopula"), derCdfWrtArgsExplicitCopula)
-setMethod("derCdfWrtArgs", signature("gumbelCopula"), derCdfWrtArgsExplicitCopula)
-setMethod("derCdfWrtArgs", signature("indepCopula"), derCdfWrtArgsIndepCopula)
+setMethod("dCdu", signature("archmCopula"), dCduExplicitCopula)
+setMethod("dCdu", signature("plackettCopula"), dCduExplicitCopula)
+setMethod("dCdu", signature("evCopula"), dCduExplicitCopula)
+setMethod("dCdu", signature("gumbelCopula"), dCduExplicitCopula)
+setMethod("dCdu", signature("indepCopula"), dCduIndepCopula)
 
-derCdfWrtArgsEllipCopula <- function(cop, u)
+dCduEllipCopula <- function(cop, u)
 {
     p <- cop@dimension
     sigma <- getSigma(cop)
@@ -91,7 +91,7 @@ derCdfWrtArgsEllipCopula <- function(cop, u)
 	    }
 	    else {
 		if(df != as.integer(df))
-		    stop("'df' is not integer; therefore, derCdfWrtArgs() cannot be computed yet")
+		    stop("'df' is not integer; therefore, dCdu() cannot be computed yet")
 		for (i in 1:n)
 		    mat[i,j] <- pmvt(lower = rep(-Inf, p - 1),
 				     upper = drop(sqrt((df+1)/(df+v[i,j]^2)) *
@@ -103,7 +103,7 @@ derCdfWrtArgsEllipCopula <- function(cop, u)
     mat
 }
 
-setMethod("derCdfWrtArgs", signature("ellipCopula"), derCdfWrtArgsEllipCopula)
+setMethod("dCdu", signature("ellipCopula"), dCduEllipCopula)
 
 
 ### Plackett formula for elliptical copulas ####################################
@@ -166,10 +166,10 @@ setMethod("plackettFormula", signature("tCopula"), plackettFormulaTCopula)
 
 ### partial derivatives of the CDF wrt parameters ##############################
 
-setGeneric("derCdfWrtParams", function(cop, u) standardGeneric("derCdfWrtParams"))
+setGeneric("dCdtheta", function(cop, u) standardGeneric("dCdtheta"))
 
 
-derCdfWrtParamsExplicitCopula <- function(cop, u)
+dCdthetaExplicitCopula <- function(cop, u)
   {
     p <- cop@dimension
     alpha <- cop@parameters
@@ -178,20 +178,20 @@ derCdfWrtParamsExplicitCopula <- function(cop, u)
     return(as.matrix(eval(der.cdf.alpha, data.frame(u))))
   }
 
-derCdfWrtParamsEvCopula <- function(cop, u) {
+dCdthetaEvCopula <- function(cop, u) {
   alpha <- cop@parameters
   loguv <- log(u[,1], u[,2])
   w <- log(u[,2]) / loguv
-  der.cdf.alpha <- pcopula(cop, u) * loguv * derAfunWrtParam(cop, w)
+  der.cdf.alpha <- pCopula(u, cop) * loguv * dAdtheta(cop, w)
   return(as.matrix(der.cdf.alpha))
 }
 
-setMethod("derCdfWrtParams", signature("archmCopula"), derCdfWrtParamsExplicitCopula)
-setMethod("derCdfWrtParams", signature("plackettCopula"), derCdfWrtParamsExplicitCopula)
-setMethod("derCdfWrtParams", signature("evCopula"), derCdfWrtParamsExplicitCopula)
-setMethod("derCdfWrtParams", signature("gumbelCopula"), derCdfWrtParamsExplicitCopula)
+setMethod("dCdtheta", signature("archmCopula"), dCdthetaExplicitCopula)
+setMethod("dCdtheta", signature("plackettCopula"), dCdthetaExplicitCopula)
+setMethod("dCdtheta", signature("evCopula"), dCdthetaExplicitCopula)
+setMethod("dCdtheta", signature("gumbelCopula"), dCdthetaExplicitCopula)
 
-derCdfWrtParamsEllipCopula <- function(cop, u)
+dCdthetaEllipCopula <- function(cop, u)
   {
     p <- cop@dimension
 
@@ -264,7 +264,7 @@ derCdfWrtParamsEllipCopula <- function(cop, u)
       }
   }
 
-setMethod("derCdfWrtParams", signature("ellipCopula"), derCdfWrtParamsEllipCopula)
+setMethod("dCdtheta", signature("ellipCopula"), dCdthetaEllipCopula)
 
 
 ### Partial derivatives of the PDF wrt arguments for ellipCopula: DIVIDED BY PDF
@@ -423,23 +423,16 @@ derPdfWrtParamsEllipCopula <- function(cop, u)
 setMethod("derPdfWrtParams", signature("ellipCopula"), derPdfWrtParamsEllipCopula)
 
 
-### dcopula wrapper for influence coefficients #################################
+### dCopula wrapper for influence coefficients #################################
 
 setGeneric("dcopwrap",  function(cop, u, ...) standardGeneric("dcopwrap"))
 
-dcopwrapExplicitCopula <- function(cop, u)
-  {
-    return(dcopula(cop,u))
-  }
+dcopwrapExplicitCopula <- function(cop, u) dCopula(u,cop)
 
-setMethod("dcopwrap", signature("archmCopula"), dcopwrapExplicitCopula)
+setMethod("dcopwrap", signature("archmCopula"),	   dcopwrapExplicitCopula)
+setMethod("dcopwrap", signature("evCopula"),	   dcopwrapExplicitCopula)
 setMethod("dcopwrap", signature("plackettCopula"), dcopwrapExplicitCopula)
-setMethod("dcopwrap", signature("evCopula"), dcopwrapExplicitCopula)
-setMethod("dcopwrap", signature("gumbelCopula"), dcopwrapExplicitCopula)
 
-dcopwrapEllipCopula <- function(cop, u)
-  {
-    return(1)
-  }
+dcopwrapEllipCopula <- function(cop, u) rep.int(1, NROW(u))
 
 setMethod("dcopwrap", signature("ellipCopula"), dcopwrapEllipCopula)

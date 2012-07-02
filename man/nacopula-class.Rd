@@ -4,8 +4,7 @@
 \alias{outer_nacopula-class}
 \alias{nacopula-class}
 \alias{dim,nacopula-method}
-%
-\title{Class "nacopula" of Nested Archimedean Copulas}
+\title{Class "nacopula" of nested Archimedean copulas}
 \description{
   Class of nested Archimedean Copulas, \code{"nacopula"},
   and its \emph{specification} \code{"outer_nacopula"}
@@ -20,8 +19,8 @@
 \section{Slots}{
   \describe{
     \item{\code{copula}:}{an object of class
-      \code{"\linkS4class{acopula}"}, denoting the top-level Archimedean copula of
-      the nested Archimedean copula, that is, the root copula.}
+      \code{"\linkS4class{acopula}"}, denoting the top-level Archimedean
+      copula of the nested Archimedean copula, that is, the root copula.}
     \item{\code{comp}:}{an \code{\link{integer}} vector (possibly of
       length 0) of indices of components in \code{1:d} which are not
       nested Archimedean copulas.  Here, \eqn{d} denotes the
@@ -46,7 +45,8 @@
 \author{Martin Maechler}
 \seealso{
   \code{\link{onacopula}} for building (outer) "nacopula" objects.  For the
-  class definition of the \code{copula} component, see \code{\linkS4class{acopula}}.
+  class definition of the \code{copula} component, see
+  \code{\linkS4class{acopula}}.
 }
 \examples{
 ## nacopula and outer_nacopula class information

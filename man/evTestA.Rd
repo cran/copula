@@ -1,6 +1,5 @@
 \name{evTestA}
 \alias{evTestA}
-
 \title{Bivariate test of extreme-value dependence based on the Pickands
   dependence function}
 \description{
@@ -14,7 +13,6 @@
 \usage{
 evTestA(x, N = 1000, derivatives = "An")
 }
-
 \arguments{
   \item{x}{ a data matrix that will be transformed to pseudo-observations. }
   \item{N}{ number of multiplier iterations to be used to
@@ -25,32 +23,28 @@ evTestA(x, N = 1000, derivatives = "An")
     \code{"An"} or \code{"Cn"}. The former gives better results for
     samples smaller than 400 but is slower.}
 }
-
 \details{
-
   More details are available in the third reference.
   See also Genest and Segers (2009) and Remillard and Scaillet (2009).
-
 }
 \value{
   Returns a list whose attributes are:
   \item{statistic}{ value of the test statistic. }
-  \item{pvalue}{ corresponding approximate p-value. }
+  \item{p.value}{ corresponding approximate p-value. }
 }
 \references{
-
-  C. Genest and J. Segers (2009). Rank-based inference for bivariate
+  Genest, C. and Segers, J. (2009). Rank-based inference for bivariate
   extreme-value copulas. \emph{Annals of Statistics}, 37, pages 2990-3022.
 
-  B. Remillard and O. Scaillet (2009). Testing for equality between two
-  copulas. \emph{Journal of Multivariate Analysis}, 100(3),
+  R\enc{é}{e}millard, B. and Scaillet, O. (2009). Testing for equality
+  between two copulas. \emph{Journal of Multivariate Analysis}, 100(3),
   pages 377-386.
 
-  I. Kojadinovic and J. Yan (2010). Nonparametric rank-based tests of
+  Kojadinovic, I. and Yan, J. (2010). Nonparametric rank-based tests of
   bivariate extreme-value dependence. \emph{Journal of Multivariate
     Analysis} \bold{101}, 2234--2249.
 
-  I. Kojadinovic and J. Yan (2010). Modeling Multivariate Distributions
+  Kojadinovic, I. and Yan, J. (2010). Modeling Multivariate Distributions
   with Continuous Margins Using the copula R Package. \emph{Journal of
   Statistical Software}, 34(9), pages 1-20.
 }
@@ -61,13 +55,12 @@ evTestA(x, N = 1000, derivatives = "An")
   approximate p-value. One way of dealing with ties was suggested in the
   last reference.
 }
-
 \seealso{ \code{\link{evTestK}}, \code{\link{evTestC}}, \code{\link{evCopula}},
-  \code{\link{gofEVCopula}}, \code{\link{Anfun}}. }
+  \code{\link{gofEVCopula}}, \code{\link{An}}. }
 \examples{
 ## Do these data come from an extreme-value copula?
-uG <- rcopula(gumbelCopula(3), 100)
-uC <- rcopula(claytonCopula(3), 100)
+uG <- rCopula(100, gumbelCopula(3))
+uC <- rCopula(100, claytonCopula(3))
 \donttest{% 48 seconds on MM's lynne (2012-06)
 evTestA(uG)
 evTestA(uG, derivatives = "Cn")
@@ -79,6 +72,5 @@ evTestA(uG[1:10,])
 evTestA(uG[1:10,], derivatives = "Cn")
 }
 }
-
 \keyword{htest}
 \keyword{multivariate}

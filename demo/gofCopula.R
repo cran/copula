@@ -14,7 +14,7 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-x <- rcopula(claytonCopula(3), 200)
+x <- rCopula(200, claytonCopula(3))
 
 ## Does the Gumbel family seem to be a good choice?
 gofCopula(gumbelCopula(1), x)
@@ -27,7 +27,7 @@ gofCopula(claytonCopula(1), x, method="itau")
 
 
 ## A three-dimensional example
-x <- rcopula(tCopula(c(0.5, 0.6, 0.7), dim = 3, dispstr = "un"),200)
+x <- rCopula(200, tCopula(c(0.5, 0.6, 0.7), dim = 3, dispstr = "un"))
 
 ## Does the Clayton family seem to be a good choice?
 gofCopula(gumbelCopula(1, dim = 3), x)

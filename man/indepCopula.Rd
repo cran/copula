@@ -14,12 +14,13 @@ indepCopula(dim = 2)
 \value{
   An independence copula object of class \code{"\linkS4class{indepCopula}"}.
 }
-\seealso{ \code{\link{archmCopula}}, \code{\link{ellipCopula}}, \code{\link{evCopula}}. }
+\seealso{\code{\link{archmCopula}}, \code{\link{ellipCopula}},
+  \code{\link{evCopula}}.}
 \examples{
 indep.cop <- indepCopula(3)
-x <- rcopula(indep.cop, 10)
-dcopula(indep.cop, x)
-persp(indepCopula(), pcopula)
+x <- rCopula(10, indep.cop)
+dCopula(x, indep.cop)
+persp(indepCopula(), pCopula)
 }
 \keyword{ distribution }% at least one, from doc/KEYWORDS
 \keyword{ multivariate }% __ONLY ONE__ keyword per line

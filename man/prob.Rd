@@ -1,11 +1,11 @@
 \name{prob}
 \alias{prob}
 \alias{prob-methods}
-\alias{prob,outer_nacopula-method}
-\title{Computing Probabilities of "nacopula" Objects to Fall in Hypercubes}
+\alias{prob,Copula-method}
+\title{Computing probabilities of hypercubes}
 \description{
   Compute probabilities of a \eqn{d-}dimensional random vector \eqn{U}
-  distributed according to the nested Archimedean copula \code{x} to
+  distributed according to a given copula \code{x} to
   fall in a hypercube \eqn{(l,u]}, where \eqn{l} and \eqn{u} denote the
   lower and upper corners of the hypercube, respectively.
 }
@@ -13,9 +13,8 @@
 prob(x, l, u)
 }
 \arguments{
-  \item{x}{(nested) Archimedean copula of dimension \eqn{d}, that is, an object
-    of class \code{\linkS4class{nacopula}}, typically constructed with
-    \code{\link{onacopula}(..)}.}
+  \item{x}{copula of dimension, that is, an object
+    of class \code{\linkS4class{Copula}}.}
   \item{l, u}{\eqn{d}-dimensional, \code{\link{numeric}}, lower and
     upper hypercube boundaries, respectively, satisfying
     \eqn{0 \le l_i \le u_i \le 1}{0 <= l_i <= u_i <= 1},
@@ -26,9 +25,7 @@ prob(x, l, u)
 }
 \author{Marius Hofert, Martin Maechler}
 \seealso{
-  \code{\link{onacopula}()} for the construction of nested Archimedean
-  copulas, the class \code{\linkS4class{nacopula}}, and the evaluation
-  of nested Archimedean copulas via \code{\link{pnacopula}(.)}.
+  \code{\link{pCopula}(.)}.
 }
 \examples{
 ## Construct a three-dimensional nested Joe copula with parameters
@@ -44,6 +41,9 @@ C3 <- onacopula("J", C(theta0, 1, C(theta1, c(2,3))))
 l <- c(.7,.8,.6)
 u <- c(1,1,1)
 prob(C3, l, u)
+
+## ditto for a bivariate normal copula with rho = 0.8 :
+prob(normalCopula(0.8), c(.2,.4), c(.3,.6))
 }
 \keyword{distribution}
 \keyword{methods}

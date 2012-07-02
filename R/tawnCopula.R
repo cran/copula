@@ -14,13 +14,13 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-AfunTawn <- function(copula, w) {
+ATawn <- function(copula, w) {
   alpha <- copula@parameters[1]
   A <- alpha * w^2 - alpha * w + 1
   ifelse(w == 0 | w == 1, 1, A)
 }
 
-AfunDerTawn <- function(copula, w) {
+dAduTawn <- function(copula, w) {
   alpha <- copula@parameters[1]
   ## deriv(expression(alpha * w^2 - alpha * w + 1), "w", hessian=TRUE)
   value <- eval(expression({
@@ -39,12 +39,12 @@ AfunDerTawn <- function(copula, w) {
   data.frame(der1 = der1, der2 = der2)
 }
 
-tawnCopula <- function(param) {
+tawnCopula <- function(param = NA_real_) {
   dim <- 2L
   ## See Table 1 from Ghoudi, Khoudraji, and Rivest (1998, CJS, in french)
   cdf <- expression( u1 * u2 * exp( - alpha * log(u1) * log(u2) / log(u1 * u2)) )
-  derCdfWrtU1 <- D(cdf, "u1")
-  pdf <- D(derCdfWrtU1, "u2")
+  dCdU1 <- D(cdf, "u1")
+  pdf <- D(dCdU1, "u2")
 
   new("tawnCopula",
              dimension = dim,
@@ -53,10 +53,10 @@ tawnCopula <- function(param) {
              param.names = "param",
              param.lowbnd = 0,
              param.upbnd = 1,
-             message = "Tawn copula family; Extreme value copula")
+             fullname = "Tawn copula family; Extreme value copula")
 }
 
-ptawnCopula <- function(copula, u) {
+ptawnCopula <- function(u, copula) {
   dim <- copula@dimension
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
@@ -64,7 +64,7 @@ ptawnCopula <- function(copula, u) {
   c(eval(tawnCopula.cdf.algr[dim]))
 }
 
-dtawnCopula <- function(copula, u, log=FALSE, ...) {
+dtawnCopula <- function(u, copula, log=FALSE, ...) {
   dim <- copula@dimension
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
@@ -75,22 +75,22 @@ dtawnCopula <- function(copula, u, log=FALSE, ...) {
   if(log) log(val) else val
 }
 
-kendallsTauTawnCopula <- function(copula) {
+tauTawnCopula <- function(copula) {
   alpha <- copula@parameters[1]
   ## the range of tau is [0,  0.4183992]
   8 * atan(sqrt(alpha / (4 - alpha))) / sqrt(alpha * (4 - alpha)) - 2
 }
 
-calibKendallsTauTawnCopula <- function(copula, tau) {
+iTauTawnCopula <- function(copula, tau) {
   alpha <- 1
   taumax <- 8 * atan(sqrt(alpha / (4 - alpha))) / sqrt(alpha * (4 - alpha)) - 2
   bad <- (tau < 0 | tau >= taumax)
   if (any(bad)) warning("tau is out of the range [0, 0.4183992]")
   ifelse(tau <= 0, 0,
-         ifelse(tau >= taumax, 1, calibKendallsTauCopula(copula, tau)))
+         ifelse(tau >= taumax, 1, iTauCopula(copula, tau)))
 }
 
-tauDerTawnCopula <- function(copula) {
+dTauTawnCopula <- function(copula) {
   alpha <- copula@parameters[1]
   ##  deriv(expression( 8 * atan(sqrt(alpha / (4 - alpha))) / sqrt(alpha * (4 - alpha)) - 2), "alpha")
   value <- eval(expression({
@@ -111,7 +111,7 @@ tauDerTawnCopula <- function(copula) {
   attr(value, "gradient")
 }
 
-spearmansRhoTawnCopula <- function(copula) {
+rhoTawnCopula <- function(copula) {
   alpha <- copula@parameters[1]
   ## from Mathematica
   ## the range of rho is [0, 0.58743682]
@@ -119,16 +119,16 @@ spearmansRhoTawnCopula <- function(copula) {
   if(alpha == 0) 0 else 12 * integ - 3
 }
 
-calibSpearmansRhoTawnCopula <- function(copula, rho) {
+iRhoTawnCopula <- function(copula, rho) {
   alpha <- 1
   rhomax <- 12 * ( (8 - alpha) * alpha + 8 * sqrt( (8 - alpha) * alpha ) * atan(sqrt(alpha) / sqrt(8 - alpha)) ) / ( (8 - alpha)^2 * alpha ) - 3
   bad <- (rho < 0 | rho >= rhomax)
   if (any(bad)) warning("rho is out of the range [0, 0.58743682]")
   ifelse(rho <= 0, 0,
-         ifelse(rho >= rhomax, 1, calibSpearmansRhoCopula(copula, rho)))
+         ifelse(rho >= rhomax, 1, iRhoCopula(copula, rho)))
 }
 
-rhoDerTawnCopula <- function(copula) {
+dRhoTawnCopula <- function(copula) {
   alpha <- copula@parameters[1]
   ## deriv(expression(12 * ( (8 - alpha) * alpha + 8 * sqrt( (8 - alpha) * alpha ) * atan(sqrt(alpha) / sqrt(8 - alpha)) ) / ( (8 - alpha)^2 * alpha ) - 3), "alpha")
   value <- eval(expression({
@@ -157,17 +157,20 @@ rhoDerTawnCopula <- function(copula) {
 
 ################################################################################
 
-setMethod("pcopula", signature("tawnCopula"), ptawnCopula)
-setMethod("dcopula", signature("tawnCopula"), dtawnCopula)
+setMethod("pCopula", signature("matrix", "tawnCopula"), ptawnCopula)
+setMethod("pCopula", signature("numeric", "tawnCopula"),ptawnCopula)
+setMethod("dCopula", signature("matrix", "tawnCopula"), dtawnCopula)
+setMethod("dCopula", signature("numeric", "tawnCopula"),dtawnCopula)
 
-setMethod("Afun", signature("tawnCopula"), AfunTawn)
-setMethod("AfunDer", signature("tawnCopula"), AfunDerTawn)
 
-setMethod("kendallsTau", signature("tawnCopula"), kendallsTauTawnCopula)
-setMethod("spearmansRho", signature("tawnCopula"), spearmansRhoTawnCopula)
+setMethod("A", signature("tawnCopula"), ATawn)
+setMethod("dAdu", signature("tawnCopula"), dAduTawn)
 
-setMethod("calibKendallsTau", signature("tawnCopula"), calibKendallsTauTawnCopula)
-setMethod("calibSpearmansRho", signature("tawnCopula"), calibSpearmansRhoTawnCopula)
+setMethod("tau", signature("tawnCopula"), tauTawnCopula)
+setMethod("rho", signature("tawnCopula"), rhoTawnCopula)
 
-setMethod("tauDer", signature("tawnCopula"), tauDerTawnCopula)
-setMethod("rhoDer", signature("tawnCopula"), rhoDerTawnCopula)
+setMethod("iTau", signature("tawnCopula"), iTauTawnCopula)
+setMethod("iRho", signature("tawnCopula"), iRhoTawnCopula)
+
+setMethod("dTau", signature("tawnCopula"), dTauTawnCopula)
+setMethod("dRho", signature("tawnCopula"), dRhoTawnCopula)

@@ -14,14 +14,14 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-AfunHuslerReiss <- function(copula, w) {
+AHuslerReiss <- function(copula, w) {
   alpha <- copula@parameters[1]
   A <- w * pnorm(1 / alpha + 0.5 * alpha * log(w /(1 - w))) +
     (1 - w) * pnorm(1 / alpha - 0.5 * alpha * log(w / (1 - w)))
   ifelse(w == 0 | w == 1, 1, A)
 }
 
-AfunDerHuslerReiss <- function(copula, w) {
+dAduHuslerReiss <- function(copula, w) {
   alpha <- copula@parameters[1]
   ainv <- 1 / alpha
   z <- 0.5 * alpha * log(w / (1 - w))
@@ -56,7 +56,7 @@ AfunDerHuslerReiss <- function(copula, w) {
   data.frame(der1 = der1, der2 = der2)
 }
 
-derAfunWrtParamHuslerReiss <- function(copula, w) {
+dAdthetaHuslerReiss <- function(copula, w) {
   alpha <- copula@parameters[1]
   ainv <- 1 / alpha; a2inv <- 1 / alpha^2
   z <- 0.5 * alpha * log(w / (1 - w))
@@ -69,24 +69,27 @@ derAfunWrtParamHuslerReiss <- function(copula, w) {
   data.frame(der1 = der1, der2 = der2)
 }
 
-huslerReissCopula <- function(param) {
+huslerReissCopula <- function(param = NA_real_) {
   dim <- 2L
-  cdf <- expression( exp(log(u1 * u2) *  ((log(u2) / log(u1 * u2)) * pnorm(1 / alpha + 0.5 * alpha * log((log(u2) / log(u1 * u2)) /(1 - (log(u2) / log(u1 * u2))))) +    (1 - (log(u2) / log(u1 * u2))) * pnorm(1 / alpha - 0.5 * alpha * log((log(u2) / log(u1 * u2)) / (1 - (log(u2) / log(u1 * u2)))))) ) )
-  derCdfWrtU1 <- D(cdf, "u1")
-  pdf <- D(derCdfWrtU1, "u2")
+  cdf <- expression( exp(log(u1 * u2) * (
+      log(u2) / log(u1 * u2)       * pnorm(1 / alpha + 0.5*alpha * log(log(u2) / log(u1 * u2) /(1 - log(u2) / log(u1 * u2)))) +
+      (1 - log(u2) / log(u1 * u2)) * pnorm(1 / alpha - 0.5*alpha * log(log(u2) / log(u1 * u2) /(1 - log(u2) / log(u1 * u2))))
+      ) ) )
+  dCdU1 <- D(cdf, "u1")
+  pdf <- D(dCdU1, "u2")
 
   new("huslerReissCopula",
-             dimension = dim,
-             exprdist = c(cdf = cdf, pdf = pdf),
-             parameters = param[1],
-             param.names = "param",
-             param.lowbnd = 0,
-             param.upbnd = Inf,
-             message = "Husler-Reiss copula family; Extreme value copula")
+      dimension = dim,
+      exprdist = c(cdf = cdf, pdf = pdf),
+      parameters = param[1],
+      param.names = "param",
+      param.lowbnd = 0,
+      param.upbnd = Inf,
+      fullname = "Husler-Reiss copula family; Extreme value copula")
 }
 
 
-phuslerReissCopula <- function(copula, u) {
+phuslerReissCopula <- function(u, copula) {
   dim <- copula@dimension
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
@@ -99,7 +102,7 @@ phuslerReissCopula <- function(copula, u) {
       - u2p * pnorm(1/alpha + 0.5 * alpha * log(u2p / u1p)))
 }
 
-dhuslerReissCopula <- function(copula, u, log=FALSE, ...) {
+dhuslerReissCopula <- function(u, copula, log=FALSE, ...) {
   dim <- copula@dimension
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
@@ -108,7 +111,7 @@ dhuslerReissCopula <- function(copula, u, log=FALSE, ...) {
   alpha <- copula@parameters[1]
   ## Joe (1997, p.142)
   u1p <- -log(u1); u2p <- -log(u2); z <- u1p / u2p
-  val <- 1/ (u1 * u2) * pcopula(copula, u) *
+  val <- 1/ (u1 * u2) * pCopula(u, copula) *
     (pnorm(1/alpha - 0.5 * alpha * log(z)) *
      pnorm(1/alpha + 0.5 * alpha * log(z)) +
      0.5 * alpha / u2p * dnorm(1/alpha + 0.5 * alpha * log(z)))
@@ -117,14 +120,15 @@ dhuslerReissCopula <- function(copula, u, log=FALSE, ...) {
 }
 
 
-rhuslerReissCopula <- function(copula, n) {
+rhuslerReissCopula <- function(n, copula) {
   u1 <- runif(n)
    v <- runif(n)
   alpha <- copula@parameters[1]
   eps <- .Machine$double.eps ^ 0.8  ## don't know a better way
   myfun <- function(u2, u1, v) {
     ## Joe (1997, p.147)
-    phuslerReissCopula(copula, cbind(u1, u2)) / u1 * pnorm(1/alpha + 0.5 * alpha * log(log(u1) / log(u2))) - v
+    phuslerReissCopula(cbind(u1, u2), copula) / u1 *
+        pnorm(1/alpha + 0.5 * alpha * log(log(u1) / log(u2))) - v
   }
   u2 <- sapply(1:n, function(x) uniroot(myfun, c(eps, 1 - eps), v=v[x], u1=u1[x])$root)
   cbind(u1, u2)
@@ -143,20 +147,15 @@ huslerReissTauFun <- function(alpha) {
   valFun(theta)
 }
 
-kendallsTauHuslerReissCopula <- function(copula) {
-  alpha <- copula@parameters[1]
-  huslerReissTauFun(alpha)
-}
-
-calibKendallsTauHuslerReissCopula <- function(copula, tau) {
-  if (any(tau < 0)) warning("tau is out of the range [0, 1]")
+iTauHuslerReissCopula <- function(copula, tau) {
+  if (any(tau < 0)) warning("some tau < 0")
   huslerReissTauInv <- approxfun(x = .huslerReissTau$assoMeasFun$fm$ysmth,
                                  y = .huslerReissTau$assoMeasFun$fm$x, rule = 2)
-
   ss <- .huslerReissTau$ss
   theta <- huslerReissTauInv(tau)
   ifelse(tau <= 0, 0, .huslerReissTau$trFuns$backwardTransf(theta, ss))
 }
+
 
 huslerReissTauDer <- function(alpha) {
   ss <- .huslerReissTau$ss
@@ -168,10 +167,6 @@ huslerReissTauDer <- function(alpha) {
   valFun(theta, 1) * forwardDer(alpha, ss)
 }
 
-tauDerHuslerReissCopula <- function(copula) {
-  alpha <- copula@parameters[1]
-  huslerReissTauDer(alpha)
-}
 
 ## rho
 
@@ -184,13 +179,8 @@ huslerReissRhoFun <- function(alpha) {
   valFun(theta)
 }
 
-spearmansRhoHuslerReissCopula <- function(copula) {
-  alpha <- copula@parameters[1]
-  huslerReissRhoFun(alpha)
-}
-
-calibSpearmansRhoHuslerReissCopula <- function(copula, rho) {
-  if (any(rho < 0)) warning("rho is out of the range [0, 1]")
+iRhoHuslerReissCopula <- function(copula, rho) {
+  if (any(rho < 0)) warning("some rho < 0")
   huslerReissRhoInv <- approxfun(x = .huslerReissRho$assoMeasFun$fm$ysmth,
                                  y = .huslerReissRho$assoMeasFun$fm$x, rule = 2)
 
@@ -209,26 +199,32 @@ huslerReissRhoDer <- function(alpha) {
   valFun(theta, 1) * forwardDer(alpha, ss)
 }
 
-rhoDerHuslerReissCopula <- function(copula) {
-  alpha <- copula@parameters[1]
-  huslerReissRhoDer(alpha)
-}
 
 ################################################################################
 
-setMethod("pcopula", signature("huslerReissCopula"), phuslerReissCopula)
-setMethod("dcopula", signature("huslerReissCopula"), dhuslerReissCopula)
-## revCopula is much faster
-## setMethod("rcopula", signature("huslerReissCopula"), rhuslerReissCopula)
+setMethod("pCopula", signature("numeric", "huslerReissCopula"),phuslerReissCopula)
+setMethod("pCopula", signature("matrix", "huslerReissCopula"), phuslerReissCopula)
 
-setMethod("Afun", signature("huslerReissCopula"), AfunHuslerReiss)
-setMethod("AfunDer", signature("huslerReissCopula"), AfunDerHuslerReiss)
+setMethod("dCopula", signature("numeric", "huslerReissCopula"),dhuslerReissCopula)
+setMethod("dCopula", signature("matrix", "huslerReissCopula"), dhuslerReissCopula)
 
-setMethod("kendallsTau", signature("huslerReissCopula"), kendallsTauHuslerReissCopula)
-setMethod("spearmansRho", signature("huslerReissCopula"), spearmansRhoHuslerReissCopula)
+## inherits from "evCopula" --> revCopula() in ./evCopula.R :
+## setMethod("rCopula", signature("numeric", "huslerReissCopula"), rhuslerReissCopula)
 
-setMethod("calibKendallsTau", signature("huslerReissCopula"), calibKendallsTauHuslerReissCopula)
-setMethod("calibSpearmansRho", signature("huslerReissCopula"), calibSpearmansRhoHuslerReissCopula)
+setMethod("A", signature("huslerReissCopula"), AHuslerReiss)
+setMethod("dAdu", signature("huslerReissCopula"), dAduHuslerReiss)
 
-setMethod("tauDer", signature("huslerReissCopula"), tauDerHuslerReissCopula)
-setMethod("rhoDer", signature("huslerReissCopula"), rhoDerHuslerReissCopula)
+setMethod("tau", signature("huslerReissCopula"), function(copula)
+	  huslerReissTauFun(copula@parameters[1]))
+
+setMethod("rho", signature("huslerReissCopula"), function(copula)
+	  huslerReissRhoFun(copula@parameters[1]))
+
+setMethod("iTau", signature("huslerReissCopula"), iTauHuslerReissCopula)
+setMethod("iRho", signature("huslerReissCopula"), iRhoHuslerReissCopula)
+
+setMethod("dTau", signature("huslerReissCopula"), function(copula)
+	  huslerReissTauDer(copula@parameters[1]))
+
+setMethod("dRho", signature("huslerReissCopula"), function(copula)
+	  huslerReissRhoDer(copula@parameters[1]))

@@ -1,6 +1,6 @@
 \name{dDiag}
 \alias{dDiag}
-\title{Density of the Diagonal of (Nested) Archimedean Copulas}
+\title{Density of the diagonal of (nested) Archimedean copulas}
 \description{
   Evaluate the density of the diagonal of a \eqn{d}-dimensional (nested)
   Archimedean copula.  Note that the diagonal of a copula is a cumulative
@@ -24,18 +24,18 @@ dDiag(u, cop, log=FALSE)
 \references{
 	Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011a),
   \emph{Estimators for Archimedean copulas in high dimensions: A comparison},
-   to be submitted.
+   submitted.
 }
 \seealso{
   \code{\linkS4class{acopula}} class, \code{\link{dnacopula}}.
 }
 \examples{
 th. <- c(0.1, 0.2, 0.5, 0.8, 1.4, 2., 5.)
-curve(dDiag(x, cop=onacopulaL("Clayton", list(th.[1], 1:3))), 0, 1, 
+curve(dDiag(x, cop=onacopulaL("Clayton", list(th.[1], 1:3))), 0, 1,
       n=1000, ylab="dDiag(x, *)", main="Diagonal densities of Clayton")
 abline(h=0, lty=3)
 for(j in 2:length(th.))
-  curve(dDiag(x, cop=onacopulaL("Clayton", list(th.[j], 1:3))), add=TRUE, 
+  curve(dDiag(x, cop=onacopulaL("Clayton", list(th.[j], 1:3))), add=TRUE,
 	     col=j, n=1000)
 legend("topleft", do.call(expression, lapply(th., function(th)
                                  substitute(theta == TH, list(TH=th)))),

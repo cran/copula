@@ -1,8 +1,8 @@
 \name{rnacModel}
 \alias{rnacModel}
-\title{Random nacopula Model}
+\title{Random nacopula model}
 \description{
-  Construct a nested Archimedean copula model,
+  Randomly construct a nested Archimedean copula model,
   %% FIXME
 }
 \usage{
@@ -25,13 +25,11 @@ rnacModel(family, d, pr.comp, rtau0 = function() rbeta(1, 2,4),
   an object of \code{\linkS4class{outer_nacopula}}.
 }
 \author{Martin Maechler, 10 Feb 2012}
-
 \seealso{
   \code{\link{rnacopula}} for generating \eqn{d}-dimensional
   observations from an (outer) \code{\linkS4class{nacopula}}, e.g., from
   the \emph{result} of \code{rnacModel()}.
 }
-
 \examples{
 ## Implicitly tests the function {with validity of outer_nacopula ..}
 set.seed(11)
@@ -43,7 +41,6 @@ for(i in 1:40) {
 		  rtau0 = function() runif(1, 0.1, 0.5))
   mF <- rnacModel("Frank", d=sample(20:25, 1), pr.comp = 0.3, order="seq")
 }
-
 }% Ex.
 \keyword{distribution}
 \keyword{multivariate}

@@ -14,29 +14,19 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-genFunClayton <- function(copula, u) {
+iPsiClayton <- function(copula, u) {
   alpha <- copula@parameters[1]
   ## (u^(-alpha) - 1) / alpha ## This is in Nelson Table 4.1; alpha in denom redundant
   u^(-alpha) - 1
 }
 
-genInvClayton <- function(copula, s) {
+psiClayton <- function(copula, s) {
   alpha <- copula@parameters[1]
   ## (1 + alpha * s)^(-1/alpha) ## corresponding to the comment above
   (1 + s)^(-1/alpha)
 }
 
-genFunDer1Clayton <- function(copula, u) {
-  alpha <- copula@parameters[1]
-  eval(claytonCopula.genfunDer.expr[1])
-}
-
-genFunDer2Clayton <- function(copula, u) {
-  alpha <- copula@parameters[1]
-  eval(claytonCopula.genfunDer.expr[2])
-}
-
-claytonCopula <- function(param, dim = 2L) {
+claytonCopula <- function(param = NA_real_, dim = 2L) {
   ## get expressions of cdf and pdf
   cdfExpr <- function(n) {
     expr <- "u1^(-alpha) - 1"
@@ -59,20 +49,18 @@ claytonCopula <- function(param, dim = 2L) {
   if ((dim <- as.integer(dim)) > 2 && param[1] < 0)
     stop("param can be negative only for dim = 2")
   cdf <- cdfExpr(dim)
-  if (dim <= 6)  pdf <- pdfExpr(cdf, dim)
-  else pdf <- NULL
-  val <- new("claytonCopula",
-             dimension = dim,
-             parameters = param[1],
-             exprdist = c(cdf = cdf, pdf = pdf),
-             param.names = "param",
-             param.lowbnd = if(dim == 2) -1 else 0,
-             param.upbnd = Inf,
-             message = "Clayton copula family; Archimedean copula")
-  val
+  pdf <- if (dim <= 6) pdfExpr(cdf, dim) # else NULL
+  new("claytonCopula",
+      dimension = dim,
+      parameters = param[1],
+      exprdist = c(cdf = cdf, pdf = pdf),
+      param.names = "param",
+      param.lowbnd = if(dim == 2) -1 else 0,
+      param.upbnd = Inf,
+      fullname = "Clayton copula family; Archimedean copula")
 }
 
-rclaytonBivCopula <- function(copula, n) {
+rclaytonBivCopula <- function(n, copula) {
   val <- cbind(runif(n), runif(n))
   alpha <- copula@parameters[1]
   ## This implementation is confirmed by Splus module finmetrics
@@ -85,12 +73,12 @@ rclaytonBivCopula <- function(copula, n) {
 }
 
 
-rclaytonCopula <- function(copula, n) {
+rclaytonCopula <- function(n, copula) {
   dim <- copula@dimension
   alpha <- copula@parameters[1]
   if (abs(alpha - 0) < .Machine$double.eps ^ (1/3))
-    return(rcopula(indepCopula(dim), n))
-  if (dim == 2) return (rclaytonBivCopula(copula, n))
+    return(rCopula(n, indepCopula(dim)))
+  if (dim == 2) return (rclaytonBivCopula(n, copula))
   ## gamma frailty
   val <- matrix(runif(n * dim), nrow = n)
   if (abs(alpha) <= 100 * .Machine$double.eps)
@@ -98,7 +86,7 @@ rclaytonCopula <- function(copula, n) {
   ## gam <- rgamma(n, shape = 1/alpha, rate = 1/alpha) ## fixed from rate = 1
   gam <- rgamma(n, shape = 1/alpha, rate = 1) ## fixed from rate = 1
   gam <- matrix(gam, nrow = n, ncol = dim)
-  genInv(copula, - log(val) / gam)
+  psi(copula, - log(val) / gam)
 }
 
 
@@ -120,19 +108,18 @@ dclaytonCopula <- function(copula, u, ...) {
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
   for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
-  if(log) stop("'log=TRUE' not yet implemented")
   val <- c(eval(copula@exprdist$pdf))
   val[apply(u, 1, function(v) any(v < 0))] <- 0
   val[apply(u, 1, function(v) any(v > 1))] <- 0
 ##   if (alpha < 0) {
-##     cdf <- pcopula(copula, u)
+##     cdf <- pCopula(u, copula)
 ##     bad <- cdf == 0
 ##     val[bad] <- 0
 ##   }
-  val
+  if(log) log(val) else val
 }
 
-dclaytonCopula.pdf <- function(copula, u, log=FALSE) {
+dclaytonCopula.pdf <- function(u, copula, log=FALSE) {
   dim <- copula@dimension
   if (dim > 10) stop("Clayton copula PDF not implemented for dimension > 10.")
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
@@ -153,12 +140,12 @@ dclaytonCopula.pdf <- function(copula, u, log=FALSE) {
 }
 
 
-kendallsTauClaytonCopula <- function(copula) {
+tauClaytonCopula <- function(copula) {
   alpha <- copula@parameters[1]
   alpha / (alpha + 2)
 }
 
-calibKendallsTauClaytonCopula <- function(copula, tau) {
+iTauClaytonCopula <- function(copula, tau) {
   2 * tau / (1 - tau)
 }
 
@@ -183,13 +170,13 @@ claytonRhoDer <- function(alpha) {
   as.vector(if(alpha <= 0) valFunNeg(theta, 1) else valFunPos(theta, 1)) * forwardDer(alpha, ss)
 }
 
-spearmansRhoClaytonCopula <- function(copula) {
+rhoClaytonCopula <- function(copula) {
   alpha <- copula@parameters[1]
   claytonRhoFun(alpha)
 }
 
 
-calibSpearmansRhoClaytonCopula <- function(copula, rho) {
+iRhoClaytonCopula <- function(copula, rho) {
   claytonRhoInvNeg <- approxfun(x = .claytonRhoNeg$assoMeasFun$fm$ysmth,
                                 y = .claytonRhoNeg$assoMeasFun$fm$x)
 
@@ -201,7 +188,7 @@ calibSpearmansRhoClaytonCopula <- function(copula, rho) {
   .claytonRhoPos$trFuns$backwardTransf(theta, ss)
 }
 
-rhoDerClaytonCopula <- function(copula) {
+dRhoClaytonCopula <- function(copula) {
   alpha <- copula@parameters[1]
   claytonRhoDer(alpha)
 }
@@ -212,25 +199,67 @@ tailIndexClaytonCopula <- function(copula) {
     upper= 0)
 }
 
-tauDerClaytonCopula <- function(copula) {
+dTauClaytonCopula <- function(copula) {
   return( 2 / (copula@parameters+2)^2 )
 }
 
-setMethod("rcopula", signature("claytonCopula"), rclaytonCopula)
-setMethod("pcopula", signature("claytonCopula"), pclaytonCopula)
-setMethod("dcopula", signature("claytonCopula"), dclaytonCopula.pdf)
+pMatClayton <- function (u, copula, ...) {
+    stopifnot(ncol(u) == (d <- copula@dimension))
+    th <- copula@parameters
+    if(d == 2 && !copClayton@paraConstr(th)) # for now, .. to support negative tau
+        pclaytonCopula(copula, u=u)
+    else
+        pacopula(u, copClayton, theta=copula@parameters, ...)
+}
 
-setMethod("genFun", signature("claytonCopula"), genFunClayton)
-setMethod("genInv", signature("claytonCopula"), genInvClayton)
-setMethod("genFunDer1", signature("claytonCopula"), genFunDer1Clayton)
-setMethod("genFunDer2", signature("claytonCopula"), genFunDer2Clayton)
+dMatClayton <- function (u, copula, log = FALSE, ...) {
+    stopifnot(ncol(u) == (d <- copula@dimension))
+    th <- copula@parameters
+    if(d == 2 && !copClayton@paraConstr(th)) # for now, .. to support negative tau
+        dclaytonCopula.pdf(u, copula, log=log)
+    else
+        copClayton@dacopula(u, theta=copula@parameters, log=log, ...)
+}
 
-setMethod("kendallsTau", signature("claytonCopula"), kendallsTauClaytonCopula)
-setMethod("spearmansRho", signature("claytonCopula"), spearmansRhoClaytonCopula)
+setMethod("rCopula", signature("numeric", "claytonCopula"), rclaytonCopula)
+
+setMethod("pCopula", signature("numeric", "claytonCopula"),
+	  function (u, copula, ...)
+	  ## was  pclaytonCopula
+          pMatClayton(matrix(u, ncol = dim(copula)), copula, ...))
+setMethod("pCopula", signature("matrix", "claytonCopula"), pMatClayton)
+
+setMethod("dCopula", signature("numeric", "claytonCopula"),
+	  function (u, copula, ...)
+	  ## was  dclaytonCopula.pdf
+          dMatClayton(matrix(u, ncol = dim(copula)), copula, ...))
+setMethod("dCopula", signature("matrix", "claytonCopula"), dMatClayton)
+
+
+setMethod("iPsi", signature("claytonCopula"), iPsiClayton)
+## FIXME {negative tau}
+## setMethod("iPsi", signature("claytonCopula"),
+## 	  function(copula, u) copClayton@iPsi(u, theta=copula@parameters))
+setMethod("psi", signature("claytonCopula"), psiClayton)
+## FIXME {negative tau}
+## setMethod("psi", signature("claytonCopula"),
+## 	  function(copula, s) copClayton@psi(t=s, theta=copula@parameters))
+
+setMethod("diPsi", signature("claytonCopula"),
+	  function(copula, u, degree=1, log=FALSE, ...)
+      {
+	  s <- if(log || degree %% 2 == 0) 1. else -1.
+	  s* copClayton@absdiPsi(u, theta=copula@parameters, degree=degree, log=log, ...)
+      })
+
+
+
+setMethod("tau", signature("claytonCopula"), tauClaytonCopula)
+setMethod("rho", signature("claytonCopula"), rhoClaytonCopula)
 setMethod("tailIndex", signature("claytonCopula"), tailIndexClaytonCopula)
 
-setMethod("calibKendallsTau", signature("claytonCopula"), calibKendallsTauClaytonCopula)
-setMethod("calibSpearmansRho", signature("claytonCopula"), calibSpearmansRhoClaytonCopula)
+setMethod("iTau", signature("claytonCopula"), iTauClaytonCopula)
+setMethod("iRho", signature("claytonCopula"), iRhoClaytonCopula)
 
-setMethod("tauDer", signature("claytonCopula"), tauDerClaytonCopula)
-setMethod("rhoDer", signature("claytonCopula"), rhoDerClaytonCopula)
+setMethod("dTau", signature("claytonCopula"), dTauClaytonCopula)
+setMethod("dRho", signature("claytonCopula"), dRhoClaytonCopula)

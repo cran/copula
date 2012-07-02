@@ -27,9 +27,9 @@ opower <- function(copbase, thetabase) {
     C. <- new("acopula", name = paste("opower", copbase@name, sep=":"),
               ## generator
               psi = function(t,theta) { copbase@psi(t^(1/theta), thetabase) },
-	      psiInv = function(t,theta, log=FALSE) {
-		  if(log) theta * copbase@psiInv(t, thetabase, log=TRUE)
-		  else copbase@psiInv(t, thetabase)^theta
+	      iPsi = function(t,theta, log=FALSE) {
+		  if(log) theta * copbase@iPsi(t, thetabase, log=TRUE)
+		  else copbase@iPsi(t, thetabase)^theta
 	      },
 	      ## parameter interval
 	      paraInterval = interval("[1,Inf)"),
@@ -39,32 +39,32 @@ opower <- function(copbase, thetabase) {
 		  copbase@paraConstr(theta1) && theta1 >= theta0
 	      },
 	      ## absolute value of generator derivatives
-	      psiDabs = function(t, theta, degree=1, n.MC=0,
+	      absdPsi = function(t, theta, degree=1, n.MC=0,
 				 method=c("stirling", "binomial.coeff"), log=FALSE)
 	  {
-	      if(theta == 1) return(copbase@psiDabs(t, theta, degree=degree,
+	      if(theta == 1) return(copbase@absdPsi(t, theta, degree=degree,
 		 n.MC=n.MC, log=log))	# copbase case
 	      is0 <- t == 0
 	      isInf <- is.infinite(t)
 	      res <- numeric(n <- length(t))
-	      res[is0] <- Inf # Note: psiDabs(0, ...) is correct (even for n.MC > 0)
+	      res[is0] <- Inf # Note: absdPsi(0, ...) is correct (even for n.MC > 0)
 	      res[isInf] <- -Inf
 	      n0Inf <- !(is0 | isInf)
 	      if(all(!n0Inf)) return(if(log) res else exp(res))
 	      t. <- t[n0Inf]
 	      if(n.MC > 0) {
-		  res[n0Inf] <- psiDabsMC(t, family=C., theta=theta,
+		  res[n0Inf] <- absdPsiMC(t, family=C., theta=theta,
 					  degree=degree, n.MC=n.MC, log=TRUE)
 	      } else {
 		  k <- 1:degree # compute everything once for 1:degree
 		  beta <- 1/theta
 		  t.beta <- t.^beta   # beta = 1/theta for psi(t^beta)
 		  ## in principle, it would be efficient to vectorize
-		  ## the psiDabs slots also in the parameter "degree",
+		  ## the absdPsi slots also in the parameter "degree",
 		  ## but that would be even more complicated
-		  lpsiDabs <- do.call(rbind,
+		  labsdPsi <- do.call(rbind,
 				      lapply(k, function(k.)
-					     copbase@psiDabs(t.beta,
+					     copbase@absdPsi(t.beta,
 							     theta=thetabase,
 							     degree=k.,
 							     log=TRUE))) # (degree,n)-matrix
@@ -78,7 +78,7 @@ opower <- function(copbase, thetabase) {
 				     k <- 1:j.
 				     signs <- (-1)^k
 				     lS <- log(Stirling2.all(j.))
-				     a <- lS + lpsiDabs[k,, drop=FALSE] + bklt[k,, drop=FALSE]
+				     a <- lS + labsdPsi[k,, drop=FALSE] + bklt[k,, drop=FALSE]
 				     (-beta)^j. * abs(s[j.]) * colSums(signs*exp(a))
 				 }
 				 ## => returns a vector of length n containing the values for one j. and all t
@@ -91,7 +91,7 @@ opower <- function(copbase, thetabase) {
 				 lfac <- lfactorial(0:degree) # log(0!), log(1!), .., log(degree!)
 				 log.b.one.j <- function(j.) {
 				     k <- j.:degree
-				     a <- lpsiDabs[k,, drop=FALSE] + bklt[k,, drop=FALSE] - lfac[j.+1] - lfac[k-j.+1] # (degree-j.+1, n)-matrix
+				     a <- labsdPsi[k,, drop=FALSE] + bklt[k,, drop=FALSE] - lfac[j.+1] - lfac[k-j.+1] # (degree-j.+1, n)-matrix
 				     ls. <- lsum(a) # length = n
 				     lchoose(beta*j., degree) + ls. # note: the lchoose() can be non-finite with this approach!
 				 }
@@ -100,20 +100,20 @@ opower <- function(copbase, thetabase) {
 				 b <- do.call(rbind, lapply(j, FUN=log.b.one.j)) # (degree, n)-matrix
 				 signs <- signFF(beta, j, degree)
 				 lfac[degree+1] - degree*log(t.) + lssum(b, signs, strict=FALSE)
-			     }, stop(sprintf("unsupported method '%s' in psiDabs",
+			     }, stop(sprintf("unsupported method '%s' in absdPsi",
 					     method))) # end{switch}
 	      }
 	      if(log) res else exp(res)
 	  },
               ## derivatives of the generator inverse
-              psiInvD1abs = function(t, theta, log=FALSE) {
-                  if(theta == 1) return(copbase@psiInvD1abs(t, theta, log=log)) # copbase case
+              absdiPsi = function(t, theta, log=FALSE) {
+                  if(theta == 1) return(copbase@absdiPsi(t, theta, log=log)) # copbase case
                   if(log) {
-                      log(theta)+(theta-1)*log(copbase@psiInv(t,thetabase))+
-                          copbase@psiInvD1abs(t, thetabase,log=TRUE)
+                      log(theta)+(theta-1)*log(copbase@iPsi(t,thetabase))+
+                          copbase@absdiPsi(t, thetabase,log=TRUE)
                   } else {
-                      theta*copbase@psiInv(t,thetabase)^(theta-1)*
-                          copbase@psiInvD1abs(t, thetabase,log=FALSE)
+                      theta*copbase@iPsi(t,thetabase)^(theta-1)*
+                          copbase@absdiPsi(t, thetabase,log=FALSE)
                   }
               },
               ## density
@@ -129,9 +129,9 @@ opower <- function(copbase, thetabase) {
               if(!any(n01)) return(res)
               ## auxiliary results
               u. <- u[n01,, drop=FALSE]
-              psiI <- rowSums(C.@psiInv(u.,theta))
-              res[n01] <- C.@psiDabs(psiI, theta, degree=d, n.MC=n.MC, log=TRUE) +
-                  rowSums(C.@psiInvD1abs(u., theta, log=TRUE))
+              psiI <- rowSums(C.@iPsi(u.,theta))
+              res[n01] <- C.@absdPsi(psiI, theta, degree=d, n.MC=n.MC, log=TRUE) +
+                  rowSums(C.@absdiPsi(u., theta, log=TRUE))
               if(log) res else exp(res)
           },
               ## score function

@@ -16,35 +16,15 @@
 
 ### asymmetric explicit copulas ################################################
 
-setClass("asymExplicitCopula",
+setClass("asymExplicitCopula", contains = "asymCopula",
          representation = representation(
-           "copula",
-           copula1 = "copula",
-           copula2 = "copula",
            exprdist = "expression",
            derExprs1 = "expression",
            derExprs2 = "expression"
-           ),
-         validity = function(object) {
-           stopifnot(object@copula1@dimension == object@copula2@dimension)
-           dim <- object@dimension
-           ## from Classes.R
-           if (dim != as.integer(dim))
-             return("dim must be integer")
-           if (dim < 2)
-             return("dim must be >= 2")
-           param <- object@parameters
-           upper <- object@param.upbnd
-           lower <- object@param.lowbnd
-           if (length(param) != length(upper))
-             return("Parameter and upper bound have non-equal length")
-           if (length(param) != length(lower))
-             return("Parameter and lower bound have non-equal length")
-           if (any(is.na(param) | param > upper | param < lower))
-             return("Parameter value out of bound")
-           else return (TRUE)
-         },
-         contains = list("copula")
+           )
+         ## validity = function(object) {
+         ##     ## TODO: check exprdist, derExprs[12]
+         ## },
          )
 
 ## Liebscher (2008, JMA); the special case is Khoudraji
@@ -110,7 +90,7 @@ asymExplicitCopula <- function(shapes, copula1, copula2) {
              copula2 = copula2,
              exprdist = c(cdf=cdf, pdf=pdf),
              derExprs1 = derExprs1, derExprs2 = derExprs2,
-             message = "Asymmetric Explicit Copula")
+             fullname = "Asymmetric Explicit Copula")
 }
 
 
@@ -126,7 +106,7 @@ getAsymExplicitCopulaComps <- function(object) {
   list(shapes = shapes, copula1 = copula1, copula2 = copula2)
 }
 
-## AfunAsymCopula <- function(copula, w) {
+## AAsymCopula <- function(copula, w) {
 ##   ## assuming copula@copula1 and copula@copula2 are both evCopula
 ##   comps <- getCopulaComps(copula)
 ##   a1 <- comps$shape[1];  a2 <- comps$shape[2]
@@ -135,14 +115,14 @@ getAsymExplicitCopulaComps <- function(object) {
 ##   den2 <- a1 * (1 - w) + a2 * w
 ##   t1 <- (1 - a2) * w / den1; t1 <- ifelse(is.na(t1), 1, t1)
 ##   t2 <- a2 * w / den2; t2 <- ifelse(is.na(t2), 1, t2)
-##   den1 * Afun(copula1, t1) + den2 * Afun(copula2, t2)
+##   den1 * A(copula1, t1) + den2 * A(copula2, t2)
 ## }
 
-pasymExplicitCopula <- function(copula, u) {
+pasymExplicitCopula <- function(u, copula) {
   u <- as.matrix(u)
   comps <- getAsymExplicitCopulaComps(copula)
-  p1 <- pcopula(comps$copula1, t(t(u)^(1 - comps$shapes)))
-  p2 <- pcopula(comps$copula2, t(t(u)^comps$shapes))
+  p1 <- pCopula(t(t(u)^(1 - comps$shapes)), comps$copula1)
+  p2 <- pCopula(t(t(u)^comps$shapes), comps$copula2)
   p1 * p2
 }
 
@@ -163,7 +143,7 @@ densDers <- function(idx, u, dg, copula, derExprs) {
   c(eval(derExprs[dorder + 1])) * dgu
 }
 
-dasymExplicitCopula <- function(copula, u, log=FALSE, ...) {
+dasymExplicitCopula <- function(u, copula, log=FALSE, ...) {
   u <- as.matrix(u)
   comps <- getAsymExplicitCopulaComps(copula)
   a <- comps$shapes
@@ -186,13 +166,13 @@ dasymExplicitCopula <- function(copula, u, log=FALSE, ...) {
 }
 
 
-rasymExplicitCopula <- function(copula, n) {
+rasymExplicitCopula <- function(n, copula) {
   comps <- getAsymExplicitCopulaComps(copula)
   copula1 <- comps$copula1; copula2 <- comps$copula2
   shapes <- comps$shapes
   ## Theorem 2.1, Lemma 2.1, Liebscher (2008, JMA)
-  u <- rcopula(copula1, n)
-  v <- rcopula(copula2, n)
+  u <- rCopula(n, copula1)
+  v <- rCopula(n, copula2)
   d <- copula@dimension
   x <- matrix(NA, n, d)
   for (i in 1:d) {
@@ -201,9 +181,13 @@ rasymExplicitCopula <- function(copula, n) {
   x
 }
 
-## setMethod("Afun", signature("asymCopula"), AfunAsymCopula)
+## setMethod("A", signature("asymCopula"), AAsymCopula)
 
-setMethod("rcopula", signature("asymExplicitCopula"), rasymExplicitCopula)
-setMethod("pcopula", signature("asymExplicitCopula"), pasymExplicitCopula)
-setMethod("dcopula", signature("asymExplicitCopula"), dasymExplicitCopula)
+setMethod("rCopula", signature("numeric", "asymExplicitCopula"), rasymExplicitCopula)
+
+setMethod("pCopula", signature("numeric", "asymExplicitCopula"),pasymExplicitCopula)
+setMethod("pCopula", signature("matrix", "asymExplicitCopula"), pasymExplicitCopula)
+
+setMethod("dCopula", signature("numeric", "asymExplicitCopula"), dasymExplicitCopula)
+setMethod("dCopula", signature("matrix", "asymExplicitCopula"), dasymExplicitCopula)
 

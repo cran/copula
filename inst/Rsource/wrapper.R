@@ -116,9 +116,9 @@ copCreate <- function(family, theta, d, ...)
 
 ### Kendall's tau ##############################################################
 
-if(FALSE) { ## MM__FIXME__  "old copula" already has kendallsTau() and calibKendallsTau()
-showMethods("calibKendallsTau", incl=TRUE)
-showMethods("kendallsTau", incl=TRUE)
+if(FALSE) { ## MM__FIXME__  "old copula" already has tau() and iTau()
+showMethods("iTau", incl=TRUE)
+showMethods("tau", incl=TRUE)
 }## Rather use these by providing "nacopula" methods !!
 
 ##' Determine tau from given theta (matricized)
@@ -177,7 +177,7 @@ rcop <- function(n, cop)
 {
     switch(copClass(cop),
            "elliptical"={
-               rcopula(cop, n)
+               rCopula(n, cop)
            },
            "nArchimedean"={
                rnacopula(n, cop)

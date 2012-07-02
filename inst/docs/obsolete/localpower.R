@@ -26,9 +26,9 @@
 localpowerC <- function(copC, copD, N=1000, n=1000, step=5, ndelta=4, alpha = 0.05)
 {
   p <- 2
-  x <- rcopula(copC,n)
+  x <- rCopula(n, copC)
   u <- apply(x,2,rank)/(n+1) ## make pseudo-observations
-  
+
   ## set r according to recommendations
   r <- 3:5
   nr <- length(r)
@@ -55,26 +55,26 @@ localpowerC <- function(copC, copD, N=1000, n=1000, step=5, ndelta=4, alpha = 0.
 
   ##s0np <- matrix(s0np, ncol = nr, byrow = TRUE)
   ##s0np <- apply(s0np,1,sum)
-  
+
   ## param
-  der <- derCdfWrtArgs(copC,g)
+  der <- dCdu(copC,g)
   dert <- numeric(0)
   for (i in r)
-    dert <- c(dert,as.double(derCdfWrtArgs(copC,g^(1/i))))
-  
-  pcopC <- pcopula(copC,g)
-  pcopD <- pcopula(copD,g)
+    dert <- c(dert,as.double(dCdu(copC,g^(1/i))))
+
+  pcopC <- pCopula(copC,g)
+  pcopD <- pCopula(g, copD)
   pcopCt <- numeric(0)
   delta.term <- numeric(0)
   for (i in r)
     {
-      pcopCr <- pcopula(copC,g^(1/i))
+      pcopCr <- pCopula(g^(1/i), copC)
       pcopCt <- c(pcopCt,pcopCr)
       delta.term <- c(delta.term,
-                      i *  pcopCr^(i - 1) * (pcopula(copD,g^(1/i)) -  pcopCr)
+                      i *  pcopCr^(i - 1) * (pCopula(g^(1/i), copD) -  pcopCr)
                       - (pcopD - pcopC))
     }
-  
+
   s0 <- .C("evtest_LP",
            as.double(x),
            as.integer(n),
@@ -111,13 +111,13 @@ localpowerC <- function(copC, copD, N=1000, n=1000, step=5, ndelta=4, alpha = 0.
 
 AD <- function(copD,y)
   {
-    integrand <- function(x) {(pcopula(copD,cbind(x^(1-y),x^y)) - (x > exp(-1)))/ (x * log(x))}
+    integrand <- function(x) {(pCopula(cbind(x^(1-y),x^y), copD) - (x > exp(-1)))/ (x * log(x))}
     exp(-0.57721566 + integrate(integrand, 0,1)$value)
   }
 
 localpowerA <- function(copC, copD, N=1000, n=1000, step=5, ndelta=4, alpha = 0.05)
 {
-  x <- rcopula(copC,n)
+  x <- rCopula(n, copC)
   u <- apply(x,2,rank)/(n+1) ## make pseudo-observations
 
   #s0np <- .C("evtestA",
@@ -132,16 +132,16 @@ localpowerA <- function(copC, copD, N=1000, n=1000, step=5, ndelta=4, alpha = 0.
   #           s0 = double(N),
   #           PACKAGE="copula")$s0
 
-  der <- derCdfWrtArgs(copC,u)
+  der <- dCdu(copC,u)
   loguv <- log(u[,1]*u[,2])
   g <- log(u[,2])/loguv #grid (size n)
-  AC <- Afun(copC,g)
+  AC <- A(copC,g)
   ADg <- numeric(n)
   for (i in 1:n)
     ADg[i] <- AD(copD,g[i])
-  delta.term <- pcopula(copD,u) - pcopula(copC,u) -
-    exp(loguv * AC) * loguv * AC * (log(ADg) - log(AC)) 
-  
+  delta.term <- pCopula(u, copD) - pCopula(u, copC) -
+    exp(loguv * AC) * loguv * AC * (log(ADg) - log(AC))
+
   s0 <- .C("evtestA_LP",
            as.double(u[,1]),
            as.double(u[,2]),
@@ -160,13 +160,13 @@ localpowerA <- function(copC, copD, N=1000, n=1000, step=5, ndelta=4, alpha = 0.
            PACKAGE="copula")$s0
 
   s0 <- matrix(s0, ncol = ndelta)
-  
+
   q <- sort(s0[,1])[(1- alpha) * N] #critical value
-  
+
   localpow <- numeric(ndelta - 1)
   for (i in 2:ndelta)
     localpow[i-1] <- mean(s0[,i] >= q)
-  
+
   #return(list(s0np=s0np,s0=s0,lp=c(alpha,localpow)))
   return(c(alpha,localpow))
 }

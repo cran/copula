@@ -16,27 +16,23 @@
 */
 
 
-/*****************************************************************************
-
-  Multivariate independence test  based on the empirical
-  copula process as proposed by Christian Genest and Bruno
-  Rémillard (2004), Test 13:2, pages 335-369.
-
-  Ivan Kojadinovic, May 2007, modified Dec 2007
-
-*****************************************************************************/
+/**
+ * @file   ecIndepTest.c
+ * @author Ivan Kojadinovic
+ * @date   December 2007
+ *
+ * @brief  Multivariate independence test based on the empirical
+ *         copula process as proposed by Christian Genest and Bruno
+ *         Rémillard (2004), Test 13:2, pages 335-369.
+ *
+ */
 
 #include <R.h>
 #include <Rmath.h>
-#include "set.utils.h"
-#include "empcop.stat.h"
+#include "set_utils.h"
+#include "indepTests.h"
 
-/*****************************************************************************
-
-  Array J
-
-******************************************************************************/
-
+/// Temporary array J
 void J_u(int n, int p, const double R[], double *J)
 {
   int i, j, l, m;
@@ -49,25 +45,27 @@ void J_u(int n, int p, const double R[], double *J)
 
 }
 
-/*****************************************************************************
-
-  Simulate the distribution of TA, up to subsets of cardinality p
-  and of the global statistic
-  n: sample size
-  N: number of repetitions
-  p: dimension of data
-  m: max. card. of A
-  TA0: values of TA under independence (N repetitions)
-  G0: values of the global stat. under independence (N repetitions)
-  subset: subsets of {1,...,p} in binary notation (int) whose card. is
-  between 2 and m in "natural" order
-  subset_char: similar, for printing
-
-******************************************************************************/
-
+/**
+ * Simulate the distribution of TA (up to subsets of cardinality p)
+ * and of the global statistic
+ *
+ * @param n sample size
+ * @param N number of simulations
+ * @param p dimension
+ * @param m max cardinality of A
+ * @param TA0 values of TA under independence (N repetitions)
+ * @param G0 values of the global stat. under independence (N repetitions)
+ * @param subset subsets of {1,...,p} in binary notation (int) whose card. is
+ *               between 2 and m in "natural" order
+ * @param subset_char similar, for printing
+ * @param fisher0 p-values à la Fisher
+ * @param tippett0 p-values à la Tippett
+ * @param verbose display progress bar if > 0
+ * @author Ivan Kojadinovic
+ */
 void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
 			       double *G0, int *subset, char **subset_char,
-			       double *fisher0, double *tippett0, int *pe)
+			       double *fisher0, double *tippett0, int *verbose)
 {
   int i, j, k, index, sb[1], count;
   double *R = Calloc((*n) * (*p), double);
@@ -92,9 +90,6 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
   /* N repetitions */
   for (k=0;k<*N;k++)
     {
-      if ((*pe > 0) && ((k+1) % (*pe) == 0))
-	Rprintf("Simulation iteration %d\n",k+1);
-
       /* generate data */
       for (j=0;j<*p;j++)
 	{
@@ -122,6 +117,9 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
 
       /* global stat under independence*/
       G0[k] = I_n(*n, *p, J, K, L);
+
+      if (*verbose)
+	progressBar(k, *N, 70);
     }
 
   PutRNGstate();
@@ -169,6 +167,29 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
 
 ******************************************************************************/
 
+/**
+ * Computes the statistcs TA (up to subsets of cardinality p)
+ * Computes the global statistic In
+ *
+ * @param R multivariate ranks
+ * @param n sample size
+ * @param p dimension
+ * @param m maximum cardinality of subsets of {1,...,p}
+ * @param TA0 simulated values of TA under independence (size: N * (sb - p - 1))
+ * @param G0 simulated values of In under independence
+ * @param N number of repetitions (nrows TA0, fisher0, tippett0)
+ * @param subset subsets of {1,...,p} in binary notation (int) whose card. is
+ *               between 2 and m in "natural" order
+ * @param TA test statistics (size: sum.bin. - p - 1)
+ * @param G global statistic
+ * @param pval p-values (size = sum.bin. - p - 1) for TA
+ * @param fisher pvalue à la Fisher
+ * @param tippett pvalue à la Tippett
+ * @param globpval pvalue of In
+ * @param fisher0 p-values à la Fisher under the null
+ * @param tippett0 p-values à la Tippett under the null
+ * @author Ivan Kojadinovic
+ */
 void empirical_copula_test(double *R, int *n, int *p, int *m, double *TA0, double *G0,
 			   int *N, int *subset, double *TA, double *G, double *pval,
 			   double *fisher, double *tippett, double *globpval,

@@ -15,30 +15,25 @@
   this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
+/**
+ * @file   serialIndepTest.c
+ * @author Ivan Kojadinovic
+ * @date   December 2007
+ *
+ * @brief Serial independence test  based on the empirical
+ *        copula process as proposed by Christian Genest and Bruno
+ *        Rémillard (2004), Test 13:2, pages 335-369.
+ *
+ */
 
-/*****************************************************************************
-
-  Serial independence test  based on the empirical
-  copula process as proposed by Christian Genest and Bruno
-  Rémillard (2004), Test 13:2, pages 335-369.
-
-  Ivan Kojadinovic, December 2007
-
-*****************************************************************************/
 
 #include <R.h>
 #include <Rmath.h>
-#include "set.utils.h"
+#include "set_utils.h"
+#include "indepTests.h"
 
-#include "empcop.stat.h"
 
-
-/*****************************************************************************
-
-  Array J
-
-******************************************************************************/
-
+/// Temporary array J
 void J_s(int n, int p, const double U[], double *J)
 {
   int m=0;
@@ -48,27 +43,28 @@ void J_s(int n, int p, const double U[], double *J)
 	J[m++] = 1.0 - fmax2(U[i + j], U[l + j]);
 }
 
-
-/*****************************************************************************
-
-  Simulate the distribution of TAs, up to subsets of cardinality p containing 1
-  and of the global statistic
-  n+p-1: sample size
-  N: number of repetitions
-  p: number of lags + 1
-  m: max. card. of A
-  TA0: values of TAs under serial independence (N repetitions)
-  G0: values of the global stat. under serial independence (N repetitions)
-  subset: subsets of {1,...,p} in binary notation (int) whose card. is
-  between 2 and m in "natural" order and that contain 1
-  subset_char: similar, for printing
-
-******************************************************************************/
-
+/**
+ * Simulate the distribution of the TAs, up to subsets of cardinality p
+ * containing 1, and of the global statistic
+ *
+ * @param n n+p-1 is the sample size
+ * @param N number of repetitions
+ * @param p number of lags + 1
+ * @param m max. card. of A
+ * @param TA0 values of TAs under serial independence (N repetitions)
+ * @param G0 values of the global stat. under serial independence (N repetitions)
+ * @param subset subsets of {1,...,p} in binary notation (int) whose card. is
+ *               between 2 and m in "natural" order and that contain 1
+ * @param subset_char similar, for printing
+ * @param fisher0 p-values à la Fisher
+ * @param tippett0 p-values à la Tippett
+ * @param verbose display progress bar if > 0
+ * @author Ivan Kojadinovic
+ */
 void simulate_empirical_copula_serial(int *n, int *N, int *p, int *m,
 				      double *TA0, double *G0, int *subset,
 				      char **subset_char, double *fisher0,
-				      double *tippett0, int *pe)
+				      double *tippett0, int *verbose)
 {
   int i, j, k, np = *n + *p - 1, p1[1], m1[1], sb[1], count, index;
   double *U = Calloc(np, double);
@@ -98,9 +94,6 @@ void simulate_empirical_copula_serial(int *n, int *N, int *p, int *m,
   /* N repetitions */
   for (k=0;k<*N;k++) {
 
-    if ((*pe > 0) && ((k+1) % (*pe) == 0))
-	Rprintf("Simulation iteration %d\n",k+1);
-
     /* generate data */
     for (i=0;i<np;i++)
       U[i] = (i+1)/(double)np;
@@ -126,6 +119,9 @@ void simulate_empirical_copula_serial(int *n, int *N, int *p, int *m,
 
     /* global stat under independence*/
     G0[k] = I_n(*n, *p, J, K, L);
+
+    if (*verbose)
+      progressBar(k, *N, 70);
   }
 
   PutRNGstate();
@@ -153,24 +149,29 @@ void simulate_empirical_copula_serial(int *n, int *N, int *p, int *m,
   Free(L);
 }
 
-/*****************************************************************************
-
-  Compute TAs for subsets of cardinality 2 to p containing 1
-  U: ranks/np (pseudo-obs)
-  n+p-1: sample size
-  p: number of lags + 1
-  m: max. cardinality of subsets of {1,...,p}
-  TA0: simulated values of TAs under serial independence (size: N * (sb - 1))
-  N: number of repetitions (nrows TA0, fisher0, tippett0)
-  subset: subsets of {1,...,p} in binary notation (int) whose card. is
-  between 2 and m in "natural" order and that contain 1
-  TA: test statistics (size: sum.bin. - 1)
-  pval: corresponding p-values (size = sum.bin. - 1)
-  fisher: pvalue à la Fisher
-  tippett: pvalue à la Tippett
-
-******************************************************************************/
-
+/**
+ * Compute the TAs for subsets of cardinality 2 to p containing 1,
+ * as well as In
+ *
+ * @param U univariate pseudo-observations
+ * @param n n+p-1 is the sample size
+ * @param p number of lags + 1
+ * @param m max. cardinality of subsets of {1,...,p}
+ * @param TA0 simulated values of TAs under serial independence (size: N * (sb - 1))
+ * @param G0 simulated values of G under serial independence
+ * @param N number of repetitions (nrows TA0, fisher0, tippett0)
+ * @param subset subsets of {1,...,p} in binary notation (int) whose card. is
+ *               between 2 and m in "natural" order and that contain 1
+ * @param TA test statistics (size: sum.bin. - 1)
+ * @param G global statistic
+ * @param pval p-values corresponding to the TAs (size = sum.bin. - 1)
+ * @param fisher pvalue à la Fisher
+ * @param tippett pvalue à la Tippett
+ * @param globpval pvalue of G
+ * @param fisher0 pvalues à la Fisher under the null
+ * @param tippett0 pvalues à la Tippett under the null
+ * @author Ivan Kojadinovic
+ */
 void empirical_copula_test_serial(double *U, int *n, int *p, int *m, double *TA0, double *G0,
 				  int *N, int *subset, double *TA, double *G, double *pval,
 				  double *fisher, double *tippett, double *globpval,

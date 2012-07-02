@@ -4,16 +4,18 @@
 \alias{dSibuya}
 \alias{rSibuyaR}
 \alias{dsumSibuya}
-\title{Sibuya Distribution - Sampling and Probabilities}
+\title{Sibuya distribution - sampling and probabilities}
 \description{
-  The Sibuya distribution \eqn{\mathrm{Sib}(\alpha)}{Sib(alpha)} can be defined by
-  its Laplace transform
-  \deqn{1-(1-\exp(-t))^\alpha,\ t\in[0,\infty),}{1-(1-exp(-t))^alpha, t in [0,Inf),}
+  The Sibuya distribution \eqn{\mathrm{Sib}(\alpha)}{Sib(alpha)} can be
+  defined by its Laplace transform
+  \deqn{1-(1-\exp(-t))^\alpha,\ t\in[0,\infty),}{1-(1-exp(-t))^alpha, t
+ in [0,Inf),}
   its distribution function% "R man - FIXME: allow to use \mathbb{N} instead:
-  \deqn{F(k)=1-(-1)^k{\alpha-1\choose k}=1-\frac{1}{kB(k,1-\alpha)},\ k\in\mathbf{N}}{%
+  \deqn{F(k)=1-(-1)^k{\alpha-1\choose k}=1-\frac{1}{kB(k,1-\alpha)},\
+    k\in\mathbf{N}}{%
     F(k)=1-(-1)^k * choose(alpha-1,k)=1-1/(k * beta(k, 1-alpha)), k in N,}
-  (where \eqn{B}{beta} denotes the beta function) or its probability mass function
-  \deqn{p_k={\alpha\choose k}(-1)^{k-1},\ k\in\mathbf{N},
+  (where \eqn{B}{beta} denotes the beta function) or its probability
+  mass function \deqn{p_k={\alpha\choose k}(-1)^{k-1},\ k\in\mathbf{N},
   }{p_k = choose(alpha,k)*(-1)^(k-1), k in N,}
   where \eqn{\alpha\in(0,1]}{alpha in (0,1]}.
 
@@ -33,7 +35,8 @@
 
   This probability mass function can be shown (see Hofert
   (2010, pp. 99)) to be
-  \deqn{\sum_{j=1}^n{n\choose j}{j\alpha\choose k} (-1)^{k-j},\ k\in\{n,n+1,\dots\}.}{%
+  \deqn{\sum_{j=1}^n{n\choose j}{j\alpha\choose k} (-1)^{k-j},\
+    k\in\{n,n+1,\dots\}.}{%
     sum(j=1..n) choose(n,j) * choose(j*alpha,k) * (-1)^(k-j), k >= n.}
 }
 \usage{
@@ -55,9 +58,10 @@ dsumSibuya(x, n, alpha,
     for \code{dsumSibuya}: the number \eqn{n} of summands.
   }
   \item{alpha}{parameter in \eqn{(0,1]}.}
-  \item{x}{vector of \code{\link{integer}} values (\dQuote{quantiles}) \eqn{x} at which to
-    compute the probability mass or cumulative probability.}
-  \item{log, log.p}{\code{\link{logical}}; if TRUE, probabilities p are given as log(p).}
+  \item{x}{vector of \code{\link{integer}} values (\dQuote{quantiles})
+\eqn{x} at which to compute the probability mass or cumulative probability.}
+  \item{log, log.p}{\code{\link{logical}}; if TRUE, probabilities p are
+given as log(p).}
   \item{lower.tail}{\code{\link{logical}}; if TRUE (the default), probabilities
       are \eqn{P(X \le x)}{P(X <= x)}, otherwise, \eqn{P(X > x)}.}
   \item{method}{character string specifying which computational method is to be
@@ -77,9 +81,9 @@ dsumSibuya(x, n, alpha,
 %% FIXME --- when do we *compute* the precision (without adaption, but
 %% by pre() formula? --- exactly when 'alpha' is not an mpfr number
 	For all \code{"Rmpfr*"} methods, \code{alpha} can be set to a
-        \code{\link[Rmpfr:mpfr-class]{mpfr}} number of specified precision and this
-        will determine the precision of all parts of the internal
-        computations.
+        \code{\link[Rmpfr:mpfr-class]{mpfr}} number of specified
+        precision and this will determine the precision of all parts of
+    the internal computations.
       }
       \item{\code{"diff"}}{interprets the sum as a forward difference
 	and computes it via \code{diff};}
@@ -125,14 +129,15 @@ dsumSibuya(x, n, alpha,
 \references{
   Hofert, M. (2010).
   \emph{Sampling Nested Archimedean Copulas with Applications to CDO Pricing}.
-  Suedwestdeutscher Verlag fuer Hochschulschriften AG & Co. KG.
+  S\enc{ü}{ue}dwestdeutscher Verlag fuer Hochschulschriften AG & Co. KG.
 
   Hofert, M. (2011).
   Efficiently sampling nested Archimedean copulas.
   \emph{Computational Statistics & Data Analysis} \bold{55}, 57--70.
 }
 \seealso{
-  \code{\link{rFJoe}} and \code{\link{rF01Joe}} (where \code{rSibuya} is applied).
+  \code{\link{rFJoe}} and \code{\link{rF01Joe}} (where \code{rSibuya} is
+  applied).
 }
 \examples{
 ## Sample n random variates from a Sibuya(alpha) distribution and plot a

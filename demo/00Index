@@ -1,6 +1,7 @@
-gofCopula	goodness-of-fit test for copula models
-QARClayton	AR(1) Clayton with Student marginals Estimation and Quantile Curves
+fitting-tests   Tests of fitCopula
 estimation.gof	Estimation and goodness-of-fit capabilities
+QARClayton	AR(1) Clayton with Student marginals Estimation and Quantile Curves
+gofCopula	goodness-of-fit test for copula models
 gof_graph	Graphical goodness-of-fit based on pairwise Rosenblatt transforms
 G_ak		Coefficients a_k for Gumbel's density derivatives, MLE, etc
 GIG-demo        Generalized Inverse Gaussian Archimedean copulas

@@ -1,11 +1,11 @@
 \name{math-fun}
 \alias{A..Z}
 \alias{sinc}
-\title{Sinc, Zolotarev's, and Other Mathematical Utility Functions}
+\title{Sinc, Zolotarev's, and other mathematical utility functions}
 \description{
   \code{sinc(x)} computes the \emph{sinc function}
-  \eqn{s(x)=\sin(x)/x}{s(x) = sin(x)/x} for \eqn{x\ne 0}{x != 0} and \eqn{s(0) = 1},
-  such that \eqn{s()} is continuous, also at \eqn{x = 0}.
+  \eqn{s(x)=\sin(x)/x}{s(x) = sin(x)/x} for \eqn{x\ne 0}{x != 0} and
+  \eqn{s(0) = 1}, such that \eqn{s()} is continuous, also at \eqn{x = 0}.
 
   \code{A..Z(x, a)} computes Zolotarev's function to
   the power \code{1-a}.
@@ -16,7 +16,8 @@ sinc(x)
 A..Z(x, alpha, I.alpha = 1 - alpha)
 }
 \arguments{
-  \item{x}{\code{\link{numeric}} argument in \eqn{[0,\pi]}{[0,pi]}, typically a vector.}
+  \item{x}{\code{\link{numeric}} argument in \eqn{[0,\pi]}{[0,pi]},
+    typically a vector.}
   \item{alpha}{parameter in (0,1].}
   \item{I.alpha}{must be \code{ = 1 - alpha}, maybe more accurately
     when \code{alpha} is very close to 1.}
@@ -41,7 +42,8 @@ A..Z(x, alpha, I.alpha = 1 - alpha)
   Devroye, L. (2009)
   Random variate generation for exponentially and polynomially tilted
   stable distributions,
-  \emph{ACM Transactions on Modeling and Computer Simulation} \bold{19}, 18, 1--20.
+  \emph{ACM Transactions on Modeling and Computer Simulation} \bold{19},
+  18, 1--20.
 }
 \examples{
 curve(sinc, -15,25); abline(h=0,v=0, lty=2)

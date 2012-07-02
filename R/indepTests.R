@@ -13,27 +13,23 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
+##' Computes the sum of binomial coefficients
+binom.sum <- function(n,k) sum(choose(n, 0:k))
 
-## Computes the sum of binomial coefficients
-binom.sum <- function(n,k)
-{
-    bs <- 1
-    for (i in 1:k)
-        bs <- bs + choose(n,i)
-    bs
-}
-
-################################################################################
-
-##  Multivariate independence test based on the empirical
-##  copula process as proposed by Christian Genest and Bruno
-##  Rémillard (2004), Test 13:2, pages 335-369.
-##
-##  Ivan Kojadinovic, May 2007
-
-# simulate the distribution of TA for A of cardinality 2 to m under independence
-
-indepTestSim <- function(n,p,m=p,N=1000,print.every=100)
+##' Multivariate independence test based on the empirical
+##' copula process as proposed by Christian Genest and Bruno
+##' Rémillard (2004), Test 13:2, pages 335-369.
+##'
+##' @title Simulate the distribution of TA for A of cardinality 2 to m under independence
+##' @param n sample size
+##' @param p dimension
+##' @param m up to subsets of cardinality m
+##' @param N number of simulations
+##' @param verbose display progress bar if TRUE
+##' @param print.every is deprecated
+##' @return an object of class 'indepTestDist'
+##' @author Ivan Kojadinovic
+indepTestSim <- function(n, p, m=p, N=1000, verbose = TRUE, print.every = NULL)
 {
     if (!is.numeric(n) || (n <- as.integer(n)) < 2)
         stop("n should be an integer greater than 2")
@@ -43,6 +39,10 @@ indepTestSim <- function(n,p,m=p,N=1000,print.every=100)
         stop(paste("m should be an integer greater than 2 and smaller than",p))
     if (!is.numeric(N) || as.integer(N) < 100)
         stop("N should be an integer greater than 100")
+    if (!is.null(print.every)) {
+        warning("Argument 'print.every' is deprecated. Please use 'verbose' instead.")
+        verbose <- print.every > 0
+    }
 
     sb <- binom.sum(p,m)
 
@@ -57,7 +57,7 @@ indepTestSim <- function(n,p,m=p,N=1000,print.every=100)
              subsets.char = character(sb),
              fisher0 = double(N),
              tippett0 = double(N),
-             as.integer(print.every))
+             as.integer(verbose))
 
     structure(class = "indepTestDist",
               list(sample.size = n,
@@ -72,10 +72,16 @@ indepTestSim <- function(n,p,m=p,N=1000,print.every=100)
                    dist.tippett.independence = r.$tippett0))
 }
 
-################################################################################
-
-# test in itself
-
+##' Multivariate independence test based on the empirical
+##' copula process as proposed by Christian Genest and Bruno
+##' Rémillard (2004), Test 13:2, pages 335-369.
+##'
+##' @title Test in itself
+##' @param x the data
+##' @param d an object of class 'indepTestDist'
+##' @param alpha
+##' @return an object of class 'indepTest'
+##' @author Ivan Kojadinovic
 indepTest <- function(x, d, alpha=0.05)
 {
     if (!is.numeric(x <- as.matrix(x)))
@@ -98,8 +104,7 @@ indepTest <- function(x, d, alpha=0.05)
     N <- as.integer(d$number.repetitions)
 
     ## transform data to ranks
-    for (j in 1:p)
-        x[,j] <- rank(x[,j])
+    x <- apply(x,2,rank)
 
     sb <- binom.sum(p,m)
 
@@ -140,18 +145,22 @@ indepTest <- function(x, d, alpha=0.05)
                    beta=beta, global.statistic=r.$G, global.statistic.pvalue=r.$globpval))
 }
 
-################################################################################
 
-##  Serial independence test based on the empirical
-##  copula process as proposed by Christian Genest and Bruno
-##  Rémillard (2004), Test 13:2, pages 335-369.
-##
-##  Ivan Kojadinovic, May 2007
-
-## simulate the distribution of TAs for A of cardinality 2 to m
-## containing 1 under serial independence
-
-serialIndepTestSim <- function(n,lag.max,m=lag.max+1,N=1000,print.every=100)
+##' Serial independence test based on the empirical
+##' copula process as proposed by Christian Genest and Bruno
+##' Rémillard (2004), Test 13:2, pages 335-369.
+##'
+##' @title Simulate the distribution of the TAs for A of cardinality 2 to m
+##' containing 1 under serial independence
+##' @param n sample size
+##' @param lag.max maximum lag
+##' @param m subsets of cardinality up to m
+##' @param N number of simulations
+##' @param verbose display progress bar if TRUE
+##' @param print.every is deprecated
+##' @return an object of class 'serialIndepTestDist'
+##' @author Ivan Kojadinovic
+serialIndepTestSim <- function(n, lag.max, m=lag.max+1, N=1000, verbose = TRUE, print.every = NULL)
 {
     if (!is.numeric(n) || (n <- as.integer(n)) < 2)
         stop("n should be an integer greater than 2")
@@ -162,13 +171,17 @@ serialIndepTestSim <- function(n,lag.max,m=lag.max+1,N=1000,print.every=100)
 
     if (n-p+1 < 2)
       stop("wrong number of lags with respect to the sample size")
-
     if (!is.numeric(m) || (m <- as.integer(m)) < 2 || m > p)
         stop(paste("m should be an integer greater than 2 and smaller than",p))
     if (!is.numeric(N) || (N <- as.integer(N)) < 100)
         stop("N should be an integer greater than 100")
     if (!is.numeric(lag.max) || (p <- as.integer(lag.max) + 1) <= 1 || n-p+1 < 2)
       stop("wrong number of lags")
+    if (!is.null(print.every)) {
+        warning("Argument 'print.every' is deprecated. Please use 'verbose' instead.")
+        verbose <- print.every > 0
+    }
+
 
     sb <- binom.sum(p-1,m-1)
 
@@ -183,7 +196,7 @@ serialIndepTestSim <- function(n,lag.max,m=lag.max+1,N=1000,print.every=100)
              subsets.char = character(sb),
              fisher0 = double(N),
              tippett0 = double(N),
-             as.integer(print.every))
+             as.integer(verbose))
 
     structure(class = "serialIndepTestDist",
 	      list(sample.size = n,
@@ -198,10 +211,16 @@ serialIndepTestSim <- function(n,lag.max,m=lag.max+1,N=1000,print.every=100)
 		   dist.tippett.independence = R $tippett0))
 }
 
-################################################################################
-
-# test in itself
-
+##' Serial independence test based on the empirical
+##' copula process as proposed by Christian Genest and Bruno
+##' Rémillard (2004), Test 13:2, pages 335-369.
+##'
+##' @title Test in itself
+##' @param x the data
+##' @param d an object of class 'serialIndepTestDist'
+##' @param alpha the asymptotic level of the test
+##' @return an object of class 'indepTest'
+##' @author Ivan Kojadinovic
 serialIndepTest <- function(x, d, alpha=0.05)
 {
     if (!is.numeric(x))
@@ -230,7 +249,7 @@ serialIndepTest <- function(x, d, alpha=0.05)
     sb <- binom.sum(p-1,m-1)
 
     ## perform test
-    R <- .C(empirical_copula_test_serial,
+    r. <- .C(empirical_copula_test_serial,
             as.double(x),
             as.integer(n),
             as.integer(p),
@@ -261,20 +280,26 @@ serialIndepTest <- function(x, d, alpha=0.05)
     }
 
     structure(class = "indepTest",
-	      list(subsets=d$subsets,statistics=R $TA, critical.values=critical,
-		   pvalues = R $pval, fisher.pvalue=R $fisher, tippett.pvalue=R $tippett, alpha=alpha,
-		   beta=beta, global.statistic=R $G, global.statistic.pvalue=R $globpval))
+	      list(subsets=d$subsets,statistics=r.$TA, critical.values=critical,
+		   pvalues = r.$pval, fisher.pvalue=r.$fisher, tippett.pvalue=r.$tippett, alpha=alpha,
+		   beta=beta, global.statistic=r.$G, global.statistic.pvalue=r.$globpval))
 }
 
-################################################################################
-
-##  Independence test among random vectors based on the empirical
-##  copula process
-##
-##  Ivan Kojadinovic, December 2007
-
+##' Independence test among random vectors based on the empirical
+##' copula process
+##'
+##' @title
+##' @param x data
+##' @param d dimension of the data
+##' @param m consider subsets up to cardinality m
+##' @param N number of bootstrap replicates
+##' @param alpha asymptotic nominal level
+##' @param verbose display progress bar if TRUE
+##' @param print.every is deprecated
+##' @return an object of class 'indepTest'
+##' @author Ivan Kojadinovic
 multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05,
-                          print.every=100)
+                          verbose = TRUE, print.every = NULL)
 {
     if (!is.numeric(x <- as.matrix(x)))
         stop("data should be numerical")
@@ -293,10 +318,13 @@ multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05,
         stop("N should be an integer greater than 100")
     if (!is.numeric(alpha) || alpha <= 0 || alpha >= 1)
         stop("the significance level alpha is not properly set")
+    if (!is.null(print.every)) {
+        warning("Argument 'print.every' is deprecated. Please use 'verbose' instead.")
+        verbose <- print.every > 0
+    }
 
     ## transform data to pseudo-observations
-    for (j in 1:nc)
-        x[,j] <- rank(x[,j])/n
+    x <- apply(x,2,rank)/n
 
     sb <- binom.sum(p,m)
 
@@ -315,14 +343,14 @@ multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05,
                     I0 = double(N),
                     subsets = integer(sb),
                     subsets.char = character(sb),
-                    as.integer(print.every))
+                    as.integer(verbose))
 
     subsets <- bootstrap$subsets.char[(p+2):sb]
     subsets.binary <- bootstrap$subsets[(p+2):sb]
     dist.statistics.independence <- matrix(bootstrap$MA0,N,sb-p-1)
 
     ## perform test
-    R <- .C(empirical_copula_test_rv,
+    r. <- .C(empirical_copula_test_rv,
              as.double(x),
              as.integer(n),
              as.integer(p),
@@ -338,7 +366,7 @@ multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05,
              fisher = double(1),
              tippett = double(1),
              Ipval = double(1)
-	     )## FIXME: additional argument  as.integer(print.every)
+	     )
 
     ## compute critical values at the alpha level
     beta <- (1 - alpha)^(1 / (sb - p - 1))
@@ -348,21 +376,27 @@ multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05,
       critical[k] <- sort(dist.statistics.independence[,k])[round(beta * N)]
 
      structure(class = "indepTest",
-	       list(subsets=subsets,statistics=R $MA, critical.values=critical,
-		    pvalues = R $pval, fisher.pvalue=R $fisher, tippett.pvalue=R $tippett,
+	       list(subsets=subsets,statistics=r.$MA, critical.values=critical,
+		    pvalues = r.$pval, fisher.pvalue=r.$fisher, tippett.pvalue=r.$tippett,
 		    alpha=alpha, beta=beta,
-		    global.statistic=R $I, global.statistic.pvalue=R $Ipval))
+		    global.statistic=r.$I, global.statistic.pvalue=r.$Ipval))
 }
 
-################################################################################
-
-##  Multivariate serial independence test based on the empirical
-##  copula process
-##
-##  Ivan Kojadinovic, December 2007
-
+##' Multivariate serial independence test based on the empirical
+##' copula process -- see AISM paper for more details
+##'
+##' @title Multivariate serial independence test based
+##' @param x the data
+##' @param lag.max the maximum lag
+##' @param m consider subsets of cardinality up to m
+##' @param N number of permutations
+##' @param alpha asymptotic level of the test
+##' @param verbose display progress bar if TRUE
+##' @param print.every is deprecated
+##' @return an object of class 'indepTest'
+##' @author Ivan Kojadinovic
 multSerialIndepTest <- function(x, lag.max, m=lag.max+1, N=1000, alpha=0.05,
-                                print.every=100)
+                                verbose = TRUE, print.every = NULL)
 {
     if (!is.numeric(x <- as.matrix(x)))
         stop("data should be numerical")
@@ -378,12 +412,15 @@ multSerialIndepTest <- function(x, lag.max, m=lag.max+1, N=1000, alpha=0.05,
         stop("N should be an integer greater than 100")
     if (!is.numeric(alpha) || alpha <= 0 || alpha >= 1)
         stop("the significance level alpha is not properly set")
+    if (!is.null(print.every)) {
+        warning("Argument 'print.every' is deprecated. Please use 'verbose' instead.")
+        verbose <- print.every > 0
+    }
 
     q <- ncol(x)
 
     ## transform data to ranks
-    for (j in 1:q)
-        x[,j] <- rank(x[,j])/n
+    x <- apply(x,2,rank)/n
 
     n <- n-p+1 ## number of rows of p-dimensional virtual data
 
@@ -401,14 +438,14 @@ multSerialIndepTest <- function(x, lag.max, m=lag.max+1, N=1000, alpha=0.05,
                     I0 = double(N),
                     subsets = integer(sb),
                     subsets.char = character(sb),
-                    as.integer(print.every))
+                    as.integer(verbose))
 
     subsets <- bootstrap$subsets.char[2:sb]
     subsets.binary <- bootstrap$subsets[2:sb]
     dist.statistics.independence <- matrix(bootstrap$MA0,N,sb-1)
 
     ## perform test
-    R <- .C(empirical_copula_test_rv_serial,
+    r. <- .C(empirical_copula_test_rv_serial,
              as.double(x),
              as.integer(n),
              as.integer(p),
@@ -438,13 +475,19 @@ multSerialIndepTest <- function(x, lag.max, m=lag.max+1, N=1000, alpha=0.05,
     }
 
     structure(class = "indepTest",
-	      list(subsets=subsets,statistics=R $MA, critical.values=critical,
-		   pvalues = R $pval, fisher.pvalue=R $fisher, tippett.pvalue=R $tippett, alpha=alpha,
-		   beta=beta, global.statistic=R $I, global.statistic.pvalue=R $Ipval))
+	      list(subsets=subsets,statistics=r.$MA, critical.values=critical,
+		   pvalues = r.$pval, fisher.pvalue=r.$fisher, tippett.pvalue=r.$tippett, alpha=alpha,
+		   beta=beta, global.statistic=r.$I, global.statistic.pvalue=r.$Ipval))
 }
 
-## Dependogram #################################################################
-
+##' Displays a 'dependogram' from an object of class 'indepTest'
+##'
+##' @title Displays a 'dependogram'
+##' @param test an object of class 'indepTest'
+##' @param pvalues logical; if TRUE display p-values, otherwise statistics
+##' @param print additional printed information
+##' @return nothing
+##' @author Ivan Kojadinovic
 dependogram <- function(test, pvalues=FALSE, print=FALSE)
 {
   if (!inherits(test, "indepTest"))
@@ -483,8 +526,7 @@ dependogram <- function(test, pvalues=FALSE, print=FALSE)
 }
 
 
-## summary and show methods for class 'indepTest' ##############################
-
+## summary and show methods for class 'indepTest'
 print.indepTest <- function(x, ...)
 {
   cat("\nGlobal Cramer-von Mises statistic:", x$global.statistic,
@@ -494,214 +536,3 @@ print.indepTest <- function(x, ...)
   cat("  ", x$tippett.pvalue, " from Tippett's rule.\n")
 
 }
-
-################################################################################
-
-## myEcdf <- function(x) {
-##   N <- length(x)
-##   fun <- ecdf(x)
-##   myfun <- function(x) (0.5 + N * fun(x)) / (N + 1)
-##   myfun
-## }
-
-## myEcdf.caglad <- function(x) {
-##   N <- length(x)
-##   fun <- ecdf(-x)
-##   myfun <- function(x) (0.5 + N * fun(-x)) / (N + 1)
-##   myfun
-## }
-
-## combinePvals <- function(MAn) {
-##   MAn <- t(MAn)
-##   nA <- ncol(MAn)
-##   N <- nrow(MAn) - 1
-##   ## the observed is in the 1st row
-## ##   OneMinusFhat <- apply(MAn, 2,
-## ##                         function(x) {
-## ##                           myfun <- myEcdf(x[-1])
-## ##                           1 - myfun(x)
-## ##                         })
-## ##   Fisher <- -2 * apply(OneMinusFhat, 1, function(x) sum(log(x)))
-## ##   Tippett <-  apply(OneMinusFhat, 1, min)
-##   pvalues <- apply(MAn, 2,
-##                    function(x) {
-##                      myfun <- myEcdf.caglad(x[-1])
-##                      myfun(x)
-##                    })
-##   Fisher <- -2 * apply(pvalues, 1, function(x) sum(log(x)))
-##   Tippett <-  apply(pvalues, 1, min)
-##   Fisher.pvalue <- (0.5 + sum(Fisher[-1] >= Fisher[1])) / (N + 1)
-##   Tippett.pvalue <- (0.5 + sum(Tippett[-1] <= Tippett[1])) / (N + 1)
-##   list(Fisher.pvalue=Fisher.pvalue, Tippett.pvalue=Tippett.pvalue)
-## }
-
-## myCritical <- function(dist.statistics.independence, beta, p, m, N) {
-##   ## compute critical values at the alpha level
-##   critical <- numeric(0)
-##   from <- 1
-##   for (j in 1:(m-1)) {
-##     to <- from + choose(p-1,j) - 1
-##     crit <- sort(as.double(dist.statistics.independence[,from:to]))[round(beta * N * (to - from + 1))]
-##     critical <- c(critical,rep(crit,choose(p-1,j)))
-##     from <- to + 1
-##   }
-##   critical
-## }
-
-## empcopsm.test.jy <- function(x, lag.max, m=lag.max + 1, N=1000, alpha=0.05) {
-##   if (!is.numeric(x <- as.matrix(x)))
-##     stop("data should be numerical")
-##   if (any(is.na(x)))
-##     stop("data cannot contain missing values")
-##   if ((n <- nrow(x)) < 2)
-##     stop("data should contain more than 2 rows")
-##   if (!is.numeric(lag.max) || (p <- as.integer(lag.max) + 1) <= 1 || n-p+1 < 2)
-##     stop("wrong number of lags")
-
-##   q <- ncol(x)
-##   n <- n - p + 1 ## number of rows of p-dimensional virtual data
-
-##   if (!is.numeric(m) || ((m <- as.integer(m)) < 2) || m > p)
-##     stop(paste("m should be an integer greater than 2 and smaller than",p))
-##   if (!is.numeric(N) || (N <- as.integer(N)) < 100)
-##     stop("N should be an integer greater than 100")
-##   if (!is.numeric(alpha) || alpha <= 0 || alpha >= 1)
-##     stop("the significance level alpha is not properly set")
-
-##   ## transform data to ranks
-##   for (j in 1:q) x[,j] <- rank(x[,j])
-
-##   sb <- binom.sum(p-1,m-1)
-
-##   ## power set operation
-##   powerSet <- 2 ^ as.set(0 : (p - 1))
-##   Asize <- unlist(lapply(powerSet, length))
-##   hasZero <- unlist(lapply(powerSet, function(x) 0 %e% x))
-##   good <- Asize > 1 & Asize <= m & hasZero
-##   Asize <- Asize[good]
-##   Aidx <- unlist(powerSet[good])
-##   nA <- length(Asize)
-##   subsets <- powerSet[good]
-
-##   run <- .C("empcopsm", as.integer(x), as.integer(N),
-##             as.integer(n), as.integer(p), as.integer(q),
-##             as.integer(Aidx), as.integer(Asize), as.integer(nA),
-##             In = double(N + 1), MAn = double((N + 1) * nA),
-##             package = "copula")
-##   MAn <- matrix(run$MAn, nrow=nA)
-##   MAn.obs <- MAn[,1]
-##   MAn.sim <- MAn[,-1]
-##   MAn.pvalues <- apply(MAn, 1, function(x) (sum(x[-1] >= x[1]) + 0.5) / (N + 1) )
-##   In.obs <- run$In[1]
-##   In.sim <- run$In[-1]
-##   In.pvalue <- (sum(In.obs <= In.sim) + 0.5) / (N + 1)
-
-##   MAn.sim <- t(MAn.sim)
-##   pcombined <- combinePvals(MAn)
-
-##   beta <- (1 - alpha)^(1 / (sb - 1))
-##   critical <- myCritical(MAn.sim, beta, p, m, N)
-##   test <- list(subsets = subsets,
-##                statistics = MAn.obs,
-##                critical.values=critical,
-##                pvalues = MAn.pvalues,
-##                fisher.pvalue = pcombined$Fisher.pvalue,
-##                tippett.pvalue = pcombined$Tippett.pvalue,
-##                alpha = alpha, beta = beta,
-##                global.statistic = In.obs, global.statistic.pvalue = In.pvalue)
-##   class(test) <- "empcop.test"
-##   return(test)
-## }
-
-## empcopsm.test.ik <- function(x, lag.max, m=lag.max+1, N=1000, alpha=0.05)
-## {
-##     if (!is.numeric(x <- as.matrix(x)))
-##         stop("data should be numerical")
-##     if (any(is.na(x)))
-##         stop("data cannot contain missing values")
-##     if ((n <- nrow(x)) < 2)
-##         stop("data should contain more than 2 rows")
-##     if (!is.numeric(lag.max) || (p <- as.integer(lag.max) + 1) <= 1 || n-p+1 < 2)
-##       stop("wrong number of lags")
-
-##     q <- ncol(x)
-##     n <- n-p+1 ## number of rows of p-dimensional virtual data
-
-##     if (!is.numeric(m) || ((m <- as.integer(m)) < 2) || m > p)
-##         stop(paste("m should be an integer greater than 2 and smaller than",p))
-## ##     if (!is.numeric(N) || (N <- as.integer(N)) < 100)
-## ##         stop("N should be an integer greater than 100")
-##     if (!is.numeric(alpha) || alpha <= 0 || alpha >= 1)
-##         stop("the significance level alpha is not properly set")
-
-##     ## transform data to ranks
-##     for (j in 1:q)
-##         x[,j] <- rank(x[,j])
-
-##     sb <- binom.sum(p-1,m-1)
-
-##     ## bootstrap
-##     bootstrap <- .C("bootstrap_serial",
-##                     n = as.integer(n),
-##                     N = as.integer(N),
-##                     p = as.integer(p),
-##                     q = as.integer(q),
-##                     R = as.integer(x),
-##                     m = as.integer(m),
-##                     MA0 = double(N * (sb - 1)),
-##                     I0 = double(N),
-##                     subsets = integer(sb),
-##                     subsets.char = character(sb))#,                    PACKAGE="copula")
-
-##     subsets <- bootstrap$subsets.char[2:sb]
-##     subsets.binary <- bootstrap$subsets[2:sb]
-##     dist.statistics.independence <- matrix(bootstrap$MA0,N,sb-1)
-
-##     ## perform test
-##     R <- .C("empirical_copula_test_rv_serial",
-##              as.integer(x),
-##              as.integer(n),
-##              as.integer(p),
-##              as.integer(q),
-##              as.integer(m),
-##              as.double(bootstrap$MA0),
-##              as.double(bootstrap$I0),
-##              as.integer(N),
-##              as.integer(subsets.binary),
-##              MA = double(sb - 1),
-##              I = double(1),
-##              pval = double(sb - 1),
-##              fisher = double(1),
-##              tippett = double(1),
-##              Ipval = double(1)) #,             PACKAGE="copula")
-
-##     ## compute critical values at the alpha level
-##     beta <- (1 - alpha)^(1 / (sb - 1))
-##     critical <- numeric(0)
-##     from <- 1
-##     for (j in 1:(m-1))
-##     {
-##         to <- from + choose(p-1,j) - 1
-##         crit <- sort(as.double(dist.statistics.independence[,from:to]))[round(beta * N * (to - from + 1))]
-##         critical <- c(critical,rep(crit,choose(p-1,j)))
-##         from <- to + 1
-##     }
-
-##     test <- list(subsets=subsets,statistics=R $MA, critical.values=critical,
-##                  pvalues = R $pval, fisher.pvalue=R $fisher, tippett.pvalue=R $tippett, alpha=alpha,
-##                  beta=beta, global.statistic=R $I, global.statistic.pvalue=R $Ipval,
-##                  MAn.sim=dist.statistics.independence)
-
-##     class(test) <- "empcop.test"
-
-##     return(test)
-## }
-
-## ## Computes the sum of binomial coefficients
-## binom.sum <- function(n,k)
-## {
-##     bs <- 1
-##     for (i in 1:k)
-##         bs <- bs + choose(n,i)
-##     bs
-## }

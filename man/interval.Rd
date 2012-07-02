@@ -1,6 +1,6 @@
 \name{interval}
 \alias{interval}
-\title{Construct Simple "interval" Object}
+\title{Construct simple "interval" object}
 \description{
   Easy construction of an object of class \code{\linkS4class{interval}},
   using typical mathematical notation.

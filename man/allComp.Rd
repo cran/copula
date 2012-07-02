@@ -1,6 +1,6 @@
 \name{allComp}
 \alias{allComp}
-\title{All Components of a (Inner or Outer) Nested Archimedean Copula}
+\title{All components of a (inner or outer) nested Archimedean copula}
 \description{
   Given the nested Archimedean copula \code{x}, return an integer vector
   of the \emph{indices} of all components of the corresponding

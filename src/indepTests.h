@@ -15,70 +15,72 @@
   this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
+/**
+ * @file   indepTests.h
+ * @author Ivan Kojadinovic
+ * @date   December 2007
+ *
+ * @brief  Multivariate and "vectorial" tests of independence and serial
+ *         independence based on the empirical copula process
+ *
+ */
 
-/*****************************************************************************
+#ifndef INDEPTESTS_H
+#define INDEPTESTS_H
 
-  Multivariate serial independence test based on the empirical
-  copula process
-
-  Ivan Kojadinovic, December 2007
-
-*****************************************************************************/
-
-
-// empcop.stat.c  --- "Utilities" ----------------------------------------------
-//void K_array(int n, int p, double *J, double *K);
+// indepTest_utils.c  --- temporary arrays -------------------------------------
 void K_array(int n, int p, const double J[], double *K);
-//void L_array(int n, int p, double *K, double *L);
 void L_array(int n, int p, const double K[], double *L);
 
 double I_n(int n, int p, double *J, double *K, double *L);
 double M_A_n(int n, int p, double *J, double *K, double *L, int A);
 
-// different versions of "Array J" -----------------------
+// different versions of temporary array J -----------------------
 void J_m (int n, int p, const int b[], const double U[], const int R[], double *J);
 void J_s (int n, int p,                const double U[],                double *J);
 
 void J_sm(int n, int p, int q, const double U[], const int B[], double *J);
 void J_u (int n, int p,        const double R[],                double *J);
 
+// utility function: text progress bar 
+void progressBar(int k, int N, int w);
 
-// empcopm.test.c  --- Independence test among random vectors ------------------
+// multIndepTest.c  --- Independence test among random vectors ------------------
 void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
 		    double *MA0, double *I0, int *subset, char **subset_char,
-		    int *pe);
+		    int *verbose);
 void empirical_copula_test_rv(double *U, int *n, int *p, int *b, int *m, double *MA0,
 			      double *I0, int *N, int *subset, double *MA, double *I,
 			      double *pval, double *fisher, double *tippett, double *Ipval);
 
-// empcops.test.c  --- Serial Indep. test Genest-Remillard (2004) --------------
+// serialIndepTest.c  --- Serial independence test of Genest and Remillard (2004) ---------
 void simulate_empirical_copula_serial(int *n, int *N, int *p, int *m,
 				      double *TA0, double *G0, int *subset,
 				      char **subset_char, double *fisher0,
-				      double *tippett0, int *pe);
+				      double *tippett0, int *verbose);
 void empirical_copula_test_serial(double *U, int *n, int *p, int *m, double *TA0, double *G0,
 				  int *N, int *subset, double *TA, double *G, double *pval,
 				  double *fisher, double *tippett, double *globpval,
 				  double *fisher0, double *tippett0);
 
 
-// empcopsm.test.c  --- Multivar. Serial Indep. test ---------------------------
+// multSerialIndepTest.c  --- Multivariate serial independence test ------------------------
 void bootstrap_serial(int *n, int *N, int *p, int *q, double *U, int *m,
 		      double *MA0, double *I0, int *subset, char **subset_char,
-		      int *pe);
+		      int *verbose);
 void empirical_copula_test_rv_serial(double *U, int *n, int *p, int *q, int *m, double *MA0,
 				     double *I0, int *N, int *subset, double *MA, double *I,
 				     double *pval, double *fisher, double *tippett, double *Ipval);
 
-// empcopu.test.c  --- Multivar.Indep. test Genest-Remillard (2004) ------------
+// ecIndepTest.c  --- Multivariate independence test of Genest and Remillard (2004) ------------
 void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
 			       double *G0, int *subset, char **subset_char,
-			       double *fisher0, double *tippett0, int *pe);
+			       double *fisher0, double *tippett0, int *verbose);
 void empirical_copula_test(double *R, int *n, int *p, int *m, double *TA0, double *G0,
 			   int *N, int *subset, double *TA, double *G, double *pval,
 			   double *fisher, double *tippett, double *globpval,
 			   double *fisher0, double *tippett0);
 
-
+#endif
 
 

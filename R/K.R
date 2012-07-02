@@ -50,7 +50,7 @@ pK <- function(u, cop, d, n.MC=0, log=FALSE)
 	stopifnot(is.finite(n.MC))
         if(length(not01)){
             V <- cop@V0(n.MC, th) # vector of length n.MC
-            psiI <- cop@psiInv(uN01, th) # vector of length n
+            psiI <- cop@iPsi(uN01, th) # vector of length n
             lr <- unlist(lapply(psiI, function(psInv){
                 -log(n.MC) + lsum(as.matrix(ppois(d-1, V*psInv, log.p=TRUE)))
                 ## Former code: mean(ppois(d-1, V*psInv))
@@ -62,37 +62,37 @@ pK <- function(u, cop, d, n.MC=0, log=FALSE)
 	    res[not01] <- if(d == 1) { # d == 1
 		if(log) log(uN01) else uN01 # K(u) = u
 	    } else if(d == 2) { # d == 2
-		r <- uN01 + exp( cop@psiInv(uN01, theta=th, log=TRUE) -
-                                 cop@psiInvD1abs(uN01, th, log=TRUE) ) # K(u) = u - psi^{-1}(u) / (psi^{-1})'(u)
+		r <- uN01 + exp( cop@iPsi(uN01, theta=th, log=TRUE) -
+                                 cop@absdiPsi(uN01, th, log=TRUE) ) # K(u) = u - psi^{-1}(u) / (psi^{-1})'(u)
                 if(log) log(r) else r
 	    } else { # d >= 3
 		j <- seq_len(d-1)
-		lpsiI. <- cop@psiInv(uN01, theta=th, log=TRUE)
-		lpsiDabs <- do.call(rbind,
+		lpsiI. <- cop@iPsi(uN01, theta=th, log=TRUE)
+		labsdPsi <- do.call(rbind,
 				    lapply(j, function(j.)
-					   cop@psiDabs(exp(lpsiI.),
+					   cop@absdPsi(exp(lpsiI.),
 						       theta=th,
 						       degree=j.,
 						       log=TRUE))) # (d-1) x n  matrix [n = length(not01)]
                 ## containing log( (-1)^j * psi^{(j)}(psi^{-1}(u)) ) in the j-th row
 		lfac.j <- cumsum(log(j)) ## == lfactorial(j)
-                lx <- lpsiDabs + j %*% t(lpsiI.) - lfac.j # (d-1) x n matrix
+                lx <- labsdPsi + j %*% t(lpsiI.) - lfac.j # (d-1) x n matrix
                 lx <- rbind(log(uN01), lx) # d x n matrix containing the logarithms of the summands of K
                 ls <- lsum(lx) # log(K(u))
                 if(log) ls else pmin(1, exp(ls)) # ensure we are in [0,1] {numerical inaccuracy}
 		## Former code:
 		## K2 <- function(psInv) {
-		##    lpsiDabs <- unlist(lapply(j, cop@psiDabs,
+		##    labsdPsi <- unlist(lapply(j, cop@absdPsi,
 		##			      u=psInv, theta=th, log=TRUE))
-		##    sum(exp(lpsiDabs + j*log(psInv) - lfac.j))
+		##    sum(exp(labsdPsi + j*log(psInv) - lfac.j))
 		## }
 		## pmin(1, uN01 + unlist(lapply(psiI[not01], K2)))
 		##
 		## NB: AMH, Clayton, Frank are numerically not quite monotone near one;
 		## --  this does not change that {but maybe slightly *more* accurate}:
-		## psiDabs. <- unlist(lapply(j, cop@psiDabs, u = psInv, theta = th,
+		## absdPsi. <- unlist(lapply(j, cop@absdPsi, u = psInv, theta = th,
 		##						 log = FALSE))
-		##		       sum(psiDabs.*psInv^j/factorial(j))
+		##		       sum(absdPsi.*psInv^j/factorial(j))
 	    } # else (d >= 3)
     } # if/else method (MC/direct)
     res
@@ -237,12 +237,12 @@ dK <- function(u, cop, d, n.MC=0, log=FALSE)
 {
     stopifnot(is(cop, "acopula"), 0 < u, u < 1)
     th <- cop@theta
-    lpsiI <- cop@psiInv(u, theta=th, log=TRUE) # log(psi^{-1}(u))
-    lpsiIDabs <- cop@psiInvD1abs(u, theta=th, log=TRUE) # (-psi^{-1})'(u)
+    lpsiI <- cop@iPsi(u, theta=th, log=TRUE) # log(psi^{-1}(u))
+    lpsiIDabs <- cop@absdiPsi(u, theta=th, log=TRUE) # (-psi^{-1})'(u)
     ld <- lfactorial(d-1) # log((d-1)!)
-    psiI <- cop@psiInv(u, theta=th) # psi^{-1}(u)
-    lpsiDabs <- cop@psiDabs(psiI, theta=th, degree=d, n.MC=n.MC, log=TRUE) # log((-1)^d psi^{(d)}(psi^{-1}(u)))
-    res <- lpsiDabs-ld+(d-1)*lpsiI+lpsiIDabs
+    psiI <- cop@iPsi(u, theta=th) # psi^{-1}(u)
+    labsdPsi <- cop@absdPsi(psiI, theta=th, degree=d, n.MC=n.MC, log=TRUE) # log((-1)^d psi^{(d)}(psi^{-1}(u)))
+    res <- labsdPsi-ld+(d-1)*lpsiI+lpsiIDabs
     if(log) res else exp(res)
 }
 
@@ -262,5 +262,5 @@ rK <- function(n, cop, d) {
     } else if(!is(cop, c2 <- "outer_nacopula"))
 	stop(sprintf("'cop' must be \"%s\" or \"%s\"", c1,c2))
 
-    pcopula(cop, rcopula(cop, n))
+    pCopula(rCopula(n, cop), cop)
 }

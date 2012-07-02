@@ -19,13 +19,13 @@ setClass("schlatherCopula", contains = "evCopula"
            # , exprdist = "expression")
          )
 
-AfunSchlather <- function(copula, w) { ## one-parameter for now
+ASchlather <- function(copula, w) { ## one-parameter for now
   alpha <- copula@parameters[1]
   A <- 0.5 * (1 + sqrt(1 - 2 * (alpha + 1) * w * (1 - w)))
   ifelse(w == 0 | w == 1, 1, A)
 }
 
-AfunDerSchlather <- function(copula, w) {
+dAduSchlather <- function(copula, w) {
   alpha <- copula@parameters[1]
   ainv <- 1 / alpha
   z <- 0.5 * alpha * log(w / (1 - w))
@@ -49,26 +49,26 @@ AfunDerSchlather <- function(copula, w) {
   data.frame(der1 = der1, der2 = der2)
 }
 
-derAfunWrtParamSchlather <- function(copula, w) {
+dAdthetaSchlather <- function(copula, w) {
   alpha <- copula@parameters[1]
   ## to be completed
   stop("to be implemented")
 }
 
-schlatherCopula <- function(param) {
+schlatherCopula <- function(param = NA_real_) {
   dim <- 2L
-  new("huslerReissCopula",
+  new("schlatherCopula",
              dimension = dim,
              ## exprdist = c(cdf = cdf, pdf = pdf),
              parameters = param[1],
              param.names = "param",
              param.lowbnd = -1,
              param.upbnd = 1,
-             message = "Schlather copula family; Extreme value copula")
+             fullname = "Schlather copula family; Extreme value copula")
 }
 
 
-pschlatherCopula <- function(copula, u) {
+pschlatherCopula <- function(u, copula) {
   dim <- copula@dimension
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
@@ -77,10 +77,10 @@ pschlatherCopula <- function(copula, u) {
   alpha <- copula@parameters[1]
   ## Beirlant, Goegebeur, Segers, and Teugels (2004, p.295)
   w <- log(u2) / log(u1 * u2)
-  u1 * u2 * exp(AfunSchlather(copula, w))
+  u1 * u2 * exp(ASchlather(copula, w))
 }
 
-dschlatherCopula <- function(copula, u, log=FALSE, ...) {
+dschlatherCopula <- function(u, copula, log=FALSE, ...) {
   dim <- copula@dimension
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
@@ -93,19 +93,17 @@ dschlatherCopula <- function(copula, u, log=FALSE, ...) {
 
 ## This block is copied from ../../copulaUtils/assoc/ ##########################
 
-#setMethod("pcopula", signature("schlatherCopula"), pschlatherCopula)
-#setMethod("dcopula", signature("schlatherCopula"), dschlatherCopula)
-## revCopula is much faster
-## setMethod("rcopula", signature("schlatherCopula"), rschlatherCopula)
+#setMethod("pCopula", signature("schlatherCopula"), pschlatherCopula)
+#setMethod("dCopula", signature("schlatherCopula"), dschlatherCopula)
 
-#setMethod("Afun", signature("schlatherCopula"), AfunSchlather)
-#setMethod("AfunDer", signature("schlatherCopula"), AfunDerSchlather)
+#setMethod("A", signature("schlatherCopula"), ASchlather)
+#setMethod("dAdu", signature("schlatherCopula"), dAduSchlather)
 
-## setMethod("kendallsTau", signature("schlatherCopula"), kendallsTauHuslerReissCopula)
-## setMethod("spearmansRho", signature("schlatherCopula"), spearmansRhoHuslerReissCopula)
+## setMethod("tau", signature("schlatherCopula"), tauSchlatherCopula)
+## setMethod("rho", signature("schlatherCopula"), rhoSchlatherCopula)
 
-## setMethod("calibKendallsTau", signature("schlatherCopula"), calibKendallsTauHuslerReissCopula)
-## setMethod("calibSpearmansRho", signature("schlatherCopula"), calibSpearmansRhoHuslerReissCopula)
+## setMethod("iTau", signature("schlatherCopula"), iTauSchlatherCopula)
+## setMethod("iRho", signature("schlatherCopula"), iRhoSchlatherCopula)
 
-## setMethod("tauDer", signature("schlatherCopula"), tauDerHuslerReissCopula)
-## setMethod("rhoDer", signature("schlatherCopula"), rhoDerHuslerReissCopula)
+## setMethod("dTau", signature("schlatherCopula"), dTauSchlatherCopula)
+## setMethod("dRho", signature("schlatherCopula"), dRhoSchlatherCopula)

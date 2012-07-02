@@ -16,16 +16,20 @@
 */
 
 
-#include <math.h>
+/* Kemp, A. W., 1981, Applied Statistics 30(3) p. 249--253 */
 
+#include <math.h>
 #include <R.h>
 #include <Rmath.h>
-
 #include "copula.h"
 
-/* Kemp A.W. 1981, Applied Statistics 30(3) pp249--253 */
-
-/* Algorithm LS */
+/**
+ * Algorithm LS of Kemp (1981)
+ *
+ * @param alpha in (0,1)x
+ * @return random variate following the logarithmic (series) distribution Log(alpha)
+ * @author Marius Hofert
+ */
 static
 int rlogseries_LS ( double alpha ) {
   double t = - alpha / log(1 - alpha);
@@ -39,8 +43,13 @@ int rlogseries_LS ( double alpha ) {
   return (x);
 }
 
-
-/* Algorithm LK */
+/**
+ * Algorithm LK of Kemp (1981)
+ *
+ * @param alpha in (0,1)
+ * @return random variate following the logarithmic (series) distribution Log(alpha)
+ * @author Marius Hofert
+ */
 static
 int rlogseries_LK ( double alpha ) {
   double h = log(1 - alpha);
@@ -53,8 +62,14 @@ int rlogseries_LK ( double alpha ) {
   return 2;
 }
 
-
-/* R wrapper */
+/**
+ * R wrapper
+ *
+ * @param n sample size
+ * @param alpha parameters in (0,1)
+ * @return val return value(s)
+ * @author Marius Hofert
+ */
 void rlogseries_R (int *n, double *alpha, int *val) {
   int i;
   double thres = 0.95;// FIXME : thres should be *argument*

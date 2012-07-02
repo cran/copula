@@ -330,14 +330,14 @@ generators are the ones given in \citet[pp.\ 116]{nelsen2007}. Also note that fo
 
 These Archimedean copula families are provided as \code{"acopula"} \R\
 objects (for more information about the statistical software \R, see \citet[2.11.1]{r}), containing as slots the corresponding generator
-$\psi$, \code{psi}, its inverse $\psii$, \code{psiInv},
+$\psi$, \code{psi}, its inverse $\psii$, \code{iPsi},
 and the ``sampler'', i.e., random number generator for $V\sim F$, as \code{V0}:
 <<acopula-family>>=
 require(copula)
 ls("package:copula", pattern = "^cop[A-Z]")
 copClayton
 copClayton@psi
-copClayton@psiInv # the inverse of psi(), psi^{-1}
+copClayton@iPsi # the inverse of psi(), psi^{-1}
 copClayton@V0     # "sampler" for  V ~ F()
 @
 The majority of slots of such copula objects are functions, encoding properties
@@ -732,8 +732,8 @@ pnacopula <- function(x,u) {
     C <- x@copula
     th <- C@theta
     ## use u[j] for the direct components 'comp':
-    C@psi(sum(unlist(lapply(u[x@comp], C@psiInv, theta=th)),
-              C@psiInv(unlist(lapply(x@childCops, pnacopula, u = u)),
+    C@psi(sum(unlist(lapply(u[x@comp], C@iPsi, theta=th)),
+              C@iPsi(unlist(lapply(x@childCops, pnacopula, u = u)),
                        theta=th)),
           theta=th)
 }

@@ -74,7 +74,7 @@ a.coeff <- function(t, cops, th0)
 ##'
 ##'     b_k(t) = \sum_{j in Q_{d.,k}^{d_0} \prod_{s=1}^{d_0} a_{s, d_s j_s}(t_s(u_s))
 ##'
-##' where t_s is the sum over psiInv of sector s,
+##' where t_s is the sum over iPsi of sector s,
 ##'       a_{s, d_s j_s}(t) is a function specific to each family (and = 1 for
 ##'       non-sectorial parts),
 ##'   and Q_{d.,k}^{d_0} is the set of all vectors j=(j_1,..,j_d_0) such that the sum
@@ -161,13 +161,13 @@ nacLL <- function(cop, u)
     lcomp <- length(C@comp) # if > 0 there is a non-sectorial part
     d0 <- S+lcomp # dim(C_0)
     n <- nrow(u)
-    lpsiInvD1. <- matrix(, nrow=n, ncol=if(lcomp>0) S+1 else S) # n x S(+1) matrix of log(psiInvD1abs()); the "+1" comes from the non-sectorial part (if there is one)
+    liPsiD1. <- matrix(, nrow=n, ncol=if(lcomp>0) S+1 else S) # n x S(+1) matrix of log(absdiPsi()); the "+1" comes from the non-sectorial part (if there is one)
     eta0. <- matrix(, nrow=n, ncol=d0) # n x d_0 matrix containing C_s(u_s)'s and u_0's (if there is a non-sectorial part)
 
     ## walk over the non-sectorial part (if available)
     if(lcomp > 0){
         u0 <- u[,C@comp, drop=FALSE]
-        lpsiInvD1.[,S+1] <- rowSums(C@copula@psiInvD1abs(u0, theta=C@copula@theta,
+        liPsiD1.[,S+1] <- rowSums(C@copula@absdiPsi(u0, theta=C@copula@theta,
                                                          log=TRUE))
         eta0.[,(S+1):d0] <- u0 # just set to the u's of the non-sectorial part
     }
@@ -177,15 +177,15 @@ nacLL <- function(cop, u)
     for(s in 1:S){
         Cs <- C@childCops[[s]] # sector s copula list
         us <- u[, Cs@comp] # col-indices of u that belong to sector s
-        t.[,s] <- rowSums(Cs@copula@psiInv(us, theta=Cs@copula@theta))
-        lpsiInvD1.[,s] <- rowSums(Cs@copula@psiInvD1abs(us, theta=Cs@copula@theta,
+        t.[,s] <- rowSums(Cs@copula@iPsi(us, theta=Cs@copula@theta))
+        liPsiD1.[,s] <- rowSums(Cs@copula@absdiPsi(us, theta=Cs@copula@theta,
                                                         log=TRUE))
         eta0.[,s] <- Cs@copula@psi(t.[,s], theta=Cs@copula@theta) # C_s(u_s)
     }
 
     ## finish computations
-    lpsiInvD1sum <- rowSums(lpsiInvD1.) # sum(log(psiInvD1abs)); vector of length n
-    eta0 <- rowSums(C@copula@psiInv(eta0., theta=C@copula@theta)) # eta0; vector of length n; = C@copula@psiInv(pnacopula(C, u), theta=C@copula@theta)
+    liPsiD1sum <- rowSums(liPsiD1.) # sum(log(absdiPsi)); vector of length n
+    eta0 <- rowSums(C@copula@iPsi(eta0., theta=C@copula@theta)) # eta0; vector of length n; = C@copula@iPsi(pnacopula(C, u), theta=C@copula@theta)
 
     ## compute b_k's, k=d0,..,d
     ## note: it suffices to give b.coeff only the sectorial t's
@@ -195,11 +195,11 @@ nacLL <- function(cop, u)
     th0 <- C@copula@theta
     x <- sapply(d0:d, function(k){
         log((-1)^(d-k) * b.mat[,k-d0+1]) +
-            C@copula@psiDabs(eta0, theta=th0, degree=k, log=TRUE)
+            C@copula@absdPsi(eta0, theta=th0, degree=k, log=TRUE)
     })
 
     ## return
-    sum(copula:::lsum(t(x)) + lpsiInvD1sum) # sum over all t's
+    sum(copula:::lsum(t(x)) + liPsiD1sum) # sum over all t's
 }
 
 

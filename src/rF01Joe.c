@@ -23,8 +23,9 @@
 
 /**
  * Sample V01 ~ F01 with Laplace-Stieltjes transform ((1-(1-exp(-t))^alpha))^V0
- * Used, e.g., for sampling F01 for Joe and for sampling F01 for Frank.
+ * Used, for example, for sampling F01 for Joe and for sampling F01 for Frank.
  * Note: The caller of this function must use GetRNGstate() and PutRNGstate().
+ *
  * @param V0 parameter V0
  * @param alpha parameter theta0/theta1 in (0,1]
  * @param gamma_1_a Gamma(1-alpha)
@@ -44,8 +45,9 @@ double rF01Joe(double V0, double alpha, double gamma_1_a /**< == Gamma(1 - alpha
 
 /**
  * Generate a vector of variates V01 ~ F01 with Laplace-Stieltjes transform
- * ((1-(1-exp(-t))^alpha))^V0. Vectorized version of rF01Joe. Used, e.g., to draw
+ * ((1-(1-exp(-t))^alpha))^V0. Vectorized version of rF01Joe. Used, for example, to draw
  * several variates from rF01Joe.
+ *
  * @param V01 vector of random variates from F01 (result)
  * @param V0 vector of random variates from F0
  * @param n length of the vector V0
@@ -68,8 +70,9 @@ void rF01Joe_vec(double* V01, const double *V0, int n, double alpha, double appr
 
 /**
  * Generate a vector of variates V01 ~ F01 with Laplace-Stieltjes transform
- * ((1-(1-exp(-t))^alpha))^V0. Bridge to R. Used, e.g., to draw several variates
+ * ((1-(1-exp(-t))^alpha))^V0. Bridge to R. Used, for example, to draw several variates
  * from rF01Joe.
+ *
  * @param V0_ vector of random variates from F0
  * @param alpha_ parameter alpha = theta0/theta1 in (0,1]
  * @param approx_ largest number of summands before asymptotics is used

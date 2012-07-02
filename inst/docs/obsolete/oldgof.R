@@ -24,7 +24,7 @@
 gof <- function(cop, x, N=1000, method="kendall")
   {
     x <- as.matrix(x)
-    
+
     ## number of observations
     n <- dim(x)[1]
     ## number of variables
@@ -52,7 +52,7 @@ gof <- function(cop, x, N=1000, method="kendall")
     if ((method == 2 || method == 3) && length(cop@parameters) != 1)
       stop("Estimation based on Kendall's tau or Spearman's rho will work only for one-parameter copulas")
 
-  
+
     ## make pseudo-observations
     u <- apply(x,2,rank)/(n+1)
 
@@ -69,18 +69,18 @@ gof <- function(cop, x, N=1000, method="kendall")
             as.integer(n),
             as.integer(p),
             as.double(u),
-            as.double(pcopula(fcop,u)),
+            as.double(pCopula(u, fcop)),
             stat = double(1),
             PACKAGE="copula")$stat
-    
+
     ## simulation of the null distribution
     s0 <- numeric(N)
     for (i in 1:N)
       {
         cat(paste("Iteration",i,"\n"))
-        x0 <- rcopula(fcop,n)
+        x0 <- rCopula(n, fcop)
         u0 <- apply(x0,2,rank)/(n+1)
-        
+
          ## fit the copula
         if (method==1)
           fcop0 <- fitCopula(u0,cop,fcop@parameters)@copula
@@ -88,16 +88,16 @@ gof <- function(cop, x, N=1000, method="kendall")
           fcop0 <- fitCopulaKendallsTau(cop,u0)
         else if (method==3)
           fcop0 <- fitCopulaSpearmansRho(cop,u0)
-        
+
         s0[i] <- .C("cramer_vonMises",
                     as.integer(n),
                     as.integer(p),
                     as.double(u0),
-                    as.double(pcopula(fcop0,u0)),
+                    as.double(pCopula(u0, fcop0)),
                     stat = double(1),
                     PACKAGE="copula")$stat
       }
-    
+
     return(list(statistic=s, pvalue=(sum(s0 >= s)+0.5)/(N+1)))
   }
 
@@ -106,7 +106,7 @@ gof <- function(cop, x, N=1000, method="kendall")
 gofMobius <- function(cop, x, maxcard=ncol(x), use.empcop=TRUE, m=2000, N=100)
   {
     x <- as.matrix(x)
-    
+
     ## number of observations
     n <- dim(x)[1]
     ## number of variables
@@ -124,20 +124,20 @@ gofMobius <- function(cop, x, maxcard=ncol(x), use.empcop=TRUE, m=2000, N=100)
     if (!is.numeric(maxcard) || (maxcard <- as.integer(maxcard)) < 2
         || maxcard > p)
       stop(paste("maxcard should be an integer greater than 2 and smaller than",p))
-  
+
     ## number of subsets
     sb <- binom.sum(p,maxcard)
     nsubsets <- sb - p - 1
 
     ## power set of {1,...,dim} in integer notation
-    subsets <-  .C("k_power_set", 
+    subsets <-  .C("k_power_set",
                    as.integer(p),
                    maxcard,
                    subsets = integer(sb),
                    PACKAGE="copula")$subsets
-    
+
     ## power set in character vector: {}, {1}, {2}, ..., {1,2}, ..., {1,...,dim}
-    subsets.char <-  .C("k_power_set_char", 
+    subsets.char <-  .C("k_power_set_char",
                         as.integer(p),
                         as.integer(sb),
                         as.integer(subsets),
@@ -147,7 +147,7 @@ gofMobius <- function(cop, x, maxcard=ncol(x), use.empcop=TRUE, m=2000, N=100)
     ## remove emptyset and singletons
     subsets <- subsets[(p+2):sb]
     subsets.char <- subsets.char[(p+2):sb]
-    
+
     ## make pseudo-observations
     u <- apply(x,2,rank)/(n+1)
 
@@ -155,14 +155,14 @@ gofMobius <- function(cop, x, maxcard=ncol(x), use.empcop=TRUE, m=2000, N=100)
     fcop <- fitCopula(u,cop,cop@parameters)@copula
 
     ## compute the test statistic
-    if (use.empcop == TRUE)   
+    if (use.empcop == TRUE)
       s <- .C("Mobius_cramer_vonMises_approx",
               as.integer(n),
               as.integer(p),
               as.integer(nsubsets),
               as.integer(subsets),
               as.double(u),
-              as.double(rcopula(fcop,m)),
+              as.double(rCopula(m, fcop)),
               as.integer(m),
               stat = double(nsubsets+1),
               PACKAGE="copula")$stat
@@ -176,9 +176,9 @@ gofMobius <- function(cop, x, maxcard=ncol(x), use.empcop=TRUE, m=2000, N=100)
             marg[[j]] <- eval(parse(text=sub('\\}', ')', marg[[j]])))
             ones <- matrix(1,n,p)
             ones[,marg[[j]]] <- u[,marg[[j]]]
-            pcop[,j] <- pcopula(fcop,ones)
+            pcop[,j] <- pCopula(ones, fcop)
           }
-        
+
         s <- .C("Mobius_cramer_vonMises",
                 as.integer(n),
                 as.integer(p),
@@ -189,16 +189,16 @@ gofMobius <- function(cop, x, maxcard=ncol(x), use.empcop=TRUE, m=2000, N=100)
                 stat = double(nsubsets+1),
                 PACKAGE="copula")$stat
       }
-    
+
     ## simulation of the null distribution
     s0 <- matrix(0,N,nsubsets+1)
     for (i in 1:N)
       {
         cat(paste("Iteration",i,"\n"))
-        x0 <- rcopula(fcop,n)
+        x0 <- rCopula(n, fcop)
         u0 <- apply(x0,2,rank)/(n+1)
-        
-        ## fit the copula 
+
+        ## fit the copula
         fcop0 <- fitCopula(u0,cop,cop@parameters)@copula
 
         ## compute the test statistic
@@ -209,7 +209,7 @@ gofMobius <- function(cop, x, maxcard=ncol(x), use.empcop=TRUE, m=2000, N=100)
                        as.integer(nsubsets),
                        as.integer(subsets),
                        as.double(u0),
-                       as.double(rcopula(fcop0,m)),
+                       as.double(rCopula(m, fcop0)),
                        as.integer(m),
                        stat = double(nsubsets+1),
                        PACKAGE="copula")$stat
@@ -220,9 +220,9 @@ gofMobius <- function(cop, x, maxcard=ncol(x), use.empcop=TRUE, m=2000, N=100)
               {
                 ones <- matrix(1,n,p)
                 ones[,marg[[j]]] <- u0[,marg[[j]]]
-                pcop0[,j] <- pcopula(fcop0,ones)
+                pcop0[,j] <- pCopula(ones, fcop0)
               }
-        
+
             s0[i,] <- .C("Mobius_cramer_vonMises",
                         as.integer(n),
                         as.integer(p),
@@ -234,14 +234,14 @@ gofMobius <- function(cop, x, maxcard=ncol(x), use.empcop=TRUE, m=2000, N=100)
                         PACKAGE="copula")$stat
         }
       }
-    
+
     pval <-.C("Mobius_pvalues",
               as.integer(nsubsets),
               as.integer(N),
               as.double(rbind(s0,s)),
               pval = double(nsubsets+3),
               PACKAGE="copula")$pval
-    
+
     test <- list(s0=s0, subsets=subsets.char, statistics=s[1:nsubsets],
                  pvalues = pval[1:nsubsets], global.statistic = s[nsubsets+1],
                  global.statistic.pvalue = pval[nsubsets+1], fisher.pvalue=pval[nsubsets+2],
@@ -256,12 +256,12 @@ gofMobius <- function(cop, x, maxcard=ncol(x), use.empcop=TRUE, m=2000, N=100)
 derivatives <- function(cop)
   {
     p <- cop@dimension
-    
+
     ## partial derivatives of the cdf wrt arguments
     cdf.u <- vector("list",p)
     for (j in 1:p)
       cdf.u[[j]] <- D(cop@exprdist$cdf,paste("u",j,sep=""))
-    
+
     ## partial derivative of the cdf wrt parameter
     cdf.alpha <- D(cop@exprdist$cdf,"alpha")
 
@@ -272,7 +272,7 @@ derivatives <- function(cop)
     pdf.u <- vector("list",p)
     for (j in 1:p)
       pdf.u[[j]] <- D(cop@exprdist$pdf,paste("u",j,sep=""))
-   
+
     return(list(cdf.u=cdf.u,cdf.alpha=cdf.alpha,
                 pdf.alpha=pdf.alpha,pdf.u=pdf.u))
   }
@@ -281,7 +281,7 @@ derivatives <- function(cop)
 
 fitCopulaKendallsTau <- function(cop,u)
 {
-    cop@parameters <- calibKendallsTau(cop,cor(u[,1],u[,2],method="kendall"))
+    cop@parameters <- iTau(cop,cor(u[,1],u[,2],method="kendall"))
     return(cop)
 }
 
@@ -289,7 +289,7 @@ fitCopulaKendallsTau <- function(cop,u)
 
 fitCopulaSpearmansRho <- function(cop,u)
 {
-    cop@parameters <- calibSpearmansRho(cop,cor(u[,1],u[,2],method="spearman"))
+    cop@parameters <- iRho(cop,cor(u[,1],u[,2],method="spearman"))
     return(cop)
 }
 
@@ -319,10 +319,10 @@ influ.add <- function(x0, y0, influ1, influ2)
 gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
                        der=NULL, betavar=FALSE, center=FALSE, M=2500,
                        grid=0)
-  {     
+  {
     ## data
     x <- as.matrix(x)
-    
+
     ## number of observations
     n <- dim(x)[1]
     ## number of variables
@@ -343,31 +343,31 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
       stop("invalid estimation method")
     if(method == -1)
       stop("ambiguous estimation method")
-  
+
     ## make pseudo-observations
     u <- apply(x,2,rank)/(n+1)
 
     ## fit the copula
     if (method==1)
-      cop <- fitCopula(u,cop,calibKendallsTau(cop,cor(u[,1],u[,2],
+      cop <- fitCopula(u,cop,iTau(cop,cor(u[,1],u[,2],
                                                       method="kendall")))@copula
     else if (method==2)
       cop <- fitCopulaKendallsTau(cop,u)
     else if (method==3)
-      cop <- fitCopulaSpearmansRho(cop,u) 
-    
+      cop <- fitCopulaSpearmansRho(cop,u)
+
     ## estimate of theta
     alpha <-  cop@parameters
-    
+
     ## grid points where to evaluate the process
     if (grid == 0 || grid == 1)
-      g <- rcopula(cop,n) ## default 
+      g <- rCopula(n, cop) ## default
     else if (grid==2)
       g <- matrix(runif(n*p),n,p)
     else if (grid >= 3)
-      g <- u 
-    pcop <- pcopula(cop,g)
-    
+      g <- u
+    pcop <- pCopula(g, cop)
+
     ## compute the test statistic
     s <- .C("cramer_vonMises_2",
             as.integer(p),
@@ -378,61 +378,61 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
             as.double(pcop),
             stat = double(1),
             PACKAGE="copula")$stat
-   
+
     ## generate realizations under H0
     if (grid==1)
       x0 <- g
-    else 
-      x0 <- rcopula(cop,m) ## default
-    
+    else
+      x0 <- rCopula(m, cop) ## default
+
     if (grid==4) ## a la Genest et al.
       {
         g <- apply(x0,2,rank)/(m+1) #pseudo-obs
-        pcop <- pcopula(cop,g)
+        pcop <- pCopula(g, cop)
       }
 
     ## matrix of partial derivatives at g
     ## n lines  by p+1 columns
     ## (wrt arguments (p cols) + wrt parameter (1 col) + NEW
     dermat <- matrix(0,n,p+1)
-    
+
     ## Now, prepare derivatives and influence coefficients
-    
+
     #####################################################
     ##
     ## Copulas having an explicit cdf
     ##
     #####################################################
 
-    if (!(class(cop) %in% c("normalCopula","tCopula"))) 
-      { 
+    if (!(class(cop) %in% c("normalCopula","tCopula")))
+      {
         ## partial derivatives
         if (is.null(der))
           der <- derivatives(cop)
-        
+
         v <- character()
         for (j in 1:p)
           v <- c(v,paste("u",j,sep=""))
-        
+
         for (j in 1:p)
           assign(v[j], g[,j])
         for (j in 1:p)
           dermat[,j] <- eval(der$cdf.u[[j]], list(u1 = u1, u2 = u2))
         dermat[,p+1] <- eval(der$cdf.alpha, list(u1 = u1, u2 = u2))
-     
+
         ## influence coefficients for estimation
         if (method==1) ## likelihood
           {
             for (j in 1:p)
               assign(v[j], x0[,j])
-            
+
             ## influence: first part
-            influ <- eval(der$pdf.alpha, list(u1 = u1, u2 = u2)) / dcopula(cop, x0)
-              
+            influ <- eval(der$pdf.alpha, list(u1 = u1, u2 = u2)) / dCopula(x0, cop)
+
             ## influence: second part
             ## integrals computed from M realizations by Monte Carlo
-            y0 <- rcopula(cop,M)
-            dcopy0 <- dcopula(cop, y0)
+            y0 <- rCopula(M, cop)
+            dcopy0 <- dCopula(y0, cop)
             for (j in 1:p)
               assign(v[j], y0[,j])
             influ0 <- eval(der$pdf.alpha, list(u1 = u1, u2 = u2)) / dcopy0
@@ -450,7 +450,7 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
     ## Metaelliptical copulas
     ##
     #####################################################
-    
+
     else if (class(cop) == "normalCopula") #WARNING p=2 only !!!
       {
         ## derivatives
@@ -460,7 +460,7 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
         dermat[,2] <- pnorm(v1, alpha * v2, sqrt(1 - alpha^2))
         dermat[,3] <- exp(-(v1^2 + v2^2 - 2 * alpha * v1 * v2)
                           /(2 * (1 - alpha^2)))/(2 * pi * sqrt(1 - alpha^2))
- 
+
         ## influence coefficients for estimation
         if (method==1) ## likelihood
           {
@@ -473,7 +473,7 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
 
             ## influence: second part
             ## integrals computed from M realizations by Monte Carlo
-            y0 <- rcopula(cop,M)
+            y0 <- rCopula(M, cop)
             v1 <- qnorm(y0[,1])
             v2 <- qnorm(y0[,2])
             influ0 <- (alpha * (1 - alpha^2) - alpha * (v1^2 + v2^2) +
@@ -491,7 +491,7 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
     else if (class(cop) == "tCopula") #WARNING p=2 only !!!
       {
         df <- cop@df
-  
+
         ## derivatives
         v1 <- qt(g[,1], df=df)
         v2 <- qt(g[,2], df=df)
@@ -501,7 +501,7 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
                          sqrt((df+1)/(df+v2^2)) / sqrt(1 - alpha^2), df=df+1)
         dermat[,3] <- (1 + (v1^2 + v2^2 - 2 * alpha * v1 * v2) /
                        (df * (1 - alpha^2)))^(-df / 2) / (2 * pi * sqrt(1 - alpha^2))
-        
+
         ## influence coefficients for estimation
         if (method==1)
           {
@@ -512,10 +512,10 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
             influ <- (1 + df) * alpha / (alpha^2 - 1) +
               (2 + df) * (df * alpha + v1 * v2) /
                 (df * (1 - alpha^2) + v1^2 + v2^2 - 2 * alpha * v1 * v2)
-             
+
             ## influence: second part
             ## integrals computed from M realizations by Monte Carlo
-            y0 <- rcopula(cop,M)
+            y0 <- rCopula(M, cop)
             v1 <- qt(y0[,1], df=df)
             v2 <- qt(y0[,2], df=df)
 
@@ -523,7 +523,7 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
               (2 + df) * (df * alpha + v1 * v2) /
                 (df * (1 - alpha^2) + v1^2 + v2^2 - 2 * alpha * v1 * v2)
             beta <- if (betavar) var(influ0) else mean(influ0^2)
-            
+
             influ1 <- - influ0 * sqrt(pi) * ((df+v1^2)/df)^((df-1)/2) *
               (df * (1 + (1 + df) * alpha^2) * v1 + v1^3 - df * alpha *
                (2 + df - v1^2) * v2 - (1 + df) * v1 * v2^2) * gamma(df/2) /
@@ -549,9 +549,9 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
 
     if (method==2) ## kendall's tau
       {
-        tauCtheta <- kendallsTau(cop)
-        influ <- 4 * (2 * pcopula(cop,x0) - x0[,1] - x0[,2] + (1 - tauCtheta)/2)
-        
+        tauCtheta <- tau(cop)
+        influ <- 4 * (2 * pCopula(x0, cop) - x0[,1] - x0[,2] + (1 - tauCtheta)/2)
+
         if (class(cop) == "claytonCopula")
           influ <- influ * (alpha+2)^2 / 2
         else if (class(cop) == "frankCopula")
@@ -560,7 +560,7 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
         else if (class(cop) == "gumbelCopula")
           influ <- influ * alpha^2
         else if (class(cop) == "plackettCopula") ## added by JY; testing only
-          influ <- influ / tauDerPlackettCopula(cop)
+          influ <- influ / dTauPlackettCopula(cop)
         else if (class(cop) %in% c("normalCopula","tCopula"))
           influ <- influ * pi * sqrt(1 - alpha^2) / 2
         else stop("H0 copula not implemented")
@@ -574,17 +574,17 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
 
     if (method==3) ## Spearman's rho
       {
-        rhoCtheta <- spearmansRho(cop)
+        rhoCtheta <- rho(cop)
 
         ## integrals computed from M realizations by Monte Carlo
-        y0 <- rcopula(cop,M)
+        y0 <- rCopula(M, cop)
         influ <- 12 * (x0[,1] * x0[,2] + influ.add(x0, y0, y0[,2],y0[,1])) -
           3 - rhoCtheta
 
         if (class(cop) == "claytonCopula") ## added by JY; testing only
-          influ <- influ / rhoDerClaytonCopula(cop)
+          influ <- influ / dRhoClaytonCopula(cop)
         else if (class(cop) == "gumbelCopula") ## added by JY; testing only
-          influ <- influ / rhoDerGumbelCopula(cop)
+          influ <- influ / dRhoGumbelCopula(cop)
         else if (class(cop) == "frankCopula")
           influ <- influ / (12 / (alpha * (exp(alpha) - 1)) -
                             36 / alpha^2 * debye2(alpha) +
@@ -596,7 +596,7 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
           influ <- influ * pi * sqrt(4 - alpha^2) / 6
         else stop("H0 copula not implemented")
       }
-   
+
     #####################################################
     ##
     ## Simulate under H0
@@ -610,9 +610,9 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
              as.integer(p),
              as.double(x0),
              as.integer(m),
-             as.double(g), 
-             as.integer(n), 
-             as.double(pcop), 
+             as.double(g),
+             as.integer(n),
+             as.double(pcop),
              as.double(dermat),
              as.double(influ),
              as.integer(N),

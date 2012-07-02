@@ -14,7 +14,7 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-plackettCopula <- function(param) {
+plackettCopula <- function(param = NA_real_) {
     ## get expressions of cdf and pdf
   cdfExpr <- parse(text = "0.5 / (alpha - 1) * (1 + (alpha - 1) * (u1 + u2) - ((1 + (alpha - 1) * (u1 + u2))^2 - 4 * alpha * (alpha - 1) * u1 * u2)^0.5)")
 
@@ -28,10 +28,10 @@ plackettCopula <- function(param) {
              param.names = "param",
              param.lowbnd = 0,
              param.upbnd = Inf,
-             message = "Plackett copula family")
+             fullname = "Plackett copula family")
 }
 
-pplackettCopula <- function(copula, u) {
+pplackettCopula <- function(u, copula) {
   dim <- copula@dimension
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
@@ -43,7 +43,7 @@ pplackettCopula <- function(copula, u) {
   0.5 / eta * (1 + eta * (u1 + u2) - ((1 + eta * (u1 + u2))^2 - 4 * alpha * eta * u1 * u2)^0.5)
 }
 
-dplackettCopula <- function(copula, u, log = FALSE, ...) {
+dplackettCopula <- function(u, copula, log = FALSE, ...) {
   dim <- copula@dimension
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
@@ -59,7 +59,7 @@ dplackettCopula <- function(copula, u, log = FALSE, ...) {
 }
 
 
-rplackettCopula <- function(copula, n) {
+rplackettCopula <- function(n, copula) {
   u1 <- runif(n)
   u2 <- runif(n)
   psi <- copula@parameters[1]
@@ -104,13 +104,13 @@ plackettTauDer <- function(alpha) {
   ##         valFun(1/theta, 1) * forwardDer(alpha, ss) / theta^2))
 }
 
-kendallsTauPlackettCopula <- function(copula) {
+tauPlackettCopula <- function(copula) {
   alpha <- copula@parameters[1]
   plackettTauFun(alpha)
 }
 
 
-calibKendallsTauPlackettCopula <- function(copula, tau) {
+iTauPlackettCopula <- function(copula, tau) {
   plackettTauInvLt1 <- approxfun(x = .plackettTau$assoMeasFun$fm$ysmth,
                                  y = .plackettTau$assoMeasFun$fm$x)
 
@@ -119,30 +119,35 @@ calibKendallsTauPlackettCopula <- function(copula, tau) {
   .plackettTau$trFuns$backwardTransf(theta, ss)
 }
 
-tauDerPlackettCopula <- function(copula) {
+dTauPlackettCopula <- function(copula) {
   alpha <- copula@parameters[1]
   plackettTauDer(alpha)
 }
 
-rhoDerPlackettCopula <- function(copula) {
+dRhoPlackettCopula <- function(copula) {
   alpha <- copula@parameters
   return( (2 * (2 - 2 * alpha + (1 + alpha) * log(alpha))) / (alpha - 1)^3 )
 }
 
-spearmansRhoPlackettCopula <- function(copula) {
+rhoPlackettCopula <- function(copula) {
   theta <- copula@parameters[1]
   if (theta == 0) -1 else (theta + 1) / (theta - 1) - 2 * theta * log(theta) / (theta - 1)^2
 }
 
-setMethod("pcopula", signature("plackettCopula"), pplackettCopula)
-setMethod("dcopula", signature("plackettCopula"), dplackettCopula)
-setMethod("rcopula", signature("plackettCopula"), rplackettCopula)
 
-setMethod("kendallsTau", signature("plackettCopula"), kendallsTauPlackettCopula)
-setMethod("spearmansRho", signature("plackettCopula"), spearmansRhoPlackettCopula)
+setMethod("pCopula", signature("matrix", "plackettCopula"), pplackettCopula)
+setMethod("pCopula", signature("numeric", "plackettCopula"),pplackettCopula)
 
-setMethod("calibKendallsTau", signature("plackettCopula"), calibKendallsTauPlackettCopula)
-setMethod("calibSpearmansRho", signature("plackettCopula"), calibSpearmansRhoCopula)
+setMethod("dCopula", signature("matrix", "plackettCopula"), dplackettCopula)
+setMethod("dCopula", signature("numeric", "plackettCopula"),dplackettCopula)
 
-setMethod("tauDer", signature("plackettCopula"), tauDerPlackettCopula)
-setMethod("rhoDer", signature("plackettCopula"), rhoDerPlackettCopula)
+setMethod("rCopula", signature("numeric", "plackettCopula"), rplackettCopula)
+
+setMethod("tau", signature("plackettCopula"), tauPlackettCopula)
+setMethod("rho", signature("plackettCopula"), rhoPlackettCopula)
+
+setMethod("iTau", signature("plackettCopula"), iTauPlackettCopula)
+setMethod("iRho", signature("plackettCopula"), iRhoCopula)
+
+setMethod("dTau", signature("plackettCopula"), dTauPlackettCopula)
+setMethod("dRho", signature("plackettCopula"), dRhoPlackettCopula)

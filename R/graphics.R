@@ -13,13 +13,27 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
+##' @title Check if function 'fun' is like  pcopula or like pCopula
+##' @param fun function such as pCopula, dcopula, ..
+##' @return logical: TRUE if "like pCopula"
+##' @author Martin Maechler
+chkFun <- function(fun) {
+    stopifnot(is.function(fun))
+    isObj <- function(nm) any(nm == c("copula","mvdc"))
+    nf <- names(formals(fun))
+    if(isObj(nf[2])) TRUE
+    else if(isObj(nf[1])) FALSE
+    else NA # and the caller will get an error eventually
+}
+
+
 
 perspCopula <- function(x, fun, n = 51, theta = -30, phi = 30, expand = 0.618, ...) {
   eps <- (.Machine$double.eps)^(1/4)
   eps <- 0 ## FIXME - argument with default 0 ??
   xis <- yis <- seq(0 + eps, 1 - eps, len = n)
-  grids <- as.matrix(expand.grid(xis, yis))
-  zmat <- matrix(fun(x, grids), n, n)
+  grids <- as.matrix(expand.grid(xis, yis, KEEP.OUT.ATTRS=FALSE))
+  zmat <- matrix(if(chkFun(fun)) fun(grids, x) else fun(x, grids), n, n)
   persp(xis, yis, zmat, theta = theta, phi = phi, expand = expand, ...)
   invisible(list(x = xis, y = yis, z = zmat))
 }
@@ -30,8 +44,8 @@ contourCopula <- function(x, fun, n = 51,...) {
   eps <- (.Machine$double.eps)^(1/4)
   eps <- 0 ## FIXME - argument with default 0 ??
   xis <- yis <- seq(0 + eps, 1 - eps, len = n)
-  grids <- as.matrix(expand.grid(xis, yis))
-  zmat <- matrix(fun(x, grids), n, n)
+  grids <- as.matrix(expand.grid(xis, yis, KEEP.OUT.ATTRS=FALSE))
+  zmat <- matrix(if(chkFun(fun)) fun(grids, x) else fun(x, grids), n, n)
   contour(xis, yis, zmat, ...)
   invisible(list(x = xis, y = yis, z = zmat))
 }
@@ -42,27 +56,28 @@ perspMvdc <- function(x, fun,
                       theta = -30, phi = 30, expand = 0.618, ...) {
   xis <- seq(xlim[1], xlim[2], length = nx)
   yis <- seq(ylim[1], ylim[2], length = ny)
-  grids <- as.matrix(expand.grid(xis, yis))
-  zmat <- matrix(fun(x, grids), nx, ny)
+  grids <- as.matrix(expand.grid(xis, yis, KEEP.OUT.ATTRS=FALSE))
+  zmat <- matrix(if(chkFun(fun)) fun(grids, x) else fun(x, grids), nx, ny)
   persp(xis, yis, zmat, theta = theta, phi = phi, expand = expand, ...)
   invisible(list(x = xis, y = yis, z = zmat))
 }
-
 
 
 contourMvdc <- function(x, fun, xlim, ylim, nx = 51, ny = 51, ...)
 {
   xis <- seq(xlim[1], xlim[2], length = nx)
   yis <- seq(ylim[1], ylim[2], length = ny)
-  grids <- as.matrix(expand.grid(xis, yis))
-  zmat <- matrix(fun(x, grids), nx, ny)
+  grids <- as.matrix(expand.grid(xis, yis, KEEP.OUT.ATTRS=FALSE))
+  zmat <- matrix(if(chkFun(fun)) fun(grids, x) else fun(x, grids), nx, ny)
   contour(xis, yis, zmat, ...)
   invisible(list(x = xis, y = yis, z = zmat))
 }
 
+## special for independence copula:
 setMethod("persp", signature("indepCopula"), perspCopula)
 setMethod("contour", signature("indepCopula"), contourCopula)
 
+## all other copulas:
 setMethod("persp", signature("copula"), perspCopula)
 setMethod("contour", signature("copula"), contourCopula)
 

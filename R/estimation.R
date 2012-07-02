@@ -88,13 +88,16 @@ initOpt <- function(family, tau.range=NULL, interval=TRUE, u,
 ##'                2^(1-d) in Blomqvist's beta are omitted
 ##' @return sample version of multivariate Blomqvist beta
 ##' @author Marius Hofert
-beta.hat <- function(u, scaling = FALSE) {
+betan <- function(u, scaling = FALSE) {
     less.u <- u <= 0.5
     prod1 <- apply( less.u, 1, all)
     prod2 <- apply(!less.u, 1, all)
     b <- mean(prod1 + prod2)
     if(scaling) b else {T <- 2^(ncol(u)-1); (T*b - 1)/(T - 1)}
 }
+
+beta.hat <- function(u, scaling = FALSE) { .Deprecated("betan") ; betan(u, scaling) }
+
 
 ##' Compute the population version of Blomqvist's beta for Archimedean copulas
 ##'
@@ -108,7 +111,7 @@ beta.hat <- function(u, scaling = FALSE) {
 ##' @author Marius Hofert & Martin Maechler
 beta. <- function(cop, theta, d, scaling=FALSE) {
     j <- seq_len(d)
-    diags <- cop@psi(j*cop@psiInv(0.5, theta), theta) # compute diagonals
+    diags <- cop@psi(j*cop@iPsi(0.5, theta), theta) # compute diagonals
     b <- 1 + diags[d] + if(d < 30) sum((-1)^j * choose(d, j) * diags)
     else sum((-1)^j * exp(lchoose(d, j) + log(diags)))
     if(scaling) b else { T <- 2^(d-1); (T*b - 1)/(T - 1)}
@@ -135,7 +138,7 @@ ebeta <- function(u, cop, interval=initOpt(cop@copula@name), ...) {
     ## Note: We do not need the constants 2^(d-1)/(2^(d-1)-1) and 2^(1-d) here,
     ##	     since we equate the population and sample versions of Blomqvist's
     ##       beta anyway.
-    b.hat <- beta.hat(u, scaling = TRUE)
+    b.hat <- betan(u, scaling = TRUE)
     d <- ncol(u)
     safeUroot(function(theta) {beta.(cop@copula, theta, d, scaling=TRUE) - b.hat},
               interval=interval, Sig=+1, check.conv=TRUE, ...)
@@ -153,7 +156,7 @@ ebeta <- function(u, cop, interval=initOpt(cop@copula@name), ...) {
 ##' @return checked and (if check failed) modified x
 ##' @author Marius Hofert
 tau.checker <- function(x, family, warn=TRUE){
-    eps <- 1e-8
+    eps <- 1e-8 ## "fixed" currently, see below
     tau.range <- switch(family,
                         ## limiting (attainable) taus that can be dealt with by
                         ## copFamily@tauInv() *and* that can be used to construct
@@ -378,10 +381,10 @@ dDiagA <- function(u, d, cop, log=FALSE) {
 	return(u)
     }
     if(log) {
-        log(d) + cop@psiDabs(d*cop@psiInv(u, th), th, log=TRUE) +
-            cop@psiInvD1abs(u, th, log=TRUE)
+        log(d) + cop@absdPsi(d*cop@iPsi(u, th), th, log=TRUE) +
+            cop@absdiPsi(u, th, log=TRUE)
     } else {
-        d * cop@psiDabs(d*cop@psiInv(u, th), th) * cop@psiInvD1abs(u, th)
+        d * cop@absdPsi(d*cop@iPsi(u, th), th) * cop@absdiPsi(u, th)
     }
 }
 

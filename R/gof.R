@@ -100,28 +100,28 @@ gofTstat <- function(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
 ##' @param m # order up to which Rosenblatt's transform is computed, i.e.,
 ##'        C(u_j | u_1,...,u_{j-1}), j=2,..,m
 ##' @param n.MC parameter n.MC for evaluating the derivatives via Monte Carlo
-##' @return matrix of supposedly U[0,1]^d realizations
+##' @return matrix (as u) of supposedly U[0,1]^d realizations
 ##' @author Marius Hofert
 rtrafo <- function(u, cop, m=d, n.MC=0)
 {
+    if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
+    stopifnot(0 <= u, u <=1)
     d. <- dim(u)
     n <- d.[1]
     d <- d.[2]
     stopifnot(is(cop, "outer_nacopula"), 2 <= m, m <= d)
     if(length(cop@childCops))
         stop("currently, only Archimedean copulas are provided")
-    if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-    stopifnot(0 <= u, u <=1)
     cop <- cop@copula
     th <- cop@theta
     stopifnot(cop@paraConstr(th))
-    psiI <- cop@psiInv(u, theta=th)
-    psiI. <- t(apply(psiI, 1, cumsum))
+    psiI <- cop@iPsi(u, theta=th) # n x d
+    psiI. <- t(apply(psiI, 1, cumsum)) # n x d
     ## compute all conditional probabilities
     if(n.MC==0){
         ## Note: C(u_j | u_1,...,u_{j-1}) = \psi^{(j-1)}(\sum_{k=1}^j \psi^{-1}(u_k)) / \psi^{(j-1)}(\sum_{k=1}^{j-1} \psi^{-1}(u_k))
 	C.j <- function(j){ # computes C(u_j | u_1,...,u_{j-1}) with the same idea as for cacopula
-	    logD <- cop@psiDabs(as.vector(psiI.[,c(j,j-1)]), theta=th,
+	    logD <- cop@absdPsi(as.vector(psiI.[,c(j,j-1)]), theta=th,
                                 degree=j-1, n.MC=0, log=TRUE)
             exp(logD[1:n]-logD[(n+1):(2*n)])
         }
@@ -129,7 +129,7 @@ rtrafo <- function(u, cop, m=d, n.MC=0)
 	## draw random variates
 	V <- cop@V0(n.MC, th)
         C.j <- function(j){ # computes C(u_j | u_1,...,u_{j-1}) with the same idea as for cacopula
-            ## use same idea as default method of psiDabsMC
+            ## use same idea as default method of absdPsiMC
             ## only difference: only draw V's once
             arg <- c(psiI.[,j], psiI.[,j-1])
             iInf <- is.infinite(arg)
@@ -140,7 +140,8 @@ rtrafo <- function(u, cop, m=d, n.MC=0)
             exp(logD[1:n]-logD[(n+1):(2*n)])
         }
     }
-    cbind(u[,1],sapply(2:m, C.j))
+    u[, -1] <- vapply(2:m, C.j, numeric(n))
+    u
 }
 
 ##' Transforms vectors of random variates following the given (nested) Archimedean
@@ -178,7 +179,7 @@ htrafo <- function(u, cop, include.K=TRUE, n.MC=0, inverse=FALSE,
         ## ingredient 1: log(psi^{-1}(K^{-1}(u_d)))
         KI <- qK(u[,d], cop=cop@copula, d=d, n.MC=n.MC, method=method,
                  u.grid=u.grid, ...) # n-vector K^{-1}(u_d)
-        lpsiIKI <- cop@copula@psiInv(KI, th, log=TRUE) # n-vector log(psi^{-1}(K^{-1}(u_d)))
+        lpsiIKI <- cop@copula@iPsi(KI, th, log=TRUE) # n-vector log(psi^{-1}(K^{-1}(u_d)))
         n <- nrow(u)
         ## ingredient 2: sum_{k=j}^{d-1} log(u_k)/k) for j=1,..,d
         lu. <- log(u[,-d, drop=FALSE]) * (ik <- 1/rep(1:(d-1), each=n))
@@ -193,7 +194,7 @@ htrafo <- function(u, cop, include.K=TRUE, n.MC=0, inverse=FALSE,
         expo <- rep(lpsiIKI, d) + cslu + l1p
         cop@copula@psi(exp(expo), th)
     } else { # "goodness-of-fit trafo" of Hofert and Hering (2011)
-        lpsiI <- cop@copula@psiInv(u, th, log=TRUE) # matrix log(psi^{-1}(u))
+        lpsiI <- cop@copula@iPsi(u, th, log=TRUE) # matrix log(psi^{-1}(u))
         lcumsum <- matrix(unlist(lapply(1:d, function(j)
                                         lsum(t(lpsiI[,1:j, drop=FALSE])))),
                           ncol=d)
@@ -298,7 +299,10 @@ apply the transformations yourself,  see ?gnacopula.")
     ## (4) conduct the parametric bootstrap
     theta.hat. <- numeric(n.bootstrap) # vector of estimators
     T. <- vector("list", n.bootstrap) # vector of test.stat() results
-    if(verbose) pb <- txtProgressBar(max=n.bootstrap, style = 3) # setup progress bar
+    if(verbose) {
+	pb <- txtProgressBar(max = n.bootstrap, style = 3) # setup progress bar
+	on.exit(close(pb)) # and close it on exit
+    }
     for(k in 1:n.bootstrap) {
 
 	## (4.1) sample from the copula with estimated parameter and build
@@ -317,7 +321,6 @@ apply the transformations yourself,  see ?gnacopula.")
         T.[[k]] <- gofTstat(u.prime., method=method)
         if(verbose) setTxtProgressBar(pb, k) # update progress bar
     }
-    if(verbose) close(pb) # close progress bar
 
     ## (5) build and return results
     structure(class = "htest",

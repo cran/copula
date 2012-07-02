@@ -15,19 +15,18 @@
   this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #ifndef SET_UTILS_H
 #define SET_UTILS_H
 
-#include <R.h>
-
-/*****************************************************************************
-
-  Set function utilities
-
-  Ivan Kojadinovic, May 2007
-
-*****************************************************************************/
+/**
+ * @file   set_utils.h
+ * @author Michel Grabisch and Ivan Kojadinovic
+ * @date   May 2007
+ * 
+ * @brief  Set function utilities adapted from the R package kappalab
+ * 
+ * 
+ */
 
 int card(int n);
 double sum_binom(int n, int k);

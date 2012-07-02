@@ -1,5 +1,5 @@
 \name{rnchild}
-\title{Sampling Child 'nacopula's}
+\title{Sampling child 'nacopula's}
 \alias{rnchild}
 \description{
   Method for generating vectors of random numbers of nested Archimedean
