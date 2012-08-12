@@ -58,9 +58,14 @@ gumbel.cop <- gumbelCopula(3, dim=2)
 myMvd <- mvdc(gumbel.cop, c("exp","exp"),
               list(list(rate=2), list(rate=4)))
 x <- rMvdc(10000, myMvd)
-## Takes about  25 sec. [2012-07]:
-fit <- fitMvdc(x, myMvd, start = c(1,1,2))
-fit
+## the example is typically not run with CRAN checking:
+(doExtras <- interactive() || nzchar(Sys.getenv("R_copula_check_extra")) ||
+ identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING"))))
+if(doExtras) {
+ ## Takes about  25 sec. [2012-07]:
+ fit <- fitMvdc(x, myMvd, start = c(1,1,2))
+ print(fit)
+}
 
 ## Roger Koenker prepared a demo illustrating MLE for a Clayton AR(1)
 ## copula model with identical, user-defined Student marginals

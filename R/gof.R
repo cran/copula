@@ -272,12 +272,12 @@ apply the transformations yourself,  see ?gnacopula.")
     meth2 <- paste0(method,", est.method = ", estimation.method)
     meth <-
 	switch(method,
-	       "AnChisq" =, ## A_n
+	       "AnChisq" =,  ## A_n
 	       "AnGamma" = { ## A_n with gamma distribution
 		   paste0(meth, "Anderson and Darling (with trafo = ",
-				    trafo, " and method = ", meth2, ")")
+                          trafo, " and method = ", meth2, ")")
 	       },
-	       "SnB" =,## S_n(B) and S_n(C)
+	       "SnB" =, ## S_n(B) and S_n(C)
 	       "SnC" = {
 		   paste0(meth, meth2," (with trafo = ", trafo, ")")
 	       },
@@ -292,16 +292,16 @@ apply the transformations yourself,  see ?gnacopula.")
 
     ## (2) transform the data with the copula with estimated parameter
     u.prime <- gtrafomulti(u, cop=cop.hat) # transformed data in the unit hypercube
-    T <- gofTstat(u.prime, method=method) # transformed data
+    T <- gofTstat(u.prime, method=method)  # transformed data
 
     ## (3) conduct the Anderson-Darling test or compute the test statistic (depends on method)
 
     ## (4) conduct the parametric bootstrap
     theta.hat. <- numeric(n.bootstrap) # vector of estimators
-    T. <- vector("list", n.bootstrap) # vector of test.stat() results
-    if(verbose) {
-	pb <- txtProgressBar(max = n.bootstrap, style = 3) # setup progress bar
-	on.exit(close(pb)) # and close it on exit
+    T. <- vector("list", n.bootstrap)  # vector of test.stat() results
+    if(verbose) {	     # setup progress bar and close it on exit
+	pb <- txtProgressBar(max = n.bootstrap, style = if(isatty(stdout())) 3 else 1)
+	on.exit(close(pb))
     }
     for(k in 1:n.bootstrap) {
 

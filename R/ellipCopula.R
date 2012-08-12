@@ -42,8 +42,8 @@ ellipCopula <- function(family, param = NA_real_, dim = 2L, dispstr = "ex", df =
   if (fam == -1)
     stop(paste("Valid family names are", familiesImplemented))
   switch(fam,
-         normalCopula(param, dim = dim, dispstr = dispstr),
-         tCopula(param, dim = dim, dispstr = dispstr, df = df, ...)
+	 normalCopula(param, dim = dim, dispstr = dispstr),
+	      tCopula(param, dim = dim, dispstr = dispstr, df = df, ...)
          )
 }
 
@@ -56,7 +56,7 @@ iRhoEllipCopula <- function(copula, rho) {
 }
 
 dTauEllipCopula <- function(copula)  {
-  return( 2 / (pi * sqrt(1 - copula@parameters^2)) )
+  return( 2 / (pi * sqrt(1 - copula@getRho(copula)^2)) )
 }
 
 dTauFunEllipCopula <- function(copula)  {
@@ -64,7 +64,7 @@ dTauFunEllipCopula <- function(copula)  {
 }
 
 dRhoEllipCopula <- function(copula) {
-  return( 6 / (pi * sqrt(4 - copula@parameters^2)) )
+  return( 6 / (pi * sqrt(4 - copula@getRho(copula)^2)) )
 }
 
 dRhoFunEllipCopula <- function(copula) {

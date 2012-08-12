@@ -495,7 +495,7 @@ copFrank <-
 		      res <- lfactor + dsumSibuya(x, V0, theta0/theta1, log=TRUE)
 		      if(log) res else exp(res)
 		  },
-		  ## Kendall's tau; debye_1() is from package 'gsl' :
+		  ## Kendall's tau; debye1() calls debye_1() from package 'gsl' :
 		  tau = function(theta) {
 		      if((l <- length(theta)) == 0) return(numeric(0)) # to work with NULL
 		      res <- numeric(l)
@@ -507,14 +507,16 @@ copFrank <-
 		  },
 		  tauInv = function(tau, tol = .Machine$double.eps^0.25, ...) {
 		      res <- tau
-		      res[isN <- res == 0] <- 0 # limiting case
-		      res[!isN] <- sapply(res[!isN], function(tau) {
-			  r <- safeUroot(function(th) C.@tau(th) - tau,
-					 interval = c(1e-12, 198),
-					 Sig = +1, tol=tol,
-					 check.conv=TRUE, ...)
-			  r$root
-		      })
+		      isN <- tau == 0 ## res[isN] <- 0 # limiting case
+		      if(length(nn <- which(!isN)))
+			  res[nn] <- vapply(tau[nn], function(tau) {
+			      r <- safeUroot(function(th) C.@tau(th) - tau,
+					     ## interval: from experiments on x86_64 Linux (2012-08)
+					     interval = if(tau > 0) c(0, 7.21e+16) else c(-1.81e+16, 0),
+					     Sig = +1, tol=tol,
+					     check.conv=TRUE, ...)
+			      r$root
+			  }, 0.)
 		      res
 		  },
 		  ## lower tail dependence coefficient lambda_l
@@ -731,7 +733,7 @@ copJoe <-
                       if(log) log(res) else res
 		  },
 		  ## parameter interval
-		  paraInterval = interval("[1,Inf)"),
+		  paraInterval = interval("[1,Inf)"),## [0.24, Inf) for neg.tau
 		  ## absolute value of generator derivatives
 		  absdPsi = function(t, theta, degree = 1, n.MC = 0,
 				     method= eval(formals(polyJ)$method), log = FALSE)
@@ -869,15 +871,9 @@ copJoe <-
 		  },
 		  ## Kendall's tau
 		  ## noTerms: even for theta==0, the approximation error is < 10^(-5)
-		  tau = function(theta, noTerms=446) {
-		      k <- noTerms:1
-		      sapply(theta,
-			     function(th) {
-				 tk2 <- th*k + 2
-				 1 - 4*sum(1/(k*tk2*(tk2 - th)))
-				 ## ==... (1/(k*(th*k+2)*(th*(k-1)+2)))
-			     })
-		  },
+                  ## MM: "FIXME" , using  http://dlmf.nist.gov/2.10#E1  (or better?)
+                  ## + maxima   integrate(1/(x*(t*x+2)*(t*x+2-t)), x)
+		  tau = tauJoe,
 		  tauInv = function(tau, tol = .Machine$double.eps^0.25, ...) {
 		      sapply(tau,function(tau) {
 			  r <- safeUroot(function(th) C.@tau(th) - tau,

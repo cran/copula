@@ -20,20 +20,23 @@ setGeneric("dCdu", function(cop, u) standardGeneric("dCdu"))
 
 ## Warning: This function assumes symmetry in u
 dCduExplicitCopula <- function(cop, u)
-  {
+{
     p <- cop@dimension
     alpha <- cop@parameters
-    der.cdf.u <- get(paste(class(cop)[1], "cdfDerWrtArg.algr", sep="."))[p]
-    unames0 <- paste("u",1:p,sep="")
-    mat <- matrix(0,nrow(u),p)
-    for (j in 1:p)
-      {
-        unames <- unames0; unames[1] <- unames0[j]; unames[j] <- unames0[1]
-        colnames(u) <- unames
-        mat[,j] <- eval(der.cdf.u, data.frame(u))
-      }
+    mat <- matrix(NA_real_, nrow(u),p)
+    algNm <- paste(class(cop)[1], "cdfDerWrtArg.algr", sep=".")
+    if(exists(algNm)) {
+        der.cdf.u <- get(algNm)[p]
+        unames0 <- paste("u",1:p,sep="")
+        for (j in 1:p)
+        {
+            unames <- unames0; unames[1] <- unames0[j]; unames[j] <- unames0[1]
+            colnames(u) <- unames
+            mat[,j] <- eval(der.cdf.u, data.frame(u))
+        }
+    } else warning("there is no formula for dCdu*() for this copula")
     return(mat)
-  }
+}
 
 ## this function is used for Khoudraji's device
 dCduIndepCopula <- function(cop, u) {
@@ -173,9 +176,15 @@ dCdthetaExplicitCopula <- function(cop, u)
   {
     p <- cop@dimension
     alpha <- cop@parameters
-    colnames(u) <- paste("u",1:p,sep="")
-    der.cdf.alpha <- get(paste(class(cop)[1], "cdfDerWrtPar.algr", sep="."))[p]
-    return(as.matrix(eval(der.cdf.alpha, data.frame(u))))
+    algNm <- paste(class(cop)[1], "cdfDerWrtPar.algr", sep=".")
+    if(exists(algNm)) {
+        der.cdf.alpha <- get(algNm)[p]
+        colnames(u) <- paste("u",1:p,sep="")
+        as.matrix(eval(der.cdf.alpha, data.frame(u)))
+    } else {
+        warning("there is no formula for dCdtheta*() for this copula")
+        matrix(NA_real_, nrow(u),p)
+    }
   }
 
 dCdthetaEvCopula <- function(cop, u) {
@@ -275,15 +284,18 @@ derPdfWrtArgsExplicitCopula <- function(cop, u)
   {
     p <- cop@dimension
     alpha <- cop@parameters
-    der.pdf.u <- get(paste(class(cop)[1], "pdfDerWrtArg.algr", sep="."))[p]
-    unames0 <- paste("u",1:p,sep="")
-    mat <- matrix(0,nrow(u),p)
-    for (j in 1:p)
-      {
-        unames <- unames0; unames[1] <- unames0[j]; unames[j] <- unames0[1]
-        colnames(u) <- unames
-        mat[,j] <- eval(der.pdf.u, data.frame(u))
-      }
+    algNm <- paste(class(cop)[1], "pdfDerWrtArg.algr", sep=".")
+    mat <- matrix(NA_real_, nrow(u),p)
+    if(exists(algNm)) {
+        der.pdf.u <- get(algNm)[p]
+        unames0 <- paste("u",1:p,sep="")
+        for (j in 1:p)
+        {
+            unames <- unames0; unames[1] <- unames0[j]; unames[j] <- unames0[1]
+            colnames(u) <- unames
+            mat[,j] <- eval(der.pdf.u, data.frame(u))
+        }
+    } else warning("there is no formula for derPdfWrtArgs*() for this copula")
     return(mat)
   }
 
@@ -315,7 +327,7 @@ derPdfWrtArgsTCopula <- function(cop, u)
 setMethod("derPdfWrtArgs", signature("tCopula"), derPdfWrtArgsTCopula)
 
 
-### Partial derivatives of the PDF wrt parameters for ellipCopula: DIVIDED BY PDF
+## Partial derivatives of the PDF wrt parameters for ellipCopula: DIVIDED BY PDF
 
 setGeneric("derPdfWrtParams", function(cop, u) standardGeneric("derPdfWrtParams"))
 
@@ -323,9 +335,15 @@ derPdfWrtParamsExplicitCopula <- function(cop, u)
   {
     p <- cop@dimension
     alpha <- cop@parameters
-    colnames(u) <- paste("u",1:p,sep="")
-    der.pdf.alpha <- get(paste(class(cop)[1], "pdfDerWrtPar.algr", sep="."))[p]
-    return(as.matrix(eval(der.pdf.alpha, data.frame(u))))
+    algNm <- paste(class(cop)[1], "pdfDerWrtPar.algr", sep=".")
+    if(exists(algNm)) {
+        der.pdf.alpha <- get(algNm)[p]
+        colnames(u) <- paste("u",1:p,sep="")
+        as.matrix(eval(der.pdf.alpha, data.frame(u)))
+    } else {
+        warning("there is no formula for derPdfWrtParam*() for this copula")
+        matrix(NA_real_, nrow(u),p)
+    }
   }
 
 setMethod("derPdfWrtParams", signature("archmCopula"), derPdfWrtParamsExplicitCopula)
@@ -334,91 +352,100 @@ setMethod("derPdfWrtParams", signature("evCopula"), derPdfWrtParamsExplicitCopul
 setMethod("derPdfWrtParams", signature("gumbelCopula"), derPdfWrtParamsExplicitCopula)
 
 derPdfWrtParamsEllipCopula <- function(cop, u)
-  {
+{
     p <- cop@dimension
 
     ## quantile transformation
-    if (class(cop) == "normalCopula")
-      v <- qnorm(u)
-    else if (class(cop) == "tCopula")
-      {
-        df <- cop@df
-        v <- qt(u,df=df)
-      }
-    else stop("not implemented")
-
+    v <- switch(clc <- class(cop),
+		"normalCopula" = qnorm(u),
+		"tCopula" = {
+		    df <- cop@df
+		    qt(u, df=df)
+		},
+		## else:
+		stop("not implemented"))
     if (p == 2)
-      {
-        rho <- cop@parameters
-        if (class(cop) == "normalCopula")
-          return(as.matrix((rho * (1 - rho^2) - rho * (v[,1]^2 + v[,2]^2) +
-                            (rho^2 + 1) * v[,1] * v[,2])/(1 - rho^2)^2))
-        else if (class(cop) == "tCopula")
-          return(as.matrix((1 + df) * rho / (rho^2 - 1) + (2 + df) * (df * rho + v[,1] * v[,2])
-                           / (df * (1 - rho^2) + v[,1]^2 + v[,2]^2 - 2 * rho * v[,1] * v[,2])))
-      }
-    else
-      {
+    {
+	rho <- cop@parameters
+	ir2 <- 1 - rho^2
+        sv2 <- rowSums(v^2) # == v[,1]^2 + v[,2]^2
+	as.matrix(switch(clc,
+			 "normalCopula" =
+			 (rho * ir2 - rho * sv2 + (rho^2 + 1) * v[,1] * v[,2])/ir2^2,
+			 "tCopula" =
+			 (1 + df) * rho / -ir2 + (2 + df) * (df * rho + v[,1] * v[,2])
+			 / (df * ir2 + sv2 - 2 * rho * v[,1] * v[,2])))
+
+    } else { ##  p >= 3
         n <- nrow(u)
         sigma <- getSigma(cop)
         detsig <- det(sigma)
         invsig <- solve(sigma)
 
         if (cop@dispstr %in% c("ex","ar1")) ## exchangeable or ar1
-          {
+        {
             rho <- cop@parameters
 
             dersig <- matrix(1,p,p)
             if (cop@dispstr == "ex") ## ex
-              diag(dersig) <- 0
+                diag(dersig) <- 0
             else ## ar1
-              for (i in 1:p)
-                for (j in 1:p)
-                  dersig[i,j] <- abs(i - j) * rho^(abs(i - j) - 1)
+                for (i in 1:p)
+                    for (j in 1:p) {
+                        ij <- abs(i - j)
+                        dersig[i,j] <- ij * rho^(ij - 1)
+                    }
 
-            derdetsig <- detsig * sum(diag(invsig %*% dersig))
+            ## MM:  sum(diag(A %*% B)) == sum(A * t(B)) .. and B=dersig is symmetric here
+            ## derdetsig <- detsig * sum(diag(invsig %*% dersig))
+            derdetsig <- detsig *  sum(invsig * dersig)
             derinvsig <- - invsig %*% dersig %*% invsig
             firstterm <- derdetsig/detsig
 
-            if (class(cop) == "normalCopula")
-              mat <- - (firstterm + rowSums((v %*% derinvsig) * v))/2
-            else if (class(cop) == "tCopula")
-              mat <- - (firstterm + (df + p) * rowSums((v %*% derinvsig) * v)
-                        / (df +  rowSums((v %*% invsig) * v)) ) / 2
-            return(as.matrix(mat))
-          }
+	    mat <-
+		switch(clc,
+		       "normalCopula" =
+		       - (firstterm + rowSums((v %*% derinvsig) * v))/2,
+		       "tCopula" =
+		       - (firstterm + (df + p) * rowSums((v %*% derinvsig) * v)
+			  / (df +  rowSums((v %*% invsig) * v)) ) / 2)
+            as.matrix(mat)
+        }
         else ## unstructured or toeplitz
-          {
+        {
             mat <- matrix(0,n,p*(p-1)/2)
             l <- 1
             for (j in 1:(p-1))
-              for (i in (j+1):p)
+                for (i in (j+1):p)
                 {
-                  derdetsig <- 2 * det(sigma[-i,-j,drop=FALSE]) * (-1)^(i+j)
-                  derinvsig <- - invsig[,i] %*% t(invsig[,j]) - invsig[,j] %*% t(invsig[,i])
-                  firstterm <- derdetsig/detsig
-                  if (class(cop) == "normalCopula")
-                    mat[,l] <- - (firstterm + rowSums((v %*% derinvsig) * v))/2
-                  else if (class(cop) == "tCopula")
-                    mat[,l] <- - (firstterm + (df + p) * rowSums((v %*% derinvsig) * v)
-                                  / (df +  rowSums((v %*% invsig) * v)) ) / 2
-                  l <- l + 1
+                    derdetsig <- 2 * det(sigma[-i,-j,drop=FALSE]) * (-1)^(i+j)
+                    derinvsig <- - invsig[,i] %*% t(invsig[,j]) - invsig[,j] %*% t(invsig[,i])
+                    firstterm <- derdetsig/detsig
+
+		    mat[,l] <-
+			switch(clc,
+			       "normalCopula" =
+			       - (firstterm + rowSums((v %*% derinvsig) * v))/2,
+			       "tCopula" =
+			       - (firstterm + (df + p) * rowSums((v %*% derinvsig) * v)
+				  / (df +  rowSums((v %*% invsig) * v)) ) / 2)
+                    l <- l + 1
                 }
             if (cop@dispstr == "un") ## unstructured
-              return(mat)
+                mat
             else ## toeplitz: p-1 parameters
-              {
+            {
                 coef <- matrix(0,p*(p-1)/2,p-1)
                 for (k in 1:(p-1))
-                  {
+                {
                     m <- row(sigma) == col(sigma) + k
                     coef[,k] <- m[lower.tri(m)]
-                  }
-                return(mat %*% coef)
-              }
-          }
-      }
-  }
+                }
+                mat %*% coef
+            }
+        }
+    } ## p >= 3
+}
 
 setMethod("derPdfWrtParams", signature("ellipCopula"), derPdfWrtParamsEllipCopula)
 

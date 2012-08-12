@@ -65,14 +65,8 @@ initOpt <- function(family, tau.range=NULL, interval=TRUE, u,
                           mean(tau.hat.mat[upper.tri(tau.hat.mat)]) # mean of estimated taus
                       },
                       stop("wrong method for initOpt"))
-    ## truncate if required
-    cop@tauInv(if(tau.hat < tau.range[1]){
-        tau.range[1]
-    }else if(tau.hat > tau.range[2]){
-        tau.range[2]
-    }else{
-        tau.hat
-    })
+    ## truncate to range if required
+    cop@tauInv(pmax(tau.range[1], pmin(tau.range[2], tau.hat)))
 }
 
 

@@ -1,8 +1,12 @@
 ##-*- org -*-->  Emacs .. [Tab] key + [Org] menu; C-c C-o to follow links
 * Very Short Term
-** mvdc() -- fitMvdc() and generate data from fit -- currently wrong on help page
+** fitCopula() for 2-dim tCopula() *AND* 2-dim  tevCopula();  latter clearly fails
+
+** mvdc() -- fitMvdc() and generate data from fit -- currently wrong on help page;
  - see FIXMEs in R/fitMvdc.R  man/fitMvdc.Rd and man/fitCopula-class.Rd -- think of
-   class slots etc
+   class slots etc.
+
+
 * Short Term
 ** DONE persp(), contour() should work with pCopula / dCopula
 ** getAcop(class(gumbelCopula())) should work => we could then write general methods for all Archimedean objects... possible problem (for now): negative concordance case for AMH, Clayton, and Frank
@@ -25,10 +29,11 @@ IK: Me too
 *** NAC Archimedean families <--> archmCopula  unification
 - The NAC Archimedean families are partly 'better' and partly "worse" than
   archmCop: need 'uscore'
--Write testing code that compares the two classes numerically.
+- Write testing code that compares the two classes numerically.
 **** TODO (MM): Make  pcopula(<archm>) and dcopula(<archm>)
  use the the numerically good formulae rather than the "exprDist".
-**** d=2 is special: allows negative tau, MH-code does not yet
+**** d=2 is special: allows negative tau, MH-code now does partly.
+ Partly done for Clayton Frank, AMH:  Joe for theta >= 0.238734 ??? (MM!)
 *** "copula" class:  slot re-definitions
 **** 'message' --> 'name' (or ??)
 **** 'param.lowbnd' / 'param.upbnd' --- use "interval" as in nacopula
@@ -161,6 +166,8 @@ for estimation purposes etc. Note: look at nacPairthetas
 - call functions like f(x, foo=1, bar=2) instead of f(x, 1, 2).
   This makes the code more readable and more error-prone (naming all
   arguments except the first one).
+
+** Use  paste0()  where possible in IJ-code
 
 
 * Long Term

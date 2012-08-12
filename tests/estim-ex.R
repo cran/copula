@@ -13,8 +13,12 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
+###__ Estimation methods for Archimedean Copulas __
 
 require(copula)
+
+(doExtras <- interactive() || nzchar(Sys.getenv("R_copula_check_extra")) ||
+ identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING"))))
 
 ## From source(system.file("test-tools.R", package = "Matrix")) :
 showProc.time <- local({
@@ -102,18 +106,22 @@ showProc.time()
 ## Extend the range:
 show.(m2 <- p.log.f(1, 200, n.th=401, d = 5, u0 = .987))
 
+if(doExtras) {
 ## Extend the range even more -- change u0
 show.(m3 <- p.log.f(10, 500, d = 5, u0 = .96))
 ## and more
 show.(m3.2 <- p.log.f(10, 800, d = 5, u0 = .96))#-> breakdown at ~ 775..
-
+}
 showProc.time()
 
+
 ## higher d:
+if(doExtras) {
 show.(m4 <- p.log.f(10, 500, d = 12, u0 = 0.95))
 m5 <- p.log.f(10, 500, d = 12, u0 = 0.92)
 m6 <- p.log.f(1,  200, d = 12, u0 = c(0.8, 0.9), legend.x="topright")
 m7 <- p.log.f(1,  400, d = 12, u0 = c(0.88, 0.9))
+}
 
 ## whereas this now also overflows for Eulerian *AND* asymp. + log.arg:
 show.(mm <- p.log.f(10, 1000, d = 12, u0 = 0.9))
@@ -148,6 +156,7 @@ if(FALSE)
 
 untrace(polylog)
 
+if(doExtras)
 ## and similarly here:
 ll <- p.log.f(1, 12000, d = 12, u0 = 0.08)
 
@@ -183,7 +192,7 @@ showProc.time()
 ## Use selected (the best 6) estimation methods:
 ## (estMeth <- c("mle", "smle", "dmle", "tau.tau.mean", "mde.chisq.CvM", "mde.chisq.KS"))
 
-n <- 128
+n <- if(doExtras) 128 else 8
 d <- 6 ; theta <- 2
 (cop <- onacopula("Clayton", C(theta, 1:d)))
 set.seed(1)

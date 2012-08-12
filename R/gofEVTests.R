@@ -69,7 +69,7 @@ gofEVCopula <- function(copula, x, N = 1000, method = "mpl",
     ## simulation of the null distribution
     s0 <- matrix(NA, N, 2)
     if (verbose) {
-	pb <- txtProgressBar(max = N, style = 3) # setup progress bar
+	pb <- txtProgressBar(max = N, style = if(isatty(stdout())) 3 else 1) # setup progress bar
 	on.exit(close(pb)) # and close it on exit
     }
     for (i in 1:N)
@@ -147,15 +147,15 @@ gofA <- function(copula, x, N = 1000, method = "mpl", # estimator = "CFG",
                as.double(-log(u[,2])),
                as.double(A(fcop,g)),
                stat = double(2),
-               as.integer(0)            # estimator == Pickands
+               as.integer(0)# estimator == Pickands
                )$stat
 
     s <- c(sCn, sCFG, sPck)
 
     ## simulation of the null distribution
-    s0 <- matrix(NA, N, 5)
+    s0 <- matrix(NA_real_, N, 5)
     if (verbose) {
-	pb <- txtProgressBar(max = N, style = 3) # setup progress bar
+	pb <- txtProgressBar(max = N, style = if(isatty(stdout())) 3 else 1) # setup progress bar
 	on.exit(close(pb)) # and close it on exit
     }
 

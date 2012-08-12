@@ -16,12 +16,13 @@
 
 ##' show method
 showCopula <- function(object) {
+  validObject(object)
   cat(object@fullname, "\n")
   cat("Dimension: ", object@dimension, "\n")
-  if (length(object@parameters) > 0) {
+  if (length(par <- object@parameters) > 0) {
     cat("Parameters:\n")
-    for (i in (1:length(object@parameters)))
-      cat("  ", object@param.names[i], " = ", object@parameters[i], "\n")
+    for (i in seq_along(par))
+      cat("  ", object@param.names[i], " = ", par[i], "\n")
   }
   invisible(object)
 }
@@ -69,29 +70,29 @@ setMethod("tailIndex", signature("copula"), tailIndexCopula)
 
 ### numerical calibration
 
-iTauCopula <- function(copula, tau) {
+## NB:  uniroot()'s  precision is tol = .Machine$double.eps^.25 = 0.000122 ~= 1e-4
+iTauCopula <- function(copula, tau, bound.eps = .Machine$double.eps^.5, ...) {
   myfun <- function(theta) {
     copula@parameters <- theta
     tau(copula) - tau
   }
-  .eps <- .Machine$double.eps^.5
-  lower <- pmax(-sqrt(.Machine$double.xmax), copula@param.lowbnd + .eps)
-  upper <- pmin( sqrt(.Machine$double.xmax), copula@param.upbnd  - .eps)
-  uniroot(myfun, interval=c(lower, upper))$root
+  lower <- pmax(-sqrt(.Machine$double.xmax), copula@param.lowbnd + bound.eps)
+  upper <- pmin( sqrt(.Machine$double.xmax), copula@param.upbnd  - bound.eps)
+  uniroot(myfun, interval=c(lower, upper), ...)$root
 }
 
-iRhoCopula <- function(copula, rho) {
+iRhoCopula <- function(copula, rho, ...) {
   myfun <- function(theta) {
     copula@parameters <- theta
     rho(copula) - rho
   }
   lower <- pmax(-sqrt(.Machine$double.xmax), copula@param.lowbnd)
   upper <- pmin( sqrt(.Machine$double.xmax), copula@param.upbnd )
-  uniroot(myfun, interval=c(lower, upper))$root
+  uniroot(myfun, interval=c(lower, upper), ...)$root
 }
 
-# setMethod("iTau", signature("copula"), iTauCopula)
-# setMethod("iRho", signature("copula"), iRhoCopula)
+setMethod("iTau", signature("copula"), iTauCopula)
+setMethod("iRho", signature("copula"), iRhoCopula)
 
 ###-- "Copula" methods + glue  former "copula" <--> former "nacopula" ---------
 

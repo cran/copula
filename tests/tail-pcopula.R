@@ -17,12 +17,13 @@ require(copula)
 ## fCopulae: don't do on CRAN, and really "can not" suggest fCopulae
 tryfCop <- TRUE # for interactive convenience
 ## when run as BATCH:
-tryfCop <- (Sys.getenv("USER") == "maechler"
-	    ) || nzchar(Sys.getenv("R_copula_check_fCop"))
+tryfCop <- nzchar(Sys.getenv("R_copula_check_fCop")) ||
+    identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING")))
 
 if(tryfCop) { ## will only "work" if not "--as-cran"
     .r <- require
     tryfCop <- suppressWarnings(.r(fCopulae, quietly=TRUE)) }
+tryfCop
 
 ## From system.file("test-tools-1.R", package="Matrix"):
 ## Make sure errors are signaled

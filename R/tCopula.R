@@ -13,41 +13,57 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
+
+## DONE: allow "param = NA" --
 ### TODO:  {also for "normalCopula"}
-##  1) allow "param = NA" --
 ##  2) ndim(dim, dispstr, df.fixed) |-->  "dimension" (length) of param
 ##  3) validity should check  pos.definiteness for "un"structured (maybe "toeplitz"
 ##
-tCopula <- function(param = NA_real_, dim = 2L, dispstr = "ex", df = 4, df.fixed = FALSE) {
-  dim <- as.integer(dim)
-  stopifnot((pdim <- length(param)) >= 1, is.numeric(param))
-  parameters <- param
-  param.names <- paste("rho", 1:pdim, sep=".")
-  param.lowbnd <- rep.int(-1, pdim)
-  param.upbnd  <- rep.int( 1, pdim)
-  if (!df.fixed) { ## df is another parameter __at end__
-    parameters <- c(parameters, df)
-    param.names <- c(param.names, "df")
-    param.lowbnd <- c(param.lowbnd, 1e-6)
-    param.upbnd <- c(param.upbnd, Inf)
-  }
+tCopula <- function(param = NA_real_, dim = 2L, dispstr = "ex", df = 4, df.fixed = FALSE)
+{
+    dim <- as.integer(dim)
+    stopifnot((pdim <- length(param)) >= 1, is.numeric(param))
+    parameters <- param
+    param.names <- paste("rho", 1:pdim, sep=".")
+    param.lowbnd <- rep.int(-1, pdim)
+    param.upbnd	 <- rep.int( 1, pdim)
+    if (!df.fixed) { ## df is another parameter __at end__
+	parameters <- c(parameters, df)
+	param.names <- c(param.names, "df")
+	param.lowbnd <- c(param.lowbnd, 1e-6)
+	param.upbnd <- c(param.upbnd, Inf)
+    }
 
-  new("tCopula",
-             dispstr = dispstr,
-             dimension = dim,
-             parameters = parameters,
-             df = df,
-             df.fixed = df.fixed,
-             param.names = param.names,
-             param.lowbnd = param.lowbnd,
-             param.upbnd = param.upbnd,
-             fullname = paste("t copula family",
-               if(df.fixed) paste("df fixed at", df) else NULL),
-             getRho = function(obj) {
-               if (df.fixed) obj@parameters
-               else obj@parameters[-length(obj@parameters)]
-             }
-             )
+    new("tCopula",
+	dispstr = dispstr,
+	dimension = dim,
+	parameters = parameters,
+	df = df,
+	df.fixed = df.fixed,
+	param.names = param.names,
+	param.lowbnd = param.lowbnd,
+	param.upbnd = param.upbnd,
+	fullname = paste("t copula family", if(df.fixed) paste("df fixed at", df)),
+	getRho = function(obj) {
+	    par <- obj@parameters
+	    if (obj@df.fixed) par else par[-length(par)]
+	}
+	)
+}
+
+## used for tCopula *and* tevCopula :
+as.df.fixed <- function(cop, classDef = getClass(class(cop))) {
+    stopifnot( ## fast .slotNames()
+	      any(names(classDef@slots) == "df.fixed"))
+    if (!cop@df.fixed) { ## df is another parameter __at end__
+	cop@df.fixed <- TRUE
+	ip <- seq_len(length(cop@parameters) - 1L)
+	cop@parameters	 <- cop@parameters  [ip]
+	cop@param.names	 <- cop@param.names [ip]
+	cop@param.lowbnd <- cop@param.lowbnd[ip]
+	cop@param.upbnd	 <- cop@param.upbnd [ip]
+    }
+    cop
 }
 
 getdf <- function(object) {
@@ -87,7 +103,7 @@ dtCopula <- function(u, copula, log = FALSE, ...) {
   df <- getdf(copula)
   if(!is.matrix(u)) u <- matrix(u, ncol = dim)
   x <- qt(u, df)
-  ## work in log-scale [less over-/under-flow, then (maybe) transform:
+  ## work in log-scale [less over-/under-flow, then (maybe) transform]:
   val <- dmvt(x, delta = rep.int(0, dim), sigma = sigma, df = df, log = TRUE) -
       rowSums(dt(x, df = df, log=TRUE))
   if(any(out <- !is.na(u) & (u <= 0 | u >= 1)))

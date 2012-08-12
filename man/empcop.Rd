@@ -28,15 +28,15 @@ Cn(x, w)
   of \code{x} at the points specified in \code{w}.
 }
 \references{
-  R\enc{ü}{u}schendorf, L. (1976). Asymptotic distributions of
+  R\enc{ü}{u}schendorf, L. (1976).  Asymptotic distributions of
   multivariate rank order statistics, \emph{Annals of
     Statistics}. \bold{4}, 912--923.
 
-  Deheuvels, P. (1979). La fonction de dépendance empirique et ses
+  Deheuvels, P. (1979).  La fonction de dépendance empirique et ses
   propriétés: un test non paramétrique d'indépendance, \emph{Acad. Roy.
     Belg. Bull. Cl. Sci.}, 5th Ser. \bold{65}, 274--292.
 
-  Deheuvels, P. (1981), A non parametric test for independence,
+  Deheuvels, P. (1981).  A non parametric test for independence,
   \emph{Publ. Inst. Statist. Univ. Paris}. \bold{26}, 29--50.
 }
 \seealso{\code{\link{pCopula}}.}

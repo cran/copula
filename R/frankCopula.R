@@ -220,7 +220,8 @@ setMethod("tau", signature("frankCopula"), tauFrankCopula)
 setMethod("rho", signature("frankCopula"), rhoFrankCopula)
 setMethod("tailIndex", signature("frankCopula"), function(copula) c(lower=0, upper=0))
 
-setMethod("iTau", signature("frankCopula"), iTauCopula)
+setMethod("iTau", signature("frankCopula"),
+	  function(copula, tau) copFrank@tauInv(tau, tol = 1e-7))
 setMethod("iRho", signature("frankCopula"), iRhoCopula)
 
 setMethod("dRho", signature("frankCopula"), dRhoFrankCopula)

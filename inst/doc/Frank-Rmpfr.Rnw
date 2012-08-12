@@ -465,8 +465,10 @@ legend("top", c("double prec.", "mpfr(*, precBits = 200)"),
 Further investigation shows that the culprit is really the use of
 \code{log(-expm1(-theta))} inside \code{absdPsi.2()} which underflows for
 large theta, and hence should be replaced by the generally accurate
-%% as shown by   Maechler (2011) --- FIXME: finally write that small paper!!
-%%               =========================  ~/R/MM/NUMERICS/log1-exp.R
+\code{log1mexp()}, see \citet{maechler2012}.
+%%   M\"achler, M. (2012) Accurately Computing $\log(1-\exp(-\lvert a\rvert))$,
+%%  http://cran.r-project.org/web/packages/Rmpfr/vignettes/log1mexp-note.pdf
+%% (MM: ~/R/Pkgs/Rmpfr/inst/doc/log1mexp-note.Rnw + ~/R/MM/NUMERICS/log1-exp.R)
 <<log1mexp>>=
 log1mexp <- function(a) # accurately compute log(1-exp(-a))
 {

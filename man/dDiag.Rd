@@ -22,9 +22,9 @@ dDiag(u, cop, log=FALSE)
   diagonal of the Archimedean copula at \code{u}.}
 \author{Martin Maechler, Marius Hofert}
 \references{
-	Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011a),
+  Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011a),
   \emph{Estimators for Archimedean copulas in high dimensions: A comparison},
-   submitted.
+  submitted.
 }
 \seealso{
   \code{\linkS4class{acopula}} class, \code{\link{dnacopula}}.

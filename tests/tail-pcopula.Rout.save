@@ -1,5 +1,5 @@
 
-R version 2.15.1 Patched (2012-07-24 r59961) -- "Roasted Marshmallows"
+R version 2.15.1 Patched (2012-08-06 r60176) -- "Roasted Marshmallows"
 Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -36,21 +36,14 @@ Loading required package: copula
 > ## fCopulae: don't do on CRAN, and really "can not" suggest fCopulae
 > tryfCop <- TRUE # for interactive convenience
 > ## when run as BATCH:
-> tryfCop <- (Sys.getenv("USER") == "maechler"
-+ 	    ) || nzchar(Sys.getenv("R_copula_check_fCop"))
+> tryfCop <- nzchar(Sys.getenv("R_copula_check_fCop")) ||
++     identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING")))
 > 
 > if(tryfCop) { ## will only "work" if not "--as-cran"
 +     .r <- require
 +     tryfCop <- suppressWarnings(.r(fCopulae, quietly=TRUE)) }
-Loading required package: mnormt
-Loading required package: MASS
-
-Attaching package: 'fBasics'
-
-The following object(s) are masked from 'package:base':
-
-    norm
-
+> tryfCop
+[1] FALSE
 > 
 > ## From system.file("test-tools-1.R", package="Matrix"):
 > ## Make sure errors are signaled
@@ -215,8 +208,8 @@ Parameters:
 > 
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ''statistical reasons''
-Time elapsed:  2.524 0.172 3.048 0 0 
+Time elapsed:  0.948 0.044 0.989 0 0 
 > 
 > proc.time()
    user  system elapsed 
-  2.524   0.172   3.048 
+  0.948   0.044   0.989 

@@ -45,8 +45,8 @@ timing(n, family, taus, digits = 3, verbose = FALSE)
   \file{timings.R} in the demo folder).
 }
 \examples{
-## takes about 12 seconds (so we rather test unrealistically 10x smaller):
+## takes about 7 seconds:% so we rather test a much smaller set in R CMD check
 \dontrun{timing(10000, "Gumbel", taus = c(0.05,(1:9)/10,0.95))}
-\dontshow{timing( 100, "Gumbel", taus = c(0.05,(1:9)/10,0.95))}
+\dontshow{timing(1000, "Gumbel", taus = c(0.5,1,6,9)/10)}
 }
 \keyword{utilities}

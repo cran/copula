@@ -2,20 +2,19 @@
 \alias{indepTest}
 \alias{indepTestSim}
 \alias{dependogram}
-\title{Independence test among continuous random variables based
-  on the empirical copula process}
+\title{Test Independence of Continuous Random Variables via Empirical Copula}
 \description{
   Multivariate independence test based on the empirical
   copula process as proposed by Christian Genest and Bruno
-  Rémillard. The test can be seen as composed of
+  Rémillard.  The test can be seen as composed of
   three steps: (i) a simulation step, which consists of simulating the
   distribution of the test statistics under independence for the sample
   size under consideration; (ii) the test itself, which consists of
   computing the approximate p-values of the test statistics with respect
   to the empirical distributions obtained in step (i); and (iii) the
   display of a graphic, called a \emph{dependogram}, enabling to
-  understand the type of departure from independence, if any. More details can
-  be found in the articles cited in the reference section.
+  understand the type of departure from independence, if any.  More
+  details can be found in the articles cited in the reference section.
 }
 \usage{
 indepTestSim(n, p, m = p, N = 1000, verbose = TRUE, print.every = NULL)
@@ -27,18 +26,18 @@ dependogram(test, pvalues = FALSE, print = FALSE)
     statistics under independence.}
   \item{p}{ dimension of the data when simulating the distribution of the test
     statistics under independence.}
-  \item{m}{ maximum cardinality of the subsets of variables for which a
-    test statistic is to be computed. It makes sense to consider \code{m
-<< p} especially when \code{p} is large.}
-  \item{N}{ number of repetitions when simulating under independence.}
+  \item{m}{maximum cardinality of the subsets of variables for which a
+    test statistic is to be computed.  It makes sense to consider \eqn{m
+      \ll p}{m << p} especially when \code{p} is large.}
+  \item{N}{number of repetitions when simulating under independence.}
   \item{print.every}{ is deprecated in favor of \code{verbose}.}
-  \item{verbose}{ a logical specifying if progress
+  \item{verbose}{a logical specifying if progress
     should be displayed via \code{\link[utils]{txtProgressBar}}.}
   \item{x}{ data frame or data matrix containing realizations (one per
     line) of the random vector whose independence is to be tested.}
   \item{d}{ object of class \code{"indepTestDist"} as returned by
-  the function \code{"indepTestSim"}. It can be regarded as the
-  empirical distribution of the test statistics under independence.}
+    the function \code{"indepTestSim"}. It can be regarded as the
+    empirical distribution of the test statistics under independence.}
   \item{alpha}{ significance level used in the computation of the
     critical values for the test statistics.}
   \item{test}{ object of class \code{"indepTest"} as return by the
@@ -116,19 +115,22 @@ x[,5] <- x[,4]/2 + sqrt(3) * x[,5]/2
 ## {1,...,5} whose cardinality is between 2 and 5, we set p=m=5.
 ## This may take a while...
 
+(doExtras <- interactive() || nzchar(Sys.getenv("R_copula_check_extra")) ||
+ identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING"))))
+if(doExtras) {%-----------------------------------------------
+print(system.time(
 d <- indepTestSim(100,5)
+))
 
 ## The next step consists of performing the test itself:
 
 test <- indepTest(x,d)
-
 ## Let us see the results:
-
-test
+print(test)
 
 ## Display the dependogram with the details:
-
-dependogram(test,print=TRUE)
+dependogram(test, print=TRUE)
+}%-------------------------------- not on CRAN ---------------
 
 ## We could have tested for a weaker form of independence, for instance,
 ## by only computing statistics for subsets whose cardinality is between 2

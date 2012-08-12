@@ -269,11 +269,16 @@ setClass("fittedMV",
 			optimOpts = "list"))
 
 
-
-
 ###-------------------------- Glue   "copula" <-> "nacopula"
 
 ##' The mother of all copula classes:
 setClassUnion("Copula",
               members = c("copula", "nacopula"))
 ## NB: "acopula" *not* : It has no dimension, is rather a family object
+
+##' does the copula have 'df' as parameter?
+has.par.df <- function(cop, classDef = getClass(class(cop)),
+                       isEllip = extends(classDef, "ellipCopula")) {
+  ((isEllip && extends(classDef, "tCopula")) ||
+   extends(classDef, "tevCopula")) && !cop@df.fixed
+}

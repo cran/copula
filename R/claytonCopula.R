@@ -183,9 +183,8 @@ iRhoClaytonCopula <- function(copula, rho) {
   claytonRhoInvPos <- approxfun(x = .claytonRhoPos$assoMeasFun$fm$ysmth,
                                 y = .claytonRhoPos$assoMeasFun$fm$x)
 
-  ss <- .claytonRhoNeg$ss
   theta <- if(rho <= 0) claytonRhoInvNeg(rho) else claytonRhoInvPos(rho)
-  .claytonRhoPos$trFuns$backwardTransf(theta, ss)
+  .claytonRhoPos$trFuns$backwardTransf(theta, .claytonRhoNeg$ss)
 }
 
 dRhoClaytonCopula <- function(copula) {

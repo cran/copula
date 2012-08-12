@@ -40,13 +40,15 @@ evTestA(x, N = 1000, derivatives = "An")
   between two copulas. \emph{Journal of Multivariate Analysis}, 100(3),
   pages 377-386.
 
-  Kojadinovic, I. and Yan, J. (2010). Nonparametric rank-based tests of
-  bivariate extreme-value dependence. \emph{Journal of Multivariate
-    Analysis} \bold{101}, 2234--2249.
+  Kojadinovic, I. and Yan, J. (2010).
+  Nonparametric rank-based tests of bivariate extreme-value dependence.
+  \emph{Journal of Multivariate Analysis} \bold{101}, 2234--2249.
 
-  Kojadinovic, I. and Yan, J. (2010). Modeling Multivariate Distributions
-  with Continuous Margins Using the copula R Package. \emph{Journal of
-  Statistical Software}, 34(9), pages 1-20.
+  Kojadinovic, I. and Yan, J. (2010).
+  Modeling Multivariate Distributions with Continuous Margins Using the
+  copula R Package.
+  \emph{Journal of Statistical Software} \bold{34}(9), 1--20.
+  \url{http://www.jstatsoft.org/v34/i09/}.
 }
 \note{
   This test was derived under the assumption of continuous margins,

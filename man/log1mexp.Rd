@@ -23,15 +23,10 @@
   Martin Maechler, May 2002.
 }
 \references{
-  Martin Maechler (2012)
-  \emph{}
-  \url{}
-%  see also <<log1mexp>> in ../inst/doc/Frank-Rmpfr.Rnw
-%   which has {log(-expm1(-theta))} ... underflows for large
-%   theta, and hence should be replaced by the generally
-%   accurate %% as shown by Maechler (2011) --- FIXME:
-%   finally right that small paper!! %%
-%   ========================= ~/R/MM/NUMERICS/log1-exp.R
+  Martin \enc{Mächler}{Maechler} (2012).
+  Accurately Computing \eqn{\log(1-\exp(-|a|))};
+  \url{http://cran.r-project.org/web/packages/Rmpfr/vignettes/log1mexp-note.pdf}.
+  %  see also <<log1mexp>> in ../inst/doc/Frank-Rmpfr.Rnw
 }
 \examples{
 a <- 2^seq(-58,10, length = 256)

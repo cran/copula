@@ -30,7 +30,7 @@
 ##' @author Ivan Kojadinovic
 gofCopula <- function(copula, x, N = 1000, method = "mpl",
                       simulation = c("pb", "mult"),
-                      verbose = TRUE, print.every = NULL,
+		      verbose = TRUE, print.every = NULL,
                       optim.method = "BFGS", optim.control = list(maxit=20))
 {
     x <- as.matrix(x)
@@ -108,7 +108,7 @@ gofPB <- function(copula, x, N, method, verbose, optim.method, optim.control)
     ## simulation of the null distribution
     s0 <- numeric(N)
     if (verbose) {
-	pb <- txtProgressBar(max = N, style = 3) # setup progress bar
+	pb <- txtProgressBar(max = N, style = if(isatty(stdout())) 3 else 1) # setup progress bar
 	on.exit(close(pb)) # and close it on exit
     }
     # if (print.every > 0)
@@ -223,18 +223,15 @@ influCoef <- function(cop,u,v)
     M <- nrow(v)
     dcop <- dcopwrap(cop,v) ## wrapper
     influ0 <- derPdfWrtParams(cop,v)/dcop
-    derArg <- derPdfWrtArgs(cop,v)/dcop
+    derArg <- derPdfWrtArgs  (cop,v)/dcop
 
     influ <- vector("list",p)
     for (i in 1:p)
         influ[[i]] <- influ0 * derArg[,i]
 
-    ## expectation
-    q <- length(cop@parameters)
-    e <- crossprod(influ0)
-    e <- e/M
-
-    return(solve(e, t(derPdfWrtParams(cop,u)/dcopwrap(cop,u) - add.influ(u,v,influ,q))))
+    ## expectation  e := crossprod(influ0)/M
+    solve(crossprod(influ0)/M, t(derPdfWrtParams(cop,u)/dcopwrap(cop,u) -
+                                 add.influ(u,v, influ=influ, q = length(cop@parameters))))
 }
 
 ### Utility function: Second part of influence coefficients
@@ -243,21 +240,17 @@ add.influ <- function(u, v, influ, q)
   M <- nrow(v)
   p <- ncol(v)
   n <- nrow(u)
-
-  o <- matrix(0,M,p)
-  ob <- matrix(0,n,p)
-  for (i in 1:p)
-    {
-      o[,i] <- order(v[,i], decreasing=TRUE)
-      ob[,i] <- ecdf(v[,i])(u[,i]) * M
-    }
-
-  out <- matrix(0,n,q)
-  for (i in 1:p)
-      out <- out + rbind(rep(0,q),apply(influ[[i]][o[,i],,drop=FALSE],2,cumsum))[M + 1 - ob[,i],,drop=FALSE] / M -
-        matrix(colMeans(influ[[i]] * v[,i]),n,q,byrow=TRUE)
-        #matrix(apply(influ[[i]] * v[,i],2,mean),n,q,byrow=TRUE)
-  return(out)
+  S <- matrix(0,n,q)
+  for (i in 1:p) {
+      vi <- v[,i]
+      o.i <- order(vi, decreasing=TRUE)
+      obi <- ecdf(vi)(u[,i]) * M # "FIXME": use findInterval(); keep obi integer throughout
+      S <- S + rbind(rep.int(0,q),
+                     apply(influ[[i]][o.i,,drop=FALSE],2,cumsum))[M + 1 - obi,,drop=FALSE] / M -
+                         matrix(colMeans(influ[[i]] * vi), n,q, byrow=TRUE)
+	#matrix(apply(influ[[i]] * vi,2,mean),n,q,byrow=TRUE)
+  }
+  S
 }
 
 ##' Multiplier GOF based on MPL

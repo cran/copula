@@ -98,9 +98,9 @@ fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
   For the t copula with \code{df.fixed=FALSE} (see \code{\link{ellipCopula}}),
   the methods \code{"itau"} and \code{"irho"} cannot be used in
   \code{fitCopula()}.  For the methods \code{"ml"} and \code{"mpl"},
-  when \code{start} is not specified, starting value for \code{df} is
-  set to 4.  Also, the asymptotic variance cannot (yet) be estimated for
-  method \code{"mpl"}.
+  when \code{start} is not specified, the starting value for \code{df} is
+  set to \code{copula@df}, typically 4.  Also, the asymptotic variance
+  cannot (yet) be estimated for method \code{"mpl"}.
 
   To implement the \dQuote{\emph{inference functions for margins}}
   method (see e.g., Joe 2005), the \code{data} need to be pseudo-observations

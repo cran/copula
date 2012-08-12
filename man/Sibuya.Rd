@@ -1,4 +1,5 @@
 \name{Sibuya}
+\alias{Sibuya}
 \alias{rSibuya}
 \alias{pSibuya}
 \alias{dSibuya}

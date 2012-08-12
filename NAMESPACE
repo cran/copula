@@ -162,7 +162,7 @@ export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        ,"Eulerian.all", "Stirling1.all", "Stirling2.all"
        ,"absdPsiMC"
        ,"setTheta"
-       ,"tauAMH"
+       ,"tauAMH", "tauJoe"
        ,"allComp" # <- maybe keep private ?
        ,"safeUroot"
        ,"splom2"

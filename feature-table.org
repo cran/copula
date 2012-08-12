@@ -4,7 +4,7 @@
 | rho          | pedagogy                     | spearmansRho                  | rho            | I     | I  | I        | I  |         |
 | lambdaU,L    | pedagogy                     | tailIndex, lambda{U,L} (th) ? | tdc            | I     |    |          | I  |         |
 | C(u,u)/u  x2 | pedagogy                     |                               | tdcFun (?)     | I     | I  | I        | I  |         |
-| itau         | fitting                      | calibKendallsTau              | iTau           | I     | I  |          | I  |         |
+| itau         | fitting                      | calibKendallsTau, tauInv      | iTau           | I     | I  |          | I  |         |
 | irho         | fitting                      | calibSpearmansRho             | iRho           | I     | I  | I ex amh |    |         |
 | tau'         | itau fitting std err (se)    | tauDer                        | dTau           | I     | I  |          |    |         |
 | rho'         | irho fitting std err         | rhoDer                        | dRho           | I     | I  |          |    |         |
@@ -14,7 +14,7 @@
 | C'param      | gof mult                     | derCdfWrtParams               | dCdtheta       | I     |    | I ex amh |    |         |
 | C'args       | gof mult, cov emp cop proc   | derCdfWrtArgs                 | dCdu           | I     |    | I ex amh | P  |         |
 | c'param      | not directly needed -> score | derPdfWrtParams               | _rm_           |       |    | I ex amh |    |         |
-| c'args       | not directly needed -> score | derPdfWrtArgs                 | _rm_           |       |    | I ex amh |    |         |
+| c'args       | not directly ..... -> uscore | derPdfWrtArgs                 | _rm_           |       |    | I ex amh |    |         |
 | c'param / c  | ml se, mpl se, gof mult      |                               | score          | I     |    |          | I  |         |
 | c'args / c   | ml se, mpl se, gof mult      |                               | uscore         | I     |    |          |    |         |
 | sampling     | gof pb                       | rcopula                       | rCopula        | I     |    |          | I  |         |

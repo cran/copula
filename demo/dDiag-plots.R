@@ -84,6 +84,11 @@ p.dDiag <-
     invisible(list(d = d, tau=tau, theta=th., u = u, dDiag.a = yM.a, dDiag.s = yM.s))
 }
 
+
+if(!exists("doExtras") || !is.logical(doExtras))
+    doExtras <- interactive() || nzchar(Sys.getenv("R_copula_check_extra"))
+doExtras
+
 par(ask = dev.interactive(orNone = TRUE))
 
 r.dDiag.3 <- lapply(copula:::c_longNames,
@@ -99,6 +104,8 @@ r.dDiag.75 <- lapply(copula:::c_longNames,
 
 r.dDiag.200.L <- lapply(copula:::c_longNames,
                     function(family) p.dDiag(family, d = 200, log=TRUE))
+
+if(!doExtras) q(save = "no")##-------------- and don't do those large study/computations:
 
 ### Experiment with and Explore dDiagFrank() methods ###########################
 ###                             ============

@@ -57,7 +57,7 @@ amhCopula <- function(param = NA_real_, dim = 2L) {
       parameters = param[1],
       exprdist = c(cdf = cdf, pdf = pdf),
       param.names = "param",
-      param.lowbnd = -1,
+      param.lowbnd = -1,# 0 for tau >= 0
       param.upbnd = 1,
       fullname = "Amh copula family; Archimedean copula")
 }
@@ -110,11 +110,19 @@ ramhCopula <- function(n, copula) {
   cbind(u, v)
 }
 
-tauAmhCopula <- function(copula) {
-  alpha <- copula@parameters[1]
-  ## Nelsen (2006, p.172)
-  ## range of tau: [(5 - 8 log 2) / 3, 1/3] ~= [-0.1817, 0.3333]
-  (3 * alpha - 2) / 3 / alpha - 2 / 3 * (1 - 1/alpha)^2 * log(1 - alpha)
+iTauAmhCopula <- function(copula, tau) {
+  tauMin <- (5 - 8*log(2)) / 3
+  iSml <- tau < tauMin
+  iLrg <- tau > 1/3
+  if(any(out <- iSml | iLrg))
+      warning("tau is out of the range [(5 - 8 log 2) / 3, 1/3] ~= [-0.1817, 0.3333]")
+  ## A _faster_ version of  r <- ifelse(tau < tauMin, -1, ifelse(tau > 1/3, 1, ....)):
+  r <- tau
+  r[iSml] <- -1.
+  r[iLrg] <- +1.
+  if(any(in. <- !out))
+      r[in.] <- iTauCopula(copula, tau[in.])
+  r
 }
 
 rhoAmhCopula <- function(copula) {
@@ -171,9 +179,10 @@ setMethod("diPsi", signature("amhCopula"),
       })
 
 
-setMethod("tau", signature("amhCopula"), tauAmhCopula)
+setMethod("tau", signature("amhCopula"), function(copula) tauAMH(copula@parameters[1]))
+
 setMethod("rho", signature("amhCopula"), rhoAmhCopula)
 setMethod("tailIndex", signature("amhCopula"), function(copula) c(lower=0, upper=0))
 
-setMethod("iTau", signature("amhCopula"), iTauCopula)
+setMethod("iTau", signature("amhCopula"), iTauAmhCopula)
 

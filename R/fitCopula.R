@@ -67,6 +67,9 @@ fitCopula <- function(copula, data, method = c("mpl","ml","itau","irho"),
                       optim.method = "BFGS", optim.control = list(maxit=1000),
                       estimate.variance = TRUE, hideWarnings = TRUE)
 {
+  if(!is.matrix(data)) {
+    data <- as.matrix(data); stopifnot(is.matrix(data))
+  }
   switch(match.arg(method),
 	 "ml" =
 	 fitCopula.ml(copula, data, start=start, lower=lower, upper=upper,
@@ -83,15 +86,17 @@ fitCopula <- function(copula, data, method = c("mpl","ml","itau","irho"),
 
 fitCopStart <- function(copula, data, hideWarnings, default = copula@parameters)
 {
-  if (hasMethod("iTau", clc <- class(copula))) {
-    start <- fitCopula.itau(copula, data, FALSE)@estimate
-    if(extends(clc, "tCopula") && !copula@df.fixed)
-      ## add starting value for 'df'
-      start <- c(start, 4)
-    if(is.na(loglikCopula(start, data, copula, hideWarnings)))
-      default else start
-  }
-  else default
+    if (hasMethod("iTau", clc <- class(copula))) {
+	ccl <- getClass(clc)
+	.par.df <- has.par.df(copula, ccl)
+	start <- fitCopula.itau(if(.par.df) as.df.fixed(copula, ccl) else copula,
+				data, FALSE, FALSE)@estimate
+	if(.par.df) ## add starting value for 'df'
+	    start <- c(start, copula@df)
+	if(is.na(loglikCopula(start, data, copula, hideWarnings)))
+	    default else start
+    }
+    else default
 }
 
 ## fitCopula with maximizing pseudo-likelihood #################################
@@ -122,20 +127,26 @@ fitCopula.mpl <- function(copula, data, start=NULL,
 }
 
 
-## fitCopula using inversion of Kendall's tau ##################################
-
-fitCopula.itau <- function(copula, data, estimate.variance=TRUE) {
+##' fitCopula using inversion of Kendall's tau
+fitCopula.itau <- function(copula, data, estimate.variance=TRUE, warn.df=TRUE) {
+  ccl <- getClass(class(copula))
+  isEll <- extends(ccl, "ellipCopula")
+  if(has.par.df(copula, ccl, isEll)) { ## must treat it as "df.fixed=TRUE"
+      if(warn.df)
+          warning("\"itau\" fitting ==> copula coerced to 'df.fixed=TRUE'")
+      copula <- as.df.fixed(copula, classDef = ccl)
+  }
   q <- length(copula@parameters)
-  X <- getXmat(copula)
   tau <- cor(data, method="kendall")
   itau <- fitKendall(copula, tau)
   itau <- itau[lower.tri(itau)]
+
+  X <- getXmat(copula)
   estimate <-
-      if (is(copula, "ellipCopula") && copula@dispstr == "ar1") ## special treatment
-          exp(coef(lm(log(itau) ~ X - 1))) else coef(lm(itau ~ X - 1))
-  attributes(estimate) <- NULL ## strip attributes
-  ## Note that '@ parameters' may contain "'df' at end" for tCopula(*, df.fixed=FALSE) :
-  copula@parameters[seq_along(estimate)] <- estimate
+      as.vector(# stripping attributes
+		if(isEll && copula@dispstr == "ar1") ## special treatment
+		exp(coef(lm(log(itau) ~ X - 1))) else coef(lm(itau ~ X - 1)))
+  copula@parameters <- estimate
   var.est <- if (estimate.variance)
     varKendall(copula, data) / nrow(data) else matrix(NA, q, q)
   new("fitCopula",
@@ -151,25 +162,32 @@ fitCopula.itau <- function(copula, data, estimate.variance=TRUE) {
 
 ## fitCopula using inversion of Spearman's rho #################################
 
-fitCopula.irho <- function(copula, data, estimate.variance=TRUE) {
+fitCopula.irho <- function(copula, data, estimate.variance=TRUE, warn.df=TRUE) {
+  ccl <- getClass(class(copula))
+  isEll <- extends(ccl, "ellipCopula")
+  if(has.par.df(copula, ccl, isEll)) { ## must treat it as "df.fixed=TRUE"
+      if(warn.df)
+          warning("\"irho\" fitting ==> copula coerced to 'df.fixed=TRUE'")
+      copula <- as.df.fixed(copula, classDef = ccl)
+  }
   q <- length(copula@parameters)
-  X <- getXmat(copula)
   rho <- cor(data, method="spearman")
   irho <- fitSpearman(copula, rho)
   irho <- irho[lower.tri(irho)]
-  estimate <- if (is(copula, "ellipCopula") && copula@dispstr == "ar1") ## special treatment
-      exp(coef(lm(log(irho) ~ X - 1))) else coef(lm(irho ~ X - 1))
-  attributes(estimate) <- NULL ## strip attributes
-  ## Note that '@ parameters' may contain "'df' at end" for tCopula(*, df.fixed=FALSE) :
-  copula@parameters[seq_along(estimate)] <- estimate
+  X <- getXmat(copula)
+  estimate <-
+      as.vector(# stripping attributes
+		if (isEll && copula@dispstr == "ar1") ## special treatment
+		exp(coef(lm(log(irho) ~ X - 1))) else coef(lm(irho ~ X - 1)))
+  copula@parameters <- estimate
   var.est <- if (estimate.variance)
     varSpearman(copula, data)/nrow(data) else matrix(NA, q, q)
   new("fitCopula",
       estimate = estimate,
       var.est = var.est,
       method = "inversion of Spearman's rho",
-      loglik = as.numeric(NA),
-      convergence = as.integer(NA),
+      loglik = NA_real_,
+      convergence = NA_integer_,
       nsample = nrow(data),
       copula = copula)
 }
@@ -215,7 +233,8 @@ fitCopula.ml <- function(copula, data, start=NULL,
                          lower=NULL, upper=NULL,
                          method=NULL, optim.control=list(),
                          estimate.variance=TRUE,
-                         hideWarnings=FALSE)
+                         hideWarnings=FALSE,
+                         bound.eps = .Machine$double.eps ^ 0.5)
 {
   if (copula@dimension != ncol(data))
     stop("The dimension of the data and copula do not match.\n")
@@ -230,12 +249,11 @@ fitCopula.ml <- function(copula, data, start=NULL,
   control <- control[!vapply(control, is.null, NA)]
 
   if (!is.null(optim.control[[1]])) control <- c(control, optim.control)
-  eps <- .Machine$double.eps ^ 0.5
   meth.has.bounds <- method %in% c("Brent","L-BFGS-B")
   if (is.null(lower))
-    lower <- if(meth.has.bounds) copula@param.lowbnd + eps else -Inf
+    lower <- if(meth.has.bounds) copula@param.lowbnd + bound.eps else -Inf
   if (is.null(upper))
-    upper <- if(meth.has.bounds) copula@param.upbnd  - eps else Inf
+    upper <- if(meth.has.bounds) copula@param.upbnd  - bound.eps else Inf
 ##  if (p >= 2) {
   if (TRUE) {
     fit <- optim(start, loglikCopula,
@@ -257,16 +275,20 @@ fitCopula.ml <- function(copula, data, start=NULL,
 ##     convergence <- 0
 ##   }
 
-  if (estimate.variance){
+  varNA <- matrix(NA_real_, q, q)
+  var.est <- if (estimate.variance) {
     fit.last <- optim(copula@parameters, loglikCopula,
                       lower=lower, upper=upper,
                       method=method,
                       copula=copula, x=data, hideWarnings=hideWarnings,
                       control=c(control, maxit=0), hessian=TRUE)
-    var.est <- try(solve(-fit.last$hessian))
-    if (inherits(var.est, "try-error"))
-      warning("Hessian matrix not invertible")
-  } else var.est <- matrix(NA, q, q)
+
+    vcov <- tryCatch(solve(-fit.last$hessian), error = function(e) e)
+    if(is(vcov, "error")) {
+      warning("Hessian matrix not invertible: ", vcov$message)
+      varNA
+    } else vcov ## ok
+  } else varNA
 
   new("fitCopula",
       estimate = fit$par,
@@ -342,30 +364,33 @@ influ.terms <- function(u, influ, q)
 {
   p <- ncol(u)
   n <- nrow(u)
-
-  o <- ob <- matrix(0,n,p)
-  for (i in 1:p) {
-      o[,i] <- order(u[,i], decreasing=TRUE)
-      ob[,i] <- rank(u[,i])
-  }
-
   ## integral wrt empirical copula (-> sum):
-  out <- matrix(0,n,q)
-  for (i in 1:p)
-      out <- out + rbind(rep(0,q),
-                         apply(influ[[i]][o[,i],,drop=FALSE],2,cumsum))[n + 1 - ob[,i],,drop=FALSE]
-  return(out / n)
+  S <- matrix(0,n,q)
+  for (i in 1:p) {
+      o.i <- order(u[,i], decreasing=TRUE)
+      obi <- rank(u[,i])## FIXME?  add.influ() in  ./gofTests.R  uses  ecdf(.) * M  here
+      S <- S + rbind(rep.int(0,q),
+                     apply(influ[[i]][o.i,,drop=FALSE],2,cumsum))[n + 1 - obi,,drop=FALSE]
+  }
+  S / n
 }
 
-## cop is the FITTED copula
-## u are the available pseudo-observations
+##' @title variance-covariance (vcov) matrix for Pseudo Likelihood estimat
+##' @param cop the *fitted* copula
+##' @param u the available pseudo-observations
+##' @return vcov matrix
 varPL <- function(cop,u)
-  {
+{
     q <- length(cop@parameters)
+    ans <- matrix(NA_real_, q, q)
+    ccl <- getClass(clc <- class(cop))
+    isEll <- extends(ccl, "ellipCopula")
     ## check if variance can be computed
-    if (!hasMethod("dcopwrap", class(cop))) {
-      warning("The variance estimate cannot be computed for this copula.")
-      return(matrix(NA, q, q))
+    msg <- gettext("The variance estimate cannot be computed for this copula.",
+                  "  Rather use  'estimate.variance = FALSE'")
+    if (!isEll && (!hasMethod("dcopwrap", clc) ||
+                   !hasMethod("derPdfWrtArgs", clc))) {
+	warning(msg); return(ans)
     }
 
     p <- cop@dimension
@@ -378,7 +403,10 @@ varPL <- function(cop,u)
     ## influ0 <- score (cop,u, dcop)
     ## derArg <- score2(cop,u, dcop)
     influ0 <- derPdfWrtParams(cop,u) / dcop # c. / c  = of dim.  n x q  {== cop<foo>@score()}
-    derArg <- derPdfWrtArgs(cop,u)   / dcop #         = of dim.  n x p  { missing in copFoo -- TODO}
+    if(is.na(influ0[1])) {
+	warning(msg); return(ans)
+    }
+    derArg <- derPdfWrtArgs(cop,u)   / dcop #         = of dim.  n x p  {missing in copFoo -- TODO}
 
     ## TODO: use  array instead of list (and change influ.terms() accordingly)
     influ <- vector("list",p)
@@ -386,15 +414,19 @@ varPL <- function(cop,u)
         influ[[i]] <- influ0 * derArg[,i]
 
     inve <- solve(var(influ0))
-
-    return(inve %*% var(influ0 - influ.terms(u,influ,q)) %*% inve)
-  }
+    if(has.par.df(cop, ccl, isEll)) {
+        ## currently cannot get var/cov for 'df' part
+	ans[-q,-q] <- inve %*% var(influ0 - influ.terms(u,influ, q-1)) %*% inve
+	ans
+    }
+    else
+	inve %*% var(influ0 - influ.terms(u,influ, q)) %*% inve
+}
 
 
 ## variance of the estimator based on Kendall's tau ############################
 
-## cop is the FITTED copula
-## u are the available pseudo-observations
+## copula is the FITTED copula
 getL <- function(copula) {
   ## for ellipCopula only
   p <- copula@dimension
@@ -423,27 +455,29 @@ getL <- function(copula) {
 
 
 getXmat <- function(copula) {
-  p <- copula@dimension
-  pp <- p * (p - 1) / 2
-
-  dgidx <- outer(1:p, 1:p, "-")
-  dgidx <- dgidx[lower.tri(dgidx)]
-
-  if (!is(copula, "ellipCopula")) { ## one-parameter non-elliptical copula
-    matrix(1, nrow=pp, ncol=1)
-  } else if (copula@dispstr == "ex") {
-    matrix(1, nrow=pp, ncol=1)
-  } else if(copula@dispstr == "un") {
-    diag(pp)
-  } else if(copula@dispstr == "toep") {
-    model.matrix(~ factor(dgidx) - 1)
-  } else if(copula@dispstr == "ar1") {
-    ## estimate log(rho) first and then exponetiate back
-    ## mat <- model.matrix(~ factor(dgidx) - 1)
-    ## mat %*% diag(1:(p - 1))
-    matrix(dgidx, ncol=1)
-  }
-  else stop("Not implemented yet for this copula/dispersion structure.")
+    p <- copula@dimension
+    pp <- p * (p - 1) / 2
+    if (!is(copula, "ellipCopula")) ## one-parameter non-elliptical copula
+	matrix(1, nrow=pp, ncol=1)
+    else {
+	switch(copula@dispstr,
+	       "ex" = matrix(1, nrow=pp, ncol=1),
+	       "un" = diag(pp),
+	       "toep" =,
+	       "ar1" = {
+		   dgidx <- outer(1:p, 1:p, "-")
+		   dgidx <- dgidx[lower.tri(dgidx)]
+		   if(copula@dispstr == "toep")
+		       model.matrix(~ factor(dgidx) - 1)
+		   else { ## __"ar1"__
+		       ## estimate log(rho) first and then exponetiate back
+		       ## mat <- model.matrix(~ factor(dgidx) - 1)
+		       ## mat %*% diag(1:(p - 1))
+		       matrix(dgidx, ncol=1)
+		   }
+	       },
+	       stop("Not implemented yet for this copula/dispersion structure."))
+    }
 }
 
 
@@ -469,11 +503,14 @@ varInfluAr1 <- function(cop, v, L, der) {
   v %*% theta
 }
 
+##' Variance of the estimator based on Kendall's tau
 ##' See Kojadinovic & Yan (2010) Comparison of three semiparametric ... IME 47, 52--63
+##' @param cop the \bold{fitted} copula
+##' @param u the available pseudo-observations
 varKendall <- function(cop,u) {
   ## check if variance can be computed
   if (!hasMethod("dTau", class(cop))) {
-    warning("The variance estimate cannot be computed for a copula of class", class(cop))
+    warning("The variance estimate cannot be computed for a copula of class ", class(cop))
     q <- length(cop@parameters)
     return(matrix(NA, q, q))
   }
@@ -495,17 +532,20 @@ varKendall <- function(cop,u) {
   ## L <- getL(cop)
   X <- getXmat(cop)
   L <- t(solve(crossprod(X), t(X)))
-  ## Caution: diag(0.5) is not a 1x1 matrix of 0.5!!! check it out.
-  D <- if (length(cop@parameters) == 1) 1 / dTau(cop) else diag(1 / dTau(cop))
-  if (is(cop, "ellipCopula") && cop@dispstr == "ar1") { ## special treatment
-    v <- varInfluAr1(cop, v, L, "tau")
-    return(16 * var(v))
-  } else return(16 * var(v %*% L %*% D))
+  v <- if (is(cop, "ellipCopula") && cop@dispstr == "ar1") { ## special treatment
+    varInfluAr1(cop, v, L, "tau")
+  }
+  else {
+    ## Caution: diag(0.5) is not a 1x1 matrix of 0.5!!! check it out.
+    D <- if (length(cop@parameters) == 1) 1 / dTau(cop) else diag(1 / dTau(cop))
+    v %*% L %*% D
+  }
+  16 * var(v)
 }
 
 
-## variance of the estimator based on Spearman's rho ###########################
-##' See Kojadinovic & Yan (2010) Comparison of three seimparametirc ... IME 47, 52--63
+##' Variance of the estimator based on Spearman's rho
+##' See Kojadinovic & Yan (2010) Comparison of three semiparametric ... IME 47, 52--63
 ##'
 ##' @title variance of the estimator based on Spearman's rho
 ##' @param cop  the FITTED copula
@@ -522,30 +562,29 @@ varSpearman <- function(cop,u)  {
 
   stopifnot((p <- cop@dimension) >= 2)
   n <- nrow(u)
-  v <- matrix(0,n,p*(p-1)/2)
+  v <- matrix(0, n, p*(p-1)/2)
 
   ord <- apply(u, 2, order, decreasing=TRUE)
-  ordb <- apply(u, 2, rank)
+  ordb <- apply(u, 2, rank)# ties : "average"
+  storage.mode(ordb) <- "integer" # as used below
 
-  l <- 1
+  l <- 0L
   for (j in 1:(p-1)) {
-    for (i in (j+1):p)  {
-      v[,l] <- u[,i] * u[,j] +
-          c(0, cumsum(u[ord[,i], j]))[n + 1 - ordb[,i]] / n +
-          c(0, cumsum(u[ord[,j], i]))[n + 1 - ordb[,j]] / n
-      l <- l + 1
-    }
+    for (i in (j+ 1L):p)
+      v[,(l <- l + 1L)] <- u[,i] * u[,j] +
+          c(0, cumsum(u[ord[,i], j]))[n + 1L - ordb[,i]] / n +
+          c(0, cumsum(u[ord[,j], i]))[n + 1L - ordb[,j]] / n
   }
   ## L <- getL(cop)
   X <- getXmat(cop)
   L <- t(solve(crossprod(X), t(X)))
-  if (is(cop, "ellipCopula") && cop@dispstr == "ar1") {
-      v <- varInfluAr1(cop, v, L, "rho")
-      144 * var(v)
+  v <- if (is(cop, "ellipCopula") && cop@dispstr == "ar1") {
+      varInfluAr1(cop, v, L, "rho")
   } else {
       ## Caution: diag(0.5) is not a 1x1 matrix of 0.5!!! check it out.
       D <- if (length(cop@parameters) == 1) 1 / dRho(cop) else diag(1 / dRho(cop))
-      144 * var(v %*% L %*% D)
+      v %*% L %*% D
   }
+  144 * var(v)
 }
 

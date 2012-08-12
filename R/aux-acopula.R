@@ -26,12 +26,13 @@ paste0 <- function(...) paste(..., sep="")
 ##' @param th
 ##' @return 1 - 2*((1-th)*(1-th)*log(1-th)+th)/(3*th*th)
 ##' numerically accurately, for both limits  th -> 0  &  th -> 1
+##' Nelsen (2006, p.172) range of tau: [(5 - 8 log 2) / 3, 1/3] ~= [-0.1817, 0.3333]
 ##' @author Martin Maechler
-tauAMH <- function(th) {
-    if(length(th) == 0) return(numeric(0)) # to work with NULL
-    r <- th
-    na <- is.na(th)
-    lrg <- (th > 0.01) & !na ## for "large" theta (<=> theta >= 0.01), use standard formula
+tauAMH <- function(theta) {
+    if(length(theta) == 0) return(numeric(0)) # to work with NULL
+    r <- theta
+    na <- is.na(theta)
+    lrg <- (abs(theta) > 0.01) & !na ## for "large" theta (<=> theta >= 0.01), use standard formula
     f. <- function(t) {
 	## 1 - 2*((1-t)*(1-t)*log1p(-t) + t) / (3*t*t)
 	r <- t
@@ -40,7 +41,7 @@ tauAMH <- function(th) {
 	r[s] <- 1 - 2*((1-t)^2 *log1p(-t) + t) / (3*t*t)
 	r
     }
-    r[lrg] <- f.(th[lrg])
+    r[lrg] <- f.(theta[lrg])
     ## Otherwise use "smart" Taylor polynomials: for given order, *drop* the last two..
     ## with the following coefficients:
     ##_ x <- polynomial()
@@ -48,14 +49,15 @@ tauAMH <- function(th) {
     ##  1  1/4  1/10  1/20  1/35  1/56  1/84  1/120  1/165  1/220
 
     if(any(!lrg & !na)) {
-	l1 <- !lrg & !na & (ll1 <- th > 2e-4) ## --> k = 7
-	r[l1] <- (function(x) 2*x/9*(1+ x*(1/4 + x/10*(1 + x*(1/2 + x/3.5)))))(th[l1])
-	l2 <- !ll1 & !na & (ll2 <- th > 1e-5)	 ## --> k = 6
-	r[l2] <- (function(x) 2*x/9*(1+ x*(1/4 + x/10*(1 + x/2))))(th[l2])
-	l3 <- !ll2 & !na & (ll <- th > 2e-8)	## --> k = 5
-	r[l3] <- (function(x) 2*x/9*(1+ x*(1/4 + x/10)))(th[l3])
-	irem <- which(!ll & !na)## rest: th <= 2e-8 : k == 4
-	r[irem] <- (function(x) 2*x/9*(1+ x/4))(th[irem])
+	l1 <- !lrg & !na & (ll1 <- theta > 2e-4) ## --> k = 7
+	r[l1] <- (function(x) 2*x/9*(1+ x*(1/4 + x/10*(1 + x*(1/2 + x/3.5))))
+		  )(theta[l1])
+	l2 <- !ll1 & !na & (ll2 <- theta > 1e-5)	 ## --> k = 6
+	r[l2] <- (function(x) 2*x/9*(1+ x*(1/4 + x/10*(1 + x/2))))(theta[l2])
+	l3 <- !ll2 & !na & (ll <- theta > 2e-8)	## --> k = 5
+	r[l3] <- (function(x) 2*x/9*(1+ x*(1/4 + x/10)))(theta[l3])
+	irem <- which(!ll & !na)## rest: theta <= 2e-8 : k == 4
+	r[irem] <- (function(x) 2*x/9*(1+ x/4))(theta[irem])
     }
     r
 }
@@ -1096,6 +1098,55 @@ circRat <- function(e, d)
     }
 }
 
+##' @title tau(theta) for Joe's copula
+##' @param theta (vector of) copula parameters in [-1,1] (in [0,1] for tau >= 0)
+##' @param method string specifying the computational method.
+##' @param noTerms number of terms to use for method = "sum".
+##' @return vector of same length as theta with   tau(theta[.])
+##' @author Martin Maechler
+tauJoe <- function(theta, method = c("hybrid", "digamma", "sum"), noTerms=446)
+{
+    method <- match.arg(method)
+    switch(method,
+	   "hybrid" = {
+	       digam1 <- digamma(1) ## == - (Euler's) gamma = -0.5772157
+	       trigam1 <- pi^2/6 ##  == psigamma(1, d=1) = trigamma(1)
+	       vapply(theta, function(th) {
+		   if(th == 2) return(2 - trigam1)
+		   if(th > 1e17) return(1)
+		   q <- 2/th
+		   tol <- 1.5e-5 ## MM: from experimentation (Lnx, 64-bit)
+				 ## ---> ~/R/MM/Pkg-ex/copula/tauJoe.R
+		   dt <- if(abs(e <- q-1) < tol)## th ~= 2: |2-th| < tol*th
+		       -(digam1 + q*trigam1 + e/2*psigamma(1, deriv=2))
+		   else
+		       (digam1 - q*digamma(q))/e
+		   1 + q*(dt + digamma(1+q))
+	       }, 0.)
+	   },
+	   "digamma" = {
+	       digam1 <- digamma(1) ## == - (Euler's) gamma = -0.5772157
+	       vapply(theta, function(th) {
+		   if(th == 2) return(2 - pi^2/6)
+		   q <- 2/th
+		   ## A <- 1/(q*(q-1)) ## only for q != 1,	 i.e.,	th != 2
+		   ## 1 + 4/th^2 * (A*digam1 + digamma(1+q)/q + digamma(q)/(1-q))
+		   ##  q^2 = 4/th^2; q*A = 1/(q-1)
+		   ## 1 + q * (digam1/(q-1) + digamma(1+q) + q/(1-q)*digamma(q))
+		   1 + q*((digam1 - q*digamma(q))/(q-1) + digamma(1+q))
+	       }, 0.)
+	   },
+	   "sum" = {
+	       k <- noTerms:1
+	       sapply(theta,
+		      function(th) {
+			  tk2 <- th*k + 2
+			  1 - 4*sum(1/(k*tk2*(tk2 - th)))
+			  ## ==... (1/(k*(th*k+2)*(th*(k-1)+2)))
+		      })
+	   },
+	   stop("unsupported method: ", method))
+}
 
 ### Misc #######################################################################
 

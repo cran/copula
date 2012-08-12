@@ -50,20 +50,18 @@ tau.s <- c(       -.1, 0, (1:2)/9, 0.3)
 names(tau.s) <- paste0("tau=", sub("0[.]", ".", formatC(tau.s)))
 tTau <- sapply(tau.s, function(tau)
                sapply(copO., iTau, tau = tau))
-
 tTau
-tTau["joeCopula", "tau=-.1"] <- 1 # ugly hack
 
-stopifnot(rep(copBnds["min",],ncol(tTau)) <= tTau,
+stopifnot(rep(copBnds["min",],ncol(tTau)) <= tTau + 1e-7,
           tTau <= rep(copBnds["max",],ncol(tTau)),
           ## theta and tau are comonotone :
           apply(tTau, 1, diff) >= 0)
 
 tautau <- t(sapply(names(copO.), function(cNam)
-                   sapply(tTau[cNam,],
-                          function(th) tau(setPar(copO.[[cNam]], th)))))
-
+		   sapply(tTau[cNam,],
+			  function(th) tau(setPar(copO.[[cNam]], th)))))
 tautau
+
 xctTau <- matrix(tau.s, nrow = nrow(tautau), ncol=length(tau.s),
                  byrow=TRUE)
 ## The absolute errors
