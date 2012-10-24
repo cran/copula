@@ -1,5 +1,5 @@
 \name{copula-class}
-\title{Mother Classes "Copula" and "copula" of all Copulas in the Package}
+\title{Mother Classes "Copula" and "copula" of All Copulas in the Package}
 \docType{class}
 \alias{copula-class}
 \alias{Copula-class}

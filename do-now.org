@@ -20,14 +20,14 @@
 | X    | abs(psi^{(d)}) | Archimedean                | psiDabs                     | absdPsi        |       |    | P        | P  |         |
 | X    | psiInv'        | Archimedean                | psiInvD1abs                 | absdiPsi       |       |    | P        | P  |         |
 | X    | psiInv         | Archimedean                | psiInv                      | iPsi           |       |    | I        | P  |         |
-| ..!  | itau           | fitting                    | tauInv                      | iTau           |       |    |          | I  |         |
+| X    | itau           | fitting                    | tauInv                      | iTau           |       |    |          | I  |         |
 |------+----------------+----------------------------+-----------------------------+----------------+-------+----+----------+----+---------|
 |      |                | Simple                     |                             |                |       |    |          |    |         |
 |------+----------------+----------------------------+-----------------------------+----------------+-------+----+----------+----+---------|
 | X    | tau'           | itau fitting std err (se)  | tauDer                      | dTau           | I     | I  |          |    |         |
 | X    | rho'           | irho fitting std err       | rhoDer                      | dRho           | I     | I  |          |    |         |
-| !!!  | tau'           | itau fitting std err (se)  | TauDer                      | dTau           | I     | I  |          |    |         |
-| !!!  | rho'           | irho fitting std err       | RhoDer                      | dRho           | I     | I  |          |    |         |
+| X    | tau'           | itau fitting std err (se)  | TauDer                      | dTau           | I     | I  |          |    |         |
+| X    | rho'           | irho fitting std err       | RhoDer                      | dRho           | I     | I  |          |    |         |
 | X    | C'param        | gof mult                   | derCdfWrtParams             | dCdtheta       | I     |    | I ex amh |    |         |
 | X    | C'args         | gof mult, cov emp cop proc | derCdfWrtArgs               | dCdu           | I     |    | I ex amh | P  |         |
 | X    | A'param        | EV mpl se, gof mult        | derAfunWrtParam             | dAdtheta       |       | ?  |          |    |         |

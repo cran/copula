@@ -37,7 +37,7 @@ timing <- function(n, family, taus, digits=3, verbose=FALSE)
     f.taus <- format(taus, digits=digits)
     res <- matrix(,nrow=l,ncol=l)
     copFamily <- getAcop(family)
-    thetas <- copFamily@tauInv(taus)
+    thetas <- copFamily@iTau(taus)
 
     ## timing (based on user time)
     for(i in seq_along(thetas)) { # run over all theta0

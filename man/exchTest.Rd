@@ -1,6 +1,6 @@
 \name{exchTest}
 \alias{exchTest}
-\title{Test of exchangeability for a bivariate copula}
+\title{Test of Exchangeability for a Bivariate Copula}
 \description{
   Test for assessing the exchangeability of the underlying
   bivariate copula based on the empirical copula.
@@ -30,7 +30,7 @@ exchTest(x, N = 1000, m = 0)
   \item{p.value}{ corresponding approximate p-value. }
 }
 \references{
-  Genest, C., Nešlehová, J. and Quessy, J.-F. (2012). Tests of symmetry for
+  Genest, C., \enc{Nešlehová}{Neslehova}, J. and Quessy, J.-F. (2012). Tests of symmetry for
   bivariate copulas. \emph{Annals of the Institute of Statistical
   Mathematics}. In press.
 

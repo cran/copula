@@ -256,7 +256,7 @@ set.seed(1)
 n <- 50
 d <- 100
 tau <- 0.2
-theta <- copGumbel@tauInv(tau)
+theta <- copGumbel@iTau(tau)
 alpha <- 1/theta
 
 ## animate this

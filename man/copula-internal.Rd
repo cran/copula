@@ -7,7 +7,7 @@
 \alias{asymExplicitCopula-class}
 \alias{schlatherCopula-class}
 % Undocumented S4 methods
-\title{Internal copula functions}
+\title{Internal Copula Functions}
 \description{
   Internal Copula functions
 }

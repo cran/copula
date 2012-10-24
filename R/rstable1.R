@@ -24,6 +24,7 @@ sinc <- function(x) .Call(sinc_c, x)
 ##' @param alpha parameter in (0,1]
 ##' @return sin(alpha*x)^alpha * sin((1-alpha)*x)^(1-alpha) / sin(x)
 ##' @author Martin Maechler
+## NB: Is exported, documented, demo'ed, but not used by our own code!
 A..Z <- function(x, alpha, I.alpha = 1 - alpha)
     .Call(copula:::A__c, x, alpha, I.alpha)
 
@@ -57,8 +58,8 @@ cospi2 <- function(x) {
     r
 }
 
-##' Sample S ~ S(alpha, beta, gamma, delta; pm), see Diethelm Wuertz's code
-##' in fBasics for the parameterization.
+##' Sample S ~ S(alpha, beta, gamma, delta; pm), see package
+##' \pkg{stabledist} for the parameterization.
 ##'
 ##' @title Sampling stable distributions
 ##' @param n number of random variates to be generated
@@ -149,9 +150,8 @@ rstable1R <- function(n, alpha, beta, gamma = 1, delta = 0, pm = 1)
     Z * gamma + delta
 }
 
-##' Sample S ~ S(alpha, beta, gamma, delta; pm), see Diethelm Wuertz's code
-##' in fBasics for the parameterization. For beta == 1 and pm == 1, the fast
-##' C implementation is used.
+##' Sample S ~ S(alpha, beta, gamma, delta; pm), see rstable1R() above.
+##' For beta == 1 and pm == 1, the fast C implementation is used.
 ##'
 ##' @title Efficiently sampling stable distributions
 ##' @param n number of random variates to be generated

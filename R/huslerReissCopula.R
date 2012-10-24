@@ -157,7 +157,7 @@ iTauHuslerReissCopula <- function(copula, tau) {
 }
 
 
-huslerReissTauDer <- function(alpha) {
+huslerReissdTau <- function(alpha) {
   ss <- .huslerReissTau$ss
   forwardTransf <- .huslerReissTau$trFuns$forwardTransf
   forwardDer <- .huslerReissTau$trFuns$forwardDer
@@ -189,7 +189,7 @@ iRhoHuslerReissCopula <- function(copula, rho) {
   ifelse(rho <= 0, 0, .huslerReissRho$trFuns$backwardTransf(theta, ss))
 }
 
-huslerReissRhoDer <- function(alpha) {
+huslerReissdRho <- function(alpha) {
   ss <- .huslerReissRho$ss
   forwardTransf <- .huslerReissRho$trFuns$forwardTransf
   forwardDer <- .huslerReissRho$trFuns$forwardDer
@@ -224,7 +224,7 @@ setMethod("iTau", signature("huslerReissCopula"), iTauHuslerReissCopula)
 setMethod("iRho", signature("huslerReissCopula"), iRhoHuslerReissCopula)
 
 setMethod("dTau", signature("huslerReissCopula"), function(copula)
-	  huslerReissTauDer(copula@parameters[1]))
+	  huslerReissdTau(copula@parameters[1]))
 
 setMethod("dRho", signature("huslerReissCopula"), function(copula)
-	  huslerReissRhoDer(copula@parameters[1]))
+	  huslerReissdRho(copula@parameters[1]))

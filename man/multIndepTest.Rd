@@ -1,7 +1,7 @@
 \name{multIndepTest}
 \alias{multIndepTest}
-\title{Independence test among continuous random vectors based on the
-  empirical copula process}
+\title{Independence Test Among Continuous Random Vectors Based on the
+  Empirical Copula Process}
 \description{
   Analog of the independence test based on the empirical copula process
   proposed by Christian Genest and Bruno Rémillard (see

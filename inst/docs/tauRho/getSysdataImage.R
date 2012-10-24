@@ -15,9 +15,9 @@ load("galambos.rda")
 load("huslerReiss.rda")
 load("tev.rda")
 
-save(.claytonRhoNeg, .claytonRhoPos, ## claytonRhoFun, claytonRhoDer,
-     .gumbelRho, ## gumbelRhoFun, gumbelRhoDer,
-     .plackettTau, ## plackettTauFun, plackettTauDer,
+save(.claytonRhoNeg, .claytonRhoPos, ## claytonRhoFun, claytondRho,
+     .gumbelRho, ## gumbelRhoFun, gumbeldRho,
+     .plackettTau, ## plackettTauFun, plackettdTau,
      .galambosTau, .galambosRho,
      .huslerReissTau, .huslerReissRho,
      .tevTau, .tevRho,

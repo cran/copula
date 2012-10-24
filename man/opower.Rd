@@ -1,6 +1,6 @@
 \name{opower}
 \alias{opower}
-\title{Outer power transformation of Archimedean copulas}
+\title{Outer Power Transformation of Archimedean Copulas}
 \usage{
 opower(copbase, thetabase)
 }
@@ -38,15 +38,15 @@ opower(copbase, thetabase)
 \examples{
 ## Construct an outer power Clayton copula with parameter thetabase such
 ## that Kendall's tau equals 0.2
-thetabase <- copClayton@tauInv(0.2)
+thetabase <- copClayton@iTau(0.2)
 opC <- opower(copClayton, thetabase) # "acopula" obj. (unspecified theta)
 
 ## Construct a 3d nested Archimedean copula based on opC, that is, a nested
 ## outer power Clayton copula.  The parameters theta are chosen such that
 ## Kendall's tau equals 0.4 and 0.6 for the outer and inner sector,
 ## respectively.
-theta0 <- opC@tauInv(0.4)
-theta1 <- opC@tauInv(0.6)
+theta0 <- opC@iTau(0.4)
+theta1 <- opC@iTau(0.6)
 opC3d <- onacopulaL(opC, list(theta0, 1, list(list(theta1, 2:3))))
 ## or opC3d <- onacopula(opC, C(theta0, 1, C(theta1, c(2,3))))
 

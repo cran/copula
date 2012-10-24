@@ -1,7 +1,7 @@
 \name{gnacopula}
 \alias{gnacopula}
 \alias{gofTstat}
-\title{Goodness-of-fit testing for (nested) Archimedean copulas}
+\title{Goodness-of-fit Testing for (Nested) Archimedean Copulas}
 \description{
   \code{gnacopula()} conducts a goodness-of-fit test for the given
   (\eqn{H_0}-)copula \code{cop} based on the (copula-)data \code{u}.
@@ -9,7 +9,7 @@
 }
 \usage{
 gnacopula(u, cop, n.bootstrap,
-          estimation.method = eval(formals(enacopula)$method),
+          estim.method = eval(formals(enacopula)$method),
           include.K=TRUE, n.MC=0, trafo= c("Hering.Hofert", "Rosenblatt"),
           method=eval(formals(gofTstat)$method), verbose=TRUE, \dots)
 gofTstat(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
@@ -23,7 +23,7 @@ gofTstat(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
     provided).}
   \item{n.bootstrap}{positive integer specifying the number of bootstrap
     replicates.}
-  \item{estimation.method}{\code{\link{character}}
+  \item{estim.method}{\code{\link{character}}
     string determining the estimation method; see
     \code{\link{enacopula}}.  We currently only recommend the default
   \code{"mle"} (or maybe \code{"smle"}).}
@@ -76,14 +76,14 @@ gofTstat(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
 	\eqn{\mathrm{S_n^{(B)}}}{S[n]^(B)} from Genest,
 	R\enc{é}{e}millard, Beaudoin (2009).}
       \item{\code{"SnC"}}{for computing the test statistic
-	\eqn{\mathrm{S_n^{(C)}}}{S[n]^(C)} from Genest et al.(2009).}
+	\eqn{\mathrm{S_n^{(C)}}}{S[n]^(C)} from Genest et al. (2009).}
   }}
   \item{verbose}{if \code{TRUE}, the progress of the bootstrap is
     displayed via \code{\link[utils]{txtProgressBar}}.}
   \item{\dots}{additional arguments to \code{\link{enacopula}}.}
 }
 \details{
-  The function \code{gnacopula} performs a bootstrap for the
+  The function \code{gnacopula} performs a parametric bootstrap for the
   goodness-of-fit test specified by \code{trafo} and \code{method}.  The
   transformation given by \code{trafo} specifies the multivariate
   transformation which is first applied to the (copula-) data \code{u}
@@ -93,21 +93,26 @@ gofTstat(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
   carried out, which is either the Anderson-Darling test for the
   univariate standard uniform distribution (for \code{method="AnChisq"} or
   \code{method="AnGamma"}) in a one-dimensional setup or the tests
-  described in Genest, R\enc{é}{e}millard, Beaudoin (2009) for the
+  described in Genest et al. (2009) for the
   multivariate standard uniform distribution directly in a multivariate
   setup.  As estimation method, the method provided by
-  \code{estimation.method} is used.
+  \code{estim.method} is used.
+
+  Note that a finite-sample correction of type
+  \eqn{(sum(T0 >= T)+0.5)/(N+1)} is made, where
+  \eqn{T} and \eqn{T0} are the test statistic and bootstrapped test
+  statistc, respectively.
 
   A word of warning: Do work carefully with the variety of different
   goodness-of-fit tests that can be performed with \code{gnacopula()}.
   For example, among the possible estimation methods at hand, only
   MLE is known to be consistent (under conditions to be verified).
   Furthermore, for the tests based on the Anderson-Darling test
-  statistic, it is theoretically not clear whether the bootstrap
+  statistic, it is theoretically not clear whether the parametric bootstrap
   converges.  Consequently, the results obtained should be treated with
   care.  Moreover, several estimation methods are known to be prone to
   numerical errors (see Hofert et al. (2011a)) and are thus not
-  recommended to be used in the bootstrap. A warning is given if
+  recommended to be used in the parametric bootstrap. A warning is given if
   \code{gnacopula()} is called with a method not being MLE.
 
   Since \R is widely used by practitioners, a word of warning concerning
@@ -164,7 +169,7 @@ gofTstat(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
 }
 \examples{
 tau <- 0.5
-(theta <- copGumbel@tauInv(tau)) # 2
+(theta <- copGumbel@iTau(tau)) # 2
 d <- 5
 (copG <- onacopulaL("Gumbel", list(theta,1:d)))
 
@@ -217,7 +222,7 @@ qq1dtrafo(uH, uR)
 ##       it will be estimated anyway
 copC <- onacopulaL("Clayton", list(1, 1:d))
 res.H0.C <- gnacopula(u, cop=copC, n.bootstrap=10,
-	              estimation.method="mle")
+	              estim.method="mle")
 res.H0.C$p.value # rejection according to 5\% level
 
 ## plot of the transformed data (Hering and Hofert (2011)) to see the deviations

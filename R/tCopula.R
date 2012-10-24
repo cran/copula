@@ -112,7 +112,7 @@ dtCopula <- function(u, copula, log = FALSE, ...) {
 }
 
 showTCopula <- function(object) {
-  showCopula(object)
+  print.copula(object)
   if (object@dimension > 2) cat("dispstr: ", object@dispstr, "\n")
   if (object@df.fixed) cat("df is fixed at", object@df, "\n")
   invisible(object)

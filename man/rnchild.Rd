@@ -1,5 +1,5 @@
 \name{rnchild}
-\title{Sampling child 'nacopula's}
+\title{Sampling Child 'nacopula's}
 \alias{rnchild}
 \description{
   Method for generating vectors of random numbers of nested Archimedean
@@ -50,8 +50,8 @@ rnchild(x, theta0, V0, ...)
 ## Construct a three-dimensional nested Clayton copula with parameters
 ## chosen such that the Kendall's tau of the respective bivariate margins
 ## are 0.2 and 0.5.
-theta0 <- copClayton@tauInv(.2)
-theta1 <- copClayton@tauInv(.5)
+theta0 <- copClayton@iTau(.2)
+theta1 <- copClayton@iTau(.5)
 C3 <- onacopula("C", C(theta0, 1, C(theta1, c(2,3))))
 ## Sample n random variates V0 ~ F0 (a Gamma(1/theta0,1) distribution)
 n <- 1000

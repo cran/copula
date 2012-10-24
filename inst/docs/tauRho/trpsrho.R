@@ -36,7 +36,7 @@ frankRhoFun <- function(alpha) {
   c(.frankRho$assoMeasFun$valFun(theta))
 }
 
-frankRhoDer <- function(alpha) {
+frankdRho <- function(alpha) {
   ss <- .frankRho$ss
   forwardTransf <- .frankRho$trFuns$forwardTransf
   forwardDer <- .frankRho$trFuns$forwardDer
@@ -47,7 +47,7 @@ frankRhoDer <- function(alpha) {
 ## rhoTrue <- sapply(alphaGrid, function(x) rho(frankCopula(x)))
 ## dRhoTrue <- sapply(alphaGrid, function(x) dRho(frankCopula(x)))
 
-save(.frankRho, frankRhoFun, frankRhoDer,
+save(.frankRho, frankRhoFun, frankdRho,
      file = "frankRho.rda")
 
 ########################################################
@@ -68,7 +68,7 @@ t4RhoFun <- function(alpha) {
   c(.t4Rho$assoMeasFun$valFun(theta))
 }
 
-t4RhoDer <- function(alpha) {
+t4dRho <- function(alpha) {
   ss <- .t4Rho$ss
   forwardTransf <- .t4Rho$trFuns$forwardTransf
   forwardDer <- .t4Rho$trFuns$forwardDer
@@ -80,7 +80,7 @@ alphaGrid <- tTrFuns$backwardTransf(thetaGrid)
 rhoTrue <- sapply(alphaGrid, function(x) rho(tCopula(x)))
 dRhoTrue <-  6 / (pi * sqrt(4 - alphaGrid^2)) ## true for normal
 
-save(.t4Rho, t4RhoFun, t4RhoDer,
+save(.t4Rho, t4RhoFun, t4dRho,
      file = "t4Rho.rda")
 
 ## pdf("t4-rho.pdf", height=3, width=6, pointsize=9)
@@ -88,7 +88,7 @@ save(.t4Rho, t4RhoFun, t4RhoDer,
 ## plot(alphaGrid, rhoTrue, type="l", xlab=expression(theta), ylab=expression(rho(theta)))
 ## curve(t4RhoFun(x), add=TRUE, col="blue")
 
-## curve(t4RhoDer(x), col="blue", xlab=expression(theta), ylab=bquote(partialdiff~ rho / partialdiff ~ theta))
+## curve(t4dRho(x), col="blue", xlab=expression(theta), ylab=bquote(partialdiff~ rho / partialdiff ~ theta))
 ## lines(alphaGrid, dRhoTrue)
 ## dev.off()
 
@@ -121,7 +121,7 @@ claytonRhoFun <- function(alpha) {
   c(ifelse(alpha <= 0, valFunNeg(theta), valFunPos(theta)))
 }
 
-claytonRhoDer <- function(alpha) {
+claytondRho <- function(alpha) {
   ss <- .claytonRhoNeg$ss
   forwardTransf <- .claytonRhoNeg$trFuns$forwardTransf
   forwardDer <- .claytonRhoNeg$trFuns$forwardDer
@@ -132,7 +132,7 @@ claytonRhoDer <- function(alpha) {
   c(ifelse(alpha <= 0, valFunNeg(theta, 1), valFunPos(theta, 1))) * forwardDer(alpha, ss)
 }
 
-save(.claytonRhoNeg, .claytonRhoPos, claytonRhoFun, claytonRhoDer,
+save(.claytonRhoNeg, .claytonRhoPos, claytonRhoFun, claytondRho,
      file = "claytonRho.rda")
 
 ########################################################
@@ -159,7 +159,7 @@ gumbelRhoFun <- function(alpha) {
   c(valFun(theta))
 }
 
-gumbelRhoDer <- function(alpha) {
+gumbeldRho <- function(alpha) {
   ss <- .gumbelRho$ss
   forwardTransf <- .gumbelRho$trFuns$forwardTransf
   forwardDer <- .gumbelRho$trFuns$forwardDer
@@ -169,5 +169,5 @@ gumbelRhoDer <- function(alpha) {
   c(valFun(theta, 1)) * forwardDer(alpha, ss)
 }
 
-save(.gumbelRho, gumbelRhoFun, gumbelRhoDer,
+save(.gumbelRho, gumbelRhoFun, gumbeldRho,
      file = "gumbelRho.rda")

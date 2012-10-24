@@ -17,8 +17,7 @@
 require(copula)
 source(system.file("Rsource", "tstFit-fn.R", package="copula", mustWork=TRUE))
 
-(doExtras <- interactive() || nzchar(Sys.getenv("R_copula_check_extra")) ||
- identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING"))))
+(doExtras <- copula:::doExtras())
 
 ## From source(system.file("test-tools-1.R", package = "Matrix")) :
 showProc.time <- local({
@@ -39,7 +38,7 @@ u3 <- cbind(uu, round(runif(10),2))
 ## d = 2
 (f1 <- fit1(tCopula(df.fixed=TRUE), x = uu))
 stopifnot(identical(f1, fit1(tCopula(df.fixed=TRUE),
-			     x = data.frame(uu))))
+			     x = data.frame(uu))))# *WITH* a warning
 ## did not work with data.frame before 2012-08-12
 
 ## for df.fixed=FALSE, have 2 parameters ==> cannot use "fit1":
@@ -107,5 +106,23 @@ rtevx <- tstFit1cop(tevCopula(, df.fixed=TRUE),
 
 showProc.time()
 
+
+set.seed(121)
+
+### Fitting  multivariate incl margins --- mvdc
+gumbelC <- gumbelCopula(3, dim=2)
+gMvGam <- mvdc(gumbelC, c("gamma","gamma"), param = list(list(2,3), list(4,1)))
+gMvGam # now nicely show()s -- the *AUTO*-constructed parameter names
+X <- rMvdc(16000, gMvGam)
+plot(X, cex = 1/4)
+
+persp  (gMvGam, dMvdc, xlim = c(0,4), ylim=c(0,8)) ## almost discrete ????
+contour(gMvGam, dMvdc, xlim = c(0,2), ylim=c(0,8))
+points(X, cex = 1/16, col=adjustcolor("blue", 0.5))
 
 
+if(FALSE)# unfinished
+fMv <- fitMvdc(X, gMvGam)
+
+
+showProc.time()

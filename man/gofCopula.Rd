@@ -1,19 +1,22 @@
 \name{gofCopula}
 \alias{gofCopula}
-\title{Goodness-of-fit tests for copulas}
+\title{Goodness-of-fit Tests for Copulas}
 \description{
   Goodness-of-fit tests for copulas based on the empirical process
   comparing the empirical copula with a
   parametric estimate of the copula derived under the null hypothesis.
-  The test statistic is the Cramer-von Mises functional Sn defined
-  in equation (2) of Genest, Remillard and Beaudoin (2009).
+  The test statistic is the Cramer-von Mises functional
+  \eqn{\mathrm{S_n}}{S[n]} defined
+  in Equation (2) of Genest, Remillard and Beaudoin (2009).
   Approximate p-values for the test statistic can be obtained either
   using the \emph{parametric bootstrap} (see the two first
-  references) or by means of a fast \emph{multiplier} approach (see the two
-  last references).
+  references) or by means of a fast \emph{multiplier} approach (see the
+  last two references).
 }
 \usage{
-gofCopula(copula, x, N = 1000, method = "mpl",
+gofCopula(copula, x, N = 1000,
+          method = c("Sn", "AnChisq", "AnGamma", "SnB", "SnC"),
+          estim.method = c("mpl", "ml", "irho", "itau"),
           simulation = c("pb", "mult"), verbose = TRUE, print.every = NULL,
           optim.method = "BFGS", optim.control = list(maxit=20))
 }
@@ -24,7 +27,16 @@ gofCopula(copula, x, N = 1000, method = "mpl",
   \item{N}{ number of bootstrap or multiplier iterations to be used to
     simulate realizations of the test statistic under the null
     hypothesis.}
-  \item{method}{a character string specifying the estimation method to
+  \item{method}{a \code{\link{character}} string specifying the
+    goodness-of-fit test statistic to be used, which has to be one (or a unique
+    abbreviation) of \code{"AnChisq"}, \code{"AnGamma"}, \code{"SnB"},
+    \code{"SnC"}, or \code{"Sn"}.
+
+    \code{"Sn"} is \eqn{\mathrm{S_n}}{S[n]} from Equation (2) in Genest,
+    R\enc{é}{e}millard, Beaudoin (2009). For the others see
+    \code{method} in \code{\link{gofTstat}}.
+  }
+  \item{estim.method}{a character string specifying the estimation method to
     be used to estimate the dependence parameter(s); can be either \code{"mpl"}
     (maximum pseudo-likelihood), \code{"itau"} (inversion of
     Kendall's tau) or \code{"irho"} (inversion of Spearman's rho).}
@@ -41,14 +53,14 @@ gofCopula(copula, x, N = 1000, method = "mpl",
 \details{
   If the parametric bootstrap is used, the dependence parameters of
   the hypothesized copula family can be estimated either by maximizing
-  the pseudo-likelihood or by inverting Kendall's tau or Spearman's rho.
-  If the multiplier is used, any estimation method can be used in the
-  bivariate case, but only maximum pseudo-likelihood
+  the pseudo-likelihood, by inverting Kendall's tau, or by inverting
+  Spearman's rho.  If the multiplier is used, any estimation method
+  can be used in the bivariate case, but only maximum pseudo-likelihood
   estimation can be used in the multivariate (multiparameter) case.
 
   For the normal and t copulas, several dependence structures can be
   hypothesized: \code{"ex"} for exchangeable, \code{"ar1"} for AR(1),
-  \code{"toep"} for  Toeplitz, and \code{"un"} for unstructured (see
+  \code{"toep"} for Toeplitz, and \code{"un"} for unstructured (see
   \code{\link{ellipCopula}}). For the t copula, \code{"df.fixed"} has to
   be set to \code{TRUE}, which implies that the degrees of freedom are
   not considered as a parameter to be estimated.
@@ -58,7 +70,13 @@ gofCopula(copula, x, N = 1000, method = "mpl",
 
   Although the processes involved in the multiplier and the parametric
   bootstrap-based test are asymptotically equivalent under the null,
-  the finite-sample behavior of the two tests might differ significantly.
+  note that the finite-sample behavior of the two tests might differ
+  significantly.
+
+  Also note that in case of the parametric bootstrap, a finite-sample
+  correction of type \eqn{(sum(T0 >= T)+0.5)/(N+1)} is made, where
+  \eqn{T} and \eqn{T0} are the test statistic and bootstrapped test
+  statistc, respectively.
 }
 \value{
   An object of \code{\link{class}} \code{htest} which is a list,
@@ -113,19 +131,25 @@ gofCopula(copula, x, N = 1000, method = "mpl",
 ## A two-dimensional data example ----------------------------------
 x <- rCopula(200, claytonCopula(3))
 
+tau. <- cor(x, method="kendall")
 ## Does the Gumbel family seem to be a good choice?
-gofCopula(gumbelCopula(1), x)
+thG <- iTau(gumbelCopula(), tau.)
+gofCopula(gumbelCopula(thG), x)
+# SnC: really s..l..o..w.. --- SnB is *EVEN* slower
+gofCopula(gumbelCopula(thG), x, method = "SnC")
 ## What about the Clayton family?
-gofCopula(claytonCopula(1), x)
+thC <- iTau(claytonCopula(), tau.)
+gofCopula(claytonCopula(thC), x)
+gofCopula(claytonCopula(thC), x, method = "AnChisq")
 
 ## The same with a different estimation method
-gofCopula(gumbelCopula (1), x, method="itau")
-gofCopula(claytonCopula(1), x, method="itau")
+gofCopula(gumbelCopula (thG), x, estim.method="itau")
+gofCopula(claytonCopula(thC), x, estim.method="itau")
+
 
 
 ## A three-dimensional example  ------------------------------------
-x <- rCopula(
-             200, tCopula(c(0.5, 0.6, 0.7), dim = 3, dispstr = "un"))
+x <- rCopula(200, tCopula(c(0.5, 0.6, 0.7), dim = 3, dispstr = "un"))
 
 ## Does the Clayton family seem to be a good choice?
 gofCopula(gumbelCopula(1, dim = 3), x)
@@ -135,8 +159,8 @@ t.copula <- tCopula(rep(0, 3), dim = 3, dispstr = "un", df.fixed=TRUE)
 gofCopula(t.copula, x)
 
 ## The same with a different estimation method
-gofCopula(gumbelCopula(1, dim = 3), x, method="itau")
-gofCopula(t.copula,                 x, method="itau")
+gofCopula(gumbelCopula(1, dim = 3), x, estim.method="itau")
+gofCopula(t.copula,                 x, estim.method="itau")
 
 ## The same using the multiplier approach
 gofCopula(gumbelCopula(1, dim = 3), x, simulation="mult")

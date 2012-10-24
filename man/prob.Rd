@@ -2,7 +2,7 @@
 \alias{prob}
 \alias{prob-methods}
 \alias{prob,Copula-method}
-\title{Computing probabilities of hypercubes}
+\title{Computing Probabilities of Hypercubes}
 \description{
   Compute probabilities of a \eqn{d-}dimensional random vector \eqn{U}
   distributed according to a given copula \code{x} to
@@ -31,8 +31,8 @@ prob(x, l, u)
 ## Construct a three-dimensional nested Joe copula with parameters
 ## chosen such that the Kendall's tau of the respective bivariate margins
 ## are 0.2 and 0.5.
-theta0 <- copJoe@tauInv(.2)
-theta1 <- copJoe@tauInv(.5)
+theta0 <- copJoe@iTau(.2)
+theta1 <- copJoe@iTau(.5)
 C3 <- onacopula("J", C(theta0, 1, C(theta1, c(2,3))))
 
 ## Compute the probability of a random vector distributed according to

@@ -1,6 +1,6 @@
 \name{pobs}
 \alias{pobs}
-\title{Pseudo-observations}
+\title{Pseudo-Observations}
 \description{
   Compute the pseudo-observations for the given data matrix.
 }

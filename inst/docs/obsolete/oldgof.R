@@ -316,10 +316,9 @@ influ.add <- function(x0, y0, influ1, influ2)
 ## grid == 3 => from the observed data
 ## grid == 4 => CVM from observed, H0 dist from generated
 
-gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
-                       der=NULL, betavar=FALSE, center=FALSE, M=2500,
-                       grid=0)
-  {
+gofMultCLT <- function(cop,x, N=1000, method= c("kendall", "likelihood", "spearman"),
+                       m=nrow(x), der=NULL, betavar=FALSE, center=FALSE, M=2500, grid=0)
+{
     ## data
     x <- as.matrix(x)
 
@@ -337,24 +336,18 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
     if (cop@dimension != p)
       stop("The copula and the data should be of the same dimension")
 
-    METHODS <- c("likelihood", "kendall", "spearman")
-    method <-  pmatch(method, METHODS)
-    if(is.na(method))
-      stop("invalid estimation method")
-    if(method == -1)
-      stop("ambiguous estimation method")
+    method <- match.arg(method)
 
     ## make pseudo-observations
     u <- apply(x,2,rank)/(n+1)
 
     ## fit the copula
-    if (method==1)
-      cop <- fitCopula(u,cop,iTau(cop,cor(u[,1],u[,2],
-                                                      method="kendall")))@copula
-    else if (method==2)
-      cop <- fitCopulaKendallsTau(cop,u)
-    else if (method==3)
-      cop <- fitCopulaSpearmansRho(cop,u)
+    cop <- switch(method,
+                  "likelihood" =
+                  fitCopula(u,cop, iTau(cop, cor(u[,1],u[,2], method="kendall")))@copula,
+                  "kendall" = fitCopulaKendallsTau(cop,u),
+                  "spearman" = fitCopulaSpearmansRho(cop,u),
+                  stop("impossible 'method' -- should never happen please report"))
 
     ## estimate of theta
     alpha <-  cop@parameters
@@ -421,7 +414,7 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
         dermat[,p+1] <- eval(der$cdf.alpha, list(u1 = u1, u2 = u2))
 
         ## influence coefficients for estimation
-        if (method==1) ## likelihood
+        if (method == "likelihood")
           {
             for (j in 1:p)
               assign(v[j], x0[,j])
@@ -462,7 +455,7 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
                           /(2 * (1 - alpha^2)))/(2 * pi * sqrt(1 - alpha^2))
 
         ## influence coefficients for estimation
-        if (method==1) ## likelihood
+        if (method == "likelihood")
           {
             v1 <- qnorm(x0[,1])
             v2 <- qnorm(x0[,2])
@@ -503,7 +496,7 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
                        (df * (1 - alpha^2)))^(-df / 2) / (2 * pi * sqrt(1 - alpha^2))
 
         ## influence coefficients for estimation
-        if (method==1)
+        if (method== "likelihood")
           {
             v1 <- qt(x0[,1], df=df)
             v2 <- qt(x0[,2], df=df)
@@ -539,7 +532,7 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
             influ <- (influ - influ.add(x0, y0, influ1, influ2))/beta
           }
       }
-    else stop("H0 copula not implemented")
+    else stop("H0 copula ",class(cop)," not implemented")
 
     #####################################################
     ##
@@ -547,23 +540,23 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
     ##
     #####################################################
 
-    if (method==2) ## kendall's tau
+    if (method == "kendall")
       {
         tauCtheta <- tau(cop)
         influ <- 4 * (2 * pCopula(x0, cop) - x0[,1] - x0[,2] + (1 - tauCtheta)/2)
 
-        if (class(cop) == "claytonCopula")
-          influ <- influ * (alpha+2)^2 / 2
-        else if (class(cop) == "frankCopula")
-          influ <- influ / (4/alpha^2 + 4/(alpha * (exp(alpha) - 1)) -
-                            8/alpha^2 * debye1(alpha))
-        else if (class(cop) == "gumbelCopula")
-          influ <- influ * alpha^2
-        else if (class(cop) == "plackettCopula") ## added by JY; testing only
-          influ <- influ / dTauPlackettCopula(cop)
-        else if (class(cop) %in% c("normalCopula","tCopula"))
-          influ <- influ * pi * sqrt(1 - alpha^2) / 2
-        else stop("H0 copula not implemented")
+        influ <-
+            switch(class(cop),
+                   "claytonCopula" = influ * (alpha+2)^2 / 2,
+                   "frankCopula" = influ /
+                   (4/alpha^2 + 4/(alpha * (exp(alpha) - 1)) - 8/alpha^2 * debye1(alpha)),
+                   "gumbelCopula" =  influ * alpha^2,
+                   "plackettCopula" =  ## added by JY; testing only
+                   influ / dTauPlackettCopula(cop),
+                   "normalCopula" = ,
+                   "tCopula" = influ * pi * sqrt(1 - alpha^2) / 2,
+                   ## otherwise:
+                   stop("H0 copula (",class(cop),") not implemented"))
       }
 
     #####################################################
@@ -572,7 +565,7 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
     ##
     #####################################################
 
-    if (method==3) ## Spearman's rho
+    if (method == "spearman")
       {
         rhoCtheta <- rho(cop)
 
@@ -581,20 +574,23 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
         influ <- 12 * (x0[,1] * x0[,2] + influ.add(x0, y0, y0[,2],y0[,1])) -
           3 - rhoCtheta
 
-        if (class(cop) == "claytonCopula") ## added by JY; testing only
-          influ <- influ / dRhoClaytonCopula(cop)
-        else if (class(cop) == "gumbelCopula") ## added by JY; testing only
-          influ <- influ / dRhoGumbelCopula(cop)
-        else if (class(cop) == "frankCopula")
-          influ <- influ / (12 / (alpha * (exp(alpha) - 1)) -
+        influ <-
+            switch(class(cop),
+                   "claytonCopula" = ## added by JY; testing only
+                   influ / dRhoClaytonCopula(cop),
+                   "gumbelCopula" = ## added by JY; testing only
+                   influ / dRhoGumbelCopula(cop),
+                   "frankCopula" =
+                   influ / (12 / (alpha * (exp(alpha) - 1)) -
                             36 / alpha^2 * debye2(alpha) +
-                            24 / alpha^2 * debye1(alpha))
-        else if (class(cop) == "plackettCopula")
-          influ <- influ * (alpha - 1)^3 / (2 * (2 - 2 * alpha
-                                                 + (1 + alpha) * log(alpha)))
-        else if (class(cop) %in% c("normalCopula","tCopula"))
-          influ <- influ * pi * sqrt(4 - alpha^2) / 6
-        else stop("H0 copula not implemented")
+                            24 / alpha^2 * debye1(alpha)),
+                   "plackettCopula" =
+                   influ * (alpha - 1)^3 / (2 * (2 - 2 * alpha
+                                                 + (1 + alpha) * log(alpha))),
+                   "normalCopula" = ,
+                   "tCopula" = influ * pi * sqrt(4 - alpha^2) / 6,
+                   ## otherwise:
+                   stop("H0 copula (",class(cop),") not implemented"))
       }
 
     #####################################################
@@ -619,5 +615,5 @@ gofMultCLT <- function(cop,x,N=1000,method="kendall",m=nrow(x),
              s0 = double(N),
              PACKAGE="copula")$s0
 
-    return(list(statistic=s, pvalue=(sum(s0 >= s)+0.5)/(N+1), alpha=alpha))
-  }
+    list(statistic=s, pvalue=(sum(s0 >= s)+0.5)/(N+1), alpha=alpha)
+}

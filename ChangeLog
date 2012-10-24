@@ -1,3 +1,7 @@
+2012-08-13  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999-1, r 835, released to CRAN.
+
 2012-07-02  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/fitCopula.R: t copulas now can be fit with and without fixed

@@ -1,15 +1,15 @@
 Package: copula
-Version: 0.999-1
-Date: $Date: 2012-08-12 00:12:54 +0200 (Sun, 12. Aug 2012) $
-Revision: $Revision: 835 $
+Version: 0.999-2
+Date: $Date: 2012-10-24 14:56:42 +0200 (Wed, 24. Oct 2012) $
+SVNrev: $Revision: 861 $
 Title: Multivariate Dependence with Copulas
 Author: Marius Hofert <marius.hofert@math.ethz.ch>, Ivan Kojadinovic
         <ivan.kojadinovic@univ-pau.fr>, Martin Maechler
         <maechler@stat.math.ethz.ch>, and Jun Yan <jun.yan@uconn.edu>
 Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
 Depends: R (>= 2.14.2), methods
-Imports: stats4, graphics, gsl, ADGofTest, stabledist (>= 0.6-4),
-        mvtnorm, pspline
+Imports: stats4, stats, graphics, gsl, ADGofTest, stabledist (>=
+        0.6-4), mvtnorm, pspline
 Suggests: lattice, MASS, Matrix, KernSmooth, sfsmisc, bbmle,
         scatterplot3d, Rmpfr, mvnormtest, tseries, zoo
 SuggestsComments: packages mvnormtest, tseries, zoo are only used in
@@ -42,6 +42,6 @@ Collate: AllClass.R Classes.R Copula.R Auxiliaries.R aux-acopula.R
         schlatherCopula.R stable.R timing.R trafos.R tCopula.R
         tawnCopula.R tawnExpr.R tevCopula.R zzz.R
 Encoding: UTF-8
-Packaged: 2012-08-11 22:56:32 UTC; maechler
+Packaged: 2012-10-25 07:03:57 UTC; maechler
 Repository: CRAN
-Date/Publication: 2012-08-13 14:31:10
+Date/Publication: 2012-10-25 10:28:31

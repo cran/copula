@@ -1,6 +1,6 @@
 \name{dDiag}
 \alias{dDiag}
-\title{Density of the diagonal of (nested) Archimedean copulas}
+\title{Density of the Diagonal of (Nested) Archimedean Copulas}
 \description{
   Evaluate the density of the diagonal of a \eqn{d}-dimensional (nested)
   Archimedean copula.  Note that the diagonal of a copula is a cumulative

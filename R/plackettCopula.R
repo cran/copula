@@ -88,7 +88,7 @@ plackettTauFun <- function(alpha) {
   ## c(ifelse(theta <= 1, valFun(theta), -valFun(1/theta)))
 }
 
-plackettTauDer <- function(alpha) {
+plackettdTau <- function(alpha) {
   ss <- .plackettTau$ss
   forwardTransf <- .plackettTau$trFuns$forwardTransf
   forwardDer <- .plackettTau$trFuns$forwardDer
@@ -121,7 +121,7 @@ iTauPlackettCopula <- function(copula, tau) {
 
 dTauPlackettCopula <- function(copula) {
   alpha <- copula@parameters[1]
-  plackettTauDer(alpha)
+  plackettdTau(alpha)
 }
 
 dRhoPlackettCopula <- function(copula) {

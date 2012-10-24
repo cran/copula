@@ -1,7 +1,7 @@
 \name{initOpt}
 \alias{initOpt}
-\title{Initial interval or value for parameter estimation of Archimedean
-  copulas}
+\title{Initial Interval or Value for Parameter Estimation of Archimedean
+  Copulas}
 \description{
   Compute an initial interval or initial value for optimization/estimation
   routines (only a heuristic; if this fails, choose your own interval or value).
@@ -87,7 +87,7 @@ initOpt
 
 ## Generate some data:
 tau <- 0.25
-(theta <- copGumbel@tauInv(tau)) # 4/3
+(theta <- copGumbel@iTau(tau)) # 4/3
 d <- 20
 (cop <- onacopulaL("Gumbel", list(theta,1:d)))
 

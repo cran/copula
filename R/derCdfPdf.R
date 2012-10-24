@@ -60,15 +60,13 @@ dCduEllipCopula <- function(cop, u)
     sigma <- getSigma(cop)
 
     ## quantile transformation
-    if (class(cop) == "normalCopula")
-	v <- qnorm(u)
-    else if (class(cop) == "tCopula")
-    {
-	df <- cop@df
-	v <- qt(u,df=df)
-    }
-    else stop("not implemented")
-
+    v <- switch(class(cop),
+		"normalCopula" = qnorm(u),
+		"tCopula" = {
+		    df <- cop@df
+		    qt(u, df=df)
+		},
+		stop("not implemented for class ", class(cop)))
     n <- nrow(u)
     mat <- matrix(0,n,p)
 
@@ -76,32 +74,37 @@ dCduEllipCopula <- function(cop, u)
     {
 	s <- sigma[-j,-j] - sigma[-j,j,drop=FALSE] %*% sigma[j,-j,drop=FALSE]
 
-	if (class(cop) == "normalCopula")
-	    if (p == 2) {
-		rho <- cop@parameters
-		mat[,j] <- pnorm(v[,-j], rho * v[,j], sqrt(1 - rho^2))
-	    }
-	    else
-		for (i in 1:n)
-		    mat[i,j] <- pmvnorm(lower = rep(-Inf, p - 1), upper = v[i,-j],
-					mean = v[i,j] * sigma[-j,j],
-					sigma = drop(s))
-	else if (class(cop) == "tCopula")
-	    if (p == 2) {
-		rho <- cop@parameters
-		mat[,j] <-  pt(sqrt((df+1)/(df+v[,j]^2)) / sqrt(1 - rho^2)
-			       * (v[,-j] - rho * v[,j]), df=df+1)
-	    }
-	    else {
-		if(df != as.integer(df))
-		    stop("'df' is not integer; therefore, dCdu() cannot be computed yet")
-		for (i in 1:n)
-		    mat[i,j] <- pmvt(lower = rep(-Inf, p - 1),
-				     upper = drop(sqrt((df+1)/(df+v[i,j]^2)) *
-				     (v[i,-j] - v[i,j] * sigma[-j,j])),
-				     sigma = s, df = df + 1)
-	    }
+	switch(class(cop),
+               "normalCopula" =
+           {
+               if (p == 2) {
+                   rho <- cop@parameters
+                   mat[,j] <- pnorm(v[,-j], rho * v[,j], sqrt(1 - rho^2))
+               }
+               else
+                   for (i in 1:n)
+                       mat[i,j] <- pmvnorm(lower = rep(-Inf, p - 1), upper = v[i,-j],
+                                           mean = v[i,j] * sigma[-j,j],
+                                           sigma = drop(s))
+           },
+               "tCopula" =
+           {
+               if (p == 2) {
+                   rho <- cop@parameters
+                   mat[,j] <-  pt(sqrt((df+1)/(df+v[,j]^2)) / sqrt(1 - rho^2)
+                                  * (v[,-j] - rho * v[,j]), df=df+1)
+               }
+               else {
+                   if(df != as.integer(df))
+                       stop("'df' is not integer; therefore, dCdu() cannot be computed yet")
+                   for (i in 1:n)
+                       mat[i,j] <- pmvt(lower = rep(-Inf, p - 1),
+                                        upper = drop(sqrt((df+1)/(df+v[i,j]^2)) *
+                                        (v[i,-j] - v[i,j] * sigma[-j,j])),
+                                        sigma = s, df = df + 1)
+               }
 
+           })
     }
     mat
 }
@@ -205,11 +208,10 @@ dCdthetaEllipCopula <- function(cop, u)
     p <- cop@dimension
 
     ## quantile transformation
-    if (class(cop) == "normalCopula")
-      v <- qnorm(u)
-    else if (class(cop) == "tCopula")
-      v <- qt(u,df=cop@df)
-    else stop("not implemented")
+    v <- switch(class(cop),
+		"normalCopula" = qnorm(u),
+		"tCopula" = qt(u, df = cop@df),
+		stop("not implemented for class ", class(cop)))
 
     if (p == 2)
       plackettFormulaDim2(cop, v)

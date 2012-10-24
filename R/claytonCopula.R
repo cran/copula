@@ -159,7 +159,7 @@ claytonRhoFun <- function(alpha) {
   as.vector(if(alpha <= 0) valFunNeg(theta) else valFunPos(theta))
 }
 
-claytonRhoDer <- function(alpha) {
+claytondRho <- function(alpha) {
   ss <- .claytonRhoNeg$ss
   forwardTransf <- .claytonRhoNeg$trFuns$forwardTransf
   forwardDer <- .claytonRhoNeg$trFuns$forwardDer
@@ -189,7 +189,7 @@ iRhoClaytonCopula <- function(copula, rho) {
 
 dRhoClaytonCopula <- function(copula) {
   alpha <- copula@parameters[1]
-  claytonRhoDer(alpha)
+  claytondRho(alpha)
 }
 
 tailIndexClaytonCopula <- function(copula) {

@@ -1,5 +1,5 @@
 \name{emle}
-\title{Maximum likelihood estimators for (nested) Archimedean copulas}
+\title{Maximum Likelihood Estimators for (Nested) Archimedean Copulas}
 \alias{emle}
 \alias{.emle}
 \description{
@@ -90,7 +90,7 @@ emle(u, cop, n.MC=0, optimizer="optimize", method,
 }
 \examples{
 tau <- 0.25
-(theta <- copGumbel@tauInv(tau)) # 4/3
+(theta <- copGumbel@iTau(tau)) # 4/3
 d <-  20
 (cop <- onacopulaL("Gumbel", list(theta,1:d)))
 
@@ -119,7 +119,7 @@ axis(1, pos = 0, at=theta, label=expression(theta[0]))
 logL <- function(x) -efm@minuslogl(x)
        # == -sum(copGumbel@dacopula(U, theta=x, log=TRUE))
 logL. <- Vectorize(logL)
-I <- c(cop@copula@tauInv(0.1), cop@copula@tauInv(0.4))
+I <- c(cop@copula@iTau(0.1), cop@copula@iTau(0.4))
 curve(logL., from=I[1], to=I[2], xlab=quote(theta),
       ylab="log-likelihood",
       main="log-likelihood for Gumbel")

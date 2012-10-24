@@ -4,7 +4,7 @@
 \alias{huslerReissCopula}
 \alias{tawnCopula}
 \alias{tevCopula}
-\title{Construction of extreme-value copula class objects}
+\title{Construction of Extreme-Value Copula Class Objects}
 \description{
   Constructs an extreme-value copula class object with its corresponding
   parameter.

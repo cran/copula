@@ -46,7 +46,7 @@ initOpt <- function(family, tau.range=NULL, interval=TRUE, u,
                             "Joe" = { c(0, 0.95) },
                             stop("unsupported family for initOpt"))
     }
-    if(interval) return(cop@tauInv(tau.range)) # u is not required
+    if(interval) return(cop@iTau(tau.range)) # u is not required
     stopifnot(length(dim(u)) == 2)
     method <- match.arg(method)
     ## estimate Kendall's tau
@@ -66,7 +66,7 @@ initOpt <- function(family, tau.range=NULL, interval=TRUE, u,
                       },
                       stop("wrong method for initOpt"))
     ## truncate to range if required
-    cop@tauInv(pmax(tau.range[1], pmin(tau.range[2], tau.hat)))
+    cop@iTau(pmax(tau.range[1], pmin(tau.range[2], tau.hat)))
 }
 
 
@@ -153,19 +153,19 @@ tau.checker <- function(x, family, warn=TRUE){
     eps <- 1e-8 ## "fixed" currently, see below
     tau.range <- switch(family,
                         ## limiting (attainable) taus that can be dealt with by
-                        ## copFamily@tauInv() *and* that can be used to construct
+                        ## copFamily@iTau() *and* that can be used to construct
                         ## a corresponding copula object; checked via:
                         ## eps <- 1e-8
-                        ## th <- copAMH@tauInv(c(0,1/3-eps)); onacopulaL("AMH",list(th[1], 1:5)); onacopulaL("AMH",list(th[2], 1:5))
-                        ## th <- copClayton@tauInv(c(eps,1-eps)); onacopulaL("Clayton",list(th[1], 1:5)); onacopulaL("Clayton",list(th[2], 1:5))
-                        ## th <- copFrank@tauInv(c(eps,1-eps)); onacopulaL("Frank",list(th[1], 1:5)); onacopulaL("Frank",list(th[2], 1:5))
-                        ## th <- copGumbel@tauInv(c(0,1-eps)); onacopulaL("Gumbel",list(th[1], 1:5)); onacopulaL("Gumbel",list(th[2], 1:5))
-                        ## th <- copJoe@tauInv(c(0,1-eps)); onacopulaL("Joe",list(th[1], 1:5)); onacopulaL("Joe",list(th[2], 1:5))
+                        ## th <- copAMH@iTau(c(0,1/3-eps)); onacopulaL("AMH",list(th[1], 1:5)); onacopulaL("AMH",list(th[2], 1:5))
+                        ## th <- copClayton@iTau(c(eps,1-eps)); onacopulaL("Clayton",list(th[1], 1:5)); onacopulaL("Clayton",list(th[2], 1:5))
+                        ## th <- copFrank@iTau(c(eps,1-eps)); onacopulaL("Frank",list(th[1], 1:5)); onacopulaL("Frank",list(th[2], 1:5))
+                        ## th <- copGumbel@iTau(c(0,1-eps)); onacopulaL("Gumbel",list(th[1], 1:5)); onacopulaL("Gumbel",list(th[2], 1:5))
+                        ## th <- copJoe@iTau(c(0,1-eps)); onacopulaL("Joe",list(th[1], 1:5)); onacopulaL("Joe",list(th[2], 1:5))
                         "AMH" = { c(0, 1/3-eps) },
-                        "Clayton" = { c(eps, 1-eps) }, # copClayton@tauInv(c(eps,1-eps))
-                        "Frank" = { c(eps, 1-eps) }, # copFrank@tauInv(c(eps,1-eps))
-                        "Gumbel" = { c(0, 1-eps) }, # copGumbel@tauInv(c(0,1-eps))
-                        "Joe" = { c(0, 1-eps) }, # copJoe@tauInv(c(0,1-eps))
+                        "Clayton" = { c(eps, 1-eps) }, # copClayton@iTau(c(eps,1-eps))
+                        "Frank" = { c(eps, 1-eps) }, # copFrank@iTau(c(eps,1-eps))
+                        "Gumbel" = { c(0, 1-eps) }, # copGumbel@iTau(c(0,1-eps))
+                        "Joe" = { c(0, 1-eps) }, # copJoe@iTau(c(0,1-eps))
                         stop("unsupported family for initOpt"))
     toosmall <- which(x < tau.range[1])
     toolarge <- which(x > tau.range[2])
@@ -209,8 +209,8 @@ etau <- function(u, cop, method = c("tau.mean", "theta.mean"), warn=TRUE, ...){
     tau.hat <- tau.hat.mat[upper.tri(tau.hat.mat)] # all tau hat's
     ## define tau^{-1}
     tau_inv <- if(cop@copula@name == "AMH")
-	function(tau) cop@copula@tauInv(tau, check=FALSE, warn=warn) else cop@copula@tauInv
-    ## check and apply tauInv in the appropriate way
+	function(tau) cop@copula@iTau(tau, check=FALSE, warn=warn) else cop@copula@iTau
+    ## check and apply iTau in the appropriate way
     method <- match.arg(method)
     switch(method,
            "tau.mean" = {

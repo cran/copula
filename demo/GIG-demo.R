@@ -87,13 +87,13 @@ ii.GIG <- function(U, h, method=c("etau","dmle.G")){
     stopifnot(tau.hat > 0)
     nu.min <- 0
     I[1,1] <- nu.min # smallest value for nu
-    th.max <- tauInv.GIG(max(tau.hat-h[1],0.005), theta=c(nu.min, NA))
+    th.max <- iTau.GIG(max(tau.hat-h[1],0.005), theta=c(nu.min, NA))
     I[2,2] <- th.max[2] # largest value for theta
     ## compute smallest theta (for lower left endpoint of the inital interval)
-    th.min <- tauInv.GIG(min(tau.hat+h[2],0.995), theta=c(nu.min, NA)) # largest attainable tau with 1e-30 is one.m.eps=0.9602
+    th.min <- iTau.GIG(min(tau.hat+h[2],0.995), theta=c(nu.min, NA)) # largest attainable tau with 1e-30 is one.m.eps=0.9602
     I[1,2] <- th.min[2]
     ## compute largest nu (for lower right endpoint of the inital interval)
-    nu.max <- tauInv.GIG(max(tau.hat-h[1],0.005), theta=c(NA, th.min[2]))
+    nu.max <- iTau.GIG(max(tau.hat-h[1],0.005), theta=c(NA, th.min[2]))
     I[2,1] <- nu.max[1]
     ## result
     I
@@ -120,7 +120,7 @@ nlogl.GIG. <- function(theta, u) nlogl.GIG(theta[1], theta=theta[2], u=u)
 ### estimation #################################################################
 
 ## determine theta such that tau is matched (for given nu)
-theta <- tauInv.GIG(tau, c(nu, NA))
+theta <- iTau.GIG(tau, c(nu, NA))
 
 ## sample
 set.seed(1000)

@@ -13,17 +13,26 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
+##>>> NOTA BENE must contain exactly the \dontrun{} part of
+## ../man/gofCopula.Rd
+## ===================
 
+## A two-dimensional data example ----------------------------------
 x <- rCopula(200, claytonCopula(3))
-
+tau. <- cor(x, method="kendall")
 ## Does the Gumbel family seem to be a good choice?
-gofCopula(gumbelCopula(1), x)
+thG <- iTau(gumbelCopula(), tau.)
+gofCopula(gumbelCopula(thG), x)
+# SnC: really s..l..o..w.. --- SnB is *EVEN* slower
+gofCopula(gumbelCopula(thG), x, method = "SnC")
 ## What about the Clayton family?
-gofCopula(claytonCopula(1), x)
+thC <- iTau(claytonCopula(), tau.)
+gofCopula(claytonCopula(thC), x)
+gofCopula(claytonCopula(thC), x, method = "AnChisq")
 
 ## The same with a different estimation method
-gofCopula(gumbelCopula(1), x, method="itau")
-gofCopula(claytonCopula(1), x, method="itau")
+gofCopula(gumbelCopula (thG), x, estim.method="itau")
+gofCopula(claytonCopula(thC), x, estim.method="itau")
 
 
 ## A three-dimensional example
@@ -33,11 +42,12 @@ x <- rCopula(200, tCopula(c(0.5, 0.6, 0.7), dim = 3, dispstr = "un"))
 gofCopula(gumbelCopula(1, dim = 3), x)
 ## What about the t copula?
 t.copula <- tCopula(rep(0, 3), dim = 3, dispstr = "un", df.fixed=TRUE)
+## this is *VERY* slow currently %% FIXME ??
 gofCopula(t.copula, x)
 
 ## The same with a different estimation method
-gofCopula(gumbelCopula(1, dim = 3), x, method="itau")
-gofCopula(t.copula, x, method="itau")
+gofCopula(gumbelCopula(1, dim = 3), x, estim.method="itau")
+gofCopula(t.copula, x, estim.method="itau")
 
 ## The same using the multiplier approach
 gofCopula(gumbelCopula(1, dim = 3), x, simulation="mult")

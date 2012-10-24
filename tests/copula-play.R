@@ -182,11 +182,11 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
                      theta1=theta1))))
     print(dV01.i)
 
-    ### (5) cacopula
+    ### (5) cCopula {was "cacopula"}
 
-    cat("\n(5) values of cacopula(cbind(v,rev(v)), cop) for v=u01:\n")
+    cat("\n(5) values of cCopula(cbind(v,rev(v)), cop) for v=u01:\n")
     cop. <- onacopulaL(cop@name, list(theta0, 1:2))
-    CT <- c(CT, list(cacopula. = system.time(cac <- cacopula(cbind(u01,rev(u01)),
+    CT <- c(CT, list(cCopula. = system.time(cac <- cCopula(cbind(u01,rev(u01)),
                      cop=cop.))))
     stopifnot(is.vector(cac), length(cac) == length(u01), 0 <= cac, cac <= 1)
     print(cac)
@@ -263,13 +263,13 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
               pK(1, cop, d = 10, n.MC = 1000)==1)
     cat0("[Ok]")
 
-    ### (8) tau, tauInv
+    ### (8) tau, iTau
 
     cat("\n(8) tau at thetavec:\n")
     CT <- c(CT, list(tau = system.time(ta <- cop@tau(thetavec))))
     print(ta)
-    CT <- c(CT, list(tauI = system.time(ta.I <- cop@tauInv(ta))))
-    cat0("check if tauInv(tau(thetavec))==thetavec: ",
+    CT <- c(CT, list(tauI = system.time(ta.I <- cop@iTau(ta))))
+    cat0("check if iTau(tau(thetavec))==thetavec: ",
          all.equal(ta.I, thetavec))
     lambdaLvec <- rep(as.double(lambdaLvec), length.out= nt)
     lambdaUvec <- rep(as.double(lambdaUvec), length.out= nt)
@@ -348,8 +348,8 @@ tstCop(myFrank, 5.736283, thetavec)
 tau.th <- c(0.055417, 0.11002, 0.21389, 0.4567, 0.66578)
 tau.F <- myFrank@tau(thetavec)
 stopifnot(all.equal(tau.th, tau.F, tol = 0.0001),
-          all.equal(.9999, copFrank@tau(copFrank@tauInv(0.9999))),
-          all.equal(myFrank@tauInv(tau.F, tol = 1e-14), thetavec, tol=1e-11))
+          all.equal(.9999, copFrank@tau(copFrank@iTau(0.9999))),
+          all.equal(myFrank@iTau(tau.F, tol = 1e-14), thetavec, tol=1e-11))
 
 
 ### copGumbel ##################################################################

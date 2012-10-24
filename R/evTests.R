@@ -27,7 +27,7 @@ evTestC <- function(x, N = 1000)
   ## make pseudo-observations
   p <- ncol(x)
   n <- nrow(x)
-  u <- apply(x,2,rank)/(n+1)
+  u <- pobs(x)
 
   ## set r according to recommendations
   r <- 3:5
@@ -105,7 +105,7 @@ evTestA <- function(x, N = 1000, derivatives = "An")
 {
   ## make pseudo-observations
   n <- nrow(x)
-  u <- apply(x,2,rank)/(n+1)
+  u <- pobs(x)
 
   ## make grid
   ## m = 0

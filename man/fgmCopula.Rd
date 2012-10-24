@@ -1,6 +1,6 @@
 \name{fgmCopula}
 \alias{fgmCopula}
-\title{Construction of a fgmCopula class object}
+\title{Construction of a fgmCopula Class Object}
 \description{
   Constructs a multivariate multiparameter Farlie-Gumbel-Morgenstern
   copula class object with its corresponding parameters and dimension.

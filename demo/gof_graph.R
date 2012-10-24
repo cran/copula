@@ -36,7 +36,7 @@ if(setSeeds) set.seed(1)
 
 ## define and sample the copula (= H0 copula), build pseudo-observations
 cop <- getAcop(family)
-th <- cop@tauInv(tau) # correct parameter value
+th <- cop@iTau(tau) # correct parameter value
 copH0 <- onacopulaL(family, list(th, 1:d)) # define H0 copula
 U. <- pobs(rcop(n, cop=copH0))
 
@@ -176,14 +176,14 @@ if(setSeeds) set.seed(2)
 
 ## define and sample the copula, build pseudo-observations
 cop <- getAcop(family)
-th <- cop@tauInv(tau <- c(0.2, 0.4, 0.6))
+th <- cop@iTau(tau <- c(0.2, 0.4, 0.6))
 nacList <- list(th[1], NULL, list(list(th[2], 1:2), list(th[3], 3:d)))
 copG <- copCreate(family, nacList=nacList)
 U <- rcop(n, cop=copG)
 U. <- pobs(U)
 
 ## define the H0 copula
-th0 <- cop@tauInv(tau0 <- c(0.2, 0.4, 0.4)) # wrong 2nd-sector-parameter
+th0 <- cop@iTau(tau0 <- c(0.2, 0.4, 0.4)) # wrong 2nd-sector-parameter
 nacList <- list(th0[1], NULL, list(list(th0[2], 1:2), list(th0[3], 3:d)))
 copH0 <- onacopulaL(family, nacList)
 
@@ -222,7 +222,7 @@ if(setSeeds) set.seed(4)
 
 ## define and sample the copula, build pseudo-observations
 tau <- c(0.2, 0.4, 0.6)
-r <- tauInv(tau, family=family)
+r <- iTau(tau, family=family)
 P <- c(r[2], r[1], r[1], r[1], # upper triangle (without diagonal) of correlation "matrix"
              r[1], r[1], r[1],
                    r[3], r[3],
@@ -234,7 +234,7 @@ U. <- pobs(U)
 ## define the H0 copula
 ## Note: that's the same result when using pseudo-observations since estimation via
 ##       tau is invariant strictly increasing transformations
-P. <- nearPD(tauInv(cor(U., method="kendall"), family=family))$mat # estimate P
+P. <- nearPD(iTau(cor(U., method="kendall"), family=family))$mat # estimate P
 P. <- P.[lower.tri(P.)] # note: upper.tri() would lead to the wrong result due to the required ordering
 plot(P, P., asp=1); abline(0,1, col=adjustcolor("gray",0.5)) # P. should be close to P
 copH0 <- copCreate(family, theta=P., d=d, dispstr="un", df=df, df.fixed=TRUE)
@@ -303,7 +303,7 @@ pairs(u, gap=0, pch=".", xaxt="n", yaxt="n", main="Pseudo-observations of the lo
       labels=as.expression( sapply(1:d, function(j) bquote(italic(hat(U)[.(j)]))) ))
 
 tau <- cor(u, method="kendall") # estimate pairwise tau
-P <- tauInv(tau, family="normal") # compute corresponding matrix of pairwise correlations (equal to family="t")
+P <- iTau(tau, family="normal") # compute corresponding matrix of pairwise correlations (equal to family="t")
 
 ### Estimate (a) t-copula(s) with the approach of Demarta, McNeil (2005)
 

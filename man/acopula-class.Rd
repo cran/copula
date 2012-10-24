@@ -1,6 +1,6 @@
 \name{acopula-class}
 \Rdversion{1.1}
-\title{Class "acopula" of Archimedean copula families}
+\title{Class "acopula" of Archimedean Copula Families}
 \docType{class}
 \alias{acopula-class}
 \alias{acopula}
@@ -102,7 +102,7 @@
       the same for every component of \code{x}) or \code{V0} must be of
       the same length as \code{x} (in which case the components of
       \code{V0} correspond to the ones of \code{x}).}
-    \item{\code{tau}, \code{tauInv}:}{Compute Kendall's tau of the bivariate
+    \item{\code{tau}, \code{iTau}:}{Compute Kendall's tau of the bivariate
       Archimedean copula with generator \eqn{\psi}{psi} as a
       \code{\link{function}} of \code{theta}, respectively, \code{theta} as a
       function of Kendall's tau.}

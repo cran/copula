@@ -50,7 +50,7 @@ round(dcop, 3)
 
 ## claytonCopula
 (theta.cl <- iTau(claytonCopula(), tau))
-stopifnot(all.equal(theta.cl, copClayton@tauInv(tau), tol = 1e-13))
+stopifnot(all.equal(theta.cl, copClayton@iTau(tau), tol = 1e-13))
 dcop <- matrix(dCopula(umat, claytonCopula(param=theta.cl, dim = 2)),
                n1, n2)
 filled.contour(u1, u2, dcop, color.palette = fCols,
@@ -63,7 +63,7 @@ round(dcop, 3)
 
 ## gumbelCopula
 theta.gu <- iTau(gumbelCopula(), tau)
-stopifnot(all.equal(theta.gu, copGumbel@tauInv(tau), tol = 1e-13))
+stopifnot(all.equal(theta.gu, copGumbel@iTau(tau), tol = 1e-13))
 dcop <- matrix(dCopula(umat, gumbelCopula(param=theta.gu, dim = 2)),
                n1, n2)
 filled.contour(u1, u2, dcop, color.palette = fCols,

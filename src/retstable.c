@@ -121,10 +121,9 @@ void retstable_MH(double *St, const double V0[], double h, double alpha, int n){
      * alpha == 1 => St corresponds to a point mass at V0 with Laplace-Stieltjes
      * transform exp(-V0*t)
     */
-    if(alpha == 1.){
-	for(int i = 0; i < n; i++) {
-		St[i] = V0[i];
-	}
+    if(alpha == 1.) {
+	for(int i = 0; i < n; i++)
+	    St[i] = V0[i];
 	return;
     }
 
@@ -194,8 +193,9 @@ double sinc_MM(double x) {
 
 /**< to be called from R */
 SEXP sinc_c(SEXP x_) {
-    int n = LENGTH(PROTECT(x_ = coerceVector(x_, REALSXP)));
-    SEXP r_ = allocVector(REALSXP, n); /**< the result */
+    int n = LENGTH(PROTECT(x_ = isReal(x_) ?
+			   Rf_duplicate(x_) : coerceVector(x_, REALSXP)));
+    SEXP r_ = allocVector(REALSXP, n); // the result
     double *x = REAL(x_), *r = REAL(r_);
 
     for(int i=0; i < n; i++)
@@ -218,6 +218,7 @@ SEXP sinc_c(SEXP x_) {
     pow(_I_alpha* sinc_MM(_I_alpha*_x), _I_alpha) *		\
     pow(_alpha_ * sinc_MM(_alpha_ *_x), _alpha_ ) / sinc_MM(_x)
 
+// called in retstable_LD()
 double A_(double x, double alpha) {
   double Ialpha = 1.-alpha;
   return _A_3(x, alpha, Ialpha);
@@ -225,7 +226,8 @@ double A_(double x, double alpha) {
 
 /**< to be called from R---see experiments in ../tests/retstable-ex.R */
 SEXP A__c(SEXP x_, SEXP alpha, SEXP I_alpha) {
-    int n = LENGTH(PROTECT(x_ = coerceVector(x_, REALSXP)));
+    int n = LENGTH(PROTECT(x_ = isReal(x_) ?
+			   Rf_duplicate(x_) : coerceVector(x_, REALSXP)));
     double alp = asReal(alpha), I_alp = asReal(I_alpha);
     if(fabs(alp + I_alp - 1.) > 1e-12)
 	error("'I_alpha' must be == 1 - alpha more accurately");
@@ -274,22 +276,23 @@ void retstable_LD(double *St, const double V0[], double h, double alpha, int n)
      * alpha == 1 => St corresponds to a point mass at V0 with Laplace-Stieltjes
      * transform exp(-V0*t)
    */
-   if(alpha == 1.){
-	for(int i = 0; i < n; i++) {
-		St[i] = V0[i];
-	}
-	return;
+   if(alpha == 1.) {
+       for(int i = 0; i < n; i++)
+	   St[i] = V0[i];
+       return;
    }
 
    // compute variables not depending on V0
    const double c1 = sqrt(M_PI_2);
    const double c2 = 2.+c1;
-   double b = (1.-alpha)/alpha;
+   double Ialpha = 1. - alpha, // "FIXME" : allow Ialpha to be argument
+       b = Ialpha/alpha,
+       h_a = pow(h, alpha);
 
    for(int i = 0; i < n; i++) { /**< for each of the n required variates */
 
 	/**< set lambda for our parameterization */
-	double lambda_alpha = pow(h,alpha)*V0[i]; /**< Marius Hofert: work directly with lambda^alpha (numerically more stable for small alpha) */
+       double lambda_alpha = h_a*V0[i]; // < Marius Hofert: work directly with lambda^alpha (numerically more stable for small alpha)
 
 	/**
 	 * Apply the algorithm of Devroye (2009) to draw from
@@ -297,7 +300,7 @@ void retstable_LD(double *St, const double V0[], double h, double alpha, int n)
 	 * 	     lambda*I_{alpha != 1};1) with Laplace-Stieltjes transform
 	 * exp(-((lambda+t)^alpha-lambda^alpha))
 	*/
-	double gamma = lambda_alpha*alpha*(1.-alpha);
+	double gamma = lambda_alpha*alpha*Ialpha;
 	double sgamma = sqrt(gamma);
 	double c3 = c2* sgamma;
 	double xi = (1. + M_SQRT2 * c3)/M_PI; /**< according to John Lau */
@@ -326,10 +329,8 @@ void retstable_LD(double *St, const double V0[], double h, double alpha, int n)
 		double zeta = sqrt(BdB0(U,alpha));
 		z = 1/(1-pow(1+alpha*zeta/sgamma,-1/alpha)); /**< Marius Hofert: numerically more stable for small alpha */
 		/**< compute rho */
-		double rho = M_PI*exp(-lambda_alpha*(1.-1. \
-							  /(zeta*zeta))) / \
-							  ((1.+c1)*sgamma/zeta \
-		   					  + z);
+		double rho = M_PI*exp(-lambda_alpha*(1. - 1./(zeta*zeta))) /
+		    ((1.+c1)*sgamma/zeta + z);
 		double d = 0.;
 		if(U >= 0 && gamma >= 1) d += xi*exp(-gamma*U*U/2.);
 		if(U > 0 && U < M_PI) d += psi/sqrt(M_PI-U);
@@ -339,13 +340,13 @@ void retstable_LD(double *St, const double V0[], double h, double alpha, int n)
 	    } while( !(U < M_PI && Z <= 1.)); /* check rejection condition */
 
 	    double
-		a = pow(A_(U,alpha), 1./(1.-alpha)),
+		a = pow(_A_3(U,alpha,Ialpha), 1./Ialpha),
 		m = pow(b/a,alpha)*lambda_alpha,
 		delta = sqrt(m*alpha/a),
 		a1 = delta*c1,
 		a3 = z/a,
 		s = a1+delta+a3;
-	    double V_ = unif_rand(), N_ = 0., E_ = 0. /**< -Wall */;
+	    double V_ = unif_rand(), N_ = 0., E_ = 0.; // -Wall
 	    if(V_ < a1/s) {
 		N_ = norm_rand();
 		X = m-delta*fabs(N_);
@@ -392,13 +393,14 @@ void retstable_LD(double *St, const double V0[], double h, double alpha, int n)
  */
 SEXP retstable_c(SEXP V0_, SEXP h, SEXP alpha, SEXP method)
 {
-    int n = LENGTH(PROTECT(V0_ = coerceVector(V0_, REALSXP)));
+    int n = LENGTH(PROTECT(V0_ = isReal(V0_) ?
+			   Rf_duplicate(V0_) : coerceVector(V0_, REALSXP)));
     const char* meth_ch = CHAR(STRING_ELT(method, 0));
     enum method_kind { MH, LD
     } meth_typ = ((!strcmp(meth_ch, "MH")) ? MH :
 		  ((!strcmp(meth_ch, "LD")) ? LD :
 		   -1));
-    SEXP St; /**< the result */
+    SEXP St; // the result
     PROTECT(St = allocVector(REALSXP, n));
     switch(meth_typ) {
     case MH:

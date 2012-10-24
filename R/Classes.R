@@ -265,9 +265,29 @@ setClass("fittedMV",
 			loglik = "numeric",
 			nsample = "integer",
 			method = "character",
-			convergence = "integer",
-			optimOpts = "list"))
+			## convergence = "integer",
+			fitting.stats = "list"))
 
+setGeneric("paramNames", function(x) standardGeneric("paramNames"))
+## paramNames() methods: provided separately for "fitCopula", "fitMvdc"
+
+coef.fittedMV <- function(object, ...)
+    setNames(object@estimate, paramNames(object))
+
+nobs.fittedMV <- function(object, ...) object@nsample
+
+vcov.fittedMV <- function(object, ...) {
+    pNms <- paramNames(object)
+    structure(object@var.est, dimnames = list(pNms, pNms))
+}
+
+logLik.fittedMV <- function(object, ...) {
+    val <- object@loglik
+    attr(val, "nobs") <- n <- object@nsample
+    attr(val, "df") <- length(object@estimate)
+    class(val) <- "logLik"
+    val
+}
 
 ###-------------------------- Glue   "copula" <-> "nacopula"
 

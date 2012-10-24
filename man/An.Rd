@@ -2,7 +2,7 @@
 \alias{An.biv}
 \alias{An}
 \alias{Anfun}%deprecated
-\title{Nonparametric rank-based estimators of Pickands dependence function}
+\title{Nonparametric Rank-based Estimators of the Pickands Dependence Function}
 \description{
   Bivariate and multivariate versions of the nonparametric rank-based
   estimators of the Pickands dependence function \eqn{A}, studied in

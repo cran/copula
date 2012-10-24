@@ -175,7 +175,7 @@ opower <- function(copbase, thetabase) {
               tau = function(theta) {
                   1-(1-copbase@tau(thetabase))/theta
               },
-              tauInv = function(tau) {
+              iTau = function(tau) {
                   taubase <- copbase@tau(thetabase)
                   if(tau >= taubase) (1-taubase)/(1-tau)
                   else {

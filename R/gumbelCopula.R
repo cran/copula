@@ -98,10 +98,13 @@ rgumbelCopula <- function(n, copula) {
   dim <- copula@dimension
   alpha <- copula@parameters[1]
   ## reduce to indepCopula
-  if (alpha - 1 < .Machine$double.eps ^(1/3) ) return(rCopula(n, indepCopula(dim=dim)))
+  if (alpha - 1 < .Machine$double.eps ^(1/3) )
+      return(rCopula(n, indepCopula(dim=dim)))
   b <- 1/alpha
-  ## stable (b, 1), 0 < b < 1, Chambers, Mallows, and Stuck 1976, JASA, p.341
-  fr <- rPosStable(n, b)
+  ## stable (alpha = b, beta = 1), 0 < b < 1
+  fr <- if(identical(getOption("copula:rstable1"), "rPosStable"))
+      ## wrong, back compatible:
+      rPosStable(n, b) else rstable1(n, alpha = b, beta = 1, pm=1)
   fr <- matrix(fr, nrow=n, ncol=dim)
   ## now gumbel copula
   val <- matrix(runif(dim * n), nrow = n)
@@ -168,7 +171,7 @@ gumbelRhoFun <- function(alpha) {
   c(valFun(theta))
 }
 
-gumbelRhoDer <- function(alpha) {
+gumbeldRho <- function(alpha) {
   ss <- .gumbelRho$ss
   forwardTransf <- .gumbelRho$trFuns$forwardTransf
   forwardDer <- .gumbelRho$trFuns$forwardDer
@@ -201,7 +204,7 @@ dTauGumbelCopula <- function(copula) {
 
 dRhoGumbelCopula <- function(copula) {
   alpha <- copula@parameters[1]
-  gumbelRhoDer(alpha)
+  gumbeldRho(alpha)
 }
 
 setMethod("rCopula", signature("numeric", "gumbelCopula"), rgumbelCopula)

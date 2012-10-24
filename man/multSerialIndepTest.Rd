@@ -1,7 +1,7 @@
 \name{multSerialIndepTest}
 \alias{multSerialIndepTest}
-\title{Serial independence test for multivariate continuous time series
-  based on the empirical copula process}
+\title{Serial Independence Test for Multivariate Continuous Time Series
+  Based on the Empirical Copula Process}
 \description{
   Analog of the serial independence test based on the empirical
   copula process proposed by Christian Genest and Bruno Rémillard (see

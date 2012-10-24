@@ -1,6 +1,6 @@
 \name{polynEval}
 \alias{polynEval}
-\title{Evaluate polynomials}
+\title{Evaluate Polynomials}
 \description{
   Evaluate a univariate polynomial at \code{x} (typically a vector), that is,
   compute, for a given vector of coefficients \code{coef}, the polynomial

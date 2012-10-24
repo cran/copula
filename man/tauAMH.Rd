@@ -1,7 +1,7 @@
 \name{tauAMH}
 \alias{tauAMH}
 \alias{tauJoe}
-\title{Ali-Mikhail-Haq ("AMH")'s and Joe's Kendall's tau}
+\title{Ali-Mikhail-Haq ("AMH")'s and Joe's Kendall's Tau}
 \description{
   Compute Kendall's Tau of an Ali-Mikhail-Haq ("AMH") or Joe Archimedean
   copula with parameter \code{theta}.  In both cases, analytical

@@ -1,18 +1,33 @@
 #### Functions used for testing, demos  of   fitCopula()
 ####                    -------              -----------
 
+##' Error catching version of fitCopula()
+##' @param ... further arguments passed to fitCopula()
+fitC <- function(copula, u, p, ...) {
+    stopifnot(length(p) > 0, p == round(p))
+    r <- tryCatch(fitCopula(copula, u, ...), error = function(e)e)
+    if(is(r, "error")) {
+	cat("Caught fitCopula() error: '", r$message,"'\n*-*-*\n", sep="")
+	new("fitCopula", estimate = rep.int(NA_real_,p),
+	    var.est = matrix(NA_real_, p,p), copula = copula)
+    }
+    else r
+}
+
 ##' @title Fit one sample of size n
 ##' @param cop copula with *one* parameter to estimate {and specified if generating 'x'}
 ##' @param n sample size; only used if \code{x} is not specified
 ##' @param x numeric matrix (n x d) "as from the copula"
+##' @param ... further arguments passed to fitC()
 ##' @return a matrix with 2 columns, "est" | "se"  and one row for each method
-fit1 <- function(cop, n, x = rCopula(n, cop)) {
+fit1 <- function(cop, n, x = rCopula(n, cop), ...) {
   u <- pobs(x)
-  f.itau <- fitCopula(cop, u, method= "itau")
-  f.irho <- fitCopula(cop, u, method= "irho")
-  f.mpl	 <- fitCopula(cop, u, method= "mpl")
-  f.ml	 <- fitCopula(cop, x, method= "ml")
-  stopifnot(length(f.mpl@estimate) == 1)
+  f.itau <- fitC(cop, u, p=1, method= "itau", ...)
+  f.irho <- fitC(cop, u, p=1, method= "irho", ...)
+  f.mpl	 <- fitC(cop, u, p=1, method= "mpl",  ...)
+  f.ml	 <- fitC(cop, x, p=1, method= "ml",   ...)
+  if(length(f.mpl@estimate) != 1)
+    stop("'mpl' gave estimate of length != 1, but ", length(f.mpl@estimate))
   cbind(est = c(itau = f.itau@estimate, irho = f.irho@estimate,
 		mpl  = f.mpl@estimate,	ml   = f.ml@estimate),
 	se = c(itau = sqrt(f.itau@var.est), irho = sqrt(f.irho@var.est),
@@ -21,15 +36,20 @@ fit1 <- function(cop, n, x = rCopula(n, cop)) {
 
 
 ## N replicates of fit1()  --> mean of estimates and se, and sd of estimates
-replFitCop <- function(cop, n, N, verbose=TRUE) {
+##' @param ... further arguments passed to fit1()
+replFitCop <- function(cop, n, N, verbose=TRUE, na.rm=FALSE, ...) {
     if(verbose) { k <- 0
 		  pb <- txtProgressBar(max = N, style = if(isatty(stdout())) 3 else 1)
 		  on.exit(close(pb)) } # setup progress bar and close at end
-    sim <- replicate(N, {
+    x.try <- rCopula(2, cop)
+    if(!is.matrix(x.try) || any(is.na(x.try)))
+        stop("copula 'cop' cannot be used to generate data; maybe missing parameter?")
+    ## below replicate(N, { .. } ) now fails because of the "..." passing:
+    sim <- sapply(seq_len(N), function(i, ...) {
         if(verbose) setTxtProgressBar(pb, (k <<- k + 1)) # update progress bar
-        fit1(cop,n)
-    })
-    m <- rowMeans(sim, dims=2)
+        fit1(cop,n, , ...)
+    }, ..., simplify="array")
+    m <- rowMeans(sim, na.rm=na.rm, dims=2)
     cbind(bias = abs(m[,"est"] - cop@parameters), ## abs of bias
           dSE  = abs(m[,"se"] - apply(sim[,1,],1,sd))) ## abs of mean of se minus sd of estimates
 }
@@ -42,9 +62,10 @@ replFitCop <- function(cop, n, N, verbose=TRUE) {
 ##' @param n.set is the set of n values used in the simulation
 ##' @param N is the number of repetitions for computing the bias and dSE
 ##' @param verbose logical indicating if progress bar is desired
+##' @param ... further arguments passed to replFitCop()
 ##' @return an array bias and dSE in different tau and n scenarios
 ##' @author Martin
-tstFit1cop <- function(cop, tau.set, n.set, N, verbose=TRUE) {
+tstFit1cop <- function(cop, tau.set, n.set, N, verbose=TRUE, ...) {
   theta <- structure(iTau(cop, tau.set),
 		     names = paste("tau", format(tau.set), sep="="))
   names(n.set) <- paste("n",format(n.set),sep="=")
@@ -58,7 +79,7 @@ tstFit1cop <- function(cop, tau.set, n.set, N, verbose=TRUE) {
               sapply(n.set, function(n)
                 {
                      if(verbose) cat("  n = ",n,"\n", sep="")
-                     replFitCop(cop, n, N=N, verbose=verbose)
+                     replFitCop(cop, n, N=N, verbose=verbose, ...)
                      ##--------
                 }, simplify="array")
          }, simplify = "array")

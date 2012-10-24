@@ -15,19 +15,19 @@
 
 
 ##' show method
-showCopula <- function(object) {
-  validObject(object)
-  cat(object@fullname, "\n")
-  cat("Dimension: ", object@dimension, "\n")
-  if (length(par <- object@parameters) > 0) {
+print.copula <- function(x, digits = getOption("digits"), ...) {
+  validObject(x)
+  cat(x@fullname, "\n")
+  cat("Dimension: ", x@dimension, "\n")
+  if (length(par <- x@parameters) > 0) {
     cat("Parameters:\n")
     for (i in seq_along(par))
-      cat("  ", object@param.names[i], " = ", par[i], "\n")
+      cat("  ", x@param.names[i], " = ", format(par[i], digits=digits), "\n")
   }
-  invisible(object)
+  invisible(x)
 }
 
-setMethod("show", signature("copula"), showCopula)
+setMethod("show", "copula", function(object) print.copula(object))
 
 
 ### numerical computation of association measures
@@ -93,6 +93,13 @@ iRhoCopula <- function(copula, rho, ...) {
 
 setMethod("iTau", signature("copula"), iTauCopula)
 setMethod("iRho", signature("copula"), iRhoCopula)
+
+cCopula <-  function(u, copula, log=FALSE, n.MC=0) {
+    stopifnot(is(copula, "Copula"))
+    d <- ncol(u)
+    drop(rtrafo(u, cop=copula, j.ind = d, n.MC=n.MC, log=log, trafo.only=TRUE))
+}##      ------ -> ./gof.R
+
 
 ###-- "Copula" methods + glue  former "copula" <--> former "nacopula" ---------
 

@@ -28,7 +28,7 @@ frankTauFun <- function(alpha) {
   c(.frankTau$assoMeasFun$valFun(theta))
 }
 
-frankTauDer <- function(alpha) {
+frankdTau <- function(alpha) {
   ss <- .frankTau$ss
   forwardTransf <- .frankTau$trFuns$forwardTransf
   forwardDer <- .frankTau$trFuns$forwardDer
@@ -36,7 +36,7 @@ frankTauDer <- function(alpha) {
   c(.frankTau$assoMeasFun$valFun(theta, 1)) * forwardDer(alpha, ss)
 }
 
-save(.frankTau, frankTauFun, frankTauDer,
+save(.frankTau, frankTauFun, frankdTau,
      file = "frankTau.rda")
 
 ########################################################
@@ -68,7 +68,7 @@ plackettTauFun <- function(alpha) {
   ## c(ifelse(theta <= 1, valFun(theta), -valFun(1/theta)))
 }
 
-plackettTauDer <- function(alpha) {
+plackettdTau <- function(alpha) {
   ss <- .plackettTau$ss
   forwardTransf <- .plackettTau$trFuns$forwardTransf
   forwardDer <- .plackettTau$trFuns$forwardDer
@@ -84,5 +84,5 @@ plackettTauDer <- function(alpha) {
   ##         valFun(1/theta, 1) * forwardDer(alpha, ss) / theta^2))
 }
 
-save(.plackettTau, plackettTauFun, plackettTauDer,
+save(.plackettTau, plackettTauFun, plackettdTau,
      file = "plackettTau.rda")

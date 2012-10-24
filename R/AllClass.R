@@ -46,7 +46,7 @@ setClass("acopula",
 			V0 = "function",	  # of (n,theta) -- RNGenerator
 			dV0 = "function",	  # of (x,theta,log=FALSE) -- density of F=LS^{-1}[psi]
 			tau = "function",	  # of (theta)
-			tauInv = "function",	  # of (tau)
+			iTau = "function",	  # of (tau)
 			lambdaL = "function",	  # of (theta) lower bound  \lambda_l
 			lambdaLInv = "function",  # of (lambda) - Inverse of \lambda_l
 			lambdaU = "function",	  # of (theta)	- upper bound  \lambda_u
@@ -134,7 +134,7 @@ setMethod("validTheta", signature(x = "acopula"),
 		      else if(int[1] == -Inf) int[2] - 1
 		      else stop("invalid paraInterval slot??")
 		  }
-	      } else  { ## need to use parameter-contraint function and "random search":
+	      } else  { ## need to use parameter-constraint function and "random search":
 		  f.c <- x@paraConstr
 		  for (th in c(1/2, (0:16)/16, round(exp(rnorm(20)),2)))
 		      if(f.th <- f.c(th)) break

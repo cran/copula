@@ -33,9 +33,10 @@ SEXP polyn_eval(SEXP coef, SEXP x)
      m = LENGTH(coef);
  // deal with integer or numeric -- NULL cannot (yet?) be coerced
  if(isNull(x)) { result = allocVector(REALSXP, 0); return result; }
- if(!isNull(coef)) coef = coerceVector(coef, REALSXP);
+ if(!isNull(coef))
+     coef = isReal(coef) ? Rf_duplicate(coef) : coerceVector(coef, REALSXP);
  PROTECT(coef);
- PROTECT(x = coerceVector(x, REALSXP));
+ PROTECT(x = isReal(x) ? Rf_duplicate(x) : coerceVector(x, REALSXP));
  PROTECT(result = Rf_duplicate(x));
  double *cf = REAL(coef), *xx = REAL(x), *res = REAL(result);
  for(i = 0; i < n; i++) {

@@ -1,7 +1,7 @@
 \name{evTestA}
 \alias{evTestA}
-\title{Bivariate test of extreme-value dependence based on the Pickands
-  dependence function}
+\title{Bivariate Test of Extreme-Value Dependence Based on Pickands'
+  Dependence Function}
 \description{
   Test of bivariate extreme-value dependence based on the process
   comparing the empirical copula with a natural nonparametric

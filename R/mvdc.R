@@ -14,17 +14,66 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-mvdc <- function(copula, margins, paramMargins, marginsIdentical = FALSE) {
-  if (marginsIdentical) {
-    if (length(margins) == 1) margins <- rep(margins, copula@dimension)
-    if (length(paramMargins) == 1) paramMargins <- rep(paramMargins, copula@dimension)
-  }
-  new("mvdc", copula = copula, margins = margins, paramMargins = paramMargins,
-       marginsIdentical = marginsIdentical)
+##' do the margin functions "p<nam>", "d<nam>" exist?
+mvd.has.marF <- function(margins, prefix = "p")
+    vapply(margins, function(M)
+	   existsFunction(paste0(prefix, M)), NA)
+
+mvdCheckM <- function(margins, prefix = "p") {
+    ex <- mvd.has.marF(margins, prefix)
+    if(any(!ex))
+	warning("margins correct? Currently, have no function(s) named: ",
+		paste(vapply(unique(margins[!ex]), function(M)
+			     paste0(prefix, M), ""), collapse=", "))
 }
 
+mvdc <- function(copula, margins, paramMargins, marginsIdentical = FALSE,
+		 check = TRUE, fixupNames = TRUE)
+{
+    if (marginsIdentical) {
+	if(length(margins) == 1)
+	    margins <- rep(margins, copula@dimension)
+	if(length(paramMargins) == 1)
+	    paramMargins <- rep(paramMargins, copula@dimension)
+    }
+    if(check) {
+	mvdCheckM(margins, "p")
+	mvdCheckM(margins, "d")
+    }
+    if(fixupNames && all(mvd.has.marF(margins, "p"))) {
+	for(i in seq_along(margins)) {
+	    n.i <- names(p.i <- paramMargins[[i]])
+	    if(is.null(n.i) || any(!nzchar(n.i))) {
+		nnms <- names(formals(get(paste0("p",margins[[i]])))[-1])
+		if(length(nnms) > length(p.i)) length(nnms) <- length(p.i)
+		if(is.null(n.i) || length(nnms) == length(n.i))# careful ..
+		   names(paramMargins[[i]]) <- nnms
+	    }
+	}
+    }
+    new("mvdc", copula = copula, margins = margins, paramMargins = paramMargins,
+	marginsIdentical = marginsIdentical)
+}
 
-## Functions asCall and P0 were kindly supplied by
+setMethod("dim", "mvdc", function(x) x@copula@dimension)
+
+
+##' @title Parameter names of the margins of an "mvdc" object
+##' @param mv
+##' @return character vector of "the correct" length
+##' @author Martin Maechler
+margpnames <- function(mv) {
+    nMar <- vapply(mv@paramMargins, length, 1L)
+    p <- mv@copula@dimension
+    pnms <- unlist(lapply(mv@paramMargins, names)) # maybe NULL
+    if (sum(nMar) == 0) character()
+    else if(mv@marginsIdentical)
+	paste(paste("m", pnms[1], sep="."))
+    else
+	paste(paste0("m", rep.int(1:p, nMar)), pnms, sep=".")
+}
+
+## Function asCall was kindly supplied by
 ## Martin Maechler <maechler@stat.math.ethz.ch>,
 ## motivated by an application of nor1mix and copula
 ## from Lei Liu <liulei@virginia.edu>.
@@ -46,16 +95,14 @@ asCall <- function(fun, param)
     cc
 }
 
-P0 <- function(...) paste(..., sep="")
-
 dMvdc <- function(x, mvdc, log=FALSE) {
   dim <- mvdc@copula@dimension
   densmarg <- if(log) 0 else 1
   if (is.vector(x)) x <- matrix(x, nrow = 1)
   u <- x
   for (i in 1:dim) {
-    cdf.expr <- asCall(P0("p", mvdc@margins[i]), mvdc@paramMargins[[i]])
-    pdf.expr <- asCall(P0("d", mvdc@margins[i]), mvdc@paramMargins[[i]])
+    cdf.expr <- asCall(paste0("p", mvdc@margins[i]), mvdc@paramMargins[[i]])
+    pdf.expr <- asCall(paste0("d", mvdc@margins[i]), mvdc@paramMargins[[i]])
     u[,i] <- eval(cdf.expr, list(x = x[,i]))
     densmarg <-
 	if(log)
@@ -75,7 +122,7 @@ pMvdc <- function(x, mvdc) {
   if (is.vector(x)) x <- matrix(x, nrow = 1)
   u <- x
   for (i in 1:dim) {
-    cdf.expr <- asCall(P0("p", mvdc@margins[i]), mvdc@paramMargins[[i]])
+    cdf.expr <- asCall(paste0("p", mvdc@margins[i]), mvdc@paramMargins[[i]])
     u[,i] <- eval(cdf.expr, list(x = x[,i]))
   }
   pCopula(u, mvdc@copula)
@@ -86,7 +133,7 @@ rMvdc <- function(n, mvdc) {
   u <- rCopula(n, mvdc@copula)
   x <- u
   for (i in 1:dim) {
-    qdf.expr <- asCall(P0("q", mvdc@margins[i]), mvdc@paramMargins[[i]])
+    qdf.expr <- asCall(paste0("q", mvdc@margins[i]), mvdc@paramMargins[[i]])
     x[,i] <- eval(qdf.expr, list(x = u[,i]))
   }
   x
@@ -96,3 +143,24 @@ dmvdc <- function(mvdc, x, log=FALSE) { .Deprecated("dMvdc"); dMvdc(x, mvdc, log
 pmvdc <- function(mvdc, x) { .Deprecated("pMvdc"); pMvdc(x, mvdc) }
 rmvdc <- function(mvdc, n) { .Deprecated("rMvdc"); rMvdc(n, mvdc) }
 
+print.mvdc <- function(x, digits = getOption("digits"), ...)
+{
+    cat("Multivariate Distribution Copula based (\"mvdc\")\n @ copula:\n")
+    print(x@copula, digits=digits, ...)
+    cat(" @ margins:\n")
+    print(x@margins, ...)
+    margid <- x@marginsIdentical
+    p <- dim(x)
+    cat("   with", p, if(margid) "identical" else "(not identical)",
+        " margins;")
+    if(margid) {
+        cat(" each with parameters\n")
+        print(x@paramMargins[[1]], ...)
+    } else {
+        cat(" with parameters (@ paramMargins) \n")
+        str(x@paramMargins, digits.d = digits)
+    }
+    invisible(x)
+}
+
+setMethod("show", signature("mvdc"), function(object) print.mvdc(object))

@@ -69,3 +69,9 @@ setMethod("%in%", signature(x = "numeric", table = "interval"),
 	      (if(op[1]) `<` else `<=`)(table[1], x) &
 	      (if(op[2]) `<` else `<=`)(x, table[2])
 	  })
+
+## Not exported, and only used because CRAN checks must be faster
+doExtras <- function() {
+    interactive() || nzchar(Sys.getenv("R_copula_check_extra")) ||
+        identical("true", unname(Sys.getenv("R_PKG_CHECKING_doExtras")))
+}

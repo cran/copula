@@ -1,5 +1,5 @@
 \name{rstable1}
-\title{Random numbers from (skew) stable distributions}
+\title{Random numbers from (Skew) Stable Distributions}
 \alias{rstable1}
 \alias{rstable}
 \description{
@@ -45,11 +45,12 @@ rstable1(n, alpha, beta, gamma = 1, delta = 0, pm = 1)
   representation is continuous in all 4 parameters.
 }
 \author{
-  Diethelm Wuertz wrote \code{\link[fBasics]{rstable}} for Rmetrics;
+  Diethelm Wuertz wrote \code{\link[stabledist]{rstable}} (now in
+  package \pkg{stabledist}) for Rmetrics;
   Martin Maechler vectorized it (also in \code{alpha},\dots), fixed it
   for \eqn{\alpha=1,\beta\ne 0}{alpha = 1, beta != 0} and sped it up.
 }
-\seealso{\code{\link[fBasics]{rstable}} which also allows the
+\seealso{\code{\link[stabledist]{rstable}} which also allows the
   2-parametrization and provides further functionality for
   stable distributions.
 }
@@ -58,9 +59,9 @@ rstable1(n, alpha, beta, gamma = 1, delta = 0, pm = 1)
   \emph{A Method for Simulating Stable Random Variables},
   J.  Amer.  Statist.  Assoc. \bold{71}, 340--344.
 
-  Nolan, J. P. (2010),
+  Nolan, J. P. (2012),
   \emph{Stable Distributions---Models for Heavy Tailed Data},
-  Birkhaeuser.
+  Birkhaeuser, in progress.
 
   Samoridnitsky, G. and Taqqu, M. S. (1994),
   \emph{Stable Non-Gaussian Random Processes, Stochastic Models
@@ -70,11 +71,6 @@ rstable1(n, alpha, beta, gamma = 1, delta = 0, pm = 1)
 % Nolan, J.P. (1999),
 % \emph{Stable Distributions},
 % Preprint, University Washington DC, 30 pages.
-
-% Nolan, J.P. (1999),
-%     \emph{Numerical Calculation of Stable Densities and Distribution
-%     Functions},
-%     Preprint, University Washington DC, 16 pages.
 
 % Weron, A., Weron R. (1999),
 %     \emph{Computer Simulation of Levy alpha-Stable Variables and

@@ -1,10 +1,10 @@
 \name{evTestK}
 \alias{evTestK}
-\title{Bivariate test of extreme-value dependence based on Kendall's process}
+\title{Bivariate Test of Extreme-Value Dependence Based on Kendall's Process}
 \description{
   Test of extreme-value dependence based on the  bivariate probability integral
   transformation. The test statistic is defined in Ben Ghorbal,
-  Nešlehová and Genest (2009).
+  \enc{Nešlehová}{Neslehova} and Genest (2009).
 }
 \usage{
 evTestK(x, method = c("fsample","asymptotic","jackknife"))
@@ -16,8 +16,8 @@ evTestK(x, method = c("fsample","asymptotic","jackknife"))
     or \code{"jackknife"}.}
 }
 \details{
-  The code for this test was generously provided by Johanna Nešlehová.
-  More details are available in Appendix B of Ben Ghorbal, Nešlehová and
+  The code for this test was generously provided by Johanna \enc{Nešlehová}{Neslehova}.
+  More details are available in Appendix B of Ben Ghorbal, \enc{Nešlehová}{Neslehova} and
   Genest (2009).
 }
 \value{
@@ -26,7 +26,7 @@ evTestK(x, method = c("fsample","asymptotic","jackknife"))
   \item{p.value}{ corresponding p-value. }
 }
 \references{
-  Ghorbal, M. B., Genest, C., and Nešlehová, J. (2009)
+  Ghorbal, M. B., Genest, C., and \enc{Nešlehová}{Neslehova}, J. (2009)
   On the test of Ghoudi, Khoudraji, and Rivest for extreme-value dependence.
   \emph{The Canadian Journal of Statistics} \bold{37}, 1--9.
 }

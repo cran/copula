@@ -149,14 +149,14 @@ tau <- function(theta, family, ...)
 ##' @param ... additional args passed to tau-slots
 ##' @return parameter theta (possibly a matrix)
 ##' @author Marius Hofert
-tauInv <- function(tau, family, ...)
+iTau <- function(tau, family, ...)
 {
     switch(copFamilyClass(family),
            "elliptical"={
                sin(pi/2*tau)
            },
            "nArchimedean"={
-               getAcop(family)@tauInv(tau, ...)
+               getAcop(family)@iTau(tau, ...)
            },
            stop("family ", family, " not yet supported"))
 }

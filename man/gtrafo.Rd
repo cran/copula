@@ -2,7 +2,7 @@
 \alias{gtrafo}
 \alias{htrafo}
 \alias{rtrafo}
-\title{Goodness-of-fit testing transformations for (nested) Archimedean copulas}
+\title{Goodness-of-fit Testing Transformations for (Nested) Archimedean Copulas}
 \description{
   \code{htrafo()} the transformation described in Hering and Hofert (2011).
 
@@ -11,7 +11,7 @@
 \usage{
 htrafo(u, cop, include.K=TRUE, n.MC=0, inverse=FALSE,
        method=formals(qK)$method, u.grid, ...)
-rtrafo(u, cop, m=d, n.MC=0)
+rtrafo(u, cop, j.ind = 2:d, m, n.MC=0, log=FALSE, trafo.only=log)
 }
 \arguments{
   \item{u}{\eqn{n\times d}{n x d}-matrix of (pseudo-/copula-)observations (each
@@ -23,9 +23,10 @@ rtrafo(u, cop, m=d, n.MC=0)
     Archimedean copulas are provided).}
   \item{include.K}{logical indicating whether the last component, involving the
     Kendall distribution function \code{\link{K}}, is used in \code{htrafo}.}
-  \item{m}{integer between 2 and \eqn{d} indicating the order up to which the
-    conditional distributions are computed (the largest being the
-    \eqn{m}th given all with index smaller than \eqn{m}).}
+  \item{j.ind}{integer vector of indices \eqn{j} between 2 and \eqn{d}
+    indicating the conditional distributions that are to be computed.}
+  \item{m}{(\bold{deprecated}, use \code{j.ind} instead).  Now,
+    \code{j.ind = 2:M} should be used instead of \code{m=M}.}
   \item{n.MC}{parameter \code{n.MC} for \code{\link{K}} (for \code{htrafo})
     or for approximating the derivatives involved (for \code{rtrafo}).}
   \item{inverse}{logical indicating whether the inverse of the
@@ -33,6 +34,13 @@ rtrafo(u, cop, m=d, n.MC=0)
   \item{method}{method to compute \code{qK}.}
   \item{u.grid}{argument of \code{qK} (for \code{method="discrete"}).}
   \item{\dots}{additional arguments passed to \code{qK}.}
+  \item{log}{logical specifying if the logarithm of the transformation,
+    i.e., conditional distribution is desired (for the \code{j.ind}
+    indices; i.e., \code{u[,1]} is returned unchanged also in this case).}
+  \item{trafo.only}{logical; if true, only the transformed part is
+    returned, i.e., the unchanged first column is not.  This is typically
+    useful when \code{log = TRUE} or when the conditional distribution
+    is only needed for certain indices (\code{j.ind}).}
 }
 \details{
   \describe{
@@ -110,7 +118,7 @@ rtrafo(u, cop, m=d, n.MC=0)
 }
 \examples{
 tau <- 0.5
-(theta <- copGumbel@tauInv(tau)) # 2
+(theta <- copGumbel@iTau(tau)) # 2
 (copG <- onacopulaL("Gumbel", list(theta, 1:5))) # d = 5
 
 set.seed(1)
@@ -130,17 +138,38 @@ pairs(u.r, cex=0.2) # looks good
 
 ## what about a meta-Clayton model?
 ## the parameter is chosen such that Kendall's tau equals (the same) tau
-copC <- onacopulaL("Clayton", list(copClayton@tauInv(tau), 1:5))
+copC <- onacopulaL("Clayton", list(copClayton@iTau(tau), 1:5))
 
 ## plot of the transformed data (Hering and Hofert (2011)) to see the
 ## deviations from uniformity
-u.prime <- htrafo(u, cop=copC) # transform the data
-pairs(u.prime, cex=0.2) # clearly visible
+u.H <- htrafo(u, cop=copC) # transform the data
+pairs(u.H, cex=0.2) # clearly visible
 
 ## plot of the transformed data (Rosenblatt (1952)) to see the
 ## deviations from uniformity
-u.prime. <- rtrafo(u, cop=copC) # transform the data
-pairs(u.prime., cex=0.2) # clearly visible
+u.R <- rtrafo(u, cop=copC) # transform the data
+pairs(u.R, cex=0.2) # clearly visible
+
+## rtrafo() for elliptical:
+fN <- fitCopula(normalCopula(dim=ncol(u)), u)
+pairs(rtrafo(u, cop= fN@copula), cex = 0.2)# not so clearly visible
+if(copula:::doExtras()) {
+  f.t <- fitCopula(tCopula(dim=ncol(u)), u)
+  tCop <- f.t@copula
+} else {
+  tCop <- tCopula(param = 0.685, df = 7, dim=ncol(u))
+}
+u.Rt <- rtrafo(u, cop= tCop)
+pairs(u.Rt, cex = 0.2)# *not* clearly visible
+\dontshow{%% consistency of  log=FALSE / TRUE:
+stopifnot(all.equal(log(u.R[,-1]),
+		    rtrafo(u, cop=copC, log=TRUE), tol=1e-14),
+	  all.equal(log(rtrafo(u, cop= fN@copula, trafo.only=TRUE)),
+		    rtrafo(u, cop= fN@copula, log=TRUE), tol=1e-14),
+	  all.equal(log(u.Rt[,-1]),
+		    rtrafo(u, cop= tCop, log=TRUE), tol=1e-14),
+	  TRUE)
+}% only for testing
 }
 \keyword{transformation}
 \keyword{distribution}

@@ -17,8 +17,7 @@
 
 require(copula)
 
-(doExtras <- interactive() || nzchar(Sys.getenv("R_copula_check_extra")) ||
- identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING"))))
+(doExtras <- copula:::doExtras())
 
 ## From source(system.file("test-tools.R", package = "Matrix")) :
 showProc.time <- local({

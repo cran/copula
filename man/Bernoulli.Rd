@@ -1,7 +1,7 @@
 \name{Bernoulli}
 \alias{Bernoulli}
 \alias{Bernoulli.all}
-\title{Compute Bernoulli numbers}
+\title{Compute Bernoulli Numbers}
 \description{
   Compute the \eqn{n}th Bernoulli number, or
   generate all Bernoulli numbers up to the \eqn{n}th,

@@ -1,6 +1,6 @@
 \name{getAcop}
 \alias{getAcop}
-\title{Get "acopula" family object by name}
+\title{Get "acopula" Family Object by Name}
 \description{
   Get one of our "acopula" family objects (see \link{acopula-families} by name.
 }
@@ -11,7 +11,8 @@ getAcop(family, check=TRUE)
   \item{family}{either a \code{\link{character}} string, the short or longer
     form of the Archimedean family name (for example, "Clayton" or simply "C";
     see the \code{\link{acopula-families}} documentation), or an
-    \code{\linkS4class{acopula}} family object.}
+    \code{\linkS4class{acopula}} family object, or an object inheriting
+    from class \code{\linkS4class{archmCopula}}.}
   \item{check}{logical indicating whether the class of the return value
     should be checked to be \code{"\linkS4class{acopula}"}.}
 }
@@ -27,6 +28,7 @@ getAcop(family, check=TRUE)
 getAcop("Gumbel")
 
 stopifnot(identical(getAcop("J"), getAcop("Joe")),
-          identical(getAcop("J"), copJoe))
+          identical(getAcop("J"), copJoe),
+          identical(getAcop(frankCopula()), copFrank))
 }
 \keyword{manip}

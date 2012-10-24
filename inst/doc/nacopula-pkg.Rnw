@@ -1,4 +1,3 @@
-
 \documentclass[article,nojss]{jss}
 %% NOTA BENE: More definitions --> further down
 %%%%%%%%%%%%
@@ -501,10 +500,10 @@ given in Table~\ref{table2}.
 As an example, we define a three-dimensional Joe copula with
 parameter chosen such that Kendall's tau (for the corresponding bivariate
 marginal copula of the Archimedean type) equals 0.5; this is achieved with the
-function \code{tauInv}, which computes the parameter $\theta$ such that
+function \code{iTau}, which computes the parameter $\theta$ such that
 Kendall's tau equals 0.5.
 <<ex1-definition>>=
-(theta <- copJoe@tauInv(0.5))
+(theta <- copJoe@iTau(0.5))
 C3joe.5 <- onacopula("Joe", C(theta, 1:3))
 @
 The internal structure of this object%
@@ -985,9 +984,9 @@ Such a copula can be defined as follows, where we choose the parameters of
 $\psi_0$, $\psi_1$, and $\psi_2$ such that the corresponding Kendall's tau are
 0.2, 0.5, and 0.8, respectively.
 <<ex2-definition>>=
-theta0 <- copClayton@tauInv(0.2)
-theta1 <- copClayton@tauInv(0.5)
-theta2 <- copClayton@tauInv(0.8)
+theta0 <- copClayton@iTau(0.2)
+theta1 <- copClayton@iTau(0.5)
+theta2 <- copClayton@iTau(0.8)
 c(theta0, theta1, theta2)
 C_9_clayton <- onacopula("Clayton",
                          C(theta0, c(3,6,1),
@@ -1090,7 +1089,7 @@ base generator of Clayton's type and with base parameter such that Kendall's tau
 equals 0.5.
 %% MM: chosing name "opow.Clayton"  to make it "stand out":
 <<opwer-def2>>=
-thetabase <- copClayton@tauInv(.5)
+thetabase <- copClayton@iTau(.5)
 (opow.Clayton <- opower(copClayton, thetabase))
 @
 
@@ -1099,8 +1098,8 @@ three-dimensional fully nested outer power Clayton copula with parameters
 such that Kendall's tau are $2/3$ and $0.75$.
 %% onacopula() now works since Martin implemented it on 2010-06-26  :
 <<opwer-def3>>=
-theta0 <- opow.Clayton@tauInv(2/3) # will be 1.5
-theta1 <- opow.Clayton@tauInv(.75) # will be 2
+theta0 <- opow.Clayton@iTau(2/3) # will be 1.5
+theta1 <- opow.Clayton@iTau(.75) # will be 2
 opC3 <- onacopula(opow.Clayton, C(theta0, 1, C(theta1, c(2,3))))
 @
 

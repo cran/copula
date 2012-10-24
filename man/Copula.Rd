@@ -96,7 +96,7 @@
 \alias{rCopula,numeric,asymExplicitCopula-method}
 \alias{rCopula,numeric,nacopula-method}
 % main
-\title{Copula functions}
+\title{Density, Evaluation, and Random Number Generation for Copula Functions}
 \description{
   Density, distribution function, and random generation for a
   \code{copula} object.

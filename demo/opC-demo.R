@@ -101,7 +101,7 @@ nlogl.opC. <- function(theta, u) nlogl.opC(theta[1], theta=theta[2], u=u)
 
 ## determine theta such that tau is matched (for given thetabase)
 opC <- opower(copClayton, thetabase) # outer power Clayton copula
-theta <- opC@tauInv(tau) # choose theta such that Kendall's tau equals tau
+theta <- opC@iTau(tau) # choose theta such that Kendall's tau equals tau
 
 ## define the outer power Clayton copula to be sampled and estimated
 cop <- onacopulaL(opC, list(theta, 1:d))

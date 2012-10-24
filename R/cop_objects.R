@@ -150,7 +150,7 @@ copAMH <-
                   tau = tauAMH, ##-> ./aux-acopula.R
                   ## function(th)  1 - 2*((1-th)*(1-th)*log(1-th)+th)/(3*th*th)
                   ## but numerically stable, including, theta -> 0
-                  tauInv = function(tau, tol=.Machine$double.eps^0.25, check=TRUE, warn=TRUE, ...) {
+                  iTau = function(tau, tol=.Machine$double.eps^0.25, check=TRUE, warn=TRUE, ...) {
 		      if((L <- any(tau > 1/3)) || any(tau < 0)) {
 			  ct <- if(length(ct <- sort(tau, decreasing = L)) > 3)
 			      paste(paste(format(ct[1:3]),collapse=", "),", ...",sep="") else format(ct)
@@ -164,7 +164,7 @@ copAMH <-
 			      r[sml <- tau <=  0 ] <- 0
 			      r[lrg <- tau >= 1/3] <- 1
 			      ok <- !sml & !lrg
-			      r[ok] <- C.@tauInv(tau[ok], tol=tol, ...)
+			      r[ok] <- C.@iTau(tau[ok], tol=tol, ...)
 			      return(r)
 			  }
 		      }
@@ -306,7 +306,7 @@ copClayton <-
 		  },
 		  ## Kendall's tau
 		  tau = function(theta) { theta/(theta+2) },
-		  tauInv = function(tau) { 2*tau/(1-tau) },
+		  iTau = function(tau) { 2*tau/(1-tau) },
 		  ## lower tail dependence coefficient lambda_l
 		  lambdaL = function(theta) { 2^(-1/theta) },
 		  lambdaLInv = function(lambda) { -1/log2(lambda) },
@@ -505,7 +505,7 @@ copFrank <-
 			  res[i] <- 1 + 4*(debye1(theta[i]) - 1)/theta[i]
 		      res
 		  },
-		  tauInv = function(tau, tol = .Machine$double.eps^0.25, ...) {
+		  iTau = function(tau, tol = .Machine$double.eps^0.25, ...) {
 		      res <- tau
 		      isN <- tau == 0 ## res[isN] <- 0 # limiting case
 		      if(length(nn <- which(!isN)))
@@ -701,7 +701,7 @@ copGumbel <-
 		  },
 		  ## Kendall's tau
 		  tau = function(theta) { (theta-1)/theta },
-		  tauInv = function(tau) { 1/(1-tau) },
+		  iTau = function(tau) { 1/(1-tau) },
 		  ## lower tail dependence coefficient lambda_l
 		  lambdaL = function(theta) { 0*theta },
 		  lambdaLInv = function(lambda) {
@@ -874,7 +874,7 @@ copJoe <-
                   ## MM: "FIXME" , using  http://dlmf.nist.gov/2.10#E1  (or better?)
                   ## + maxima   integrate(1/(x*(t*x+2)*(t*x+2-t)), x)
 		  tau = tauJoe,
-		  tauInv = function(tau, tol = .Machine$double.eps^0.25, ...) {
+		  iTau = function(tau, tol = .Machine$double.eps^0.25, ...) {
 		      sapply(tau,function(tau) {
 			  r <- safeUroot(function(th) C.@tau(th) - tau,
 					 interval = c(1, 98),

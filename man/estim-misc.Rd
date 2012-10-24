@@ -2,7 +2,7 @@
 \alias{ebeta}
 \alias{edmle}
 \alias{etau}
-\title{Various estimators for (nested) Archimedean copulas}
+\title{Various Estimators for (Nested) Archimedean Copulas}
 \description{
   Various Estimators for (Nested) Archimedean Copulas, namely,
   \describe{
@@ -100,7 +100,7 @@ etau(u, cop, method = c("tau.mean", "theta.mean"), warn=TRUE, ...)
 }
 \examples{
 tau <- 0.25
-(theta <- copGumbel@tauInv(tau)) # 4/3
+(theta <- copGumbel@iTau(tau)) # 4/3
 d <- 20
 (cop <- onacopulaL("Gumbel", list(theta,1:d)))
 

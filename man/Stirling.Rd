@@ -1,5 +1,5 @@
 \name{Stirling}
-\title{Eulerian and Stirling numbers of first and second kind}
+\title{Eulerian and Stirling Numbers of First and Second Kind}
 \alias{Eulerian}
 \alias{Stirling1}
 \alias{Stirling2}

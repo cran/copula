@@ -1,6 +1,6 @@
 \name{Cn}
 \alias{Cn}
-\title{Computes the empirical copula}
+\title{Computes the Empirical Copula}
 \description{
   Given a random sample from a distribution with continuous margins and
   copula C, the empirical copula is a natural nonparametric estimator of

@@ -4,7 +4,7 @@
 \alias{qK}
 \alias{dK}
 \alias{rK}
-\title{Kendall distribution function for Archimedean copulas}
+\title{Kendall Distribution Function for Archimedean Copulas}
 \description{
   The distribution function of the \emph{Kendall distribution} of an Archimedean
   copula is defined as
@@ -100,7 +100,7 @@ rK(n, cop, d)
 }
 \examples{
 tau <- 0.5
-(theta <- copGumbel@tauInv(tau)) # 2
+(theta <- copGumbel@iTau(tau)) # 2
 d <- 20
 (cop <- onacopulaL("Gumbel", list(theta,1:d)))
 

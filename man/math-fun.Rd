@@ -1,7 +1,7 @@
 \name{math-fun}
 \alias{A..Z}
 \alias{sinc}
-\title{Sinc, Zolotarev's, and other mathematical utility functions}
+\title{Sinc, Zolotarev's, and Other Mathematical Utility Functions}
 \description{
   \code{sinc(x)} computes the \emph{sinc function}
   \eqn{s(x)=\sin(x)/x}{s(x) = sin(x)/x} for \eqn{x\ne 0}{x != 0} and

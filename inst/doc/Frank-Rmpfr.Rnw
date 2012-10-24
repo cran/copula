@@ -351,7 +351,7 @@ Unfortunately, this is not enough to get numerically stable evaluations of
 the negative log-likelihood $l()$:
 <<ex-U-data>>=
 d <- 5
-(theta <- copFrank@tauInv(tau = 0.75))
+(theta <- copFrank@iTau(tau = 0.75))
 cop <- onacopulaL("Frank", list(theta, 1:d))
 set.seed(1); for(l in 1:4) U <- rnacopula(n = 100, cop)
 U. <- sort(apply(U, 1, max)) # build the max

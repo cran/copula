@@ -2,8 +2,8 @@
 \docType{class}
 \alias{fgmCopula-class}
 \title{Class "fgmCopula" }
-\description{Multivariate multiparameter Farlie-Gumbel-Morgenstern
-  copula.}
+\description{Multivariate Multiparameter Farlie-Gumbel-Morgenstern
+  Copula.}
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("fgmCopula",
     ...)}.

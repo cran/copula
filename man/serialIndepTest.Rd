@@ -1,8 +1,8 @@
 \name{serialIndepTest}
 \alias{serialIndepTest}
 \alias{serialIndepTestSim}
-\title{Serial independence test for continuous time series based
-  on the empirical copula process}
+\title{Serial Independence Test for Continuous Time Series Based
+  on the Empirical Copula Process}
 \description{
   Serial independence test based on the empirical copula process as
   proposed in Ghoudi et al. (2001) and Genest and Rémillard (2004). The

@@ -18,21 +18,21 @@ useDynLib(copula, .registration=TRUE)
 ### Part I: Former copula ######################################################
 
 importFrom("graphics", persp, contour)
+importFrom("stats", coef, nobs, vcov)# logLik? - already import from "stats4" for mle2
 
 importFrom("mvtnorm",
            dmvnorm, pmvnorm, rmvnorm,
            dmvt, pmvt, rmvt)
 
-## FIXME[instead of "Depends"]:
-# We would want importS3MethodsFrom("pspline", predict)
+## FIXME: we would only want importS3MethodsFrom("pspline", predict)
 import("pspline")
 ## S3method(predict, smooth.Pspline)
-
 
 ## importFrom(sn, dmst)
 ## importFrom(sn, qsn, dsn, psn, dmsn, pmsn)
 
 export(dCopula, pCopula, rCopula)
+export(cCopula)
 export(dMvdc, pMvdc, rMvdc)
 export(tau, rho, tailIndex)
 export(iTau, iRho)
@@ -61,7 +61,7 @@ export(galambosCopula, huslerReissCopula, tawnCopula, tevCopula)
 export(plackettCopula)
 export(fgmCopula)
 
-exportMethods(show, summary)
+exportMethods(show)
 exportMethods(persp, contour)
 
 ## empirical copula
@@ -71,7 +71,6 @@ export(Cn)
 export(loglikCopula, loglikMvdc)
 export(fitCopula, fitMvdc)
 exportClasses(fittedMV, fitCopula, fitMvdc)
-exportClasses(summaryFitCopula, summaryFitMvdc)
 
 ## independence tests
 export(indepTestSim, indepTest, multIndepTest,
@@ -91,7 +90,19 @@ export(asymCopula)
 exportClasses(asymExplicitCopula)
 export(asymExplicitCopula)
 
+S3method(print, copula)
+S3method(print, mvdc)
 S3method(print, indepTest)
+S3method(print, fitCopula)
+S3method(summary, fitCopula)
+S3method(print, fitMvdc)
+S3method(summary, fitMvdc)
+##
+S3method(coef, fittedMV)
+S3method(nobs, fittedMV)
+S3method(vcov, fittedMV)
+S3method(logLik, fittedMV)
+
 
 ## testing
 ## export(dCdtheta, derPdfWrtParams, dTau, dRho)
@@ -106,7 +117,7 @@ S3method(print, indepTest)
 
 ## Now  'Depend'  on  stats4 and bbmle :
 importFrom("stats4", mle)
-importMethodsFrom("stats4", coef,confint, logLik, AIC, BIC, summary, plot, profile)
+importMethodsFrom("stats4", coef,confint, logLik, AIC, BIC, plot, profile)
 
 importFrom("gsl", debye_1, debye_2)
 
@@ -150,7 +161,7 @@ export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        ,"opower"
        ,"prob"
        ,"timing"
-       ## Should we provide these in a separate (very small) R pakage ?
+       ## Should we provide these in a separate (very small) R package ?
        ,"sinc", "A..Z"
        ,"rstable1"
        ,"retstable", "retstableR"

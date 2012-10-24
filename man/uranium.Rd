@@ -2,7 +2,7 @@
 \Rdversion{1.1}
 \alias{uranium}
 \docType{data}
-\title{Uranium exploration dataset of Cook & Johnson (1986)}
+\title{Uranium Exploration Dataset of Cook & Johnson (1986)}
 \description{
   These data consist of log concentrations of 7 chemical elements in 655
   water samples collected near Grand Junction, CO (from the Montrose

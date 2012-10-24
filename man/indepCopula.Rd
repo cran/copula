@@ -1,6 +1,6 @@
 \name{indepCopula}
 \alias{indepCopula}
-\title{Construction of independence copula class objects}
+\title{Construction of Independence Copula Class Objects}
 \description{
   Constructs an independence copula class object with its corresponding
   dimension.

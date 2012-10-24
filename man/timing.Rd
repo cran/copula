@@ -1,6 +1,6 @@
 \name{timing}
 \alias{timing}
-\title{Timing for sampling nested Archimedean copulas}
+\title{Timing for Sampling Nested Archimedean Copulas}
 \usage{
 timing(n, family, taus, digits = 3, verbose = FALSE)
 }

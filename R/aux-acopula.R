@@ -23,8 +23,8 @@ paste0 <- function(...) paste(..., sep="")
 ### Ali-Mikhail-Haq == "AMH" ###################################################
 
 ##' @title Ali-Mikhail-Haq ("AMH")'s  tau(theta)
-##' @param th
-##' @return 1 - 2*((1-th)*(1-th)*log(1-th)+th)/(3*th*th)
+##' @param theta
+##' @return 1 - 2*((1-th)*(1-th)*log(1-th)+th)/(3*th*th)  where th := theta
 ##' numerically accurately, for both limits  th -> 0  &  th -> 1
 ##' Nelsen (2006, p.172) range of tau: [(5 - 8 log 2) / 3, 1/3] ~= [-0.1817, 0.3333]
 ##' @author Martin Maechler
@@ -718,7 +718,7 @@ dSibuya <- function(x, alpha, log=FALSE)
 ##' @title Distribution function of a Sibuya(alpha) distribution
 ##' @param x evaluation point [integer]
 ##' @param alpha parameter alpha
-##' @param lower.tail if TRUE, probabilities are P[X ≤ x], otherwise, P[X > x]
+##' @param lower.tail if TRUE, probabilities are P[X <= x], otherwise, P[X > x]
 ##' @param log.p boolean which determines if the logarithm is returned
 ##' @return F(x) = 1 - (-1)^x * choose(alpha-1, x)
 ##' @author Marius Hofert and Martin Maechler
@@ -1168,7 +1168,7 @@ dimU <- function(u) {
 ##' Conditional copula function C(u[,d]|u[,1],...,u[,d-1])
 ##'
 ##' @title Conditional copula function
-##' @param u (n x d)-matrix of evaluation points (first d-1 colums are conditioned on)
+##' @param u (n x d)-matrix of evaluation points (first d-1 columns are conditioned on)
 ##' @param cop an outer_nacopula
 ##' @param n.MC Monte Carlo sample size
 ##' @param log if TRUE the logarithm of the conditional copula is returned
@@ -1177,22 +1177,10 @@ cacopula <- function(u, cop, n.MC=0, log=FALSE) {
     stopifnot(is(cop, "outer_nacopula"))
     if(length(cop@childCops))
 	stop("currently, only Archimedean copulas are provided")
-    if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-    stopifnot(0 <= u, u <= 1)
-    ## note: for some (but not all) families, cacopula also makes sense on
-    ##       the boundaries since the corresponding limits exist
-    th <- cop@copula@theta
-    stopifnot(cop@copula@paraConstr(th))
-    dim. <- dim(u)
-    n <- dim.[1]
-    d <- dim.[2]
-    psiI <- cop@copula@iPsi(u, theta=th)
-    arg.denom <- rowSums(psiI[,1:(d-1), drop=FALSE])
-    arg.num <- arg.denom + psiI[,d]
-    logD <- cop@copula@absdPsi(c(arg.num, arg.denom), theta=th, degree=d-1,
-                               n.MC=n.MC, log=TRUE)
-    res <- logD[1:n]-logD[(n+1):(2*n)]
-    if(log) res else exp(res)
+
+    .Deprecated("cCopula")
+    d <- ncol(u)
+    drop(rtrafo(u, cop=cop, j.ind = d, n.MC=n.MC, log=log, trafo.only=TRUE))
 }
 
 ##' Function which computes absdPsi via Monte Carlo
@@ -1437,23 +1425,38 @@ setMethod(show, "nacopula", function(object) printNacopula(object))
 ##'
 ##' @title Get one of our "acopula" family objects by name
 ##' @param family either character string (short or longer form of
-##'	 copula family name) or an "acopula" family object
+##'	 copula family name), an "acopula" family object,
+##'      *or* an object inheriting from "archmCopula"
 ##' @param check logical indicating if the class of the return value should
 ##' be checked.
 ##' @return one of our "acopula" objects
 ##' @author Martin Maechler
 getAcop <- function(family, check=TRUE) {
     if(is.character(family)) {
-        stopifnot(length(family) == 1)
-        if(nchar(family) <= 2)          # it's a short name
-            family <- c_longNames[family]
-        COP <- get(c_objNames[family])  # envir = "package:copula"
-        if(check && !is(COP, "acopula"))
-            stop(paste("invalid acopula-family object, family=",family))
-        COP
-    } else if(is(family, "acopula"))
-        family
-    else stop("'family' must be an \"acopula\" object or family name")
+	stopifnot(length(family) == 1)
+	if(nchar(family) <= 2)		# it's a short name
+	    family <- c_longNames[family]
+	COP <- get(c_objNames[family])	# envir = "package:copula"
+	if(check && !is(COP, "acopula"))
+	    stop(paste("invalid acopula-family object, family=",family))
+	COP
+    } else {
+	cl <- getClass(class(family))# so the extends(.) below are fast
+	if(extends(cl, "acopula"))
+	    family
+	else if(extends(cl, "archmCopula")) {
+	    if(extends(cl, "indepCopula"))## FIXME? do not want full family object!
+		stop("independence copula not implemnted as family")
+	    ## now use short family names
+	    getAcop(if(extends(cl, "claytonCopula")) "C" else
+		    if(extends(cl, "frankCopula"))   "F" else
+		    if(extends(cl, "amhCopula"))     "A" else
+		    if(extends(cl, "joeCopula"))     "J" else
+		    if(extends(cl, "gumbelCopula"))  "G" else
+		    stop("invalid archmCopula class: ", cl))
+	}
+	else stop("'family' must be an \"archmCopula\" or \"acopula\" object or family name")
+    }
 }
 
 

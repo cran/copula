@@ -34,7 +34,7 @@ f.tms <- function(x) paste(round(x),"ms") # with a space (sep=" ") !
 ##' @param n.bootstrap
 ##' @param include.K
 ##' @param n.MC if > 0 it denotes the sample size for SMLE
-##' @param esti.method estimation method (see enacopula)
+##' @param estim.method estimation method (see enacopula)
 ##' @param gof.method goodness-of-fit transformation (see gnacopula)
 ##' @param checkFamilies vector of Archimedean families to be used for gof
 ##' @param verbose
@@ -44,8 +44,8 @@ f.tms <- function(x) paste(round(x),"ms") # with a space (sep=" ") !
 estimation.gof <- function(n, d, simFamily, tau,
 			   n.bootstrap = 1, # dummy number of bootstrap replications
 			   include.K = TRUE,
-			   n.MC = if(esti.method=="smle") 10000 else 0,
-			   esti.method = eval(formals(enacopula)$method),
+			   n.MC = if(estim.method=="smle") 10000 else 0,
+			   estim.method = eval(formals(enacopula)$method),
 			   gof.trafo =	 eval(formals(gnacopula)$trafo),
 			   gof.method =	 eval(formals(gnacopula)$method),
 			   checkFamilies = copula:::c_longNames,
@@ -53,17 +53,17 @@ estimation.gof <- function(n, d, simFamily, tau,
 {
     ## generate data
     copFamily <- getAcop(simFamily)
-    theta <- copFamily@tauInv(tau)
+    theta <- copFamily@iTau(tau)
     cop <- onacopulaL(simFamily, list(theta,1:d))
     if(verbose){
         r <- function(x) round(x,4) # for output
-	cat("\n\n### Output for esti.method = \"",esti.method,
+	cat("\n\n### Output for estim.method = \"",estim.method,
             "\" gof.trafo = \"",gof.trafo,"\", and gof.method = \"",gof.method,"\"\n\n",sep="")
     }
     u <- rnacopula(n,cop)
 
     ## estimation and gof
-    esti.method <- match.arg(esti.method)
+    estim.method <- match.arg(estim.method)
     gof.trafo <- match.arg(gof.trafo)
     gof.method <- match.arg(gof.method)
     n.cf <- length(checkFamilies)
@@ -74,7 +74,7 @@ estimation.gof <- function(n, d, simFamily, tau,
         cop.hat <- onacopulaL(checkFamilies[k],list(NA,1:d))
         if(verbose) cat("Estimation and GoF for ",checkFamilies[k],":\n\n",sep="")
 	ute[k] <- utms(est[k] <- enacopula(u, cop=cop.hat,
-					   method=esti.method, n.MC=n.MC))
+					   method=estim.method, n.MC=n.MC))
         tau[k] <- cop.hat@copula@tau(est[k])
         if(verbose){
             cat("   theta hat      = ",r(est[k]),"\n",
@@ -89,7 +89,7 @@ estimation.gof <- function(n, d, simFamily, tau,
 	utg[k] <-
 	    utms(gof[k] <-
 		 gnacopula(u, cop=cop.hat, n.bootstrap=n.bootstrap,
-			   estimation.method=esti.method,
+			   estim.method=estim.method,
 			   include.K=include.K, n.MC=n.MC,
 			   trafo=gof.trafo, method=gof.method,
 			   verbose=FALSE)$p.value)

@@ -29,7 +29,7 @@ exchEVTest <- function(x, N = 1000, estimator = "CFG", derivatives = "Cn", m = 1
 {
   ## make pseudo-observations
   n <- nrow(x)
-  u <- apply(x,2,rank)/(n+1)
+  u <- pobs(x)
 
   ## make grid
   g <- seq(1/m, 0.5, len = m)
@@ -86,7 +86,7 @@ exchTest <- function(x, N = 1000, m = 0)
 {
   ## make pseudo-observations
   n <- nrow(x)
-  u <- apply(x,2,rank)/(n+1)
+  u <- pobs(x)
 
   ## make grid
   if (m > 0)

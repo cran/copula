@@ -55,7 +55,7 @@ dnormalCopula <- function(u, copula, log=FALSE, ...) {
 
 
 showNormalCopula <- function(object) {
-  showCopula(object)
+  print.copula(object)
   if (object@dimension > 2) cat("dispstr: ", object@dispstr, "\n")
   invisible(object)
 }

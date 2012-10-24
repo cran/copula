@@ -31,7 +31,7 @@ Cn <- function(x,w) {
     m <- nrow(w)
 
     ## make pseudo-observations
-    u <- apply(x,2,rank)/(n+1)
+    u <- pobs(x)
 
     ## compute empirical copula at w
     .C(RmultCn,

@@ -1,6 +1,6 @@
 \name{rnacModel}
 \alias{rnacModel}
-\title{Random nacopula model}
+\title{Random nacopula Model}
 \description{
   Randomly construct a nested Archimedean copula model,
   %% FIXME

@@ -1,5 +1,5 @@
 \name{beta.Blomqvist}
-\title{Blomqvist's beta for Archimedean copula, sample and population}
+\title{Sample and Population Version of Blomqvist's Beta for Archimedean Copulas}
 \alias{beta.}
 \alias{betan}
 \alias{beta.hat}%deprecated

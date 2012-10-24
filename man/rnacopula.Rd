@@ -1,6 +1,6 @@
 \name{rnacopula}
 \alias{rnacopula}
-\title{Sampling nested Archimedean copulas}
+\title{Sampling Nested Archimedean Copulas}
 \description{
   Random number generation for nested Archimedean copulas (of class
   \code{\linkS4class{outer_nacopula}}, specifically), aka
@@ -71,8 +71,8 @@ rnacopula(n, copula, x, ...)
 ## Construct a three-dimensional nested Clayton copula with parameters
 ## chosen such that the Kendall's tau of the respective bivariate margins
 ## are 0.2 and 0.5 :
-C3 <- onacopula("C", C(copClayton@tauInv(0.2), 1,
-                       C(copClayton@tauInv(0.5), c(2,3))))
+C3 <- onacopula("C", C(copClayton@iTau(0.2), 1,
+                       C(copClayton@iTau(0.5), c(2,3))))
 C3
 \dontshow{
 stopifnot(nrow(rnacopula(1, C3)) == 1,

@@ -36,7 +36,7 @@ n <- 250
 family <- "Gumbel"
 cop. <- getAcop(family)
 tau <- c(0.2, 0.4, 0.6)
-th <- cop.@tauInv(tau)
+th <- cop.@iTau(tau)
 cop <- onacopulaL(family, list(th[1], NULL, list(list(th[2], 1:2),
                                                  list(th[3], 3:5))))
 
@@ -52,7 +52,7 @@ n <- 250
 family <- "Gumbel"
 cop. <- getAcop(family)
 tau <- c(0.2, 0.4, 0.6)
-th <- cop.@tauInv(tau)
+th <- cop.@iTau(tau)
 cop <- onacopulaL(family, list(th[1], c(1,4), list(list(th[2], 2:3), list(th[3],
                                                                           5:7))))
 
@@ -67,7 +67,7 @@ nacLL(cop, u=U) # log-likelihood at correct parameters
 n <- 250
 family <- "Gumbel"
 tau <- c(0.25, 0.5)
-th <- getAcop(family)@tauInv(tau)
+th <- getAcop(family)@iTau(tau)
 copTrue <- onacopulaL(family, list(th[1], 1, list(list(th[2], 2:3))))
 
 ## Sample and compute log-likelihood
@@ -92,13 +92,13 @@ stopifnot(compTr==1) # otherwise, sub (for plotting, see below) is wrong
 n <- 100
 cop. <- getAcop(family)
 tau <- c(0.25, 0.5)
-(thTr <- cop.@tauInv(tau))
+(thTr <- cop.@iTau(tau))
 cop <- onacopulaL(family, list(thTr[1], compTr,
                                list(list(thTr[2], scompTr)))) # copula
 U <- rnacopula(n, cop) # sample
 h <- 0.2 # delta{tau} for defining a range of theta's
-(th0 <- cop.@tauInv(c(tau[1]-h, tau[1]+h)))
-(th1 <- cop.@tauInv(c(tau[2]-h, tau[2]+h)))
+(th0 <- cop.@iTau(c(tau[1]-h, tau[1]+h)))
+(th1 <- cop.@iTau(c(tau[2]-h, tau[2]+h)))
 m <- 20 # number of grid points
 grid <- expand.grid(th0= seq(th0[1], th0[2], length.out=m),
                     th1= seq(th1[1], th1[2], length.out=m))

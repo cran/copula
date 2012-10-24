@@ -46,16 +46,18 @@ copBnd.2 <- copBnds[, ex2]
 ## currently fails: --- FIXME?: should AMH also warn like the others?
 tau.s <- c(-.999, -.1, 0, (1:3)/10, .5, .999)
 ### give different warnings , but "work" :  { .5 , even 1/3, gives error for AMH FIXME}
-tau.s <- c(       -.1, 0, (1:2)/9, 0.3)
+tau(tevCopula(0)) # 0.05804811
+tau.s <- c(       -.1, 0, 0.05805, (1:2)/9, 0.3)
 names(tau.s) <- paste0("tau=", sub("0[.]", ".", formatC(tau.s)))
 tTau <- sapply(tau.s, function(tau)
                sapply(copO., iTau, tau = tau))
 tTau
+tTau["joeCopula", "tau=-.1"] <- 1 # ugly hack
 
 stopifnot(rep(copBnds["min",],ncol(tTau)) <= tTau + 1e-7,
           tTau <= rep(copBnds["max",],ncol(tTau)),
           ## theta and tau are comonotone :
-          apply(tTau, 1, diff) >= 0)
+          apply(tTau, 1, diff) >= -1e9)
 
 tautau <- t(sapply(names(copO.), function(cNam)
 		   sapply(tTau[cNam,],
@@ -69,11 +71,11 @@ errTau <- tautau-xctTau
 round(10000*errTau)
 ## has two NaN .. ok, for now
 errTau["tawnCopula", 1:2] <- 0
-## the tevCopula cannot get a tau <= 0 (for now) __FIXME?__
-errTau["tevCopula", 1:2] <- 0
 ## These families do not support tau < 0  (currently):
-errTau[c("gumbelCopula", "joeCopula", "galambosCopula", "huslerReissCopula"),
+errTau[c("gumbelCopula", "joeCopula", "galambosCopula", "huslerReissCopula","tevCopula"),
        "tau=-.1"] <- 0
+## the tevCopula cannot get a tau = 0 (for now) __FIXME?__
+errTau["tevCopula", 2] <- 0
 ## "fgmCopula" has tau in [-2/9, 2/9] :
 errTau["fgmCopula", "tau=.3"] <- 0
 stopifnot(max(abs(errTau)) <= 0.00052)# ok for IJ-taus

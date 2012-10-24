@@ -26,7 +26,7 @@ p.dDiag <-
 {
     stopifnot(length(d) == 1, d == as.integer(d), d >= 2, n >= 10)
     cop <- getAcop(family)
-    th. <- cop@tauInv(tau)
+    th. <- cop@iTau(tau)
     u <- seq(0,1, length = n)
     mainTit <-
         paste("Diagonal densities of ", family, "\n d = ",d,
@@ -122,7 +122,7 @@ str(u <- sort(c(tt, seq(1/512, 1-1/512, length= 257), 1 - tt)))
 
 ## set of  theta's :
 (taus <- c(10^(-4:-2), (1:5)/10, (12:19)/20, 1 - 10^(-2:-5)))
-thetas <- copFrank@tauInv(taus)
+thetas <- copFrank@iTau(taus)
 ## and now "round"
 taus <- copFrank@tau(thetas <- signif(thetas, 2))
 noquote(cbind(theta = thetas, tau = formatC(taus, digits = 3, width= -6)))

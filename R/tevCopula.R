@@ -159,7 +159,7 @@ iTauTevCopula <- function(copula, tau) {
   .tevTau$trFuns$backwardTransf(theta, ss)
 }
 
-tevTauDer <- function(alpha) {
+tevdTau <- function(alpha) {
   ss <- .tevTau$ss
   forwardTransf <- .tevTau$trFuns$forwardTransf
   forwardDer <- .tevTau$trFuns$forwardDer
@@ -171,7 +171,7 @@ tevTauDer <- function(alpha) {
 
 dTauTevCopula <- function(copula) {
   alpha <- copula@parameters[1]
-  tevTauDer(alpha)
+  tevdTau(alpha)
 }
 
 ## rho
@@ -200,7 +200,7 @@ iRhoTevCopula <- function(copula, rho) {
   .tevRho$trFuns$backwardTransf(theta, ss)
 }
 
-tevRhoDer <- function(alpha) {
+tevdRho <- function(alpha) {
   ss <- .tevRho$ss
   forwardTransf <- .tevRho$trFuns$forwardTransf
   forwardDer <- .tevRho$trFuns$forwardDer
@@ -212,7 +212,7 @@ tevRhoDer <- function(alpha) {
 
 dRhoTevCopula <- function(copula) {
   alpha <- copula@parameters[1]
-  tevRhoDer(alpha)
+  tevdRho(alpha)
 }
 
 ################################################################################

@@ -1,6 +1,6 @@
 \name{evTestC}
 \alias{evTestC}
-\title{Large-sample test of multivariate extreme-value dependence}
+\title{Large-sample Test of Multivariate Extreme-Value Dependence}
 \description{
   Test of multivariate extreme-value dependence based on the empirical
   copula and max-stability. The test statistics are defined in the second

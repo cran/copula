@@ -1,5 +1,5 @@
 \name{copFamilies}
-\title{Specific Archimedean copula families ("acopula" objects)}
+\title{Specific Archimedean Copula Families ("acopula" Objects)}
 \concept{Copula Family}
 \alias{acopula-families}
 \alias{copAMH}
@@ -130,7 +130,7 @@ curve(copJoe@tau(x), xlim = c(1, 10), ylim = c(0,1), col = 4)
 op <- par(mfrow= c(length(famNms), 2),
           mar = .6+ c(2,1.4,1,1), mgp = c(1.1, 0.4, 0))
 for(nm in famNms) { Cf <- get(nm)
-   thet <- Cf@tauInv(0.3)
+   thet <- Cf@iTau(0.3)
    curve(Cf@psi(x, theta = thet), 0, 5,
          xlab = expression(x), ylab="", ylim=0:1, col = 2,
          main = substitute(list(NAM ~~~ psi(x, theta == TH), tau == 0.3),

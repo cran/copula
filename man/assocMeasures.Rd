@@ -99,7 +99,7 @@
 \alias{iRho,plackettCopula-method}
 \alias{iRho,fgmCopula-method}
 \alias{iRho,nacopula-method}
-\title{Dependence measures for copulas}
+\title{Dependence Measures for Copulas}
 \description{
   These functions compute Kendall's tau, Spearman's rho, and the tail
   dependence index for bivariate copulas. Calibration is the inverse
@@ -144,7 +144,7 @@ iRho (copula, rho, \dots)
   The \code{\linkS4class{acopula}} class objects have slots,
   \code{tau}, \code{lambdaL}, and \code{lambdaU} providing functions for
   \code{tau()}, and the two tail indices \code{tailIndex()},
-  and slot \code{tauInv} for \code{iTau()}, see the
+  and slot \code{iTau} for \code{iTau()}, see the
   examples, and \code{\link{copGumbel}}, etc.
 }
 \examples{
@@ -161,7 +161,7 @@ stopifnot(all.equal(tau(gumbel.cop), copGumbel@tau(3)),
                     check.attr=FALSE),
 
           all.equal(iTau (gumbel.cop, 0.681),
-                    copGumbel@tauInv(0.681))
+                    copGumbel@iTau(0.681))
 )
 
 ## let us compute the sample versions

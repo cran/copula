@@ -174,7 +174,7 @@ iTauGalambosCopula <- function(copula, tau) {
   ifelse(tau <= 0.0001, 0, .galambosTau$trFuns$backwardTransf(theta, ss))
 }
 
-galambosTauDer <- function(alpha) {
+galambosdTau <- function(alpha) {
   ss <- .galambosTau$ss
   forwardTransf <- .galambosTau$trFuns$forwardTransf
   forwardDer <- .galambosTau$trFuns$forwardDer
@@ -186,7 +186,7 @@ galambosTauDer <- function(alpha) {
 
 dTauGalambosCopula <- function(copula) {
   alpha <- copula@parameters[1]
-  galambosTauDer(alpha)
+  galambosdTau(alpha)
 }
 
 galambosRhoFun <- function(alpha) {
@@ -213,7 +213,7 @@ iRhoGalambosCopula <- function(copula, rho) {
   ifelse(rho <= 0, 0, .galambosRho$trFuns$backwardTransf(theta, ss))
 }
 
-galambosRhoDer <- function(alpha) {
+galambosdRho <- function(alpha) {
   ss <- .galambosRho$ss
   forwardTransf <- .galambosRho$trFuns$forwardTransf
   forwardDer <- .galambosRho$trFuns$forwardDer
@@ -225,7 +225,7 @@ galambosRhoDer <- function(alpha) {
 
 dRhoGalambosCopula <- function(copula) {
   alpha <- copula@parameters[1]
-  galambosRhoDer(alpha)
+  galambosdRho(alpha)
 }
 
 ################################################################################

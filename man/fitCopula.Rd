@@ -1,7 +1,7 @@
 \name{fitCopula}
 \alias{fitCopula}
 \alias{loglikCopula}
-\title{Estimation of the parameters in copula models}
+\title{Estimation of the Parameters in Copula Models}
 \description{
   Fits a copula model to multivariate data belonging to the unit
   hypercube. The data can be pseudo-observations constructed from
@@ -9,7 +9,7 @@
   from the copula.
 }
 \usage{
-loglikCopula(param, x, copula, hideWarnings = FALSE)
+loglikCopula(param, x, copula)
 fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
           start = NULL, lower = NULL, upper = NULL,
           optim.method = "BFGS", optim.control = list(maxit=1000),
@@ -17,8 +17,12 @@ fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
 }
 \arguments{
   \item{param}{ a vector of parameter values. }
-  \item{x, data}{numeric data matrix.}
-  \item{copula}{ a \code{"\linkS4class{copula}"} object. }
+  \item{x, data}{\eqn{n\times d}{n x d}-matrix of (pseudo-)observations
+    (for \code{"mpl"} and \code{"ml"} with values necessarily in
+    \eqn{[0,1]}) from the copula to be estimated, where \eqn{n} denotes
+    the sample size and \eqn{d} the dimension.  Consider applying the function
+    \code{\link{pobs}} first in order to obtain values in \eqn{[0,1]}.} 
+  \item{copula}{a \code{"\linkS4class{copula}"} object.}
   \item{hideWarnings}{logical; if TRUE, warning messages from
     evaluating the loglikelihood at invalid parameter values are suppressed.}
   \item{method}{a \code{\link{character}} string specifying the method;
@@ -39,18 +43,34 @@ fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
   \item{estimate.variance}{logical; if TRUE, the asymptotic variance is
     estimated.}
 }
+\details{
+  There are methods for \code{\link{vcov}()}, \code{\link{coef}()},
+  \code{\link{logLik}()}, and \code{\link{nobs}()}.
+}
 \value{
   \code{loglikCopula()} returns the log likelihood evaluated at the
   given value of \code{"param"}.
 
   The return value of \code{fitCopula()} is an object of class
-  \code{"\linkS4class{fitCopula}"} containing slots (among others):
+  \code{"\linkS4class{fitCopula}"} (see there), containing slots (among
+  others!)
   \item{estimate}{ the estimate of the parameters. }
-  \item{var.est}{ estimate of the asymptotic variance estimate of the
-    parameter estimator. }
-  \item{method}{ the estimation method. }
-  \item{loglik}{ loglikelihood at \code{"estimate"}. }
-  \item{copula}{ the fitted copula. }
+  \item{var.est}{large-sample (i.e., asymptotic) variance estimate of the parameter
+    estimator (filled with \code{NA} if \code{estimate.variance = FALSE}).}
+  %%
+  \item{copula}{ the fitted copula.}
+
+%% FIXME -- formatting -- because of the special way \item is handled
+%% inside \value{...}, there is no empty line put here, even though we
+%% want it.
+
+  The \code{\link{summary}()} method for \code{"fitCopula"} objects
+  returns a S3 \dQuote{class} \code{"summary.fitCopula"}, simply a list
+  with components \code{method}, \code{loglik}, and \code{convergence},
+  all three from corresponding slots of the
+  \code{"\linkS4class{fitCopula}"} objects, and 
+  \item{coefficients}{a matrix of estimated coefficients, standard
+  errors, t values and p-values.}
 }
 \references{
   Genest, C. (1987). Frank's family of bivariate distributions.
@@ -130,6 +150,7 @@ u <- pobs(x)               ## pseudo-observations
 ## inverting Kendall's tau
 fit.tau <- fitCopula(gumbel.cop, u, method="itau")
 fit.tau
+coef(fit.tau)# named vector
 ## inverting Spearman's rho
 fit.rho <- fitCopula(gumbel.cop, u, method="irho")
 fit.rho
@@ -138,7 +159,7 @@ fit.mpl <- fitCopula(gumbel.cop, u, method="mpl")
 fit.mpl
 ## maximum likelihood
 fit.ml <- fitCopula(gumbel.cop, x, method="ml")
-fit.ml
+fit.ml # print()ing works via summary() ...
 
 ## a multiparameter example
 normal.cop <- normalCopula(c(0.6,0.36, 0.6),dim=3,dispstr="un")
@@ -153,6 +174,10 @@ fit.rho
 ## maximum pseudo-likelihood
 fit.mpl <- fitCopula(normal.cop, u, method="mpl")
 fit.mpl
+coef(fit.mpl) # named vector
+str(sf.mpl <- summary(fit.mpl))
+coef(sf.mpl)# the matrix, with SE, t-value, ...
+
 ## maximum likelihood
 fit.ml <- fitCopula(normal.cop, x, method="ml")
 fit.ml
@@ -198,21 +223,26 @@ u <- pobs(x)          ## pseudo-observations
                      start= c(0,0,0,10)))
 ## without start:
 (tc.mp. <- fitCopula(tCop, u, method="mpl", estimate.variance=FALSE))
-stopifnot(all.equal(tc.ml , tc.ml., tol= .005),
-          all.equal(tc.mpl, tc.mp., tol= .005))
+all.eqCop <- function(x,y, ...) {
+   x@fitting.stats$counts <- y@fitting.stats$counts <- NULL
+   all.equal(x,y, ...) }
+stopifnot(all.eqCop(tc.ml , tc.ml., tol= .005),
+          all.eqCop(tc.mpl, tc.mp., tol= .005))
 
 ## same t copula but with df.fixed=TRUE	 (--> use same data!)
 (tC.f <- tCopula(c(0.2,0.4,0.6), dim=3, dispstr="un", df=5, df.fixed=TRUE))
 ## maximum likelihood;  start := rho[1:3]		    -------------
 (tcF.ml  <- fitCopula(tC.f, x, method="ml", start=c(0,0,0)))
 (tcF.ml. <- fitCopula(tC.f, x, method="ml"))# without 'start'
-stopifnot(all.equal(tcF.ml,tcF.ml., tol= 4e-4))
+stopifnot(all.eqCop(tcF.ml,tcF.ml., tol= 4e-4))
+## the (estimated, asymptotic) var-cov matrix:
+vcov(tcF.ml)
 
 ## maximum pseudo-likelihood; the asymptotic variance cannot be estimated
 (tcF.mpl <- fitCopula(tC.f, u, method="mpl", estimate.variance=FALSE,
                       start=c(0,0,0)))
 (tcF.mp. <- fitCopula(tC.f, u, method="mpl", estimate.variance=FALSE))
-stopifnot(all.equal(tcF.mpl,tcF.mp., tol= 1e-5))
+stopifnot(all.eqCop(tcF.mpl,tcF.mp., tol= 1e-5))
 }
 \keyword{ models }
 \keyword{ multivariate }

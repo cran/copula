@@ -1,6 +1,6 @@
 \name{dnacopula}
 \alias{dnacopula}
-\title{Copula density evaluation}
+\title{Density Evaluation for (Nested) Archimedean Copulas}
 \description{
   Evaluates the density of an Archimedean copula.
 }
@@ -52,7 +52,7 @@ dnacopula(x, u, log=FALSE, \dots)
 \examples{
 ## Construct a twenty-dimensional Gumbel copula with parameter chosen
 ## such that Kendall's tau of the bivariate margins is 0.25.
-theta <- copJoe@tauInv(.25)
+theta <- copJoe@iTau(.25)
 C20 <- onacopula("J", C(theta, 1:20))
 
 ## Evaluate the copula density at the point u = (0.5,...,0.5)

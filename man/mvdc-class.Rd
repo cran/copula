@@ -1,12 +1,14 @@
 \name{mvdc-class}
+\title{Class "mvdc"}
 \docType{class}
 \alias{mvdc-class}
-\title{Class "mvdc"}
-\description{ Class representing multivariate distributions constructed
+\alias{dim,mvdc-method}
+\alias{show,mvdc-method}
+\description{Class representing multivariate distributions constructed
   using Sklar's theorem. }
 \section{Objects from the Class}{
-  Objects can be created by calls of the form \code{new("mvdc", ...)}
-  or by function \code{mvdc}.
+  Objects are typically created by \code{\link{mvdc}()}, or
+  can be created by calls of the form \code{new("mvdc", ...)}.
 }
 \section{Slots}{
   \describe{
@@ -25,10 +27,15 @@
 \section{Methods}{
   \describe{
     \item{contour}{\code{signature(x = "mvdc")}: ... }
+    \item{dim}{\code{signature(x = "mvdc")}: the dimension of the
+      distribution; this is the same as \code{dim(x@copula)}.}
     \item{persp}{\code{signature(x = "mvdc")}: ... }
+    \item{show}{\code{signature(object = "mvdc")}: quite compactly display
+      the content of the "mvdc" \code{object}.}
   }
 }
 \seealso{
-  \code{\link{mvdc}}.
+  \code{\link{mvdc}}, % ./Mvdc.Rd
+  also for examples.
 }
 \keyword{classes}

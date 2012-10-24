@@ -356,7 +356,7 @@ rnacModel <- function(family, d, pr.comp, rtau0 = function() rbeta(1, 2,4),
     RR <- if(do.round <- digits.theta < 17)
 	function(t) round(t, digits.theta) else identity
     stopifnot(is.numeric(t0 <- rtau0()), length(t0) == 1, abs(t0) <= 1)
-    theta0 <- RR(COP@tauInv(t0))
+    theta0 <- RR(COP@iTau(t0))
     bound.th <- as.numeric(COP@paraInterval)[2]
     rtheta <- { ## function to generate child copula thetas
 	if(bound.th == Inf) function(min.th) # in [min.th, Inf)

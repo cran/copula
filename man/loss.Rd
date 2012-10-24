@@ -2,7 +2,7 @@
 \Rdversion{1.1}
 \alias{loss}
 \docType{data}
-\title{LOSS and ALAE insurance data}
+\title{LOSS and ALAE Insurance Data}
 \description{
 Indemnity payment and allocated loss adjustment expense from an insurance
 company.

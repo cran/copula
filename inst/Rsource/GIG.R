@@ -164,17 +164,17 @@ tau.GIG <- function(theta, upper=c(200,200), quiet=TRUE, ...){
 ## inverse of Kendall's tau for all parameters fixed except the one given as NA
 ## note: initial interval has to be specified [e.g., c(1e-30,200)] since there
 ##       are no adequate bounds known
-tauInv.GIG <- function(tau, theta, upper=c(200,200), quiet=TRUE, iargs=list(), ...){
+iTau.GIG <- function(tau, theta, upper=c(200,200), quiet=TRUE, iargs=list(), ...){
     stopifnot(length(i <- which(is.na(theta))) == 1)
     tau.min <- tau.GIG(upper, upper=upper, quiet=quiet)
-    if(tau<=tau.min) stop(paste("tauInv.GIG: tau must be greater than tau.min=",tau.min,sep=""))
+    if(tau<=tau.min) stop(paste("iTau.GIG: tau must be greater than tau.min=",tau.min,sep=""))
     if(i==1){ # wanted: nu; given: theta
         interval <- c(0, upper[1])
     }else{ # wanted: theta; given: nu
-        if(theta[1]<0) stop("tauInv.GIG: only implemented for nu >= 0")
+        if(theta[1]<0) stop("iTau.GIG: only implemented for nu >= 0")
         tau.max <- 1/(1+2*theta[1])
         ## make sure we are in the range of attainable Kendall's tau
-        if(tau>=tau.max) stop(paste("tauInv.GIG: the supremum of attainable taus is",
+        if(tau>=tau.max) stop(paste("iTau.GIG: the supremum of attainable taus is",
            round(tau.max,8))) # this assumes tau to be falling in theta (numerical experiments show this behavior)
         interval <- c(1e-100, upper[2])
     }

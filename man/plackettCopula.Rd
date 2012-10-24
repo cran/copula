@@ -1,6 +1,6 @@
 \name{plackettCopula}
 \alias{plackettCopula}
-\title{Construction of a Plackett copula class object}
+\title{Construction of a Plackett Copula Class Object}
 \description{
   Constructs a Plackett copula class object with its corresponding
   parameter.

@@ -4,7 +4,7 @@
 \alias{outer_nacopula-class}
 \alias{nacopula-class}
 \alias{dim,nacopula-method}
-\title{Class "nacopula" of nested Archimedean copulas}
+\title{Class "nacopula" of Nested Archimedean Copulas}
 \description{
   Class of nested Archimedean Copulas, \code{"nacopula"},
   and its \emph{specification} \code{"outer_nacopula"}
@@ -56,8 +56,8 @@ showClass("outer_nacopula")
 ## Construct a three-dimensional nested Frank copula with parameters
 ## chosen such that the Kendall's tau of the respective bivariate margins
 ## are 0.2 and 0.5.
-theta0 <- copFrank@tauInv(.2)
-theta1 <- copFrank@tauInv(.5)
+theta0 <- copFrank@iTau(.2)
+theta1 <- copFrank@iTau(.5)
 C3 <- onacopula("F", C(theta0, 1, C(theta1, c(2,3))))
 
 C3 # displaying it, using show(C3); see help(printNacopula)

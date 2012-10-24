@@ -1,23 +1,33 @@
 \name{fitMvdc}
 \alias{fitMvdc}
+\alias{coef.fittedMV}
+\alias{logLik.fittedMV}
+\alias{vcov.fittedMV}
 \alias{loglikMvdc}
-\title{Estimation of multivariate models defined via copulas}
+\title{Estimation of Multivariate Models Defined via Copulas}
 \description{
-  Fits a copula-based multivariate distribution to multivariate data.
+  Fitting copula-based multivariate distributions
+  (\code{"\linkS4class{mvdc}"}) to multivariate data,
+  estimating both the marginal and the copula parameters.
 }
 \usage{
-loglikMvdc(param, x, mvdc, suppressMessages=FALSE)
-fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS")
+loglikMvdc(param, x, mvdc, hideWarnings = FALSE)
+fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
+        estimate.variance = TRUE, hideWarnings = TRUE)
+
+\S3method{coef}{fittedMV}(object, ...)
+\S3method{logLik}{fittedMV}(object, ...)
+\S3method{vcov}{fittedMV}(object, ...)
 }
 \arguments{
   \item{param}{a vector of parameter values.  When specifying parameters for
-    \code{mvdc} objects the parameters should be ordered with the
+    \code{mvdc} objects, the parameters must be ordered with the
     marginals first and the copula parameters last.  When the
     \code{mvdc} object has \code{marginsIdentical = TRUE}, only the
-    parameters of one marginal should be specified.}
+    parameters of one marginal must be specified.}
   \item{x}{a data matrix.}
   \item{mvdc}{a \code{"\linkS4class{mvdc}"} object. }
-  \item{suppressMessages}{ logical, if TRUE, warnings messages from
+  \item{hideWarnings}{logical; if TRUE, warning messages from
     evaluating loglikelihood at invalid parameter values are
     suppressed.}
   \item{data}{a data matrix.}
@@ -25,21 +35,41 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS")
     \code{"param"} above for ordering of this vector.}
   \item{optim.control}{a list of controls to be passed to \code{\link{optim}}.}
   \item{method}{the method for \code{\link{optim}}.}
+  \item{estimate.variance}{logical; if TRUE, the asymptotic variance is
+    estimated.}
+
+  \item{object}{an \R object of class \code{"\linkS4class{fitMvdc}"}.}
+  \item{\dots}{potentially further arguments to methods.}
 }
 \value{
   The return value \code{loglikMvdc()} is the log likelihood evaluated
   for the given value of \code{param}.
 
   The return value of \code{fitMvdc()} is an object of class
-  \code{"\linkS4class{fitMvdc}"}, % -> ./fitCopula-class.Rd
-  containing slots:
-  \item{estimate}{ the estimate of the parameters. }
-  \item{var.est}{ large-sample variance estimate of the parameter estimator. }
-  \item{loglik}{ loglikelihood at \code{estimate}. }
- %% FIXME !! \item{copula}{ the fitted copula. }
+  \code{"\linkS4class{fitMvdc}"} % -> ./fitCopula-class.Rd
+  (see there), containing slots (among others!):
+  \item{estimate}{the estimate of the parameters.}
+  \item{var.est}{large-sample (i.e., asymptotic) variance estimate of the parameter
+    estimator (filled with \code{NA} if \code{estimate.variance = FALSE}).}
+  %%
+  \item{mvdc}{the fitted multivariate distribution, see
+    \code{\linkS4class{mvdc}}.}
+
+%% FIXME -- formatting -- because of the special way \item is handled
+%% inside \value{...}, there is no empty line put here, even though we
+%% want it.
+
+  The \code{\link{summary}()} method for \code{"fitMvdc"} objects
+  returns a S3 \dQuote{class} \code{"summary.fitMvdc"}, simply a list
+  with components \code{method}, \code{loglik}, and \code{convergence},
+  all three from corresponding slots of the
+  \code{"\linkS4class{fitMvdc}"} objects, and
+  \item{coefficients}{a matrix of estimated coefficients, standard
+  errors, t values and p-values.}
+
 }
 \note{
-  User-defined marginal distribution can be used as long as the
+  User-defined marginal distributions can be used as long as the
   \code{"{dpq}"} functions are defined.  See \code{demo(QARClayton)}
   prepared by Roger Koenker \email{rkoenker@uiuc.edu}.
 
@@ -51,21 +81,51 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS")
   because invalid parameter values are tried during the optimization
   process (see \code{\link{optim}}).
 }
-\seealso{\code{\link{Copula}}, \code{\link{fitCopula}},
-  \code{\link{gofCopula}}.}
+\seealso{
+  \code{\link{mvdc}} and \code{\linkS4class{mvdc}};
+  further, \code{\link{Copula}}, \code{\link{fitCopula}},
+  \code{\link{gofCopula}}.
+
+  For fitting univariate marginals, \code{\link[MASS]{fitdistr}()}.
+}
 \examples{
 gumbel.cop <- gumbelCopula(3, dim=2)
-myMvd <- mvdc(gumbel.cop, c("exp","exp"),
+gMvd2 <- mvdc(gumbel.cop, c("exp","exp"),
               list(list(rate=2), list(rate=4)))
-x <- rMvdc(10000, myMvd)
-## the example is typically not run with CRAN checking:
-(doExtras <- interactive() || nzchar(Sys.getenv("R_copula_check_extra")) ||
- identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING"))))
-if(doExtras) {
+x <- rMvdc(10000, gMvd2)
+## with identical margins:
+gMvd.I <- mvdc(gumbel.cop, "exp", param = list(rate=3), marginsIdentical=TRUE)
+if(copula:::doExtras()) { ## these are is typically not run with CRAN checking:
  ## Takes about  25 sec. [2012-07]:
- fit <- fitMvdc(x, myMvd, start = c(1,1,2))
- print(fit)
-}
+ fit2 <- fitMvdc(x, gMvd2, start = c(1,1, 2))
+ print(fit2)
+ ## The (estimated, asymptotic) var-cov matrix:
+ print( vcov(fit2) )
+
+ fitI <- fitMvdc(x, gMvd.I, start = c(3, 2),
+                 optim.control=list(trace= TRUE, REPORT= 2))
+ print(coef(summary(fitI)))
+ print(fitI)
+
+  ## a wrong starting value  can already be *the* problem:
+  try(f2 <- fitMvdc(x, gMvd.I, start = c(1, 1),
+		     optim.control=list(trace= TRUE, REPORT= 2)))
+  ##--> Error in optim( ... : non-finite finite-difference value [2]
+
+  ##==> "Solution" :  Using a more robust (but slower) optim() method:
+  fI.2 <- fitMvdc(x, gMvd.I, start = c(1, 1), method = "Nelder",
+		  optim.control=list(trace= TRUE))
+
+ ## The (estimated, asymptotic) var-cov matrix:
+ print( vcov(fit2) )
+ str(sfI <- summary(fitI))
+ stopifnot(is.matrix(coef(sfI)))
+\dontshow{
+ stopifnot(all.equal(coef(sfI),
+                     coef(summary(fI.2)), tol = 1e-4),
+           all.equal(coef(fitI), coef(fI.2), tol = 1e-4))
+}%dont...
+}% if(..doExtras())
 
 ## Roger Koenker prepared a demo illustrating MLE for a Clayton AR(1)
 ## copula model with identical, user-defined Student marginals

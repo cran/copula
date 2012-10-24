@@ -59,12 +59,12 @@
 \alias{dAdu,tawnCopula-method}
 \alias{dAdu,tevCopula-method}
 % main
-\title{Generator functions for Archimedean and extreme-value copulas}
+\title{Generator Functions for Archimedean and Extreme-Value Copulas}
 \description{
   Methods to evaluate the generator function, the inverse generator
   function, and derivatives of the inverse of the generator function for
   Archimedean copulas. For extreme-value copulas, the \dQuote{Pickands
-    dependence function} plays the role of a generator function. 
+    dependence function} plays the role of a generator function.
 }
 \usage{
 psi(copula, s)

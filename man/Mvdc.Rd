@@ -7,13 +7,14 @@
 \alias{dmvdc}%deprecated
 \alias{pmvdc}%deprecated
 \alias{rmvdc}%deprecated
-\title{Multivariate distributions constructed from copulas}
+\title{Multivariate Distributions Constructed from Copulas}
 \description{
   Density, distribution function, and random generator for a
   multivariate distribution via copula.
 }
 \usage{
-mvdc(copula, margins, paramMargins, marginsIdentical = FALSE)
+mvdc(copula, margins, paramMargins, marginsIdentical = FALSE,
+     check = TRUE, fixupNames = TRUE)
 dMvdc(x, mvdc, log=FALSE)
 pMvdc(x, mvdc)
 rMvdc(n, mvdc)
@@ -22,11 +23,15 @@ rMvdc(n, mvdc)
   \item{copula}{ an object of \code{"\linkS4class{copula}"}. }
   \item{margins}{ a character vector specifying all the marginal
     distributions. See details below.}
-  \item{paramMargins}{ a list whose each component is a list of named
+  \item{paramMargins}{a \code{\link{list}} whose each component is a list of named
     components, giving the parameter values of the marginal
-    distributions. See details below.}
+    distributions.  See details below.}
   \item{marginsIdentical}{ logical variable restricting the marginal
     distributions to be identical. }
+  \item{check}{logical indicating to apply quick checks about existence of
+    \code{margins} \dQuote{p*} and \dQuote{d*} functions.}
+  \item{fixupNames}{logical indicating if the parameters of the margins
+    should get automatic names (from \code{\link{formals}(p<mar_i>)}).}
   \item{mvdc}{a \code{"\linkS4class{mvdc}"} object. }
   \item{x}{ a vector of the copula dimension or a matrix with number of
     columns being the copula dimension, giving the coordinates of the
@@ -74,7 +79,12 @@ rMvdc(n, mvdc)
 ## together via a normal copula
 mv.NE <- mvdc(normalCopula(0.75), c("norm", "exp"),
               list(list(mean = 0, sd =2), list(rate = 2)))
+dim(mv.NE)
+mv.NE  # using its print() / show() method
+
+# Generate (bivariate) random numbers from that, and visualize
 x.samp <- rMvdc(100, mv.NE)
+plot(x.samp)
 dMvdc(x.samp, mv.NE)
 pMvdc(x.samp, mv.NE)
 persp  (mv.NE, dMvdc, xlim = c(-4, 4), ylim=c(0, 1), main = "dMvdc(mv.NE)")

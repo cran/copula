@@ -1,7 +1,7 @@
 \name{retstable}
 \alias{retstable}
 \alias{retstableR}
-\title{Sampling exponentially tilted stable distributions}
+\title{Sampling Exponentially Tilted Stable Distributions}
 \description{
   Generating random variates of an exponentially tilted stable
   distribution of the form

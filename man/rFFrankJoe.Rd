@@ -1,7 +1,7 @@
 \name{rFFrankJoe}
 \alias{rFFrank}
 \alias{rFJoe}
-\title{Sampling distribution F for Frank and Joe}
+\title{Sampling Distribution F for Frank and Joe}
 \description{
   Generate a vector of variates \eqn{V \sim F}{V ~ F} from the distribution
   function \eqn{F} with Laplace-Stieltjes transform

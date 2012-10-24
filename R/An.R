@@ -29,7 +29,7 @@ An.biv <- function(x, w, estimator = c("CFG", "Pickands"), corrected = TRUE) {
     m <- length(w)
 
     ## make pseudo-observations
-    u <- apply(x,2,rank)/(n+1)
+    u <- pobs(x)
     mlu <- -log(u)
 
     switch(match.arg(estimator),
@@ -81,7 +81,7 @@ An <- function(x, w) {
     m <- nrow(w)
 
     .C(mult_A,
-       as.double(apply(x,2,rank)/(n+1)),
+       as.double(pobs(x)),
        as.integer(n),
        as.integer(d),
        as.double(w),
