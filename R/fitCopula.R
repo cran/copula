@@ -75,6 +75,8 @@ fitCopula <- function(copula, data, method = c("mpl","ml","itau","irho"),
     warning("coercing 'data' to a matrix.")
     data <- as.matrix(data); stopifnot(is.matrix(data))
   }
+  if(!missing(hideWarnings))
+      warning("'hideWarnings' is deprecated and has no effect anymore")
   switch(match.arg(method),
 	 "ml" =
 	 fitCopula.ml(copula, data, start=start, lower=lower, upper=upper,
@@ -209,8 +211,10 @@ chkParamBounds <- function(copula) {
   !(any(is.na(param) | param > upper | param < lower))
 }
 
-loglikCopula <- function(param, x, copula) {
+loglikCopula <- function(param, x, copula, hideWarnings) {
   stopifnot(length(copula@parameters) == length(param))
+  if(!missing(hideWarnings))
+      warning("'hideWarnings' is deprecated and has no effect anymore")
   copula@parameters <- param
   if (chkParamBounds(copula))
       sum(dCopula(x, copula, log=TRUE)) else -Inf # was NaN
@@ -223,6 +227,8 @@ fitCopula.ml <- function(copula, u, start=NULL,
                          hideWarnings=FALSE,
                          bound.eps = .Machine$double.eps ^ 0.5)
 {
+  if(hideWarnings)
+      warning("'hideWarnings' is deprecated and has no effect anymore")
   if(any(u < 0) || any(u > 1))
      stop("'u' must be in [0,1] -- probably rather use pobs(.)")
   stopifnot((d <- ncol(u)) >= 2)
@@ -255,7 +261,7 @@ fitCopula.ml <- function(copula, u, start=NULL,
   if(fit$convergence > 0)
       warning("possible convergence problem: optim() gave code=",
               fit$convergence)
-  
+
   varNA <- matrix(NA_real_, q, q)
   var.est <- if(estimate.variance && fit$convergence == 0) {
     fit.last <- optim(copula@parameters, loglikCopula,

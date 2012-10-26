@@ -334,7 +334,7 @@ assign("Eul.full.n", 0	, envir = .nacopEnv)
 
 ##' From   http://en.wikipedia.org/wiki/Polylogarithm
 ##' 1. For integer values of the polylogarithm order, the following
-##'   explicit expressions are obtained by repeated application of z·∂/∂z
+##'   explicit expressions are obtained by repeated application of  z * d/dz
 ##'   to Li_1(z):
 ##' ---
 ##'     {Li}_{1}(z) = -\ln(1-z)

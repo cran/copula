@@ -9,7 +9,7 @@
   from the copula.
 }
 \usage{
-loglikCopula(param, x, copula)
+loglikCopula(param, x, copula, hideWarnings)
 fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
           start = NULL, lower = NULL, upper = NULL,
           optim.method = "BFGS", optim.control = list(maxit=1000),
@@ -21,10 +21,10 @@ fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
     (for \code{"mpl"} and \code{"ml"} with values necessarily in
     \eqn{[0,1]}) from the copula to be estimated, where \eqn{n} denotes
     the sample size and \eqn{d} the dimension.  Consider applying the function
-    \code{\link{pobs}} first in order to obtain values in \eqn{[0,1]}.} 
+    \code{\link{pobs}} first in order to obtain values in \eqn{[0,1]}.}
   \item{copula}{a \code{"\linkS4class{copula}"} object.}
-  \item{hideWarnings}{logical; if TRUE, warning messages from
-    evaluating the loglikelihood at invalid parameter values are suppressed.}
+  \item{hideWarnings}{deprecated and no longer used; if desired, warning messages
+    must be suppressed by \code{\link{suppressWarnings}(.)} now.}
   \item{method}{a \code{\link{character}} string specifying the method;
     can be either
     \code{"ml"} (maximum likelihood),
@@ -68,7 +68,7 @@ fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
   returns a S3 \dQuote{class} \code{"summary.fitCopula"}, simply a list
   with components \code{method}, \code{loglik}, and \code{convergence},
   all three from corresponding slots of the
-  \code{"\linkS4class{fitCopula}"} objects, and 
+  \code{"\linkS4class{fitCopula}"} objects, and
   \item{coefficients}{a matrix of estimated coefficients, standard
   errors, t values and p-values.}
 }

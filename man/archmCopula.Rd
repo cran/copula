@@ -38,8 +38,8 @@ joeCopula(param = NA_real_, dim = 2)
   \code{joeCopula}.
 
 %% FIXME
-  Only the bivariate Ali-Mikhail-Haq copula family (\code{"amhCopula"})
-  is available.
+  For the Ali-Mikhail-Haq copula family (\code{"amhCopula"}), only the
+  bivariate case is available.
 
   The maximum dimension for which the expression of the pdf is available
   is 6 for the Clayton, Gumbel and Frank families. The cdf expression is
@@ -52,7 +52,7 @@ joeCopula(param = NA_real_, dim = 2)
 
   It is now recommended to work with the
   \code{\linkS4class{acopula}}-classed Archimedean copulas, as there is
-  now restriction on the dimension there.
+  no restriction on the dimension there.
 }
 \references{
   R.B. Nelsen (2006), \emph{An introduction to Copulas}, Springer, New York.
