@@ -121,7 +121,7 @@ importMethodsFrom("stats4", coef,confint, logLik, AIC, BIC, plot, profile)
 
 importFrom("gsl", debye_1, debye_2)
 
-importFrom("ADGofTest", ad.test)
+importFrom("ADGofTest", ad.test)# really would want the ad.test.statistic() but that's hidden
 
 importFrom("stabledist", dstable)
 

@@ -1,3 +1,17 @@
+2012-11-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.999-4
+
+	* tests/rstable-ex.R: add a check for U[0,1] margins for rCopula(.)
+	of "all" our copulas.
+
+	* R/stable.R (rPosStableS): is a *scaled* version of rstable(), and
+	it was always *correct* to omit the factor cos(.)^(1/alpha) factor,
+	but the docu (which implicitly said gamma=1) was wrong.
+
+	* R/gumbelCopula.R (rgumbelCopula): needs rstable1(..., gamma = GG)
+	where GG is *not* == 1.
+
 2012-08-13  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.999-1, r 835, released to CRAN.

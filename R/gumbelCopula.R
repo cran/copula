@@ -101,11 +101,10 @@ rgumbelCopula <- function(n, copula) {
   if (alpha - 1 < .Machine$double.eps ^(1/3) )
       return(rCopula(n, indepCopula(dim=dim)))
   b <- 1/alpha
-  ## stable (alpha = b, beta = 1), 0 < b < 1
-  fr <- if(identical(getOption("copula:rstable1"), "rPosStable"))
-      ## wrong, back compatible:
-      rPosStable(n, b) else rstable1(n, alpha = b, beta = 1, pm=1)
-  fr <- matrix(fr, nrow=n, ncol=dim)
+  ## stable (alpha = b, beta = 1, gamma = **), 0 < b < 1
+  fr <- if(identical(getOption("copula:rstable1"), "rPosStable")) ## back compatible
+      rPosStableS(n, b) else rstable1(n, alpha = b, beta = 1,
+				      gamma = cos(b * pi/2)^alpha, pm=1)
   ## now gumbel copula
   val <- matrix(runif(dim * n), nrow = n)
   psi(copula, - log(val) / fr)

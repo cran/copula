@@ -509,3 +509,5 @@ setMethod("rho", "acopula", function(copula)
          "\nconsider contacting  maintainer(\"copula\")")
 )
 
+setMethod("iTau", "acopula", function(copula, tau, ...) copula@iTau(tau))
+

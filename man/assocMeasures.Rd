@@ -82,6 +82,7 @@
 \alias{iTau,tawnCopula-method}
 \alias{iTau,tevCopula-method}
 \alias{iTau,nacopula-method}
+\alias{iTau,acopula-method}
 
 \alias{iRho-methods}
 \alias{iRho,ANY-method}
@@ -114,7 +115,10 @@ iTau (copula, tau, \dots)
 iRho (copula, rho, \dots)
 }
 \arguments{
-  \item{copula}{an \R object of class \code{"\linkS4class{copula}"}.}
+  \item{copula}{an \R object of class \code{"\linkS4class{copula}"}
+    (or also \code{"\linkS4class{acopula}"} or
+    \code{"\linkS4class{nacopula}"}; note however that some methods
+    may not be available for some copula families).}
   \item{tau}{ a numerical value of Kendall's tau in [-1, 1]. }
   \item{rho}{ a numerical value of Spearman's rho in [-1, 1]. }
   \item{\dots}{ currently nothing. }
@@ -145,7 +149,7 @@ iRho (copula, rho, \dots)
   \code{tau}, \code{lambdaL}, and \code{lambdaU} providing functions for
   \code{tau()}, and the two tail indices \code{tailIndex()},
   and slot \code{iTau} for \code{iTau()}, see the
-  examples, and \code{\link{copGumbel}}, etc.
+  examples and \code{\link{copGumbel}}, etc.
 }
 \examples{
 gumbel.cop <- gumbelCopula(3)
@@ -169,7 +173,7 @@ x <- rCopula(200, gumbel.cop)
 cor(x, method = "kendall")
 cor(x, method = "spearman")
 ## compare with the true parameter value 3
-iTau (gumbel.cop, cor(x, method="kendall")[1,2])
+iTau(gumbel.cop, cor(x, method="kendall" )[1,2])
 iRho(gumbel.cop, cor(x, method="spearman")[1,2])
 }
 \keyword{multivariate}

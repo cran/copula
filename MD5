@@ -1,7 +1,7 @@
-08d279faff93df356e51b947e79a3a0f *ChangeLog
-5a539668f8fada4c97a1f79f6103fa6f *DESCRIPTION
+b2b727bf24d7f00faefe80b34135da73 *ChangeLog
+f14ab98ee851aeaa9f71d46bbd36a58e *DESCRIPTION
 35020cdf0f6debb5ef3cdc5bb48f8ef7 *LICENCE
-b4081fa13ad3c6020bc07d9ff7964c18 *NAMESPACE
+020b28dd2b82772979ecc3f466ed3739 *NAMESPACE
 fac79668b148998899e16d8e2ed91826 *R/AllClass.R
 762f7664f21f0e571622f11eb897956c *R/An.R
 970feca40c249879f9df817ea2c03d03 *R/Auxiliaries.R
@@ -32,11 +32,11 @@ fb73ea8330cda357dfebcc3e7df6dec6 *R/evTests.R
 1a618d44b96da605396c0bbf8355c5b5 *R/galambosCopula.R
 559e8dfe2fd609bbdfbdf879fadaeffb *R/galambosExpr-math.R
 19396bc15b6af98037751d6fcec4ed4f *R/galambosExpr.R
-50f6d2e3ceb6721d58acb046051ce689 *R/gof.R
+8cf6319fdd5dc3ef79076cd9323cce95 *R/gof.R
 b314e39d84211bd29a6d66008c63f30b *R/gofEVTests.R
 373119539d3e5df13372903c49505b67 *R/gofTests.R
 c39137c4f21d86a9accc462df6f18391 *R/graphics.R
-520c8c51b64cb969816197870a0e44d6 *R/gumbelCopula.R
+dbf81dae5d02af71e434354db16108ea *R/gumbelCopula.R
 c9231ddb1019a33567e1a894cec87c03 *R/gumbelExpr.R
 82ca219efcbee64047842f73cf88c0bf *R/huslerReissCopula.R
 54be2befb0752586a9bb23578f9a78ab *R/huslerReissExpr.R
@@ -45,7 +45,7 @@ c9231ddb1019a33567e1a894cec87c03 *R/gumbelExpr.R
 6f95882681f97b33beddf099559f1d42 *R/joeCopula.R
 372ebfb2ad0f551a0dfd4e7847a8a6e6 *R/logseries.R
 7f7091aedbf93a8620fb3b031ba62299 *R/mvdc.R
-ba787beee7a11141667b19044c56120b *R/nacopula.R
+4caa29a1e5f4a6470d83ae5aa8ff9a8c *R/nacopula.R
 16f21576343bab9fc86d988c510aaf4a *R/normalCopula.R
 01e0faafd60a79452d2c135046eca2d5 *R/plackettCopula.R
 2833850d9434e4310882c8c7b8f1ecc5 *R/plackettExpr.R
@@ -53,7 +53,7 @@ de95136e5c0eec09918d2f18424532b7 *R/rstable1.R
 f6db3e48916b61204973341cc228fb38 *R/safeUroot.R
 b232b4fb74bad87ab23491651e594ee9 *R/schlatherCopula.R
 c5c8af1a68384ca3f5ae139477388e71 *R/special-func.R
-dff65c4777b8d935c82234f225acaddb *R/stable.R
+b105086c47c93720453db0202a955110 *R/stable.R
 77884f934769cf5312ccb7195fe24e62 *R/sysdata.rda
 0385ebc13da350408ee0bc9272a2c1a1 *R/tCopula.R
 42a7317a255c5a0fa9bf6c902091bf85 *R/tawnCopula.R
@@ -84,7 +84,7 @@ d49ac92697563505cf353bca4454ede8 *demo/polyGJ.R
 8fa5fc9fd5c0408316ca10bab5b845c3 *demo/timings.R
 9a96556e30c31e10925b858b860ef3fa *do-now.org
 e7af99b4b21a9bc1f6f5fe4cf7c3b71c *feature-table.org
-958217649b629a74ae41028d44377a14 *inst/CITATION
+86cb277cd0b38835346cd6f63be8e117 *inst/CITATION
 f37cb10ffb81b89e048b80446ba44c15 *inst/Rsource/AC-Liouville.R
 1f1eb126a7d6247d726ea63954d42dd4 *inst/Rsource/GIG.R
 78464a99e386d1355b489e8f37e99766 *inst/Rsource/dnac.R
@@ -97,11 +97,11 @@ f37cb10ffb81b89e048b80446ba44c15 *inst/Rsource/AC-Liouville.R
 5784c3118f844eb2871b6481dfdcf2b2 *inst/Rsource/utils.R
 058a5b5218bbe0b489544e0d63807d93 *inst/Rsource/wrapper.R
 069064d76b45930e434cfcb4fc9f7192 *inst/doc/Frank-Rmpfr.Rnw
-db05ca771b09ded761dfa30423394c5d *inst/doc/Frank-Rmpfr.pdf
+1fe6d9fbcc7c13c043602be706111702 *inst/doc/Frank-Rmpfr.pdf
 8da916534f7542d43b12a864add66ef2 *inst/doc/mlogL_mpfr_i686.rda
 be4c32729bb5b5707a14ab77aa89657c *inst/doc/mlogL_mpfr_x86_64.rda
 89f6f26a99a1c414d91f9e4e60ba2ac5 *inst/doc/nacopula-pkg.Rnw
-e7eaaf778262451b27e9baebd5b095fe *inst/doc/nacopula-pkg.pdf
+b9770fa3f67e13270f7ad3631224813a *inst/doc/nacopula-pkg.pdf
 ab1a749331c4a6c957a283f7248bc34e *inst/doc/nacopula.bib
 e53b44576aeeaf4060333fd3b9eb7eac *inst/docs/mathnb/README
 d5d9a616711271a879cc868f78e90ec0 *inst/docs/mathnb/amhCopula.cdf.expr
@@ -179,7 +179,7 @@ e35bf9f8e93889cca9870b1ceb122416 *man/Stirling.Rd
 372a140245cd64494b2bb33afce976ea *man/allComp.Rd
 8185abc82fffe0bbbcb3f3af6dccbe2b *man/archmCopula-class.Rd
 a21bc7a7eb1f05e0aa42c13c2e09e15d *man/archmCopula.Rd
-cd4e7ea9392c90fe764ab4212f544f5f *man/assocMeasures.Rd
+0fd3cb698c0b737757a5bd18de8fb20c *man/assocMeasures.Rd
 0f5d20d7ca76e26b90050f9e4fd678cd *man/beta.Blomqvist.Rd
 7d71835eb98a564262deb93b487711e4 *man/cCopula.Rd
 cc16291d4d94a30a5e176d0eee4870bc *man/contour-methods.Rd
@@ -210,7 +210,7 @@ c0646ce014083666db61529524b36e4c *man/fitCopula.Rd
 34a896e89cb649c35a3a611ffcd61b6e *man/fitMvdc.Rd
 07b579ec6ef508de8aae2de8762557b2 *man/generator-methods.Rd
 fa8adffec01df5a950d1b1ea4e6a6e6b *man/getAcop.Rd
-1b87fc6dc04dd547d870ceeb00061410 *man/gnacopula.Rd
+2a2f5552671489452bf2e2a6f5130df3 *man/gnacopula.Rd
 f12d3383f402f5e8e60ab5b0893c4004 *man/gofCopula.Rd
 fdbf7d501fe2973a8107a7095e06707c *man/gofEVCopula.Rd
 3147ad52c383f278d470f23e31f31a33 *man/gtrafo.Rd
@@ -300,6 +300,6 @@ fa44f53363a14c2b8e44e5883855a49e *tests/moments.R
 ab54111be3290b2debc45f2df2e9026f *tests/nac-experi.R
 fc72f4ee3ffc471fe4172885918c6d9b *tests/pdf.R
 915ecf2278acdf2d5d74d0ddf23b40c1 *tests/retstable-ex.R
-51725418e9725b1a0ac8821a82d967c5 *tests/rstable-ex.R
+6a3f9d6001afe230506d450f7c2c4233 *tests/rstable-ex.R
 72295c5bba54c911edc064409e23b689 *tests/tail-pcopula.R
 cd41c44f6c13ece916a3d902e02c46f0 *tests/tail-pcopula.Rout.save

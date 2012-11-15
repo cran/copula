@@ -15,9 +15,16 @@ gnacopula(u, cop, n.bootstrap,
 gofTstat(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
 }
 \arguments{
-  \item{u}{\eqn{n\times d}{n x d}-matrix of (pseudo-/copula-)observations (each
-    value in \eqn{[0,1]}) from the copula to be tested.  Consider applying the
-    function \code{\link{pobs}} first in order to obtain \code{u}.}
+  \item{u}{\eqn{n\times d}{n x d}-matrix, each value in \eqn{[0,1]}.
+    For
+    \describe{
+      \item{\code{gnacopula()}:}{(pseudo-/copula-)observations from the
+      copula to be tested.  Consider applying the function
+      \code{\link{pobs}} first in order to obtain \code{u}.}
+      \item{\code{gofTstat()}:}{supposedly independent uniform observations in the
+      hypercube, i.e., \eqn{U_i \sim U[0,1]^d}{U_i ~ U[0,1]^d}, i.i.d.,
+      for \eqn{i \in \{1,\dots,n\}}{i in 1..n}.}
+    }}
   \item{cop}{\eqn{H_0}-\code{"\linkS4class{outer_nacopula}"} with specified
     parameters to be tested for (currently only Archimedean copulas are
     provided).}

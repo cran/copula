@@ -13,25 +13,24 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
-##' Generate  stable(alpha, beta=1, pm=1)  random numbers
+##' Generate  stable(alpha, beta=1, gamma = cos(alpha * pi/2)^(1/alpha), pm=1)
+##'                                 ----------------------------------- "Scaled"
+##' Note that the gamma factor leads to a *simplified* formula because it cancels mostly.
+##' Only called for rCopula(<Gumbel>, .)
 ##'
-##' only called for rCopula(<Gumbel>, .)
-##' @title Generate  stable(alpha, beta=1, pm=1)  random numbers
+##' @title Generate 'Scaled' stable(alpha, beta=1, gamma = **, pm=1)  random numbers
 ##' @param n integer
-##' @param alpha number in (0, 1)l
+##' @param alpha number in (0, 1)
 ##' @references: Chambers, Mallows, and Stuck 1976, JASA, p.341, formula (2.2)
-##' @note: The formula below is (somewhat, for small alpha) *WRONG*:
-##'   it lacks a multiplicative factor   cos(pi*alpha/2)^-(1/alpha)
-##'   as can be proven by direct comparison with  rstable1() in ./rstable1.R
 ##' @return numeric vector of length n
-rPosStable <- function(n, alpha) {
+rPosStableS <- function(n, alpha) {
   if (alpha >= 1) stop("alpha must be < 1")
   theta <- runif(n, 0, pi)
   W <- rexp(n)
   ## a <- sin((1 - alpha) *theta) * sin(alpha * theta)^(alpha / (1 - alpha)) /
   ##     sin(theta)^(1/(1 - alpha))
-  a <- sin((1 - alpha) *theta) *
-      (sin(alpha * theta)^alpha / sin(theta)) ^ (1/(1 - alpha))
-  (a / W)^((1 - alpha)/alpha)
+  I_a <- 1 - alpha
+  a <- sin(I_a *theta) * (sin(alpha * theta)^alpha / sin(theta)) ^ (1/I_a)
+  (a / W)^(I_a/alpha)
 }
 

@@ -22,7 +22,7 @@
 ##' distributed vectors of random variates
 ##'
 ##' @title Test statistics for U[0,1]^d
-##' @param u matrix of (pseudo-/copula-)observations
+##' @param u matrix of supposedly  U[0,1]^d observations
 ##' @param method various test statistics. Available are:
 ##'        "AnChisq": Anderson-Darling test statistic after map to a chi-square
 ##'                   distribution using the standard normal quantile function
@@ -101,8 +101,8 @@ gofTstat <- function(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
 ##'        C(u_j | u_1,...,u_{j-1})
 ##' @param m (deprecated)
 ##' @param n.MC parameter n.MC for evaluating the derivatives via Monte Carlo
-##' @param log 
-##' @param trafo.only 
+##' @param log
+##' @param trafo.only
 ##' @return matrix U (n x k) of supposedly U[0,1]^k realizations, where k=1+length(j.ind);
 ##'         where U[,1] == u[,1] in any case.
 ##' @author Marius Hofert and Martin Maechler
@@ -140,7 +140,7 @@ rtrafo <- function(u, cop, j.ind = 2:d, m, n.MC=0, log=FALSE, trafo.only=log)
 	if(n.MC==0){
 	    ## Note: C(u_j | u_1,...,u_{j-1}) = \psi^{(j-1)}(\sum_{k=1}^j \psi^{-1}(u_k)) / \psi^{(j-1)}(\sum_{k=1}^{j-1} \psi^{-1}(u_k))
 	    C.j <- function(j) { # computes C(u_j | u_1,...,u_{j-1}) with the
-					# same idea but faster than for cacopula()  
+					# same idea but faster than for cacopula()
 		logD <- cop@absdPsi(as.vector(psiI.[,c(j,j-1)]), theta=th,
 				    degree=j-1, n.MC=0, log=TRUE)
 		res <- logD[1:n]-logD[(n+1):(2*n)]
@@ -251,7 +251,7 @@ rtrafo <- function(u, cop, j.ind = 2:d, m, n.MC=0, log=FALSE, trafo.only=log)
     } else {
 	stop("not yet implemented for copula class ", class(cop))
     }
-    
+
     if(trafo.only)
 	vapply(j.ind, C.j, numeric(n))
     else {
