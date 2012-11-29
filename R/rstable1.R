@@ -26,7 +26,7 @@ sinc <- function(x) .Call(sinc_c, x)
 ##' @author Martin Maechler
 ## NB: Is exported, documented, demo'ed, but not used by our own code!
 A..Z <- function(x, alpha, I.alpha = 1 - alpha)
-    .Call(copula:::A__c, x, alpha, I.alpha)
+    .Call(A__c, x, alpha, I.alpha)
 
 ##' @title tan(pi*x), exact for integer x
 ##' @param x numeric vector

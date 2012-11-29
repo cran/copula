@@ -109,9 +109,9 @@ rCopula(n, copula, \dots)
 \arguments{
   \item{copula}{an \R object of class \code{"\linkS4class{Copula}"},
     (i.e., \code{"\linkS4class{copula}"} or  \code{"\linkS4class{nacopula}"}).}
-  \item{u}{a vector of the copula dimension or a matrix with number of
-    columns being equal to the copula dimension, giving the coordinates of the
-    points where the density or distribution function needs to be evaluated.
+  \item{u}{a vector of the copula dimension \eqn{d} or a matrix with \eqn{d}
+    columns, giving the points where the density or distribution
+    function needs to be evaluated.
   }
   \item{log}{logical indicating if the \eqn{\log(f(\cdot))}{log(f(.))}
     should be returned instead of \eqn{f(\cdot)}{f(.)}.}
@@ -132,7 +132,7 @@ rCopula(n, copula, \dots)
   from the same package.
 
   The random number generator for an Archimedean copula uses the
-  conditional approach for the bivariate case and the Marshal-Olkin (1988)
+  conditional approach for the bivariate case and the Marshall-Olkin (1988)
   approach for dimension greater than 2.
 }
 \value{
@@ -169,10 +169,10 @@ rCopula(n, copula, \dots)
 \examples{
 norm.cop <- normalCopula(0.5)
 norm.cop
-x <- rCopula(100, norm.cop)
-plot(x)
-dCopula(x, norm.cop)
-pCopula(x, norm.cop)
+u <- rCopula(100, norm.cop)
+plot(u)
+dCopula(u, norm.cop)
+pCopula(u, norm.cop)
 persp(norm.cop, dCopula)
 contour(norm.cop, pCopula)
 

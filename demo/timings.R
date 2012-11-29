@@ -16,7 +16,7 @@
 
 require(copula)
 
-### Results of using timing() ##################################################
+### Results of using nacFrail.time() ############################################
 
 set.seed(1) # set seed
 
@@ -26,7 +26,7 @@ taus <- c(0.05,(1:9)/10,0.95)
 
 ### AMH
 
-timing(n,"AMH",taus[taus < 0.33])
+nacFrail.time(n,"AMH",taus[taus < 0.33])
 
 ##             inner tau
 ## outer tau   0.10 0.20 0.30
@@ -42,7 +42,7 @@ timing(n,"AMH",taus[taus < 0.33])
 
 ### Clayton
 
-timing(n,"Clayton",taus)
+nacFrail.time(n,"Clayton",taus)
 
 ##             inner tau
 ## outer tau   0.10 0.20 0.30 0.40 0.50 0.60 0.70 0.80 0.90 0.95
@@ -65,7 +65,7 @@ timing(n,"Clayton",taus)
 
 ### Frank
 
-timing(n,"Frank",taus)
+nacFrail.time(n,"Frank",taus)
 
 ##             inner tau
 ## outer tau   0.10 0.20 0.30 0.40 0.50 0.60 0.70 0.80 0.90 0.95
@@ -88,7 +88,7 @@ timing(n,"Frank",taus)
 
 ### Gumbel
 
-timing(n,"Gumbel",taus)
+nacFrail.time(n,"Gumbel",taus)
 
 ##             inner tau
 ## outer tau   0.10 0.20 0.30 0.40 0.50 0.60 0.70 0.80 0.90 0.95
@@ -111,7 +111,7 @@ timing(n,"Gumbel",taus)
 
 ### Joe
 
-timing(n,"Joe",taus)
+nacFrail.time(n,"Joe",taus)
 
 ##             inner tau
 ## outer tau   0.10 0.20 0.30 0.40 0.50 0.60 0.70 0.80 0.90 0.95

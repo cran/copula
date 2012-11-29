@@ -61,6 +61,7 @@ psiGumbel <- function(copula, s) {
 }
 
 gumbelCopula <- function(param = NA_real_, dim = 2L) {
+  stopifnot(length(param) == 1)
   ## get expressions of cdf and pdf
   cdfExpr <- function(n) {
     expr <- "( - log(u1))^alpha"
@@ -84,7 +85,7 @@ gumbelCopula <- function(param = NA_real_, dim = 2L) {
   pdf <- if (dim <= 6) pdfExpr(cdf, dim) else NULL
   new("gumbelCopula",
              dimension = dim,
-             parameters = param[1],
+             parameters = param,
              exprdist = c(cdf = cdf, pdf = pdf),
              param.names = "param",
              param.lowbnd = 1,

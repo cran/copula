@@ -25,6 +25,7 @@ psiAmh <- function(copula, s) {
 }
 
 amhCopula <- function(param = NA_real_, dim = 2L) {
+  stopifnot(length(param) == 1)
   ## get expressions of cdf and pdf
   cdfExpr <- function(n) {
     expr <-   "log((1 - alpha * (1 - u1)) / u1)"
@@ -54,7 +55,7 @@ amhCopula <- function(param = NA_real_, dim = 2L) {
 
   new("amhCopula",
       dimension = dim,
-      parameters = param[1],
+      parameters = param,
       exprdist = c(cdf = cdf, pdf = pdf),
       param.names = "param",
       param.lowbnd = -1,# 0 for tau >= 0

@@ -20,8 +20,8 @@
  * @author Ivan Kojadinovic
  * @date   December 2007
  *
- * @brief  Utility functions for multivariate and "vectorial" 
- *         tests of independence and serial independence based 
+ * @brief  Utility functions for multivariate and "vectorial"
+ *         tests of independence and serial independence based
  *         on the empirical copula process
  *
  */
@@ -138,34 +138,32 @@ double M_A_n(int n, int p, double *J, double *K, double *L, int A)
 }
 
 
-/** 
+/**
  * Text progress bar for k=1 to N loops
- * 
+ *
  * @param k current iteration
  * @param N maximum number of iteration
  * @param w width of the bar in characters
- * @author Ivan Kojadinovic 
+ * @author Ivan Kojadinovic
  */
 inline void progressBar(int k, int N, int w) {
   if (k < N-1) {
-    /// length of one of "block" 
-    int b = N/w;
-    
-    /// update only r times
+    // length of one of "block"
+    int b = (N <= w) ? 1 : N/w;
+
+    // update only r times
     if ( k % b != 0 ) return;
-    
+
     /// percentage done
     double percent = k / (double)N;
     int c = percent * w;
-  
+
     /// display the bar
     Rprintf("  |");
-    for (int i=0; i<c; i++)
-      Rprintf("=");
-    for (int i=c; i<w; i++)
-      Rprintf(" ");
-    Rprintf("| %3d%%", (int)(percent*100) );
-    Rprintf("\r");
+    for (int i=0; i<c; i++) Rprintf("=");
+    for (int i=c; i<w; i++) Rprintf(" ");
+    Rprintf("| %3d%%\r", (int)(percent*100) );
+    // \r = carriage return  withOUT newline
   }
   else { /// display the bar for last k (= N-1)
     Rprintf("  |");

@@ -22,6 +22,7 @@ indepTest(x, d, alpha=0.05)
 dependogram(test, pvalues = FALSE, print = FALSE)
 }
 \arguments{
+%% indepTestSim():
   \item{n}{ sample size when simulating the distribution of the test
     statistics under independence.}
   \item{p}{ dimension of the data when simulating the distribution of the test
@@ -33,15 +34,16 @@ dependogram(test, pvalues = FALSE, print = FALSE)
   \item{print.every}{ is deprecated in favor of \code{verbose}.}
   \item{verbose}{a logical specifying if progress
     should be displayed via \code{\link[utils]{txtProgressBar}}.}
+%% indepTest():
   \item{x}{ data frame or data matrix containing realizations (one per
     line) of the random vector whose independence is to be tested.}
   \item{d}{ object of class \code{"indepTestDist"} as returned by
-    the function \code{"indepTestSim"}. It can be regarded as the
+    the function \code{indepTestSim()}.  It can be regarded as the
     empirical distribution of the test statistics under independence.}
   \item{alpha}{ significance level used in the computation of the
     critical values for the test statistics.}
-  \item{test}{ object of class \code{"indepTest"} as return by the
-    function \code{indepTest}.}
+%% dependogram():
+  \item{test}{object of class \code{"indepTest"} as returned by \code{indepTest()}.}
   \item{pvalues}{ logical indicating whether the dependogram should be
     drew from test statistics or the corresponding p-values.}
   \item{print}{ logical indicating whether details should be printed.}
@@ -49,7 +51,7 @@ dependogram(test, pvalues = FALSE, print = FALSE)
 \details{See the references below for more details, especially the third
   one.
 }
-\value{The function \code{"indepTestSim"} returns an object of class
+\value{The function \code{indepTestSim()} returns an object of class
   \code{"indepTestDist"} whose attributes are: \code{sample.size},
   \code{data.dimension}, \code{max.card.subsets},
   \code{number.repetitons}, \code{subsets} (list of the subsets for
@@ -59,9 +61,9 @@ dependogram(test, pvalues = FALSE, print = FALSE)
   the values of the test statistics for each subset and each repetition)
   and \code{dist.global.statistic.independence} (a vector a length
   \code{N} containing the values of the global Cramér-von Mises test
-  statistic for each repetition - see last reference p. 175).
+  statistic for each repetition - see last reference p.~175).
 
-  The function \code{"indepTest"} returns an object of class
+  The function \code{indepTest()} returns an object of class
   \code{"indepTest"} whose attributes are: \code{subsets},
   \code{statistics}, \code{critical.values}, \code{pvalues},
   \code{fisher.pvalue} (a p-value resulting from a combination \emph{à la}
@@ -72,28 +74,30 @@ dependogram(test, pvalues = FALSE, print = FALSE)
   (1 - \code{beta} is the significance level per statistic),
   \code{global.statistic} (value of the global Cramér-von Mises
   statistic derived directly from the independence empirical copula
-  process - see last reference p. 175) and
+  process - see last reference p.~175) and
   \code{global.statistic.pvalue} (corresponding p-value).
 }
 \references{
-  Deheuvels, P. (1979). La fonction de dépendance empirique et ses
-  propriétés: un test non paramétrique d'indépendance, \emph{Acad. Roy.
-    Belg. Bull. Cl. Sci.}, 5th Ser. \bold{65}, 274--292.
+  Deheuvels, P. (1979).
+  La fonction de dépendance empirique et ses
+  propriétés: un test non paramétrique d'indépendance,
+  \emph{Acad. Roy. Belg. Bull. Cl. Sci.}, 5th Ser. \bold{65}, 274--292.
 
-  Deheuvels, P. (1981), A non parametric test for independence,
+  Deheuvels, P. (1981)
+  A non parametric test for independence,
   \emph{Publ. Inst. Statist. Univ. Paris}. \bold{26}, 29--50.
 
-  Genest, C. and R\enc{é}{e}millard, B. (2004), Tests of independence and
-  randomness based on the empirical copula process. \emph{Test}
-  \bold{13}, 335--369.
+  Genest, C. and R\enc{é}{e}millard, B. (2004)
+  Tests of independence and randomness based on the empirical copula process.
+  \emph{Test} \bold{13}, 335--369.
 
-  Genest, C., Quessy, J.-F., and R\enc{é}{e}millard, B. (2006). Local
-  efficiency of a Cramer-von Mises test of independence,
+  Genest, C., Quessy, J.-F., and R\enc{é}{e}millard, B. (2006).
+  Local efficiency of a Cramer-von Mises test of independence,
   \emph{Journal of Multivariate Analysis} \bold{97}, 274--294.
 
-  Genest, C., Quessy, J.-F., and R\enc{é}{e}millard, B. (2007), Asymptotic
-  local efficiency of Cramér-von Mises tests for multivariate
-  independence. \emph{The Annals of Statistics} \bold{35}, 166--191.
+  Genest, C., Quessy, J.-F., and R\enc{é}{e}millard, B. (2007)
+  Asymptotic local efficiency of Cramér-von Mises tests for multivariate independence.
+  \emph{The Annals of Statistics} \bold{35}, 166--191.
 }
 \seealso{
   \code{\link{serialIndepTest}},
@@ -115,7 +119,7 @@ x[,5] <- x[,4]/2 + sqrt(3) * x[,5]/2
 ## {1,...,5} whose cardinality is between 2 and 5, we set p=m=5.
 ## This may take a while...
 
-if(copula:::doExtras()) { ##  run with CRAN checking:%--------------------------------------
+if(copula:::doExtras()) { ## not run, typically:%--------------------------------------
 print(system.time(
 d <- indepTestSim(100,5)
 ))

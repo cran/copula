@@ -80,6 +80,7 @@ export(indepTestSim, indepTest, multIndepTest,
 ## gof tests
 export(gofCopula, gofEVCopula)
 
+
 ## other nonparametric tests
 export(evTestC, evTestA, evTestK)
 export(exchEVTest, exchTest)
@@ -143,7 +144,7 @@ exportClasses("acopula",
 ## Generics, functions and acopula - family objects defined in this package
 export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        ,"getAcop"
-       ,"cacopula", "dnacopula", "pnacopula", "rnacopula" ,"rnchild"
+       ,"cacopula", "dnacopula", "pnacopula", "rnacopula", "rnchild"
        ## estimation
        ## ,"coeffG", "polyG", "polyJ", "signFF"
        ,"initOpt"
@@ -160,7 +161,7 @@ export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        ,"interval"
        ,"opower"
        ,"prob"
-       ,"timing"
+       ,"nacFrail.time"
        ## Should we provide these in a separate (very small) R package ?
        ,"sinc", "A..Z"
        ,"rstable1"

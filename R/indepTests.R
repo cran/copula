@@ -37,8 +37,9 @@ indepTestSim <- function(n, p, m=p, N=1000, verbose = TRUE, print.every = NULL)
         stop("p should be an integer greater than 2")
     if (!is.numeric(m) || (m <- as.integer(m)) < 2 || m > p)
         stop(paste("m should be an integer greater than 2 and smaller than",p))
-    if (!is.numeric(N) || as.integer(N) < 100)
-        stop("N should be an integer greater than 100")
+    if (!is.numeric(N) || (N != as.integer(N)) || N <= 10)
+	stop("N should be an integer greater than 10")
+    if(N < 100) warning("N should be at least 100")
     if (!is.null(print.every)) {
         warning("Argument 'print.every' is deprecated. Please use 'verbose' instead.")
         verbose <- print.every > 0
@@ -173,8 +174,9 @@ serialIndepTestSim <- function(n, lag.max, m=lag.max+1, N=1000, verbose = TRUE, 
       stop("wrong number of lags with respect to the sample size")
     if (!is.numeric(m) || (m <- as.integer(m)) < 2 || m > p)
         stop(paste("m should be an integer greater than 2 and smaller than",p))
-    if (!is.numeric(N) || (N <- as.integer(N)) < 100)
-        stop("N should be an integer greater than 100")
+    if (!is.numeric(N) || (N != as.integer(N)) || N <= 10)
+	stop("N should be an integer greater than 10")
+    if(N < 100) warning("N should be at least 100")
     if (!is.numeric(lag.max) || (p <- as.integer(lag.max) + 1) <= 1 || n-p+1 < 2)
       stop("wrong number of lags")
     if (!is.null(print.every)) {
@@ -314,8 +316,9 @@ multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05,
 
     if (!is.numeric(m) || (m <- as.integer(m)) < 2 || m > p)
         stop(paste("m should be an integer greater than 2 and smaller than",p))
-    if (!is.numeric(N) || (N <- as.integer(N)) < 100)
-        stop("N should be an integer greater than 100")
+    if (!is.numeric(N) || (N != as.integer(N)) || N <= 10)
+	stop("N should be an integer greater than 10")
+    if(N < 100) warning("N should be at least 100")
     if (!is.numeric(alpha) || alpha <= 0 || alpha >= 1)
         stop("the significance level alpha is not properly set")
     if (!is.null(print.every)) {
@@ -408,8 +411,9 @@ multSerialIndepTest <- function(x, lag.max, m=lag.max+1, N=1000, alpha=0.05,
       stop("wrong number of lags")
     if (!is.numeric(m) || ((m <- as.integer(m)) < 2) || m > p)
         stop(paste("m should be an integer greater than 2 and smaller than",p))
-    if (!is.numeric(N) || (N <- as.integer(N)) < 100)
-        stop("N should be an integer greater than 100")
+    if (!is.numeric(N) || (N != as.integer(N)) || N <= 10)
+	stop("N should be an integer greater than 10")
+    if(N < 100) warning("N should be at least 100")
     if (!is.numeric(alpha) || alpha <= 0 || alpha >= 1)
         stop("the significance level alpha is not properly set")
     if (!is.null(print.every)) {

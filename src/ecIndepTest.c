@@ -67,12 +67,11 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
 			       double *G0, int *subset, char **subset_char,
 			       double *fisher0, double *tippett0, int *verbose)
 {
-  int i, j, k, index, sb[1], count;
+  int i, j, k, index, sb[1];
   double *R = Calloc((*n) * (*p), double);
   double *J = Calloc((*n) * (*n) * (*p), double);
   double *K = Calloc((*n) * (*p), double);
   double *L = Calloc(*p, double);
-  double pvalue, r;
 
   /* number of subsets */
   *sb = (int)sum_binom(*p,*m);
@@ -99,7 +98,7 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
 	  /* permutation = random ranks in column j */
 	  for (i=*n-1;i>=0;i--)
 	    {
-	      r = R[j * (*n) + i];
+	      double r = R[j * (*n) + i];
 	      index = (int)((i + 1) *  unif_rand());
 	      R[j * (*n) + i] = R[j * (*n) + index];
 	      R[j * (*n) + index] = r;
@@ -107,12 +106,12 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
 	}
 
       /* compute arrays J, K, L */
-      J_u(*n, *p, R, J);
+      J_u    (*n, *p, R, J);
       K_array(*n, *p, J, K);
       L_array(*n, *p, K, L);
 
       /* for subsets i of cardinality greater than 1 and lower than m */
-      for (i=*p+1;i<*sb;i++)
+      for (i=*p+1; i<*sb; i++)
 	TA0[k + (*N) * (i - *p - 1)] =  M_A_n(*n, *p, J, K, L, subset[i]);
 
       /* global stat under independence*/
@@ -125,18 +124,18 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
   PutRNGstate();
 
   /* compute W à la Fisher and à la Tippett from TA0 */
-  for (k=0;k<*N;k++)
+  for (k=0; k<*N; k++)
     {
       fisher0[k] = 0.0;
       tippett0[k] = 1.0;
-      for (i=0;i<*sb-*p-1;i++)
+      for (i=0; i< *sb-*p-1; i++)
 	{
 	  /* p-value */
-	  count = 0;
-	  for (j=0;j<*N;j++)
+          int count = 0;
+	  for (j=0; j<*N; j++)
 	    if (TA0[j + (*N) * i] >= TA0[k + (*N) * i])
 	      count ++;
-	  pvalue = (double)(count + 0.5)/(*N + 1.0);
+	  double pvalue = (double)(count + 0.5)/(*N + 1.0);
 	  fisher0[k] -= 2*log(pvalue);
 	  tippett0[k] = fmin2(tippett0[k],pvalue);
 	}
@@ -195,14 +194,14 @@ void empirical_copula_test(double *R, int *n, int *p, int *m, double *TA0, doubl
 			   double *fisher, double *tippett, double *globpval,
 			   double *fisher0, double *tippett0)
 {
-  int i, k, count, sb = (int)sum_binom(*p,*m);
+  int k, count, sb = (int)sum_binom(*p,*m);
 
   double *J = Calloc((*n) * (*n) * (*p), double);
   double *K = Calloc((*n) * (*p), double);
   double *L = Calloc(*p, double);
 
   /* compute arrays J, K, L */
-  J_u(*n, *p, R, J);
+  J_u    (*n, *p, R, J);
   K_array(*n, *p, J, K);
   L_array(*n, *p, K, L);
 
@@ -211,13 +210,13 @@ void empirical_copula_test(double *R, int *n, int *p, int *m, double *TA0, doubl
   *tippett = 1.0;
 
   /* for subsets i of cardinality greater than 1 */
-  for (i=0;i<sb-*p-1;i++)
+  for (int i=0; i < sb-*p-1; i++)
     {
       TA[i] = M_A_n(*n, *p, J, K, L, subset[i]);
 
       /* p-value */
       count = 0;
-      for (k=0;k<*N;k++)
+      for (k=0; k<*N; k++)
 	if (TA0[k + (*N) * i] >= TA[i])
 	  count ++;
       pval[i] = (double)(count + 0.5)/(*N + 1.0);

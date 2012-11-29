@@ -94,10 +94,9 @@ iRhoCopula <- function(copula, rho, ...) {
 setMethod("iTau", signature("copula"), iTauCopula)
 setMethod("iRho", signature("copula"), iRhoCopula)
 
-cCopula <-  function(u, copula, log=FALSE, n.MC=0) {
+cCopula <-  function(u, copula, j.ind=ncol(u), n.MC=0, log=FALSE) {
     stopifnot(is(copula, "Copula"))
-    d <- ncol(u)
-    drop(rtrafo(u, cop=copula, j.ind = d, n.MC=n.MC, log=log, trafo.only=TRUE))
+    drop(rtrafo(u, cop=copula, j.ind=j.ind, n.MC=n.MC, log=log, trafo.only=TRUE))
 }##      ------ -> ./gof.R
 
 

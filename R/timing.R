@@ -28,31 +28,32 @@
 ##'         times for V0 and the other cells the run time for V01 corresponding
 ##'         to two given taus among "taus" based on the generated V0's
 ##' @author Marius Hofert
-timing <- function(n, family, taus, digits=3, verbose=FALSE)
+nacFrail.time <- function(n, family, taus, digits=3, verbose=FALSE)
 {
     ## setup
     f <- function(x) formatC(x, digits=digits, width = 8)
     mTime <- function(x) 1000 * system.time(x)[1] # measuring milliseconds
     l <- length(taus)
     f.taus <- format(taus, digits=digits)
-    res <- matrix(,nrow=l,ncol=l)
-    copFamily <- getAcop(family)
-    thetas <- copFamily@iTau(taus)
+    res <- matrix(,nrow=l,ncol=l,
+		  ## use taus as row and column headers:
+		  dimnames =
+		  list('outer tau' = f.taus,
+		       '   inner tau' = c(" ", f.taus[-1])))
+    cop <- getAcop(family)
+    thetas <- cop@iTau(taus)
 
     ## timing (based on user time)
     for(i in seq_along(thetas)) { # run over all theta0
         ## run times for V0 go into the first column:
-        res[i,1] <- mTime(V0 <- copFamily@V0(n,thetas[i]))
+        res[i,1] <- mTime(V0 <- cop@V0(n,thetas[i]))
         if(verbose) cat("V0:  tau_0 = ",f.taus[i],
                         "; time = ", f(res[i,1]), " ms\n",sep="")
         if(i < l) for(j in (i+1):l) {   # run over all theta1
-            res[i,j] <- mTime(V01 <- copFamily@V01(V0,thetas[i], thetas[j]))
+            res[i,j] <- mTime(V01 <- cop@V01(V0,thetas[i], thetas[j]))
             if(verbose) cat("  V01: tau_0 = ",f.taus[i],", tau_1 = ", f.taus[j],
                             "; time = ",f(res[i,j])," ms\n", sep="")
         }
     }
-    ## use taus as row and column headers:
-    dimnames(res) <- list('outer tau' = f.taus,
-                          '   inner tau' = c(" ", f.taus[-1]))
     res
 }

@@ -23,7 +23,7 @@ getSigma <- function(copula) {
     sigma[upper.tri(sigma)] <- rho[1]
   }
   else if (copula@dispstr == "ar1") {
-      ## FIXME
+      ## FIXME  outer()
     for (i in 1:dim)  for (j in 1:dim)  sigma[i,j] <- rho ^ abs(i - j)
   }
   else if (copula@dispstr == "un") {
@@ -31,7 +31,7 @@ getSigma <- function(copula) {
     sigma[upper.tri(sigma)] <- t(sigma)[upper.tri(sigma)]
   }
   else if (copula@dispstr == "toep") {
-      ## FIXME
+      ## FIXME outer()
     for (i in 1:dim) for (j in 1:dim)
       if (i != j) sigma[i,j] <- rho[abs(i - j)]
   }

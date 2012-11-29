@@ -9,8 +9,8 @@
 ** DONE no longer try() in loglikCopula()
    MM: "hideWarnings" seems "wrong by design", notably there.
 ** TODO try() in loglikMvdc()
-   MM+MH: may be differently *report* reports in loglikMvdc() [margins: *their* errors].
-
+MM+MH: may be differently *report* reports in loglikMvdc() [margins: *their* errors].
+** DONE timings() function name -- changed to nacFrail.time()
 * Short Term
 ** DONE persp(), contour() should work with pCopula / dCopula
 ** DONE getAcop(gumbelCopula()) should work
@@ -65,38 +65,33 @@ But people have asked for it.
 *** DONE IK: in all *.c files from former copula: use Doxygen
 instead of hand made function header documentation.
 
+** TODO need a "getTheta" analogously to "setTheta" which extracts the parameter (vector) from any copula object
+** TODO Write a function "checkTheta" or "thetaConstr" which proves for a given parameter (vector) and Copula object, if the parameters are all admissible.
 ** TODO Miscellaneous Functions (bugs etc)
 *** DONE (MH) rtrafo() {and probably htrafo()} --- "fail" (are *wrong*!) for n = 1
 *** DONE (MH) copFrank@psi(1/1e20, theta=200) == Inf instead of 1
-
 *** TODO see TODO in  R/tCopula.R :  ndim() utility function; test pos.def.
-*** TODO tCopula() / normalCopula() allow alternative specification of cor.matrix
-   at least for the "un" dispersion structure
+*** TODO tCopula() / normalCopula() allow alternative specification of cor.matrix at least for the "un" dispersion structure
 *** TODO opower() and GIG --> either produce acopula with parameter *vector*, or
 --- maybe in any case ---
 produce an object of class 'opacopula' ("outer power Archimedean copula")
 which is just 'acopula' with a new show method ("thetabase" at least!),
 possibly a new slot ...
 Longer term: want to *estimate* those correctly [MLE at least].
-*** TODO rtrafo() is now "available" for "t" and "normal"
-thanks to the Master thesis of Yongsheng Wang.  (--> ...../function-gof.R )
+*** TODO rtrafo() is now "available" for "t" and "normal" thanks to the Master thesis of Yongsheng Wang.  (--> ...../function-gof.R )
 **** DONE implement it,
 **** TODO write a better wrapper for  gnacopula()/gofCopula()
 **** TODO Extend  rtrafo() to other (d > 2)-copula families
-
 ** TODO New Wrapper functions or rather extending one or the other function names
 *** TODO distribution/density/ ... functions
 **** DONE dcopula(), pcopula(), rcopula()  (for "nacopula")
 **** DONE dCopula(x, cop), pCopula(x, cop), rCopula(n, cop)  {swapping args for "standard R" usage}
 **** DONE d*():  allow  log=TRUE and use that in loglikCopula()
-**** fitCopula() should encompass all methods of enacopula()
-
-*** TODO MMMH: Use new rCopula() in ggraph *instead* of wrappers
-
-
+**** TODO fitCopula() should encompass all methods of enacopula()
+*** DONE MMMH: Use new rCopula() in ggraph *instead* of wrappers
+** TODO MM: data(rdj) should have a "Date" in column 1, not a factor !
 
 * Mid Term
-
 ** DONE R/sysdata.rda:
 CLOSED: [2012-07-17 Tue 11:10]
 MM, MH: Please tell us more about this,

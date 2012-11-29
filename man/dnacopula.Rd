@@ -37,13 +37,14 @@ dnacopula(x, u, log=FALSE, \dots)
 }
 \author{Marius Hofert, Martin Maechler}
 \references{
-  Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011a),
-  Estimators for Archimedean copulas in high dimensions: A comparison,
+  Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2013).
+  Estimators for Archimedean copulas in high dimensions: A comparison.
   submitted.
 
-  Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011b),
-  Likelihood inference for Archimedean copulas,
-  submitted.
+  Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2012).
+  Likelihood inference for Archimedean copulas in high dimensions
+  under known margins. \emph{Journal of Multivariate Analysis}
+  \bold{110}, 133--150.
 }
 \seealso{
   For more details about the derivatives of an Archimedean generator,

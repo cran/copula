@@ -52,6 +52,15 @@ gofCopula <- function(copula, x, N = 1000,
         warning("Argument 'print.every' is deprecated. Please use 'verbose' instead.")
         verbose <- print.every > 0
     }
+    ## back-compatibility:
+    if(missing(estim.method) && !missing(method)) {
+        eMeth <- eval(formals()$estim.method)
+	if(!is.na(i <- pmatch(method, eMeth))) {
+	    warning("old (pre 0.999-*) argument 'method' is now called 'estim.method'")
+	    estim.method <- eMeth[i]
+	    method <- "Sn"
+	}
+    }
     method <- match.arg(method)
     estim.method <- match.arg(estim.method)
 
@@ -83,7 +92,7 @@ gofCopula <- function(copula, x, N = 1000,
 
 ##' @title Compute Sn (Cramer-von Mises) statistic; = (2) in Genest et al. (2009)
 ##' @param u (n x d) matrix of copula observations
-##' @param copula 
+##' @param copula
 ##' @return Sn
 ##' @author Martin Maechler
 SnCvM <- function(u, copula) {
@@ -119,7 +128,7 @@ gofPB <- function(copula, x, N, method, estim.method, verbose, optim.method, opt
     ## fit the copula and compute the test statistic
     fcop <- fitCopula(copula, u, method=estim.method, estimate.variance=FALSE,
                       optim.method=optim.method, optim.control=optim.control)@copula
-    
+
     T <- if(method == "Sn") {
         SnCvM(u, fcop)
     } else {

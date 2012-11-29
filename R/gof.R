@@ -96,7 +96,7 @@ gofTstat <- function(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
 ##'
 ##' @title Rosenblatt transformation for a (nested) Archimedean copula
 ##' @param u matrix of (pseudo-/copula-)observations
-##' @param cop an outer_nacopula
+##' @param cop object of class Copula
 ##' @param j.ind indices j >= 2 for which Rosenblatt's transform is computed, i.e.,
 ##'        C(u_j | u_1,...,u_{j-1})
 ##' @param m (deprecated)
@@ -106,9 +106,10 @@ gofTstat <- function(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
 ##' @return matrix U (n x k) of supposedly U[0,1]^k realizations, where k=1+length(j.ind);
 ##'         where U[,1] == u[,1] in any case.
 ##' @author Marius Hofert and Martin Maechler
-rtrafo <- function(u, cop, j.ind = 2:d, m, n.MC=0, log=FALSE, trafo.only=log)
+rtrafo <- function(u, cop, j.ind=2:d, m, n.MC=0, log=FALSE, trafo.only=log)
 {
     if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
+    stopifnot(is(cop, "Copula"))
     if(!missing(m)) {
 	warning("'m' is deprecated; rather specify 'j.ind = 2:m'")
 	stopifnot(m >= 2)

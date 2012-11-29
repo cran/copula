@@ -103,6 +103,17 @@ rtevx <- tstFit1cop(tevCopula(, df.fixed=TRUE),
 ## for df.fixed=FALSE, have 2 parameters ==> cannot use "fit1":
 ## ....
 ## .... TODO
+showProc.time()
+
+data(rdj)
+rdj <- rdj[,2:4]
+dim(u <- pobs(rdj))# 1262 3
+fc <- frankCopula(dim=3)
+ffc <- fitCopula(fc, u) ## (failed in 0.999-4 {param constraints})
+ffc
+summary(ffc)
+stopifnot(all.equal(unname(coef(ffc)),
+                    2.866564929, tol = 1e-5))
 
 showProc.time()
 

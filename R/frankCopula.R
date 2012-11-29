@@ -29,6 +29,7 @@ psiFrank <- function(copula, s) {
 ## }
 
 frankCopula <- function(param = NA_real_, dim = 2L) {
+  stopifnot(length(param) == 1)
   ## get expressions of cdf and pdf
   cdfExpr <- function(n) {
     expr <-   "- log( (exp(- alpha * u1) - 1) / (exp(- alpha) - 1) )"
@@ -48,17 +49,16 @@ frankCopula <- function(param = NA_real_, dim = 2L) {
     val
   }
 
-  if ((dim <- as.integer(dim)) > 2 && param[1] < 0)
+  if((dim <- as.integer(dim)) > 2 && !is.na(param) && param < 0)
     stop("param can be negative only for dim = 2")
   cdf <- cdfExpr(dim)
-  if (dim <= 6)  pdf <- pdfExpr(cdf, dim)
-  else pdf <- NULL
+  pdf <- if (dim <= 6) pdfExpr(cdf, dim) # else NULL
   new("frankCopula",
       dimension = dim,
-      parameters = param[1],
+      parameters = param,
       exprdist = c(cdf = cdf, pdf = pdf),
       param.names = "param",
-      param.lowbnd = -Inf,
+      param.lowbnd = if(dim == 2) -Inf else 0,
       param.upbnd = Inf,
       fullname = "Frank copula family; Archimedean copula")
 }

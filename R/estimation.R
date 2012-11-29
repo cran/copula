@@ -153,7 +153,7 @@ tau.checker <- function(x, family, warn=TRUE){
     eps <- 1e-8 ## "fixed" currently, see below
     tau.range <- switch(family,
                         ## limiting (attainable) taus that can be dealt with by
-                        ## copFamily@iTau() *and* that can be used to construct
+			## cop<family>@iTau() *and* that can be used to construct
                         ## a corresponding copula object; checked via:
                         ## eps <- 1e-8
                         ## th <- copAMH@iTau(c(0,1/3-eps)); onacopulaL("AMH",list(th[1], 1:5)); onacopulaL("AMH",list(th[2], 1:5))

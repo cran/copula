@@ -1,8 +1,8 @@
-\name{timing}
-\alias{timing}
-\title{Timing for Sampling Nested Archimedean Copulas}
+\name{nacFrail.time}
+\alias{nacFrail.time}
+\title{Timing for Sampling Frailties of Nested Archimedean Copulas}
 \usage{
-timing(n, family, taus, digits = 3, verbose = FALSE)
+nacFrail.time(n, family, taus, digits = 3, verbose = FALSE)
 }
 \description{
   This function provides measurements of user run times for the frailty
@@ -25,8 +25,9 @@ timing(n, family, taus, digits = 3, verbose = FALSE)
     fulfilling the sufficient nesting condition; see \code{paraConstr}
     in \code{\linkS4class{acopula}}.}
   \item{digits}{number of digits for the output.}
-  \item{verbose}{logical indicating if timing output should generated
-    while the random variates are generated (defaults to \code{FALSE}).}
+  \item{verbose}{logical indicating if \code{nacFrail.time} output
+    should generated while the random variates are generated (defaults
+    to \code{FALSE}).}
 }
 \value{
   A \eqn{k \times k}{k x k} matrix of user run time measurements in milliseconds
@@ -46,7 +47,7 @@ timing(n, family, taus, digits = 3, verbose = FALSE)
 }
 \examples{
 ## takes about 7 seconds:% so we rather test a much smaller set in R CMD check
-\dontrun{timing(10000, "Gumbel", taus = c(0.05,(1:9)/10,0.95))}
-\dontshow{timing(1000, "Gumbel", taus = c(0.5,1,6,9)/10)}
+\dontrun{nacFrail.time(10000, "Gumbel", tauso= c(0.05,(1:9)/10, 0.95))}
+\dontshow{nacFrail.time(1000, "Gumbel", taus= c(0.5,1,6,9)/10)}
 }
 \keyword{utilities}

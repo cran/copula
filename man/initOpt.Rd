@@ -72,9 +72,10 @@ initOpt(family, tau.range=NULL, interval = TRUE, u,
 }
 \author{Marius Hofert}
 \references{
-  Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011b).
-  Likelihood inference for Archimedean copulas;
-  submitted.
+  Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2012).
+  Likelihood inference for Archimedean copulas in high dimensions
+  under known margins. \emph{Journal of Multivariate Analysis}
+  \bold{110}, 133--150.
 }
 \seealso{
   \code{\link{enacopula}}, \code{\link{emle}}, \code{\link{edmle}},

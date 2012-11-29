@@ -77,9 +77,10 @@ emle(u, cop, n.MC=0, optimizer="optimize", method,
   Estimators for Archimedean copulas in high dimensions: A comparison;
   submitted.
 
-  Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011b).
-  Likelihood inference for Archimedean copulas;
-  submitted.
+  Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2012).
+  Likelihood inference for Archimedean copulas in high dimensions
+  under known margins. \emph{Journal of Multivariate Analysis}
+  \bold{110}, 133--150.
 }
 \seealso{
   \code{\link[bbmle]{mle2}} from package \pkg{bbmle} and

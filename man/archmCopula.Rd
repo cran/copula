@@ -67,6 +67,7 @@ joeCopula(param = NA_real_, dim = 2)
 clayton.cop <- claytonCopula(2, dim = 3)
 ## scatterplot3d(rCopula(1000, clayton.cop))
 
+frank.3D  <- frankCopula(dim = 3)# with NA parameters
 frank.cop <- frankCopula(3)
 persp(frank.cop, dCopula)
 
