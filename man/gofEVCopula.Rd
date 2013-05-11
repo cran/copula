@@ -8,7 +8,7 @@
   Genest and Segers (2009) with a parametric estimate
   of the Pickands dependence function derived under the null hypothesis.
   The test statistic is the Cramer-von Mises functional Sn defined
-  in equation (5) of Genest, Kojadinovic, \enc{Nešlehová}{Neslehova}, and Yan (2010).
+  in Equation (5) of Genest, Kojadinovic, G. \enc{Nešlehová}{Neslehova}, and Yan (2010).
   Approximate p-values for the test statistic are obtained using a
   parametric bootstrap.
 }
@@ -57,7 +57,7 @@ gofEVCopula(copula, x, N = 1000, method = "mpl",
   Genest, C. and Segers, J. (2009). Rank-based inference for bivariate
   extreme-value copulas. \emph{Annals of Statistics} \bold{37}, 2990--3022.
 
-  Genest, C. Kojadinovic, I., \enc{Nešlehová}{Neslehova}, J., and
+  Genest, C. Kojadinovic, I., G. \enc{Nešlehová}{Neslehova}, J., and
   Yan, J. (2011). A goodness-of-fit test for bivariate extreme-value copulas.
   \emph{Bernoulli} \bold{17}(1), 253--275.
 }

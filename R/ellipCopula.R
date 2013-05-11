@@ -13,32 +13,28 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
-
-getSigma <- function(copula) {
-  dim <- copula@dimension
-  rho <- copula@getRho(copula)
-  sigma <- diag(dim)
-  if (copula@dispstr == "ex") {
-    sigma[lower.tri(sigma)] <- rho[1]
-    sigma[upper.tri(sigma)] <- rho[1]
-  }
-  else if (copula@dispstr == "ar1") {
-      ## FIXME  outer()
-    for (i in 1:dim)  for (j in 1:dim)  sigma[i,j] <- rho ^ abs(i - j)
-  }
-  else if (copula@dispstr == "un") {
-    sigma[lower.tri(sigma)] <- rho
-    sigma[upper.tri(sigma)] <- t(sigma)[upper.tri(sigma)]
-  }
-  else if (copula@dispstr == "toep") {
-      ## FIXME outer()
-    for (i in 1:dim) for (j in 1:dim)
-      if (i != j) sigma[i,j] <- rho[abs(i - j)]
-  }
-  sigma
+##' Length of parameter vector for an 'ellipCopula' (tCopula or normCopula)
+##'
+##' @title Parameter length of an 'ellipCopula'
+##' @param dim dimension of copula
+##' @param dispstr dispersion string
+##' @param df.fixed [for tCopula():] logical indicating if 'df' is fixed or a parameter
+##' @return integer
+##' @author Martin Maechler
+## NOTE: This is related to  validRho() in ./Classes.R
+npar.ellip <- function(dim, dispstr, df.fixed = TRUE) {
+    (!df.fixed) + # add 1 if 'df' is not fixed
+    switch(dispstr, ## also checking for correct 'dispstr'
+	   "ar1" =, "ex" = 1 ,
+	   "un" = dim * (dim - 1) / 2,
+	   "toep" = dim - 1,
+	   ## otherwise
+	   return("'dispstr' not supported (yet)"))
 }
 
-ellipCopula <- function(family, param = NA_real_, dim = 2L, dispstr = "ex", df = 4, ...) {
+ellipCopula <- function(family, param = NA_real_, dim = 2L, dispstr = "ex",
+                        df = 4, ...)
+{
   familiesImplemented <- c("normal", "t")
   fam <- pmatch(family, familiesImplemented, -1)
   if (fam == -1)

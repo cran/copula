@@ -74,7 +74,7 @@ AAsymCopula <- function(copula, w) {
 }
 
 pasymCopula <- function(u, copula) {
-  if(!is.matrix(u)) u <- matrix(u, ncol = 2)
+
   comps <- getCopulaComps(copula)
   a1 <- comps$shape[1];  a2 <- comps$shape[2]
   copula1 <- comps$copula1; copula2 <- comps$copula2
@@ -87,7 +87,6 @@ dasymCopula <- function(u, copula, log=FALSE, ...) {
   ## WARNING:
   ## The following derivation assumes that both components are symmetric!
   ## See dC1du and dC2du; they don't distinguish u1 or u2.
-  if(!is.matrix(u)) u <- matrix(u, ncol = 2)
   comps <- getCopulaComps(copula)
   a1 <- comps$shape[1];  a2 <- comps$shape[2]
   copula1 <- comps$copula1; copula2 <- comps$copula2

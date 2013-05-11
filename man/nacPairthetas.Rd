@@ -57,7 +57,7 @@ ths <- (th1[-1]+th1[-(nt+2)])/2
 image(log(PT), breaks = ths, col = heat.colors(nt))
 
 ## Nicer and easier:
-require("Matrix")
+require(Matrix)
 image(as(log(PT),"Matrix"), main = "log( nacPairthetas( m100 ))",
       useAbs=FALSE, useRaster=TRUE, border=NA)
 }

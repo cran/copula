@@ -100,8 +100,8 @@ opower <- function(copbase, thetabase) {
 				 b <- do.call(rbind, lapply(j, FUN=log.b.one.j)) # (degree, n)-matrix
 				 signs <- signFF(beta, j, degree)
 				 lfac[degree+1] - degree*log(t.) + lssum(b, signs, strict=FALSE)
-			     }, stop(sprintf("unsupported method '%s' in absdPsi",
-					     method))) # end{switch}
+			     }, stop(gettextf("unsupported method '%s' in absdPsi",
+					     method), domain=NA)) # end{switch}
 	      }
 	      if(log) res else exp(res)
 	  },

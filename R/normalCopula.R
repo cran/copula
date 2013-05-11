@@ -15,7 +15,9 @@
 
 
 normalCopula <- function(param = NA_real_, dim = 2L, dispstr = "ex") {
-  stopifnot((pdim <- length(param)) >= 1)
+    stopifnot((pdim <- length(param)) >= 1, is.numeric(param))
+    if(pdim == 1 && is.na(param)) ## extend it (rho)
+	pdim <- length(param <- rep(param, length.out = npar.ellip(dim, dispstr)))
   new("normalCopula",
       dispstr = dispstr,
       dimension = as.integer(dim),
@@ -36,21 +38,24 @@ pnormalCopula <- function(u, copula) {
   dim <- copula@dimension
   i.lower <- rep.int(-Inf, dim)
   sigma <- getSigma(copula)
-  u <- matrix(pmax(0, pmin(1, u)), ncol = dim)
-  apply(qnorm(u), 1, function(qu)
-        pmvnorm(lower = i.lower, upper = qu, sigma = sigma))
+  ## now happens in pCopula(): u <- matrix(pmax(0, pmin(1, u)), ncol = dim)
+  apply(qnorm(u), 1, function(x) if(any(is.na(x))) NA_real_ else
+        pmvnorm(lower = i.lower, upper = x, sigma = sigma))
 }
 
 dnormalCopula <- function(u, copula, log=FALSE, ...) {
   dim <- copula@dimension
   sigma <- getSigma(copula)
   if(!is.matrix(u)) u <- matrix(u, ncol = dim)
-  x <- qnorm(u)
+  r <- numeric(nrow(u)) # i.e. 0  by default (i.e. "outside")
+  ok <- !apply(u, 1, function(x) any(is.na(x)))
+  x <- qnorm(u[ok, , drop=FALSE])
   ## work in log-scale [less over-/under-flow, then (maybe) transform:
-  val <- dmvnorm(x, sigma = sigma, log=TRUE) - rowSums(dnorm(x, log=TRUE))
-  if(any(out <- !is.na(u) & (u <= 0 | u >= 1)))
-    val[apply(out, 1, any)] <- -Inf
-  if(log) val else exp(val)
+  r[ok] <- dmvnorm(x, sigma = sigma, log=TRUE) - rowSums(dnorm(x, log=TRUE))
+  ## now happens in dCopula(): -- dnormalCopula() not called directly by user
+  ## if(any(out <- !is.na(u) & (u <= 0 | u >= 1)))
+  ##   val[apply(out, 1, any)] <- -Inf
+  if(log) r else exp(r)
 }
 
 

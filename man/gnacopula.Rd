@@ -1,30 +1,21 @@
 \name{gnacopula}
 \alias{gnacopula}
-\alias{gofTstat}
 \title{Goodness-of-fit Testing for (Nested) Archimedean Copulas}
 \description{
   \code{gnacopula()} conducts a goodness-of-fit test for the given
   (\eqn{H_0}-)copula \code{cop} based on the (copula-)data \code{u}.
-
 }
 \usage{
 gnacopula(u, cop, n.bootstrap,
           estim.method = eval(formals(enacopula)$method),
-          include.K=TRUE, n.MC=0, trafo= c("Hering.Hofert", "Rosenblatt"),
+          include.K=TRUE, n.MC=0, trafo=c("Hering.Hofert", "Rosenblatt"),
           method=eval(formals(gofTstat)$method), verbose=TRUE, \dots)
-gofTstat(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
 }
 \arguments{
-  \item{u}{\eqn{n\times d}{n x d}-matrix, each value in \eqn{[0,1]}.
-    For
-    \describe{
-      \item{\code{gnacopula()}:}{(pseudo-/copula-)observations from the
-      copula to be tested.  Consider applying the function
-      \code{\link{pobs}} first in order to obtain \code{u}.}
-      \item{\code{gofTstat()}:}{supposedly independent uniform observations in the
-      hypercube, i.e., \eqn{U_i \sim U[0,1]^d}{U_i ~ U[0,1]^d}, i.i.d.,
-      for \eqn{i \in \{1,\dots,n\}}{i in 1..n}.}
-    }}
+  \item{u}{\eqn{n\times d}{n x d}-matrix of values in \eqn{[0,1]};
+    should be (pseudo-/copula-)observations from the copula to be
+    tested. Consider applying the function \code{\link{pobs}()} first
+    in order to obtain \code{u}.}
   \item{cop}{\eqn{H_0}-\code{"\linkS4class{outer_nacopula}"} with specified
     parameters to be tested for (currently only Archimedean copulas are
     provided).}
@@ -32,70 +23,38 @@ gofTstat(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
     replicates.}
   \item{estim.method}{\code{\link{character}}
     string determining the estimation method; see
-    \code{\link{enacopula}}.  We currently only recommend the default
+    \code{\link{enacopula}()}.  We currently only recommend the default
   \code{"mle"} (or maybe \code{"smle"}).}
   \item{include.K}{logical indicating whether the last component, involving the
-    Kendall distribution function \code{\link{K}}, is used in the transformation
-    \code{\link{htrafo}} of Hering and Hofert (2011).  Note that this only
+    Kendall distribution function \code{\link{K}()}, is used in the transformation
+    \code{\link{htrafo}()} of Hering and Hofert (2011).  Note that this only
     applies to \code{trafo="Hering.Hofert"}.}
-  \item{n.MC}{parameter \code{n.MC} for \code{\link{htrafo}} (and thus
-    for \code{\link{K}}) if \code{trafo="Hering.Hofert"} and for
-    \code{\link{rtrafo}} if \code{trafo="Rosenblatt"}.}
+  \item{n.MC}{parameter \code{n.MC} for \code{\link{htrafo}()} (and thus
+    for \code{\link{K}()}) if \code{trafo="Hering.Hofert"} and for
+    \code{\link{rtrafo}()} if \code{trafo="Rosenblatt"}.}
   \item{trafo}{a \code{\link{character}} string specifying the multivariate
     transformation performed for goodness-of-fit testing, which has to be one
     (or a unique abbreviation) of
     \describe{
       \item{\code{"Hering.Hofert"}}{for the multivariate transformation of
-	Hering and Hofert (2011); see \code{\link{htrafo}}.}
+	Hering and Hofert (2011); see \code{\link{htrafo}()}.}
       \item{\code{"Hering.Hofert"}}{for the multivariate transformation of
-	Rosenblatt (1952); see \code{\link{rtrafo}}.}
+	Rosenblatt (1952); see \code{\link{rtrafo}()}.}
     }
   }
   \item{method}{a \code{\link{character}} string specifying the
-    goodness-of-fit test statistic to be used, which has to be one (or a unique
-    abbreviation) of
-    \describe{
-      \item{\code{"AnChisq"}}{Anderson-Darling test statistic for
-	computing (supposedly) \eqn{\mathrm{U}[0,1]}{U[0,1]}-distributed
-	(under \eqn{H_0}) random variates via the distribution function
-	of chi-square distribution with \eqn{d}
-	degrees of freedom. To be more precise, the Anderson-Darling
-	test statistc of the variates
-	\deqn{\chi_d^2\Bigl(\sum_{j=1}^d(\Phi^{-1}(u_{ij}))^2\Bigr)}{%
-	  pchisq((Phi^{-1}(u_{i1}))^2+...+(Phi^{-1}(u_{id}))^2, df=d)}
-	is computed (via \code{ADGofTest::ad.test}), where
-	\eqn{\Phi^{-1}}{Phi^{-1}} denotes the quantile function
-	of the standard normal distribution function,
-	\eqn{\chi_d^2}{pchisq(.,df=d)} denotes the distribution function
-	of the chi-square distribution with \eqn{d} degrees of freedom,
-	and \eqn{u_{ij}} is the \eqn{j}th component in the \eqn{i}th row
-	of \code{u}.}
-
-      \item{\code{"AnGamma"}}{similar to \code{method="AnChisq"} but
-	based on the variates
-	\deqn{\Gamma_d\Bigl(\sum_{j=1}^d(-\log u_{ij})\Bigr),}{%
-	  pgamma(-log(u_{i1})-...-log(u_{id}), shape=d),}
-	where \eqn{\Gamma_d}{pgamma(.,shape=d)} denotes the distribution
-	function of the gamma distribution with shape parameter \eqn{d}
-	and shape parameter one	(being equal to an
-	Erlang(\eqn{d}) distribution function).}
-      \item{\code{"SnB"}}{for computing the test statistic
-	\eqn{\mathrm{S_n^{(B)}}}{S[n]^(B)} from Genest,
-	R\enc{é}{e}millard, Beaudoin (2009).}
-      \item{\code{"SnC"}}{for computing the test statistic
-	\eqn{\mathrm{S_n^{(C)}}}{S[n]^(C)} from Genest et al. (2009).}
-  }}
+    goodness-of-fit test statistic to be used; see \code{\link{gofTstat}()}.}
   \item{verbose}{if \code{TRUE}, the progress of the bootstrap is
     displayed via \code{\link[utils]{txtProgressBar}}.}
-  \item{\dots}{additional arguments to \code{\link{enacopula}}.}
+  \item{\dots}{additional arguments passed to \code{\link{enacopula}()}.}
 }
 \details{
-  The function \code{gnacopula} performs a parametric bootstrap for the
+  The function \code{gnacopula()} performs a parametric bootstrap for the
   goodness-of-fit test specified by \code{trafo} and \code{method}.  The
   transformation given by \code{trafo} specifies the multivariate
   transformation which is first applied to the (copula-) data \code{u}
   (typically, the pseudo-observations are used); see
-  \code{\link{htrafo}} or \code{\link{rtrafo}} for more details. The
+  \code{\link{htrafo}()} or \code{\link{rtrafo}()} for more details. The
   argument \code{method} specifies the particular goodness-of-fit test
   carried out, which is either the Anderson-Darling test for the
   univariate standard uniform distribution (for \code{method="AnChisq"} or
@@ -105,10 +64,8 @@ gofTstat(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
   setup.  As estimation method, the method provided by
   \code{estim.method} is used.
 
-  Note that a finite-sample correction of type
-  \eqn{(sum(T0 >= T)+0.5)/(N+1)} is made, where
-  \eqn{T} and \eqn{T0} are the test statistic and bootstrapped test
-  statistc, respectively.
+  Note that a finite-sample correction is made when computing p-values;
+  see \code{\link{gofCopula}()} for details.
 
   A word of warning: Do work carefully with the variety of different
   goodness-of-fit tests that can be performed with \code{gnacopula()}.
@@ -121,12 +78,6 @@ gofTstat(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
   numerical errors (see Hofert et al. (2011a)) and are thus not
   recommended to be used in the parametric bootstrap. A warning is given if
   \code{gnacopula()} is called with a method not being MLE.
-
-  Since \R is widely used by practitioners, a word of warning concerning
-  goodness-of-fit tests \emph{in general} is also advisable.
-  Goodness-of-fit tests are often (ab)used in practice to
-  \dQuote{justify} an assumption under which one then continues to work
-  (carelessly).  From a mathematical point of view, this is not correct.
 }
 \value{
   \code{gnacopula} returns an \R object of class \code{"htest"}.
@@ -145,8 +96,6 @@ gofTstat(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
       component \code{statistic} containing the values of the test statistic
       for each bootstrap replication.}
   }
-
-  \code{gofTstat} returns a numeric value (the test statistic).
 }
 \author{Marius Hofert, Martin Maechler.}
 \references{
@@ -168,12 +117,13 @@ gofTstat(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
   \bold{110}, 133--150.
 }
 \seealso{
-  \code{\link{gtrafo}} for the multivariate transformation(s)
-  \code{\link{htrafo}} and \code{\link{rtrafo}} involved and
-  \code{\link{K}} for the Kendall distribution function.
+  \code{\link{gofTstat}()} for the implemented test statistis,
+  \code{\link{gtrafo}()} for the multivariate transformation(s)
+  \code{\link{htrafo}()} and \code{\link{rtrafo}()} involved and
+  \code{\link{K}()} for the Kendall distribution function.
 
-  \code{\link{gofCopula}} for other (parametric bootstrap) based
-  GOF tests.
+  \code{\link{gofCopula}()} for other (parametric bootstrap) based
+  goodness-of-fit tests.
 }
 \examples{
 tau <- 0.5
@@ -221,7 +171,6 @@ qq1dtrafo <- function(uh, ur) {
                panel.qqmath(x, ...)
            })
 }
-
 qq1dtrafo(uH, uR)
 
 ## what about a meta-Clayton model? (choose larger n.bootstrap in a

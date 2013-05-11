@@ -49,5 +49,5 @@ contour(fgm.cop, dCopula)
 fgm2.cop <- fgmCopula(c(.2,-.2,-.4,.6), dim = 3)
 fgm2.cop
 }
-\keyword{ distribution }
-\keyword{ multivariate }
+\keyword{distribution}
+\keyword{multivariate}

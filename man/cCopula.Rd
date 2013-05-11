@@ -7,11 +7,6 @@
   \eqn{C(u_d\,|\,u_1,\dots,u_{d-1})}{C(u[d]|u[1],...,u[d-1])}
   of \eqn{u_d}{u[d]} given \eqn{u_1,\dots,u_{d-1}}{u[1],...,u[d-1]}.
 }
-\details{
-  \code{cCopula()} can be seen as a special case of the Rosenblatt
-  transform which by default computes all conditional distributions.
-  Conseqently, \code{cCopula()} simply calls \code{\link{rtrafo}()}.
-}
 \usage{
 cCopula(u, copula, j.ind=ncol(u), n.MC=0, log=FALSE)
 
@@ -37,6 +32,11 @@ cacopula(u, cop, n.MC=0, log=FALSE)
   \code{\link{numeric}} vector of length \eqn{n} containing the
   conditional copula function of \eqn{u_d}{u[d]} given
   \eqn{u_1,\dots,u_{d-1}}{u[1],...,u[d-1]}.
+}
+\details{
+  \code{cCopula()} can be seen as a special case of the Rosenblatt
+  transform which by default computes all conditional distributions.
+  Conseqently, \code{cCopula()} simply calls \code{\link{rtrafo}()}.
 }
 \author{Marius Hofert, Yongsheng Wang, and Martin Maechler}
 \note{

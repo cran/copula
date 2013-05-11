@@ -38,7 +38,8 @@ setMethod("dCopula" , signature("matrix", "joeCopula"),
 	  copJoe@dacopula(u, theta=copula@parameters, log=log, ...))
 setMethod("dCopula", signature("numeric", "joeCopula"),
 	  function (u, copula, log = FALSE, ...)
-	  copJoe@dacopula(matrix(u, ncol=dim(copula)), theta=copula@parameters, log=log, ...))
+	  copJoe@dacopula(rbind(u, deparse.level=0L),
+			  theta=copula@parameters, log=log, ...))
 
 setMethod("psi", signature("joeCopula"),
 	  function(copula, s) copJoe@psi(t=s, theta=copula@parameters))

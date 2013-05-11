@@ -159,14 +159,14 @@ print.chiSqChk_cop <- function(x, ...) {
 ##' compute the probability to fall in a cube with
 ##' lower point l and upper point u for d=3
 probin3dcube <- function(cop,l,u) {
-    pnacopula(cop,u)+
-        - pnacopula(cop,c(l[1],u[2],u[3]))+
-            - pnacopula(cop,c(u[1],l[2],u[3]))+
-                - pnacopula(cop,c(u[1],u[2],l[3]))+
-                    + pnacopula(cop,c(l[1],l[2],u[3]))+
-                        + pnacopula(cop,c(l[1],u[2],l[3]))+
-                            + pnacopula(cop,c(u[1],l[2],l[3]))+
-                                - pnacopula(cop,l)
+    pCopula(u, cop)+
+        - pCopula(c(l[1],u[2],u[3]), cop)+
+            - pCopula(c(u[1],l[2],u[3]), cop)+
+                - pCopula(c(u[1],u[2],l[3]), cop)+
+                    + pCopula(c(l[1],l[2],u[3]), cop)+
+                        + pCopula(c(l[1],u[2],l[3]), cop)+
+                            + pCopula(c(u[1],l[2],l[3]), cop)+
+                                - pCopula(l, cop)
 }
 
 
@@ -307,10 +307,10 @@ stopifnot(d == 3,
 	  allComp(c3) == 1:3,
 	  allComp(c3@childCops[[1]]) == 2:3)
 
-## test pnacopula()
+## test pCopula(., <nacopula>)  {was pnacopula()}
 u <- c(.3, .4, .5)
 ## with function:
-v <- pnacopula(c3, u)
+v <- pCopula(u, c3)
 ## by hand
 psi <- function(t,theta) { (1-theta)/(exp(t)-theta) }
 iPsi <- function(t,theta) { log((1-theta*(1-t))/t) }
@@ -344,8 +344,8 @@ d <- dim(c2)
 stopifnot(d ==  2,
 	  allComp(c2) == 1:2)
 
-## test pnacopula()
-v <- pnacopula(c2, u = c(.3, .4))
+## test pCopula()
+v <- pCopula(c(.3, .4), c2)
 stopifnot(all.equal(v,
                     local( { u1 <- .3; u2 <- .4
                              (u1^(-1/2)+u2^(-1/2)-1)^(-2) }),
@@ -376,8 +376,8 @@ stopifnot(d == 3,
 	  allComp(c3) == 1:3,
 	  allComp(c3@childCops[[1]]) == 2:3)
 
-## test pnacopula()
-v <- pnacopula(c3, u = c(.3, .4, .5))
+## test pCopula()
+v <- pCopula(c(.3, .4, .5), c3)
 stopifnot(all.equal(v,
                     local( { u1 <- .3; u2 <- .4; u3 <- .5
                              1/((1/u2^2 +1/u3^2 -1)^(1/4) -1 +1/sqrt(u1))^2 }),
@@ -414,10 +414,9 @@ stopifnot(d == 9,
           allComp(c9@childCops[[1]]) == c(9,2,7,5,8,4),
           allComp(c9@childCops[[1]]@childCops[[1]]) == c(8,4))
 
-## test pnacopula()
+## test pCopula()
 u <- seq(0.1,0.9,by = 0.1)
-## with pnacopula function:
-v <- pnacopula(c9, u)
+v <- pCopula(u, c9)
 ## by hand
 psi <- function(t,theta) { (1+t)^(-1/theta) }
 iPsi <- function(t,theta) { t^(-theta) - 1 }

@@ -35,6 +35,7 @@
 }
 dnacopula <- function(x, u, log=FALSE, ...) {
     stopifnot(is(x, "outer_nacopula"))
+    .Deprecated("dCopula")
     if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
     .dnacopula(u, x, log=log, ...)
 }
@@ -88,19 +89,19 @@ dacopulaG <- function(acop, u, n.MC=0, log = FALSE) {
 ##' @param copula nacopula
 ##' @return f_x(u)
 ##' @author Marius Hofert, Martin Maechler
-.pnacopula <- function(u,copula) {
+.pnacopula <- function(u, copula, ...) {
     stopifnot(ncol(u) >= dim(copula)) # will be larger for children
     C <- copula@copula
     th <- C@theta
     C@psi(rowSums(## use u[,j, drop=FALSE] for the direct components 'comp':
 		  cbind(C@iPsi(u[,copula@comp, drop=FALSE], theta=th),
 			## and recurse down for the children:
-			C@iPsi(unlist(lapply(copula@childCops, pnacopula, u=u)), theta=th))),
+			C@iPsi(unlist(lapply(copula@childCops, .pnacopula, u=u)),
+			       theta=th))),
 	  theta=th)
 }
 pnacopula <- function(x,u) {
-    ## FIXME:
-    ## .Deprecated("pCopula")
+    .Deprecated("pCopula")
     if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
     .pnacopula(u,x)
 }
@@ -481,12 +482,12 @@ nacPairthetas <- function(x) {
 setMethod("pCopula", signature("matrix", "nacopula"), .pnacopula)
 setMethod("pCopula", signature("numeric", "nacopula"),
 	  function(u, copula, ...)
-	  .pnacopula(matrix(u, ncol=dim(copula)), copula))
+	  .pnacopula(rbind(u, deparse.level = 0L), copula))
 
 setMethod("dCopula", signature("matrix", "nacopula"), .dnacopula)
 setMethod("dCopula", signature("numeric", "nacopula"),
 	  function(u, copula, log=FALSE, ...)
-	  .dnacopula(matrix(u, ncol=dim(copula)), copula, log=log))
+	  .dnacopula(rbind(u, deparse.level = 0L), copula, log=log))
 
 setMethod("rCopula", signature("numeric", "nacopula"), rnacopula)
 

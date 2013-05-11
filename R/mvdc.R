@@ -43,10 +43,13 @@ mvdc <- function(copula, margins, paramMargins, marginsIdentical = FALSE,
     if(fixupNames && all(mvd.has.marF(margins, "p"))) {
 	for(i in seq_along(margins)) {
 	    n.i <- names(p.i <- paramMargins[[i]])
-	    if(is.null(n.i) || any(!nzchar(n.i))) {
+	    if(is.null(n.i) || any(!nzchar(n.i))) { # get names of formal args
 		nnms <- names(formals(get(paste0("p",margins[[i]])))[-1])
+		## but not the typical "non-parameter" arguments:
+		nnms <- nnms[is.na(match(nnms, c("lower.tail", "log.p")))]
 		if(length(nnms) > length(p.i)) length(nnms) <- length(p.i)
-		if(is.null(n.i) || length(nnms) == length(n.i))# careful ..
+		if(length(nnms) > 0 &&
+		   (is.null(n.i) || length(nnms) == length(n.i))) # careful ..
 		   names(paramMargins[[i]]) <- nnms
 	    }
 	}

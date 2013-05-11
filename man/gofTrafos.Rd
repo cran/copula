@@ -23,7 +23,7 @@ rtrafo(u, cop, j.ind = 2:d, m, n.MC=0, log=FALSE, trafo.only=log)
     Archimedean copulas are provided).}
   \item{include.K}{logical indicating whether the last component, involving the
     Kendall distribution function \code{\link{K}}, is used in \code{htrafo}.}
-  \item{j.ind}{integer vector of indices \eqn{j} between 2 and \eqn{d}
+  \item{j.ind}{\code{\link{integer}} vector of indices \eqn{j} between 2 and \eqn{d}
     indicating the conditional distributions that are to be computed.}
   \item{m}{(\bold{deprecated}, use \code{j.ind} instead).  Now,
     \code{j.ind = 2:M} should be used instead of \code{m=M}.}

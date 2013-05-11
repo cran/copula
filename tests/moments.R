@@ -18,28 +18,18 @@ require(copula)
 if(getRversion() < "2.15")
 paste0 <- function(...) paste(..., sep="")
 
-setPar <- function(cop, par) setTheta(cop, par, noCheck=TRUE)
+source(system.file("Rsource", "utils.R", package="copula", mustWork=TRUE))
+##-> setPar(), showProc.time() etc
+## All non-virtual copula classes:
+source(system.file("Rsource", "cops.R", package="copula", mustWork=TRUE))
+## --> copcl, copObs, copBnds,  excl.2 , copO.2, copBnd.2
 
-## Look at all non-virtual classes:
-copcl <- unique(names(getClass("copula")@subclasses))
-isVirt <- vapply(copcl, isVirtualClass, NA)
-copcl <- copcl[!isVirt]
-.notYet <- "schlatherCopula"
-(copcl <- copcl[.notYet != copcl])
-copF <- sapply(copcl, get)
-frstArg <- vapply(copF, function(F) names(formals(F))[[1]], "")
-copF1 <- copF[frstArg %in% c("dim", "param")]
-copObj <- lapply(copF1, function(.) .())
-stopifnot( sapply(copObj, is, class2 = "copula"),
-           sapply(copObj, validObject))
-copO. <- copObj[ names(copObj) != "indepCopula" ]
-copO.2 <- copO.[ex2 <- !(names(copO.) %in% c("amhCopula","joeCopula"))]
-                                        # because AMH has limited tau-range
-str(copO.,max=1)
-## The parameter bounds:
-t(copBnds <- sapply(copO., function(C)
-                    c(min= C@param.lowbnd[1], max= C@param.upbnd[1])))
-copBnd.2 <- copBnds[, ex2]
+showProc.time()
+
+copcl ## the classes
+str(copObs, max.level=1)# copula objects
+## and their parameter bounds:
+t(copBnds)
 
 ###-------- tau & and inverse ---------------------------------------------------
 
@@ -50,7 +40,7 @@ tau(tevCopula(0)) # 0.05804811
 tau.s <- c(       -.1, 0, 0.05805, (1:2)/9, 0.3)
 names(tau.s) <- paste0("tau=", sub("0[.]", ".", formatC(tau.s)))
 tTau <- sapply(tau.s, function(tau)
-               sapply(copO., iTau, tau = tau))
+               sapply(copObs, iTau, tau = tau))
 tTau
 tTau["joeCopula", "tau=-.1"] <- 1 # ugly hack
 
@@ -59,10 +49,13 @@ stopifnot(rep(copBnds["min",],ncol(tTau)) <= tTau + 1e-7,
           ## theta and tau are comonotone :
           apply(tTau, 1, diff) >= -1e9)
 
-tautau <- t(sapply(names(copO.), function(cNam)
+showProc.time()
+
+tautau <- t(sapply(names(copObs), function(cNam)
 		   sapply(tTau[cNam,],
-			  function(th) tau(setPar(copO.[[cNam]], th)))))
+			  function(th) tau(setPar(copObs[[cNam]], th)))))
 tautau
+showProc.time()
 
 xctTau <- matrix(tau.s, nrow = nrow(tautau), ncol=length(tau.s),
                  byrow=TRUE)
@@ -80,6 +73,9 @@ errTau["tevCopula", 2] <- 0
 errTau["fgmCopula", "tau=.3"] <- 0
 stopifnot(max(abs(errTau)) <= 0.00052)# ok for IJ-taus
 
+showProc.time()
+
+
 ###-------- rho & and inverse ---------------------------------------------------
 
 ## NB:
@@ -90,9 +86,12 @@ rho.s <- c(-.999, -.1, 0, (1:3)/9, .5, .9, .999)
 names(rho.s) <- paste0("rho=", sub("0[.]", ".", formatC(rho.s)))
 tRho <- sapply(rho.s, function(rho)
                sapply(copO.2, iRho, rho = rho))
-warnings()
-
 tRho
+
+warnings()
+## and from now on, show them as they happen:
+options(warn = 1)
+
 ##--> oops!  clayton [rho=0] is NA __FIXME__
 tRho["claytonCopula", "rho=0"] <- 0
 ## and it has NA also for .999  {but that maybe consider ok}:
@@ -106,8 +105,9 @@ stopifnot(rep(copBnd.2["min",],ncol(tRho)) <= tRho,
 rhorho <- t(sapply(names(copO.2), function(cNam)
                    sapply(tRho[cNam,],
                           function(th) rho(setPar(copO.2[[cNam]], th)))))
-
 rhorho
+showProc.time()
+
 xctRho <- matrix(rho.s, nrow = nrow(rhorho), ncol=length(rho.s),
                  byrow=TRUE)
 ## The absolute errors
@@ -125,5 +125,6 @@ errRho["fgmCopula", abs(rho.s) > 1/3] <- 0
 stopifnot(max(abs(errRho)) <= 0.00369,
           max(abs(errRho[,rho.s <= 0.9])) <= 0.0002)# ok for IJ-rhos
 
+showProc.time()
 
-cat('Time elapsed: ', proc.time(),'\n') # for ''statistical reasons''
+

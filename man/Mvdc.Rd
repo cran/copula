@@ -22,10 +22,10 @@ rMvdc(n, mvdc)
 \arguments{
   \item{copula}{ an object of \code{"\linkS4class{copula}"}. }
   \item{margins}{ a character vector specifying all the marginal
-    distributions. See details below.}
-  \item{paramMargins}{a \code{\link{list}} whose each component is a list of named
-    components, giving the parameter values of the marginal
     distributions.  See details below.}
+  \item{paramMargins}{a \code{\link{list}} whose each component is a
+    list (or numeric vectors) of named components, giving the parameter
+    values of the marginal distributions.  See details below.}
   \item{marginsIdentical}{ logical variable restricting the marginal
     distributions to be identical. }
   \item{check}{logical indicating to apply quick checks about existence of

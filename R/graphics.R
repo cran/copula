@@ -13,7 +13,7 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
-##' @title Check if function 'fun' is like  pcopula or like pCopula
+##' @title Check if function 'fun' is like pcopula or like pCopula
 ##' @param fun function such as pCopula, dcopula, ..
 ##' @return logical: TRUE if "like pCopula"
 ##' @author Martin Maechler
@@ -148,8 +148,8 @@ KPlot <- function(x, plot=TRUE, ...) {
 ## ChiPlot(cbind(x, y))
 ## KPlot(cbind(x, y))
 
-################################################################################
 
+### Enhanced splom #############################################################
 
 ##' @title A scatter plot matrix with nice variable names
 ##' @param data numeric matrix or as.matrix(.)able
@@ -189,3 +189,84 @@ splom2 <- function(data, varnames=NULL, Vname="U", xlab="",
 }
 
 
+### Enhanced, general Q-Q plot with rugs and confidence intervals ##############
+
+##' Q-Q plot with rugs and pointwise asymptotic confidence intervals
+##'
+##' @title Q-Q plot with rugs and pointwise asymptotic confidence intervals
+##' @param x data (n-vector)
+##' @param qF theoretical quantile function
+##' @param qqline.args argument list passed to qqline(); use NULL to omit Q-Q line
+##' @param rug.args argument list passed to rug(); use NULL to omit rugs
+##' @param alpha significance level
+##' @param CI.args argument list passed to lines() for drawing confidence intervals;
+##'        use NULL to omit confidence intervals
+##' @param CI.mtext argument list for information about confidence intervals; use
+##'        NULL to omit information about confidence intervals
+##' @param main.args argument list passed to mtext() for drawing title; use NULL
+##'        to omit title
+##' @param xlab x axis label
+##' @param ylab y axis label
+##' @param ... additional arguments passed to plot()
+##' @return Q-Q plot
+##' @author Marius Hofert
+##' Note: used in Genest, Hofert, Neslehova (2013)
+qqplot2 <- function(x, qF, qqline.args=list(distribution=qF),
+                    rug.args=list(tcl=-0.6*par("tcl")),
+                    alpha=0.05, CI.args=list(col="gray50"),
+                    CI.mtext=list(text=paste0("Pointwise asymptotic ", 100*(1-alpha),
+                                  "% confidence intervals"), side=4,
+                                  cex=0.6*par("cex.main"), adj=0, col="gray50"),
+                    main.args=list(text=expression(bold(italic(F)~~"Q-Q plot")),
+                                   side=3, line=1.1, cex=par("cex.main"), font=par("font.main"),
+                                   adj=par("adj"), xpd=NA),
+                    xlab="Theoretical quantiles", ylab="Sample quantiles", ...)
+{
+    x. <- sort(x) # drops NA
+    n <- length(x.)
+    p <- ppoints(n)
+    q <- qF(p)
+    ## plot points
+    plot(q, x., xlab=xlab, ylab=ylab, ...) # empirical vs. theoretical quantiles
+    do.call(mtext, main.args)
+    ## plot the line (overplots points, but that's good for the eye!)
+    if(!is.null(qqline.args))
+        ## draw the line (through the first and third quartile; see ??qqline)
+        ## note: abline(a=0, b=1) only true if data is standardized (mu=0, sig2=1)
+        do.call(qqline, c(list(y=x.), qqline.args))
+    ## rugs
+    if(!is.null(rug.args)) {
+        do.call(rug, c(list(q, side=1), rug.args))
+        do.call(rug, c(list(x., side=2), rug.args))
+    }
+    ## confidence intervals
+    if(!is.null(CI.args)) {
+        ## Pointwise approximate (CLT) two-sided 1-alpha confidence intervals
+        ## (basic idea taken from fBasics)
+        ## With up/low = p +- qnorm(1-a/2)*sqrt(p(1-p)/n) it follows that
+        ##   IP(F^{-1}(p) in [F_n^{-1}(low), F_n^{-1}(up)]) (p ~> F(x))
+        ## = IP(x in [F_n^{-1}(low), F_n^{-1}(up)])
+        ## = IP(F_n(x) in [low, up]) ~= 1-a since (CLT)
+        ##   sqrt(n)*(F_n(x)-p)/sqrt(p*(1-p)) ~= N(0,1) since
+        ## X_i~F => F_n(x)=bar{Z}_n with Z_i=I_{X_i<=x}~B(1, p=F(x)) => mean=p, var=p(1-p)
+        SE <- sqrt(p*(1-p)/n) # standard error
+        qa2 <- qnorm(1-alpha/2)
+        ## lower
+        low <- p - qa2 * SE
+        ilow <- 0 < low & low < 1 # in (0,1)
+        low.y <- quantile(x., probs=low[ilow]) # F_n^{-1}(0<low<1)
+        low.x <- q[ilow] # corresponding theoretical quantile at each ppoint
+        ## upper
+        up <- p + qa2 * SE
+        iup <- 0 < up & up < 1 # in (0,1)
+        up.y <- quantile(x., probs=up[iup]) # F_n^{-1}(0<up<1)
+        up.x <- q[iup] # corresponding theoretical quantile at each ppoint
+        ## draw lines
+        do.call(lines, c(list(low.x, low.y), CI.args))
+        do.call(lines, c(list(up.x, up.y), CI.args))
+        ## info
+        if(!is.null(CI.mtext)) do.call(mtext, CI.mtext)
+    }
+    ## return
+    invisible()
+}

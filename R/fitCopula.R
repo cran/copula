@@ -1,3 +1,4 @@
+
 ## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
 ## This program is free software; you can redistribute it and/or modify it under
@@ -42,9 +43,11 @@ print.fitCopula <- function(x, digits = max(3, getOption("digits") - 3),
     if(!is.null(cnts <- x@fitting.stats$counts) && !all(is.na(cnts))) {
 	cat("Number of loglikelihood evaluations:\n"); print(cnts, ...)
     }
+### FIXME:  Show parts of the @copula  slot !!!!!!
     invisible(x)
 }
 
+### FIXME:  print( summary( fitC ) )  gives *less*  than print ( fitC ) !!
 summary.fitCopula <- function(object, ...) {
   estimate <- object@estimate
   se <- sqrt(diag(object@var.est))
@@ -69,14 +72,12 @@ setMethod("show", signature("fitCopula"),
 fitCopula <- function(copula, data, method = c("mpl","ml","itau","irho"),
                       start = NULL, lower = NULL, upper = NULL,
                       optim.method = "BFGS", optim.control = list(maxit=1000),
-                      estimate.variance = TRUE, hideWarnings = FALSE)
+                      estimate.variance = TRUE, hideWarnings = TRUE)
 {
   if(!is.matrix(data)) {
     warning("coercing 'data' to a matrix.")
     data <- as.matrix(data); stopifnot(is.matrix(data))
   }
-  if(!missing(hideWarnings))
-      warning("'hideWarnings' is deprecated and has no effect anymore")
   switch(match.arg(method),
 	 "ml" =
 	 fitCopula.ml(copula, data, start=start, lower=lower, upper=upper,
@@ -91,6 +92,7 @@ fitCopula <- function(copula, data, method = c("mpl","ml","itau","irho"),
 }
 
 
+##' Starting value for Maximum Likelihood ("ml")
 fitCopStart <- function(copula, data, default = copula@parameters)
 {
     if (hasMethod("iTau", clc <- class(copula))) {
@@ -138,6 +140,7 @@ fitCopula.itau <- function(copula, x, estimate.variance=TRUE, warn.df=TRUE) {
   ccl <- getClass(class(copula))
   isEll <- extends(ccl, "ellipCopula")
   if(has.par.df(copula, ccl, isEll)) { ## must treat it as "df.fixed=TRUE"
+      ## currently: tCopula  or tevCopula
       if(warn.df)
           warning("\"itau\" fitting ==> copula coerced to 'df.fixed=TRUE'")
       copula <- as.df.fixed(copula, classDef = ccl)
@@ -145,7 +148,7 @@ fitCopula.itau <- function(copula, x, estimate.variance=TRUE, warn.df=TRUE) {
   q <- length(copula@parameters)
   tau <- cor(x, method="kendall")
   itau <- fitKendall(copula, tau)
-  itau <- itau[lower.tri(itau)]
+  itau <- P2p(itau)
 
   X <- getXmat(copula)
   estimate <-
@@ -179,7 +182,7 @@ fitCopula.irho <- function(copula, x, estimate.variance=TRUE, warn.df=TRUE) {
   q <- length(copula@parameters)
   rho <- cor(x, method="spearman")
   irho <- fitSpearman(copula, rho)
-  irho <- irho[lower.tri(irho)]
+  irho <- P2p(irho)
   X <- getXmat(copula)
   estimate <-
       as.vector(# stripping attributes
@@ -224,14 +227,12 @@ fitCopula.ml <- function(copula, u, start=NULL,
                          lower=NULL, upper=NULL,
                          method=NULL, optim.control=list(),
                          estimate.variance=TRUE,
-                         hideWarnings=FALSE,
+                         hideWarnings=TRUE,
                          bound.eps = .Machine$double.eps ^ 0.5)
 {
-  if(hideWarnings)
-      warning("'hideWarnings' is deprecated and has no effect anymore")
   if(any(u < 0) || any(u > 1))
      stop("'u' must be in [0,1] -- probably rather use pobs(.)")
-  stopifnot((d <- ncol(u)) >= 2)
+  stopifnot(is.numeric(d <- ncol(u)), d >= 2)
   if (copula@dimension != d)
     stop("The dimension of the data and copula do not match")
   if(is.null(start))
@@ -239,8 +240,8 @@ fitCopula.ml <- function(copula, u, start=NULL,
   if(any(is.na(start))) stop("'start' contains NA values")
   q <- length(copula@parameters)
   if (q != length(start))
-    stop(sprintf("The lengths of 'start' (= %d) and copula@parameters (=%d) differ",
-		 length(start), q))
+    stop(gettextf("The lengths of 'start' (= %d) and copula@parameters (=%d) differ",
+		 length(start), q), domain=NA)
 
   control <- c(optim.control, fnscale = -1)
   control <- control[!vapply(control, is.null, NA)]
@@ -251,11 +252,27 @@ fitCopula.ml <- function(copula, u, start=NULL,
     lower <- if(meth.has.bounds) copula@param.lowbnd + bound.eps else -Inf
   if (is.null(upper))
     upper <- if(meth.has.bounds) copula@param.upbnd  - bound.eps else Inf
+
+  ## messageOut may be used for debugging
+  if (hideWarnings) {
+    messageOut <- textConnection("fitMessages", open="w", local=TRUE)
+    sink(messageOut); sink(messageOut, type="message")
+    oop <- options(warn = -1) ## ignore warnings; can be undesirable!
+    on.exit({ options(oop); sink(type="message"); sink(); close(messageOut)})
+  }
+
   fit <- optim(start, loglikCopula,
                lower=lower, upper=upper,
                method=method,
                copula = copula, x = u,
                control = control)
+
+  if (hideWarnings) {
+    options(oop); sink(type="message"); sink()
+    on.exit()
+    close(messageOut)
+  }
+
   copula@parameters[1:q] <- fit$par
   loglik <- fit$val
   if(fit$convergence > 0)
@@ -348,6 +365,7 @@ fitKendall <- function(cop,tau) {
 
 ## variance/covariance of the pseudo-likelihood estimator ######################
 
+## TODO this should *not* be used anymore (use Jscore() in gofCopula.R)
 influ.terms <- function(u, influ, q)
 {
   p <- ncol(u)
@@ -423,12 +441,10 @@ getL <- function(copula) {
   pp <- p * (p - 1) / 2
 
   dgidx <- outer(1:p, 1:p, "-")
-  dgidx <- dgidx[lower.tri(dgidx)]
+  dgidx <- P2p(dgidx)
 
-  if (!is(copula, "ellipCopula")) {
-    matrix(1/pp, nrow=pp, ncol=1)
-  } else if (copula@dispstr == "ex") {
-    matrix(1/pp, nrow=pp, ncol=1)
+  if (!is(copula, "ellipCopula") || copula@dispstr == "ex") {
+    cbind(rep.int(1/pp, pp), deparse.level=0L)
   } else if(copula@dispstr == "un") {
     diag(pp)
   } else if(copula@dispstr == "toep") {
@@ -456,14 +472,14 @@ getXmat <- function(copula) {
 	       "toep" =,
 	       "ar1" = {
 		   dgidx <- outer(1:p, 1:p, "-")
-		   dgidx <- dgidx[lower.tri(dgidx)]
+		   dgidx <- P2p(dgidx)
 		   if(copula@dispstr == "toep")
 		       model.matrix(~ factor(dgidx) - 1)
 		   else { ## __"ar1"__
 		       ## estimate log(rho) first and then exponetiate back
 		       ## mat <- model.matrix(~ factor(dgidx) - 1)
 		       ## mat %*% diag(1:(p - 1))
-		       matrix(dgidx, ncol=1)
+		       cbind(dgidx, deparse.level=0L)
 		   }
 	       },
 	       stop("Not implemented yet for this copula/dispersion structure."))
@@ -481,7 +497,7 @@ varInfluAr1 <- function(cop, v, L, der) {
   ## r is the lower.tri of sigma
   sigma <- getSigma(cop) # assuming cop is the fitted copula
   ## influ for log(r)
-  r <- sigma[lower.tri(sigma)]
+  r <- P2p(sigma)
   der <- if (der == "tau") dTauFun(cop)(r) else dRhoFun(cop)(r)
   D <- diag(x = 1 / r / der, pp)
   v <- v %*% D

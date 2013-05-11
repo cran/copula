@@ -23,7 +23,7 @@
 \alias{dCopula,matrix,indepCopula-method}
 \alias{dCopula,matrix,asymCopula-method}
 \alias{dCopula,matrix,asymExplicitCopula-method}
-\alias{dCopula,matrix,nacopula-method}
+%\alias{dCopula,matrix,nacopula-method}-> ./dnacopula.Rd
 %
 \alias{dCopula,numeric,claytonCopula-method}
 \alias{dCopula,numeric,frankCopula-method}
@@ -41,7 +41,7 @@
 \alias{dCopula,numeric,indepCopula-method}
 \alias{dCopula,numeric,asymCopula-method}
 \alias{dCopula,numeric,asymExplicitCopula-method}
-\alias{dCopula,numeric,nacopula-method}
+%\alias{dCopula,numeric,nacopula-method}-> ./dnacopula.Rd
 % pCopula
 \alias{pCopula,matrix,claytonCopula-method}
 \alias{pCopula,matrix,frankCopula-method}
@@ -59,7 +59,7 @@
 \alias{pCopula,matrix,indepCopula-method}
 \alias{pCopula,matrix,asymCopula-method}
 \alias{pCopula,matrix,asymExplicitCopula-method}
-\alias{pCopula,matrix,nacopula-method}
+%\alias{pCopula,matrix,nacopula-method}-> ./pnacopula.Rd
 %
 \alias{pCopula,numeric,claytonCopula-method}
 \alias{pCopula,numeric,frankCopula-method}
@@ -77,7 +77,7 @@
 \alias{pCopula,numeric,indepCopula-method}
 \alias{pCopula,numeric,asymCopula-method}
 \alias{pCopula,numeric,asymExplicitCopula-method}
-\alias{pCopula,numeric,nacopula-method}
+%\alias{pCopula,numeric,nacopula-method}-> ./pnacopula.Rd
 % rCopula
 \alias{rCopula,numeric,claytonCopula-method}
 \alias{rCopula,numeric,frankCopula-method}
@@ -98,8 +98,8 @@
 % main
 \title{Density, Evaluation, and Random Number Generation for Copula Functions}
 \description{
-  Density, distribution function, and random generation for a
-  \code{copula} object.
+  Density (\code{dCopula}), distribution function (\code{pCopula}), and
+  random generation (\code{rCopula}) for a \code{copula} object.
 }
 \usage{
 dCopula(u, copula, log=FALSE, \dots)
@@ -111,7 +111,9 @@ rCopula(n, copula, \dots)
     (i.e., \code{"\linkS4class{copula}"} or  \code{"\linkS4class{nacopula}"}).}
   \item{u}{a vector of the copula dimension \eqn{d} or a matrix with \eqn{d}
     columns, giving the points where the density or distribution
-    function needs to be evaluated.
+    function needs to be evaluated.  Note that in all cases, values
+    outside of the cube \eqn{[0,1]^d} are treated equivalently
+    to those on the cube boundary.  So, e.g., the density is zero.
   }
   \item{log}{logical indicating if the \eqn{\log(f(\cdot))}{log(f(.))}
     should be returned instead of \eqn{f(\cdot)}{f(.)}.}
@@ -169,6 +171,10 @@ rCopula(n, copula, \dots)
 \examples{
 norm.cop <- normalCopula(0.5)
 norm.cop
+## one d-vector =^= 1-row matrix, works too :
+dCopula(c(0.5, 0.5), norm.cop)
+pCopula(c(0.5, 0.5), norm.cop)
+
 u <- rCopula(100, norm.cop)
 plot(u)
 dCopula(u, norm.cop)
@@ -178,21 +184,21 @@ contour(norm.cop, pCopula)
 
 ## a 3-dimensional normal copula
 u <- rCopula(1000, normalCopula(0.5, dim = 3))
-if(require("scatterplot3d"))
+if(require(scatterplot3d))
   scatterplot3d(u)
 
 ## a 3-dimensional clayton copula
 cl3 <- claytonCopula(2, dim = 3)
 v <- rCopula(1000, cl3)
 pairs(v)
-if(require("scatterplot3d"))
+if(require(scatterplot3d))
   scatterplot3d(v)
 
 ## Compare with the "nacopula" version :
 fu1 <- dCopula(v, cl3)
 fu2 <- copClayton@dacopula(v, theta = 2)
 Fu1 <- pCopula(v, cl3)
-Fu2 <- pnacopula(onacopula("Clayton", C(2.0, 1:3)), v)
+Fu2 <- pCopula(v, onacopula("Clayton", C(2.0, 1:3)))
 ## The density and cumulative values are the same:
 stopifnot(all.equal(fu1, fu2, tol= 1e-14),
           all.equal(Fu1, Fu2, tol= 1e-15))

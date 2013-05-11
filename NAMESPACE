@@ -13,16 +13,19 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
+
 useDynLib(copula, .registration=TRUE)
 
-### Part I: Former copula ######################################################
+### Part I: Mainly former copula ###############################################
 
 importFrom("graphics", persp, contour)
 importFrom("stats", coef, nobs, vcov)# logLik? - already import from "stats4" for mle2
 
 importFrom("mvtnorm",
-           dmvnorm, pmvnorm, rmvnorm,
-           dmvt, pmvt, rmvt)
+            dmvnorm, pmvnorm, rmvnorm,
+            dmvt, pmvt, rmvt)
+
+importFrom("Matrix", nearPD)
 
 ## FIXME: we would only want importS3MethodsFrom("pspline", predict)
 import("pspline")
@@ -60,12 +63,14 @@ export(claytonCopula, frankCopula, gumbelCopula, amhCopula, joeCopula)
 export(galambosCopula, huslerReissCopula, tawnCopula, tevCopula)
 export(plackettCopula)
 export(fgmCopula)
+## auxiliary functions mainly used for working with elliptical copulas:
+export(p2P, P2p, getSigma)
 
 exportMethods(show)
 exportMethods(persp, contour)
 
 ## empirical copula
-export(Cn)
+export(Cn, C.n, dCn)
 
 ## fitting copula
 export(loglikCopula, loglikMvdc)
@@ -80,6 +85,9 @@ export(indepTestSim, indepTest, multIndepTest,
 ## gof tests
 export(gofCopula, gofEVCopula)
 
+## ggraph utils
+export(pairwiseCcop, pairwiseIndepTest, pviTest, gpviTest, RSpobs, gofBTstat) # R/ggraph-tools.R
+export(pairsColList, pairsRosenblatt, .pairsCond) # R/pairsRosenblatt.R
 
 ## other nonparametric tests
 export(evTestC, evTestA, evTestK)
@@ -105,16 +113,16 @@ S3method(vcov, fittedMV)
 S3method(logLik, fittedMV)
 
 
-## testing
+##_TESTING_
 ## export(dCdtheta, derPdfWrtParams, dTau, dRho)
 ## export(dCdu)
 ## export(ChiPlot, KPlot)
-## testing purpose
+##
 ## export(fitCopula.repar)
 ## export(multcomp) ---> R/mult.R
 
 
-### Part II: Former nacopula ###################################################
+### Part II: Mainly former nacopula ############################################
 
 ## Now  'Depend'  on  stats4 and bbmle :
 importFrom("stats4", mle)
@@ -152,8 +160,10 @@ export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        ,"ebeta", "etau", "emde", "dDiag", "edmle", "emle", "enacopula"
        ## goodness-of-fit
        ,"gofTstat", "rtrafo", "htrafo", "gnacopula"
+       ## distribution of the radial part for Archimedean copulas
+       ,"pacR", "qacR"
        ## Kendall distribution
-       ,"K", "pK", "qK", "dK", "rK"
+       ,"K", "Kn", "pK", "qK", "dK", "rK"
        ## misc
        ,"onacopula", "onacopulaL", "nac2list", "nesdepth", rnacModel, nacPairthetas
        ,"polynEval"
@@ -177,7 +187,7 @@ export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        ,"tauAMH", "tauJoe"
        ,"allComp" # <- maybe keep private ?
        ,"safeUroot"
-       ,"splom2"
+       ,"splom2", "qqplot2"
        )
 ## Deprecated old names [2012-07-25]:
 export(psiDabsMC

@@ -6,7 +6,7 @@
 \alias{fitMvdc-class}
 \alias{summaryFitCopula-class}
 \alias{summaryFitMvdc-class}
-% methods --- see also ./show-methods.Rd, and ./fitMvdc.Rd
+% methods --- see also ./show-methods.Rd, and ./fitMvdc.Rd (S3 meth.s)
 \alias{summary,fitCopula-method}
 \alias{summary,fitMvdc-method}
 \description{
@@ -35,11 +35,13 @@
   }
   In addition, the \code{"fitCopula"} class has a slot
   \describe{
-    \item{\code{copula}:}{Object of class \code{"\linkS4class{copula}"}.}
+    \item{\code{copula}:}{the \emph{fitted} copula, of class
+      \code{"\linkS4class{copula}"}.}
   }
   whereas the \code{"fitMvdc"} has
   \describe{
-    \item{\code{mvdc}:}{Object of class \code{"\linkS4class{mvdc}"}.}
+    \item{\code{mvdc}:}{the \emph{fitted} distribution, of class
+      \code{"\linkS4class{mvdc}"}.}
   }
 }
 \section{Extends}{
@@ -51,6 +53,9 @@
     \item{summary}{\code{signature(object = "fitMvdc")}: ... }
     \item{summary}{\code{signature(object = "fitCopula")}: ... }
   }
+  Further, there are S3 methods (class \code{"fittedMV"}) for
+  \code{\link{coef}()}, \code{\link{vcov}()} and \code{\link{logLik}()},
+  see \code{\link{fitMvdc}}.
 }
 \references{
   Genest, C., Ghoudi, K., and Rivest, L.-P. (1995). A semiparametric

@@ -47,14 +47,12 @@ AIndep <- function(copula, w) rep.int(1, length(w))
 rindepCopula <- function(n, copula) matrix(runif(n * copula@dimension), nrow = n)
 
 pindepCopula <- function(u, copula, log.p=FALSE) {
-  if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-  stopifnot (ncol(u) == copula@dimension)
+  stopifnot(ncol(u) == copula@dimension)
   if(log.p) rowSums(log(u)) else apply(u, 1, prod)
 }
 
 dindepCopula <- function(u, copula, log=FALSE, ...) {
-  if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-  stopifnot (ncol(u) == copula@dimension)
+  stopifnot(ncol(u) == copula@dimension)
   rep.int(if(log) 0 else 1, nrow(u))
 }
 

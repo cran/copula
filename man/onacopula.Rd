@@ -25,7 +25,7 @@ nac2list(x)
     "Clayton" or simply "C"); see the \code{\link{acopula-families}}
     documentation, or an \code{\linkS4class{acopula}} family object.}
   \item{nacStructure}{a \dQuote{formula} of the form
-    \deqn{C(\theta, c(i_1,\dots,i_c), list(C(..), ..., C(..))).}{%
+    \deqn{C(\theta, c(i_1,\dots,i_c),\mathrm{list}(C(..), ..., C(..))).}{%
       C(th, c(i1,..ic), list(C(..), ..., C(..))).}
     Note that \eqn{C()} has (maximally) three arguments: the first is
     the copula parameter (vector) \eqn{\theta}{theta}, the second a
@@ -91,9 +91,20 @@ stopifnot(identical(C3, C3.))
 err <- try(onacopula("G", C(theta0, 2, C(theta1, c(3,2)))))
 
 ## Compute the probability of falling in [0,.01]^3 for this copula
-pnacopula(C3, rep(.01,3))
+pCopula(rep(.01,3), C3)
 
 ## Compute the probability of falling in the cube [.99,1]^3
 prob(C3, rep(.99, 3), rep(1, 3))
+
+## Construct a 6-dimensional, partially nested Gumbel copula of the form
+## C_0(C_1(u_1, u_2), C_2(u_3, u_4), C_3(u_5, u_6))
+theta <- 2:5
+copG <- onacopulaL("Gumbel", list(theta[1], NULL, list(list(theta[2], c(1,2)),
+                                                       list(theta[3], c(3,4)),
+                                                       list(theta[4], c(5,6)))))
+set.seed(1)
+U <- rCopula(5000, copG)
+pairs(U, pch=".", gap=0, labels=as.expression( sapply(1:dim(copG),
+    function(j) bquote(italic(U[.(j)]))) ))
 }
 \keyword{multivariate}

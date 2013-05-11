@@ -1,5 +1,5 @@
 
-R version 2.15.1 Patched (2012-08-06 r60176) -- "Roasted Marshmallows"
+R version 2.15.2 Patched (2012-12-25 r61440) -- "Trick or Treat"
 Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -33,6 +33,9 @@ Type 'q()' to quit R.
 > 
 > require(copula)
 Loading required package: copula
+> source(system.file("Rsource", "utils.R", package="copula", mustWork=TRUE))
+> ##-> assertError()
+> 
 > ## fCopulae: don't do on CRAN, and really "can not" suggest fCopulae
 > tryfCop <- TRUE # for interactive convenience
 > ## when run as BATCH:
@@ -45,15 +48,6 @@ Loading required package: copula
 > tryfCop
 [1] FALSE
 > 
-> ## From system.file("test-tools-1.R", package="Matrix"):
-> ## Make sure errors are signaled
-> assertError <- function(expr) {
-+     d.expr <- deparse(substitute(expr))
-+     t.res <- tryCatch(expr, error = function(e) e)
-+     if(!inherits(t.res, "error"))
-+ 	stop(d.expr, "\n\t did not give an error", call. = FALSE)
-+     invisible(t.res)
-+ }
 > numTailIndexLower <- function(copula, u) {
 +   ## u is a vector approaching 0
 +   pCopula(cbind(u, u, deparse.level = 0), copula) / u
@@ -208,8 +202,8 @@ Parameters:
 > 
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ''statistical reasons''
-Time elapsed:  0.948 0.044 0.989 0 0 
+Time elapsed:  0.788 0.056 0.842 0 0 
 > 
 > proc.time()
    user  system elapsed 
-  0.948   0.044   0.989 
+  0.788   0.056   0.842 

@@ -37,9 +37,10 @@ indepTestSim <- function(n, p, m=p, N=1000, verbose = TRUE, print.every = NULL)
         stop("p should be an integer greater than 2")
     if (!is.numeric(m) || (m <- as.integer(m)) < 2 || m > p)
         stop(paste("m should be an integer greater than 2 and smaller than",p))
-    if (!is.numeric(N) || (N != as.integer(N)) || N <= 10)
-	stop("N should be an integer greater than 10")
-    if(N < 100) warning("N should be at least 100")
+    if (!is.numeric(N) || (N != as.integer(N)) || N <= 5)
+	stop("N should be an integer greater than 5")
+    if(N < 100 && getOption("copula:warn.idTS", TRUE))
+	warning("N should be at least 100")
     if (!is.null(print.every)) {
         warning("Argument 'print.every' is deprecated. Please use 'verbose' instead.")
         verbose <- print.every > 0
@@ -92,7 +93,7 @@ indepTest <- function(x, d, alpha=0.05)
     if (nrow(x) < 2)
         stop("data should contain more than 2 rows")
     if (!inherits(d, "indepTestDist"))
-        stop("d should be obtained by means of the function empcopu.simulate")
+	stop("d should be obtained by indepTestSim()")
     if (ncol(x) != d$data.dimension)
       stop("d was not obtained from simulations based on data whose dimension is equal to that of x")
     if (nrow(x) != d$sample.size)
@@ -173,7 +174,7 @@ serialIndepTestSim <- function(n, lag.max, m=lag.max+1, N=1000, verbose = TRUE, 
     if (n-p+1 < 2)
       stop("wrong number of lags with respect to the sample size")
     if (!is.numeric(m) || (m <- as.integer(m)) < 2 || m > p)
-        stop(paste("m should be an integer greater than 2 and smaller than",p))
+        stop(gettextf("m should be an integer greater than 2 and smaller than %d", p))
     if (!is.numeric(N) || (N != as.integer(N)) || N <= 10)
 	stop("N should be an integer greater than 10")
     if(N < 100) warning("N should be at least 100")
@@ -211,7 +212,8 @@ serialIndepTestSim <- function(n, lag.max, m=lag.max+1, N=1000, verbose = TRUE, 
 		   dist.global.statistic.independence = R $G0,
 		   dist.fisher.independence = R $fisher0,
 		   dist.tippett.independence = R $tippett0))
-}
+} ## end{ serialIndepTestSim }
+
 
 ##' Serial independence test based on the empirical
 ##' copula process as proposed by Christian Genest and Bruno
@@ -233,7 +235,7 @@ serialIndepTest <- function(x, d, alpha=0.05)
     if (length(x) < 2)
       stop("data should contain more than 2 observations")
     if (!inherits(d, "serialIndepTestDist"))
-      stop("d should be obtained by means of the function empcops.simulate")
+      stop("d should result from  serialIndepTestSim()")
     n <- length(x)
     if (n != as.integer(d$sample.size))
       warning("d was not obtained from simulations based on data whose size is equal to that of x")

@@ -91,9 +91,8 @@ copAMH <-
 		  if(d > 2) stopifnot(C.@paraConstr(theta))
                   ## f() := NaN outside and on the boundary of the unit hypercube
                   res <- rep.int(NaN, n <- nrow(u))
-                  ## indices for which density has to be evaluated:
-                  n01 <- apply(u,1,function(x) all(0 < x, x < 1))
-                  if(!any(n01)) return(res)
+		  n01 <- u.in.01(u)## indices for which density has to be evaluated
+                  ## if(!any(n01)) return(res)
                   if(theta == 0) { res[n01] <- if(log) 0 else 1; return(res) } # independence
                   ## auxiliary results
                   u. <- u[n01,, drop=FALSE]
@@ -126,6 +125,15 @@ copAMH <-
 			  polylog(h, s=-(d+1), method="negI-s-Stirling") /
 			      polylog(h, s=-d, method="negI-s-Stirling")
 		  },
+                  ## uscore function
+                  uscore = function(u, theta, d, method = "negI-s-Eulerian") {
+                      if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
+                      omu <- 1-u
+                      h <- theta*apply(u/(1-theta*omu), 1, prod)
+                      Li.md1 <- polylog(h, s=-(d+1), method=method, log=TRUE)
+                      Li.md <- polylog(h, s=-d, method=method, log=TRUE)
+                      (1-theta) / (u*(1-theta*omu)) * (theta*exp(Li.md1-Li.md) - 1)
+                  },
 		  ## nesting constraint
 		  nestConstr = function(theta0,theta1) {
 		      C.@paraConstr(theta0) &&
@@ -244,8 +252,8 @@ copClayton <-
 		      if(d > 2) stopifnot(C.@paraConstr(theta))
 		      ## f() := NaN outside and on the boundary of the unit hypercube
 		      res <- rep.int(NaN, n <- nrow(u))
-		      n01 <- apply(u,1,function(x) all(0 < x, x < 1)) # indices for which density has to be evaluated
-		      if(!any(n01)) return(res)
+		      n01 <- u.in.01(u)## indices for which density has to be evaluated
+		      ## if(!any(n01)) return(res)
 		      ## auxiliary results
 		      u. <- u[n01,, drop=FALSE]
 		      lu <- rowSums(log(u.))
@@ -282,6 +290,14 @@ copClayton <-
 		      sum(k/(theta*k+1))-rowSums(lu)+alpha^2*ltp1-(d+alpha)*
                           exp(ldt-ltp1)
 		  },
+                  ## uscore function
+                  uscore = function(u, theta, d) {
+                      if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
+                      t <- rowSums(iPsi(u, theta=theta))
+                      tht <- (theta*d+1)/(1+t)
+                      t1 <- theta+1
+                      tht*u^(-t1)-t1/u
+                  },
 		  ## nesting constraint
 		  nestConstr = function(theta0,theta1) {
 		      C.@paraConstr(theta0) &&
@@ -413,8 +429,8 @@ copFrank <-
 		  if(d > 2) stopifnot(C.@paraConstr(theta))
 		  ## f() := NaN outside and on the boundary of the unit hypercube
 		  res <- rep.int(NaN, n <- nrow(u))
-		  n01 <- apply(u,1,function(x) all(0 < x, x < 1)) # indices for which density has to be evaluated
-		  if(!any(n01)) return(res)
+		  n01 <- u.in.01(u)## indices for which density has to be evaluated
+		  ## if(!any(n01)) return(res)
 		  ## auxiliary results
 		  u. <- u[n01,, drop=FALSE]
 		  u.sum <- rowSums(u.)
@@ -452,8 +468,20 @@ copFrank <-
 		      h <- Ie*apply(Ie/etu, 1, prod)
 		      factor <- rowSums(u*etu/Ietu) - (d-1)*e/Ie
 		      (d-1)/theta - rowSums(u/Ietu) + factor *
-			  polylog(h, s=-d, method="negI-s-Stirling") / polylog(h, s=-(d-1), method="negI-s-Stirling")
+			  polylog(h, s=-d, method="negI-s-Stirling") /
+                              polylog(h, s=-(d-1), method="negI-s-Stirling")
 		  },
+                  ## uscore function
+                  uscore = function(u, theta, d, method = "negI-s-Eulerian") {
+                      if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
+                      Ie <- -expm1(-theta) # == 1 - e == 1-e^{-theta}
+                      etu <- exp(mtu <- -theta*u) # exp(-theta*u)
+                      h <- Ie*apply(Ie/etu, 1, prod)
+                      factor <- theta/(-expm1(mtu))
+                      Li.md <- polylog(h, s=-d, method=method, log=TRUE)
+                      Li.mdm1 <- polylog(h, s=-(d-1), method=method, log=TRUE)
+                      factor * (exp(Li.md+log(h)-theta*u - Li.mdm1) - 1)
+                  },
 		  ## nesting constraint
 		  nestConstr = function(theta0,theta1) {
 		      C.@paraConstr(theta0) &&
@@ -606,8 +634,8 @@ copGumbel <-
 		  stopifnot(C.@paraConstr(theta))
                   ## f() := NaN outside and on the boundary of the unit hypercube
                   res <- rep.int(NaN, n <- nrow(u))
-                  n01 <- apply(u,1,function(x) all(0 < x, x < 1)) # indices for which density has to be evaluated
-                  if(!any(n01)) return(res)
+		  n01 <- u.in.01(u)## indices for which density has to be evaluated
+                  ## if(!any(n01)) return(res)
                   if(theta == 1) { res[n01] <- if(log) 0 else 1; return(res) } # independence
                   ## auxiliary results
                   u. <- u[n01,, drop=FALSE]
@@ -651,6 +679,64 @@ copGumbel <-
 		      stopifnot(C.@paraConstr(theta))
 		      stop("The score function is currently not implemented for Gumbel copulas")
 		  },
+                  ## uscore function
+                  uscore = function(u, theta, d, Pmethod=eval(formals(polyG)$method),
+                                    P.method=eval(formals(coeffG)$method)) {
+                      if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
+                      t <- rowSums(C.@iPsi(u, theta))
+                      alpha <- 1/theta
+                      lx <- alpha*log(t)
+                      lP <- polyG(lx, alpha, d, method=Pmethod, log=TRUE)
+                      ## compute P' at lx; for now, only implemented all coeffG() methods (see polyG())
+                      ## as they already cover a wide range of "stable" values
+                      ## Note: this code is copied and adjusted from aux-acopula.R
+                      if(missing(P.method)) P.method <- function(d, alpha) { # adjusted meth2012 in polyG()
+                          if (d <= 30) "direct"
+                          else if (d <= 50) {
+                              if (alpha <= 0.8) "direct" else "dsSib.log"
+                          }
+                          else if (d <= 70) {
+                              if (alpha <= 0.7) "direct" else "dsSib.log"
+                          }
+                          else if (d <= 90) {
+                              if (alpha <= 0.5) "direct"
+                              else if (alpha >= 0.8) "dsSib.log"
+                              ## else if (lx <= 4.08) "pois"
+                              else if (lx >= 5.4) "direct"
+                              else "dsSib.Rmpfr"
+                          }
+                          else if (d <= 120) {
+                              if (alpha < 0.003) "sort"
+                              else if (alpha <= 0.4) "direct"
+                              else if (alpha >= 0.8) "dsSib.log"
+                              ## else if (lx <= 3.55) "pois"
+                              else if (lx >= 5.92) "direct"
+                              else "dsSib.Rmpfr"
+                          }
+                          else if (d <= 170) {
+                              if (alpha < 0.01) "sort"
+                              else if (alpha <= 0.3) "direct"
+                              else if (alpha >= 0.9) "dsSib.log"
+                              ## else if (lx <= 3.55) "pois"
+                              else "dsSib.Rmpfr"
+                          }
+                          else if (d <= 200) {
+                              if (lx <= 2.56) "pois"
+                              else if (alpha >= 0.9) "dsSib.log"
+                              else "dsSib.Rmpfr"
+                          }
+                          else "dsSib.Rmpfr"
+                      }
+                      ## compute the coefficients (adjusted for P')
+                      k <- 1:d
+                      l.a.dk. <- log(k) + coeffG(d, alpha, method=P.method, log = TRUE) # new: log(k)
+                      logx. <- l.a.dk. + (k-1) %*% t(lx) # new: new l.a.dk. and k-1 instead of k
+                      lP. <- lsum(logx.) # P'(lx)
+                      ## put the pieces together
+                      t.a <- t^alpha
+                      mlu <- -log(u)
+                      (mlu^(theta-1)*(t.a*(1-exp(lP.-lP))+d/alpha)/t - (theta-1)/mlu + 1) / u
+                  },
 		  ## nesting constraint
 		  nestConstr = function(theta0,theta1) {
 		      C.@paraConstr(theta0) &&
@@ -795,8 +881,8 @@ copJoe <-
 		  stopifnot(C.@paraConstr(theta))
                   ## f() := NaN outside and on the boundary of the unit hypercube
                   res <- rep.int(NaN, n <- nrow(u))
-                  n01 <- apply(u,1,function(x) all(0 < x, x < 1)) # indices for which density has to be evaluated
-                  if(!any(n01)) return(res)
+		  n01 <- u.in.01(u)## indices for which density has to be evaluated
+                  ## if(!any(n01)) return(res)
                   if(theta == 1) { res[n01] <- if(log) 0 else 1; return(res) } # independence
                   ## auxiliary results
                   u. <- u[n01,, drop=FALSE]
@@ -843,6 +929,44 @@ copJoe <-
 		      (d-1)/theta + rowSums(l1_u) - l1_h/theta^2 + (1-1/theta)*
 			  lh_l1_h*b + exp(lQ-lP)
 		  },
+                  ## uscore function
+                  uscore = function(u, theta, d, method=eval(formals(polyJ)$method)) {
+                      if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
+                      alpha <- 1/theta
+                      ## compute the log of the argument of P and P'
+                      omu <- 1-u # 1-u
+                      u.th <- omu^theta # (1-u)^theta
+		      lh <- rowSums (log1p(-u.th)) # rowSums(log(1-(1-u)^theta)) = log(h)
+		      l1_h <- log1mexp(-lh) # log(1-h)
+		      lh_l1_h <- lh - l1_h # log(h/(1-h))
+                      ## compute log(P(log(h/(1-h))))
+                      lP <- polyJ(lh_l1_h, alpha, d, method=method, log=TRUE)
+                      ## compute log(P'(log(h/(1-h))))
+                      ## Note: this is similar to polyJ() (see there for the comments!)
+                      k <- 2:d # 2:d instead of 1:d
+                      l.a.k <- log(Stirling2.all(d)) + lgamma(k-alpha) - lgamma(1-alpha) # log(a_{dk}(theta)*(k+1)), k = 1,..,d; note: these are not the a's of Hofert, Maechler, McNeil (2012); see polyJ()
+                      l.a.k. <- log(k-1) + l.a.k
+                      B <- l.a.k. + (k-2) %*% t(lh_l1_h) # new: new l.a.k. and k-2 instead of k-1
+                      ## the following part is taken from polyJ() (but only the log cases)
+                      lP. <- switch(method,
+                                 "log.poly" = {
+                                     lsum(B)
+                                 },
+                                 "log1p" = {
+                                     im <- apply(B, 2, which.max) # indices (vector) of maxima
+                                     n <- length(lh_l1_h) ; d1 <- d-1L
+                                     max.B <- B[cbind(im, seq_len(n))] # get max(B[,i])_{i=1,..,n} == apply(B, 2, max)
+                                     B.wo.max <- matrix(B[unlist(lapply(im, function(j) k[-j])) +
+                                                          d*rep(0:(n-1), each = d1)], d1, n) # matrix B without maxima
+                                     max.B + log1p(colSums(exp(B.wo.max - rep(max.B, each = d1))))
+                                 },
+                                 "poly" = {
+                                     log(colSums(exp(B)))
+                                 },
+                                 stop(gettextf("unsupported method '%s' in polyJ", method)), domain=NA)
+                      ## put the pieces together
+                      theta*omu^(theta-1)/(1-u.th) * (1-alpha+exp(-l1_h)*exp(lP.-lP)) - (theta-1)/omu
+                  },
 		  ## nesting constraint
 		  nestConstr = function(theta0,theta1) {
 		      C.@paraConstr(theta0) &&

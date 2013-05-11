@@ -76,8 +76,8 @@ emde(u, cop,
    submitted.
 
    Hering, C. and Hofert, M. (2011),
-	Goodness-of-fit tests for Archimedean copulas in large dimensions,
-	submitted.
+   Goodness-of-fit tests for Archimedean copulas in large dimensions,
+   submitted.
 }
 \seealso{
   \code{\link{enacopula}} (wrapper for different estimators),

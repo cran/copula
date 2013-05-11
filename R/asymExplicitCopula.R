@@ -119,10 +119,10 @@ getAsymExplicitCopulaComps <- function(object) {
 ## }
 
 pasymExplicitCopula <- function(u, copula) {
-  u <- as.matrix(u)
+  tu <- t(rbind(u, deparse.level=0L))
   comps <- getAsymExplicitCopulaComps(copula)
-  p1 <- pCopula(t(t(u)^(1 - comps$shapes)), comps$copula1)
-  p2 <- pCopula(t(t(u)^comps$shapes), comps$copula2)
+  p1 <- pCopula(t(tu^(1 - comps$shapes)), comps$copula1)
+  p2 <- pCopula(t(tu^comps$shapes), comps$copula2)
   p1 * p2
 }
 
@@ -147,10 +147,11 @@ dasymExplicitCopula <- function(u, copula, log=FALSE, ...) {
   u <- as.matrix(u)
   comps <- getAsymExplicitCopulaComps(copula)
   a <- comps$shapes
-  u1 <- t(t(u)^(1 - a))
-  u2 <- t(t(u)^a)
-  dg1 <- t((1 - a) * t(u)^(-a))
-  dg2 <- t(a * t(u)^(a - 1))
+  tu <- t(u)
+  u1 <- t(tu^(1 - a))
+  u2 <- t(tu^a)
+  dg1 <- t((1 - a) * tu^(-a))
+  dg2 <- t(a * tu^(a - 1))
   d <- copula@dimension
   powerSet <- getPowerSet(d)
   dens <- 0

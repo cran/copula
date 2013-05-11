@@ -14,41 +14,35 @@
   last two references).
 }
 \usage{
-gofCopula(copula, x, N = 1000,
-          method = c("Sn", "AnChisq", "AnGamma", "SnB", "SnC"),
-          estim.method = c("mpl", "ml", "irho", "itau"),
-          simulation = c("pb", "mult"), verbose = TRUE, print.every = NULL,
-          optim.method = "BFGS", optim.control = list(maxit=20))
+gofCopula(copula, x, N=1000,
+          method=eval(formals(gofTstat)$method),
+          estim.method=eval(formals(fitCopula)$method),
+          simulation=c("pb", "mult"),
+	  verbose=TRUE, print.every=NULL,
+          optim.method="BFGS", optim.control=list(maxit=20), ...)
 }
 \arguments{
-  \item{copula}{ object of class \code{"\linkS4class{copula}"} representing the
+  \item{copula}{object of class \code{"\linkS4class{copula}"} representing the
     hypothesized copula family.}
-  \item{x}{ a data matrix that will be transformed to pseudo-observations. }
-  \item{N}{ number of bootstrap or multiplier iterations to be used to
+  \item{x}{a data matrix that will be transformed to pseudo-observations. }
+  \item{N}{number of bootstrap or multiplier replications to be used to
     simulate realizations of the test statistic under the null
     hypothesis.}
   \item{method}{a \code{\link{character}} string specifying the
-    goodness-of-fit test statistic to be used, which has to be one (or a unique
-    abbreviation) of \code{"AnChisq"}, \code{"AnGamma"}, \code{"SnB"},
-    \code{"SnC"}, or \code{"Sn"}.
-
-    \code{"Sn"} is \eqn{\mathrm{S_n}}{S[n]} from Equation (2) in Genest,
-    R\enc{é}{e}millard, Beaudoin (2009). For the others see
-    \code{method} in \code{\link{gofTstat}}.
-  }
+    goodness-of-fit test statistic to be used; see \code{\link{gofTstat}()}.}
   \item{estim.method}{a character string specifying the estimation method to
-    be used to estimate the dependence parameter(s); can be either \code{"mpl"}
-    (maximum pseudo-likelihood), \code{"itau"} (inversion of
-    Kendall's tau) or \code{"irho"} (inversion of Spearman's rho).}
+    be used to estimate the dependence parameter(s); see \code{\link{fitCopula}()}.}
   \item{simulation}{a string specifying the simulation method for
     generating realizations of the test statistic under the null
     hypothesis; can be either \code{"pb"} (parametric bootstrap) or
     \code{"mult"} (multiplier).}
-  \item{print.every}{ is deprecated in favor of \code{verbose}.}
+  \item{print.every}{is deprecated in favor of \code{verbose}.}
   \item{verbose}{a logical specifying if progress of the bootstrap
     should be displayed via \code{\link[utils]{txtProgressBar}}.}
   \item{optim.method, optim.control}{the \code{method} and
     \code{control} arguments for \code{\link{optim}()}, see there.}
+  \item{\dots}{additional arguments passed to the underlying main
+    auxiliary functions (see the code for details).}
 }
 \details{
   If the parametric bootstrap is used, the dependence parameters of
@@ -61,7 +55,7 @@ gofCopula(copula, x, N = 1000,
   For the normal and t copulas, several dependence structures can be
   hypothesized: \code{"ex"} for exchangeable, \code{"ar1"} for AR(1),
   \code{"toep"} for Toeplitz, and \code{"un"} for unstructured (see
-  \code{\link{ellipCopula}}). For the t copula, \code{"df.fixed"} has to
+  \code{\link{ellipCopula}()}). For the t copula, \code{"df.fixed"} has to
   be set to \code{TRUE}, which implies that the degrees of freedom are
   not considered as a parameter to be estimated.
 
@@ -74,17 +68,18 @@ gofCopula(copula, x, N = 1000,
   significantly.
 
   Also note that in case of the parametric bootstrap, a finite-sample
-  correction of type \eqn{(sum(T0 >= T)+0.5)/(N+1)} is made, where
-  \eqn{T} and \eqn{T0} are the test statistic and bootstrapped test
-  statistc, respectively.
+  correction of type \eqn{(0.5+\sum_{b=1}^N\mathbf{1}_{\{T_b\ge
+      T\}})/(N+1)}{(0.5 + sum(T[b] >= T, b=1, .., N)) / (N+1)} is made,
+  where \eqn{T} and \eqn{T_b}{T[b]} denote the the test statistic and
+  bootstrapped test statistc, respectively. See Pesarin (2001) for details.
 }
 \value{
   An object of \code{\link{class}} \code{htest} which is a list,
   some of the components of which are
-  \item{statistic}{ value of the test statistic. }
-  \item{p.value}{ corresponding approximate p-value. }
-  \item{parameter}{ estimates of the parameters for the hypothesized
-    copula family. }
+  \item{statistic}{value of the test statistic.}
+  \item{p.value}{corresponding approximate p-value.}
+  \item{parameter}{estimates of the parameters for the hypothesized
+    copula family.}
 }
 \references{
   Genest, C. and R\enc{é}{e}millard, B. (2008). Validity of the parametric
@@ -109,6 +104,10 @@ gofCopula(copula, x, N = 1000,
   copula R Package.
   \emph{Journal of Statistical Software} \bold{34}(9), 1--20.
   \url{http://www.jstatsoft.org/v34/i09/}.
+
+  Pesarin, F. (2001).
+  \emph{Multivariate Permutation Tests: With Applications in Biostatistics}.
+  Wiley.
 }
 \note{
   These tests were derived under the assumption of continuous margins,
@@ -116,11 +115,17 @@ gofCopula(copula, x, N = 1000,
   presence of ties in the data might substantially affect the
   approximate p-values. One way of dealing with ties was suggested in the
   last reference.
+
+  Since \R is widely used by practitioners, a word of warning concerning
+  goodness-of-fit tests \emph{in general} is also advisable.
+  Goodness-of-fit tests are often (ab)used in practice to
+  \dQuote{justify} an assumption under which one then continues to work
+  (carelessly).  From a mathematical point of view, this is not correct.
 }
 \seealso{
-  \code{\link{fitCopula}()}, \code{\link{ellipCopula}}.
-
-  \code{\link{gnacopula}} for other goodness-of-fit tests for (nested)
+  \code{\link{fitCopula}()} for the underlying estimation procedure,
+  \code{\link{gofTstat}()} for the available test statistics,
+  \code{\link{gnacopula}()} for other goodness-of-fit tests for (nested)
   Archimedean copulas.
 }
 \examples{
@@ -131,7 +136,7 @@ gofCopula(copula, x, N = 1000,
 ## A two-dimensional data example ----------------------------------
 x <- rCopula(200, claytonCopula(3))
 
-tau. <- cor(x, method="kendall")
+(tau. <- cor(x, method="kendall")[1,2]) # around 0.5 -- 0.6
 ## Does the Gumbel family seem to be a good choice?
 thG <- iTau(gumbelCopula(), tau.)
 gofCopula(gumbelCopula(thG), x)
@@ -169,4 +174,5 @@ gofCopula(t.copula,                 x, simulation="mult")
 }
 \keyword{htest}
 \keyword{models}
+\keyword{goodness-of-fit}
 \keyword{multivariate}

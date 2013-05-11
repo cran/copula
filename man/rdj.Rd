@@ -20,9 +20,10 @@
   }
 }
 \references{
-  McNeil, A. J., Frey, R. and Embrechts, P. (2005), \emph{Quantitative risk
-    management}, Princeton University Press, Princeton Series in
-  Finance, New Jersey.}
+  McNeil, A. J., Frey, R., and Embrechts, P. (2005).
+  \emph{Quantitative Risk Management: Concepts, Techniques, Tools}.
+  Princeton University Press.
+}
 \examples{
 data(rdj)
 }

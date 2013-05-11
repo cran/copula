@@ -16,16 +16,6 @@
 */
 
 
-/**
- * @file   empcop.c
- * @author Ivan Kojadinovic
- * @date   Sat Jul 21 17:25:20 2012
- *
- * @brief  Bivariate and multivariate versions of the empirical copula
- *         and related estimators of the partial derivatives
- *
- */
-
 #include <Rmath.h>
 
 /**
@@ -103,7 +93,7 @@ double der2bivCn(const double U[], const double V[], int n, double u, double v) 
  * @return the value of the empirical copula at V[k + m * j], j=1...p
  * @author Ivan Kojadinovic
  */
-double multCn(const double U[], int n, int p, const double V[], int m, int k, double o) {
+double multCn(const double U[], int n, int p, const double V[], int m, int k, double offset) {
     double sumind = 0.0;
     for (int i = 0; i < n; i++) {
 	int ind = 1;
@@ -111,7 +101,7 @@ double multCn(const double U[], int n, int p, const double V[], int m, int k, do
 	    ind *= (U[i + n * j] <= V[k + m * j]);
 	sumind += (double)ind;
     }
-    return sumind / (n + o);
+    return sumind / (n + offset);
 }
 
 /**
@@ -132,19 +122,20 @@ double der_multCn(const double U[], int n, int p,
     return (multCn(U, n, p, u, 1, 0, 0.0) - multCn(U, n, p, v, 1, 0, 0.0)) / denom;
 }
 
-/** 
- * Computes the empirical copula at all the lines of V 
+/**
+ * Computes the empirical copula at all the lines of V
  * Called in R by .C
- * 
- * @param U pseudo-observations 
+ *
+ * @param U pseudo-observations
  * @param n sample size
- * @param p dimension of the pseudo-observations 
- * @param V is vector representing a matrix of dimension m x p 
+ * @param p dimension of the pseudo-observations
+ * @param V is vector representing a matrix of dimension m x p
  * @param m "number of lines" of V
- * @param ec values of the empirical copula at the lines of V 
+ * @param ec values of the empirical copula at the lines of V
+ * @param offset offset to be used for scaling
  * @author Ivan Kojadinovic
  */
-void RmultCn(double *U, int *n, int *p, double *V, int *m, double *ec) {
+void Cn_C(double *U, int *n, int *p, double *V, int *m, double *ec, double *offset) {
    for (int i = 0; i < *m; i++)
-     ec[i] = multCn(U, *n, *p, V, *m, i, 0.0);
+     ec[i] = multCn(U, *n, *p, V, *m, i, *offset);
 }

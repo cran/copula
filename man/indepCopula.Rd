@@ -23,4 +23,4 @@ dCopula(x, indep.cop)
 persp(indepCopula(), pCopula)
 }
 \keyword{ distribution }% at least one, from doc/KEYWORDS
-\keyword{ multivariate }% __ONLY ONE__ keyword per line
+\keyword{ multivariate }

@@ -1,14 +1,21 @@
 \name{dnacopula}
 \alias{dnacopula}
+\alias{dCopula,matrix,nacopula-method}
+\alias{dCopula,numeric,nacopula-method}
 \title{Density Evaluation for (Nested) Archimedean Copulas}
 \description{
-  Evaluates the density of an Archimedean copula.
+  For a (nested) Archimedean copula (object of class \code{\linkS4class{nacopula}})
+  \code{x}, \code{dCopula(u, x)} (or also currently still \code{dnacopula(x, u)})
+  evaluates the density of \code{x} at the given vector or matrix \code{u}.
 }
 \usage{
+\S4method{dCopula}{matrix,nacopula}(u, copula, log=FALSE, \dots)
+
+## *Deprecated*:
 dnacopula(x, u, log=FALSE, \dots)
 }
 \arguments{
-  \item{x}{an object of class \code{"\linkS4class{outer_nacopula}"}.}
+  \item{copula, x}{an object of class \code{"\linkS4class{outer_nacopula}"}.}
   \item{u}{argument of the copula x.  Note that u can be a matrix in which case
     the density is computed for each row of the matrix and the vector of
     values is returned.}
@@ -19,6 +26,10 @@ dnacopula(x, u, log=FALSE, \dots)
     function (slot), such as \code{n.MC} (non-negative integer) for
     possible Monte Carlo evaluation (see \code{dacopula} in
     \code{\linkS4class{acopula}}).}
+}
+\note{
+  \code{\link{dCopula}(u, copula)} is a \emph{generic} function with
+  methods for \emph{all} our copula classes, see \code{\link{dCopula}}.
 }
 \details{
   If it exists, the density of an Archimedean copula \eqn{C} with
@@ -58,14 +69,20 @@ C20 <- onacopula("J", C(theta, 1:20))
 
 ## Evaluate the copula density at the point u = (0.5,...,0.5)
 u <- rep(0.5, 20)
-dnacopula(C20, u)
+dCopula(u, C20)
 
 ## the same with Monte Carlo based on 10000 simulated "frailties"
-dnacopula(C20, u, n.MC = 10000)
+dCopula(u, C20, n.MC = 10000)
 
 ## Evaluate the exact log-density at several points
 u <- matrix(runif(100), ncol=20)
-dnacopula(C20, u, log = TRUE)
+dCopula(u, C20, log = TRUE)
+
+## Back-compatibility check
+stopifnot(identical( dCopula (u, C20), suppressWarnings(
+                    dnacopula(C20, u))),
+          identical( dCopula (u, C20, log = TRUE), suppressWarnings(
+                    dnacopula(C20, u, log = TRUE))))
 }
 \keyword{distribution}
 

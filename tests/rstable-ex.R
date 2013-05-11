@@ -16,7 +16,7 @@
 
 require(copula)
 
-source(system.file("test-tools-1.R", package="Matrix"), keep.source=FALSE)
+source(system.file("Rsource", "utils.R", package="copula", mustWork=TRUE))
 
 set.seed(101)
 X <- rstable1(1e4, alpha=.9999, beta=1, gamma= .25, delta=1)

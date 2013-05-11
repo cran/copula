@@ -30,7 +30,7 @@ setClass("copula",
          validity = ##' Check validity of "copula"
          function(object) {
 	     dim <- object@dimension # "integer" by definition
-	     if (length(dim) != 1) return("'dim' must be an integer (>= 2)")
+	     if (length(dim) != 1L) return("'dim' must be an integer (>= 2)")
 	     if (dim < 2) return("dim must be >= 2")
              param <- object@parameters
              upper <- object@param.upbnd
@@ -53,8 +53,22 @@ setClass("copula",
          })
 
 ## general methods for copula
-setGeneric("dCopula", function(u, copula, log=FALSE, ...) standardGeneric("dCopula"))
-setGeneric("pCopula", function(u, copula, ...) standardGeneric("pCopula"))
+setGeneric("dCopula", function(u, copula, log=FALSE, ...) {
+    if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
+    u.is.out <- outside.01(u, strictly=FALSE)## on.boundary _or_ outside
+    if(any.out <- any(u.is.out, na.rm=TRUE))
+	u[] <- pmax(0, pmin(1, u)) # <- "needed", as some methods give error
+    r <- standardGeneric("dCopula")
+    if(any.out) ## on boundary _or_ outside cube  ==> zero mass :
+	r[u.is.out & !is.na(u.is.out)] <- if(log) -Inf else 0.
+    r
+})
+setGeneric("pCopula", function(u, copula, ...) {
+    if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
+    ## here as well, 'outside' and 'on-boundary' are equivalent:
+    u[] <- pmax(0, pmin(1, u))
+    standardGeneric("pCopula")
+})
 setGeneric("rCopula", function(n, copula, ...) standardGeneric("rCopula"))
 setGeneric("tau", function(copula, ...) standardGeneric("tau"))
 setGeneric("rho", function(copula, ...) standardGeneric("rho"))
@@ -87,22 +101,23 @@ rcopula <- function(copula, n, ...) { .Deprecated("rCopula"); rCopula(n, copula,
 
 ### elliptical copulas, contains normalCopula and tCopula ######################
 
+## NOTE: This is related to  npar.ellip() in ./ellipCopula.R
 validRho <- function(dispstr, dim, lenRho) {
     switch(dispstr, ## checking for correct 'dispstr'
 	   "ar1" =, "ex" = {
 	       if (lenRho != 1)
-		   return(sprintf("'rho' parameter should have length 1 for 'dispstr' = \"%s\"",
-				  dispstr))
+		   return(gettextf("'rho' parameter should have length 1 for 'dispstr' = \"%s\"",
+				   dispstr))
 	   },
 	   "un" = {
-	       if (lenRho != dim * (dim - 1) / 2)
-		   return(sprintf("'rho' parameter should have length dim * (dim - 1) / 2 for 'dispstr' = \"%s\"",
-				  dispstr))
+	       if (lenRho != (L <- dim * (dim - 1) / 2))
+		   return(gettextf("'rho' parameter should have length dim * (dim - 1) / 2 (= %d) for 'dispstr' = \"%s\"",
+				   L, dispstr))
 	   },
 	   "toep" = {
 	       if (lenRho != dim - 1)
-		   return(sprintf("'rho' parameter should have length dim-1 for 'dispstr' = \"%s\"",
-				  dispstr))
+		   return(gettextf("'rho' parameter should have length dim-1 (= %d) for 'dispstr' = \"%s\"",
+				   dim-1, dispstr))
 	   },
 	   ## otherwise
 	   return("'dispstr' not supported (yet)"))
@@ -232,28 +247,44 @@ setClass("plackettCopula",representation(exprdist = "expression"),
 
 ### Multivariate distibution via copula ########################################
 
+validMvdc <- function(object) {
+    dim <- object@copula@dimension
+    if(!is.finite(dim) || dim < 2)
+	return("'dimension' must be integer >= 2")
+    if(dim != length(object@margins))
+	return("'dimension' does not match margins' length")
+    if(dim != length(pm <- object@paramMargins))
+	return("'dimension' does not match paraMargins' length")
+    if(!all(vapply(pm, function(e) is.list(e) || is.numeric(e), NA)))
+	return("'paramMargins' elements must all be list()s or numeric vectors")
+    okNms <- function(nms) !is.null(nms) && all(nzchar(nms))
+    if(object@marginsIdentical) {
+	if(!all(object@margins[1] == object@margins[-1]))
+	    return("margins are not identical")
+	pm1 <- pm[[1]]
+	for(i in 2:dim) {
+	    if(!identical(pm1, pm[[i]]))
+		return("margins are not identical")
+	}
+	if(length(pm1) > 0 && !okNms(names(pm1)))
+	    return("'paramMargins' must be named properly")
+    }
+    else ## not identical margins: check each
+	for(i in seq_len(dim)) {
+	    pmi <- pm[[i]]
+	    if(length(pmi) > 0 && !okNms(names(pmi)))
+		return(gettextf("'paramMargins[[%d]]' must be named properly", i))
+	    ## TODO(?): check more similar to (/ instead of) those in mvdc() --> ./mvdc.R
+	}
+    TRUE
+}## validMvdc()
+
 setClass("mvdc",
-         representation(copula = "copula",
-                        margins = "character",
-                        paramMargins = "list",
-         		marginsIdentical = "logical"),
-         validity = function(object) {
-           dim <- object@copula@dimension # guaranteed to be >= 2
-           if(dim != length(object@margins))
-               return("'dimension' does not match margins' length")
-           if(dim != length(object@paramMargins))
-               return("'dimension' does not match paraMargins' length")
-           if(object@marginsIdentical){
-             if(!all(object@margins[1] == object@margins[-1]))
-               return("margins are not identical")
-             pm1 <- object@paramMargins[[1]]
-             for(i in 2:dim) {
-               if(!identical(pm1, object@paramMargins[[i]]))
-                 return("margins are not identical")
-             }
-           }
-           TRUE
-         })
+	 representation(copula = "copula",
+			margins = "character",
+			paramMargins = "list",
+			marginsIdentical = "logical"),
+	 validity = validMvdc)
 
 ## methods like {dpr}mvdc are defined in mvdc.R
 
@@ -283,7 +314,7 @@ vcov.fittedMV <- function(object, ...) {
 
 logLik.fittedMV <- function(object, ...) {
     val <- object@loglik
-    attr(val, "nobs") <- n <- object@nsample
+    attr(val, "nobs") <- object@nsample
     attr(val, "df") <- length(object@estimate)
     class(val) <- "logLik"
     val

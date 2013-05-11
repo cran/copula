@@ -44,10 +44,8 @@ evTestC <- function(x, N = 1000)
   if (m > 0)
     {
       y <- seq(1/m, 1 - 1/m, len = m)
-      v <- vector("list", p)
-      for (i in 1:p)
-        v[[i]] <- y
-      g <- as.matrix(expand.grid(v))
+      v <- rep(list(y), p)
+      g <- as.matrix(expand.grid(v, KEEP.OUT.ATTRS = FALSE))
       m <- nrow(g)
     }
   else
@@ -101,7 +99,7 @@ evTestC <- function(x, N = 1000)
 ##' @param derivatives can be either "An" or "Cn"
 ##' @return an object of class 'htest'
 ##' @author Ivan Kojadinovic
-evTestA <- function(x, N = 1000, derivatives = "An")
+evTestA <- function(x, N = 1000, derivatives = c("An","Cn"))
 {
   ## make pseudo-observations
   n <- nrow(x)
@@ -127,6 +125,7 @@ evTestA <- function(x, N = 1000, derivatives = "An")
           stat = double(1),
           as.double(offset))$stat
 
+  derivatives <- match.arg(derivatives)
   s0 <- if (derivatives == "Cn")
       .C(evtestA,
          as.double(u[,1]),
@@ -138,7 +137,7 @@ evTestA <- function(x, N = 1000, derivatives = "An")
          as.integer(estimator == "CFG"),
          as.integer(N),
          s0 = double(N))$s0
-  else
+  else # "An"
       .C(evtestA_derA,
          as.double(u[,1]),
          as.double(u[,2]),
@@ -167,31 +166,6 @@ evTestA <- function(x, N = 1000, derivatives = "An")
 ####################################################################
 
 ## internal functions
-I <- function(X,i,j)
-{
-  if (X[i,1] <= X[j,1] && X[i,2] <= X[j,2]) {ind <- 1} else {ind <- 0}
-  ind
-}
-
-zero.mat <- function(n)
-{
-  x <- rep(0,n)
-  y <- rep(1,n)
-  A <- NULL
-  for(k in 1:n){
-    A <- rbind(A,matrix(c(rep(y,(k-1)),x,rep(y,(n-k))),byrow=TRUE,nrow=n))
-  }
-  A
-}
-
-mult.row <- function(M,delete=TRUE)
-{
-  n <- ncol(M)
-  out <- matrix(rep(as.vector(t(M)),n),ncol=n,byrow=TRUE) *
-         matrix(as.vector(t(matrix(rep(as.vector(M),n),nrow=n))),byrow=TRUE,ncol=n)
-  if(delete) out*zero.mat(n) else out
-}
-
 
 ind.matrix <- function(X)
 {
@@ -255,7 +229,7 @@ thetas <- function(X)
   c[6] <- BsqMB - absq #BsqMB
   c[7] <- b2*b1 - b3 - absq #b4
   mu[7] <- (b2)^2 - b4 - BsqMB - sum(c)
-  return(list(mu=mu,theta=theta))
+  list(mu=mu, theta =theta)
 }
 
 ## calculation of the GKR test statistic Sn
@@ -327,7 +301,7 @@ GKRstatistic <- function(X, variance=c("fsample","asymptotic","all"))
     }
     var <- c(var,n*((n-1)/n)*(sum((VSn-rep(Sn,n))^2)))
   }
-  return(list(Sn=Sn,tau=tau,mu=mu,psi=psi,var=var))
+  list(Sn=Sn, tau=tau, mu=mu, psi=psi, var=var)
 }
 
 ##' Test of bivariate extreme-value dependence based on Kendall's process
@@ -366,8 +340,8 @@ evTestK <- function(x, method = c("fsample","asymptotic","jackknife"))
   p.value <- pnorm(-abs(Tn))+pnorm(abs(Tn),lower.tail=FALSE)
 
   structure(class = "htest",
-	    list(method = paste("Test of bivariate extreme-value dependence based on Kendall's process with argument 'method' set to '",
-                 method, "'", sep = ""),
+	    list(method = sprintf("Test of bivariate extreme-value dependence based on Kendall's process with argument 'method' set to %s",
+		 dQuote(method)),
                  statistic = c(statistic = Tn),
                  p.value = p.value,
                  data.name = deparse(substitute(x))))

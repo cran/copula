@@ -113,7 +113,7 @@ if(doExtras) {
 
 U2 <- rnacopula(n,cop)
 ## the density for the *correct* parameter looks okay
-summary(dnacopula(cop, U2))
+summary(dCopula(U2, cop))
 ## hmm:  max = 5.5e177
 if(doExtras)
 system.time(r2 <- curveLogL(cop, U2, c(1, 2.5)))
@@ -127,7 +127,7 @@ system.time(r3 <- curveLogL(cop, U3, c(1, 2.5)))
 
 U4 <- rnacopula(n,cop)
 enacopula(U4, cop, "mle") # 1.4519  was 2.351..  "completely wrong"
-summary(dnacopula(cop, U4)) # ok (had one Inf)
+summary(dCopula(U4, cop)) # ok (had one Inf)
 if(doExtras)
 system.time(r4 <- curveLogL(cop, U4, c(1, 2.5)))
 

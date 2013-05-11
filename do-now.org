@@ -1,46 +1,50 @@
-| Done | Method         | Needed for                 | Current name                | Suggested name | Ellip | EV | archm    | ac | nAC     |
-|------+----------------+----------------------------+-----------------------------+----------------+-------+----+----------+----+---------|
-|      |                | DEPRECATED                 |                             |                |       |    |          |    |         |
-|------+----------------+----------------------------+-----------------------------+----------------+-------+----+----------+----+---------|
-| X    | tau            | pedagogy                   | kendallsTau                 | tau            | I     | I  | I        | I  |         |
-| X    | rho            | pedagogy                   | spearmansRho                | rho            | I     | I  | I        | I  |         |
-| X    | itau           | fitting                    | calibKendallsTau            | iTau           | I     | I  |          | I  |         |
-| X    | irho           | fitting                    | calibSpearmansRho           | iRho           | I     | I  | I ex amh |    |         |
-| X    | psiInv^{(d)}   | Archimedean                | genFunDer{1,2}              | diPsi          |       |    | P        | P  |         |
-| X    | psi            | Archimedean                | genFun                      | iPsi           |       |    | I        | P  |         |
-| X    | psi^{(d)}MC    | Archimedean                | psiDabsMC                   | absdPsiMC      |       |    | P        | P  |         |
-| X    | psiInv         | Archimedean                | genInv                      | psi            |       |    | I        | P  |         |
-| X    | A'args         | EV                         | AfunDer                     | dAdu           |       | I  |          |    |         |
-| X    | A              | EV                         | Afun                        | A              |       | I  |          |    |         |
-| X    | A_n            | EV                         | Anfun                       | An             |       | I  |          |    |         |
-| X    | beta_n         | ibeta estimate             | beta.hat                    | betan          |       |    |          | I  |         |
-|------+----------------+----------------------------+-----------------------------+----------------+-------+----+----------+----+---------|
-|      |                | Slot                       |                             |                |       |    |          |    |         |
-|------+----------------+----------------------------+-----------------------------+----------------+-------+----+----------+----+---------|
-| X    | abs(psi^{(d)}) | Archimedean                | psiDabs                     | absdPsi        |       |    | P        | P  |         |
-| X    | psiInv'        | Archimedean                | psiInvD1abs                 | absdiPsi       |       |    | P        | P  |         |
-| X    | psiInv         | Archimedean                | psiInv                      | iPsi           |       |    | I        | P  |         |
-| X    | itau           | fitting                    | tauInv                      | iTau           |       |    |          | I  |         |
-|------+----------------+----------------------------+-----------------------------+----------------+-------+----+----------+----+---------|
-|      |                | Simple                     |                             |                |       |    |          |    |         |
-|------+----------------+----------------------------+-----------------------------+----------------+-------+----+----------+----+---------|
-| X    | tau'           | itau fitting std err (se)  | tauDer                      | dTau           | I     | I  |          |    |         |
-| X    | rho'           | irho fitting std err       | rhoDer                      | dRho           | I     | I  |          |    |         |
-| X    | tau'           | itau fitting std err (se)  | TauDer                      | dTau           | I     | I  |          |    |         |
-| X    | rho'           | irho fitting std err       | RhoDer                      | dRho           | I     | I  |          |    |         |
-| X    | C'param        | gof mult                   | derCdfWrtParams             | dCdtheta       | I     |    | I ex amh |    |         |
-| X    | C'args         | gof mult, cov emp cop proc | derCdfWrtArgs               | dCdu           | I     |    | I ex amh | P  |         |
-| X    | A'param        | EV mpl se, gof mult        | derAfunWrtParam             | dAdtheta       |       | ?  |          |    |         |
-|------+----------------+----------------------------+-----------------------------+----------------+-------+----+----------+----+---------|
-|      | Swap Args      | DEPRECATED                 |                             |                |       |    |          |    |         |
-|------+----------------+----------------------------+-----------------------------+----------------+-------+----+----------+----+---------|
-| X    | C              | gof pb and mult            | pcopula                     | pCopula        | I     | I  | I        | I  |         |
-| X    | c              | fitting ml mpl             | dcopula                     | dCopula        | I     | I  | I        | I  | P(demo) |
-| X    | sampling       | gof pb                     | rcopula                     | rCopula        | I     |    |          | I  |         |
-| X    | C              | pb and mult                | pmvdc                       | pMvdc          | I     | I  | I        | I  |         |
-| X    | c              | fitting ml mpl             | dmvdc                       | dMvdc          | I     | I  | I        | I  |         |
-| X    | sampling       | pb                         | rmvdc                       | rMvdc          | I     |    |          | I  |         |
-|------+----------------+----------------------------+-----------------------------+----------------+-------+----+----------+----+---------|
-|      | Later          |                            |                             |                |       |    |          |    |         |
-|------+----------------+----------------------------+-----------------------------+----------------+-------+----+----------+----+---------|
-|      | lambdaU,L      | pedagogy                   | tailIndex, lambda{U,L}(th)? | tdc            | I     |    |          | I  |         |
+| Done | Method         | Needed for                 | Current name                  | Suggested name | Ellip | EV | archm    | ac | nAC     |
+|------+----------------+----------------------------+-------------------------------+----------------+-------+----+----------+----+---------|
+|      |                | DEPRECATED                 |                               |                |       |    |          |    |         |
+|------+----------------+----------------------------+-------------------------------+----------------+-------+----+----------+----+---------|
+| X    | tau            | pedagogy                   | kendallsTau                   | tau            | I     | I  | I        | I  |         |
+| X    | rho            | pedagogy                   | spearmansRho                  | rho            | I     | I  | I        | I  |         |
+| X    | itau           | fitting                    | calibKendallsTau              | iTau           | I     | I  |          | I  |         |
+| X    | irho           | fitting                    | calibSpearmansRho             | iRho           | I     | I  | I ex amh |    |         |
+| X    | psiInv^{(d)}   | Archimedean                | genFunDer{1,2}                | diPsi          |       |    | P        | P  |         |
+| X    | psi            | Archimedean                | genFun                        | iPsi           |       |    | I        | P  |         |
+| X    | psi^{(d)}MC    | Archimedean                | psiDabsMC                     | absdPsiMC      |       |    | P        | P  |         |
+| X    | psiInv         | Archimedean                | genInv                        | psi            |       |    | I        | P  |         |
+| X    | A'args         | EV                         | AfunDer                       | dAdu           |       | I  |          |    |         |
+| X    | A              | EV                         | Afun                          | A              |       | I  |          |    |         |
+| X    | A_n            | EV                         | Anfun                         | An             |       | I  |          |    |         |
+| X    | beta_n         | ibeta estimate             | beta.hat                      | betan          |       |    |          | I  |         |
+|------+----------------+----------------------------+-------------------------------+----------------+-------+----+----------+----+---------|
+|      |                | Slot                       |                               |                |       |    |          |    |         |
+|------+----------------+----------------------------+-------------------------------+----------------+-------+----+----------+----+---------|
+| X    | abs(psi^{(d)}) | Archimedean                | psiDabs                       | absdPsi        |       |    | P        | P  |         |
+| X    | psiInv'        | Archimedean                | psiInvD1abs                   | absdiPsi       |       |    | P        | P  |         |
+| X    | psiInv         | Archimedean                | psiInv                        | iPsi           |       |    | I        | P  |         |
+| X    | itau           | fitting                    | tauInv                        | iTau           |       |    |          | I  |         |
+|------+----------------+----------------------------+-------------------------------+----------------+-------+----+----------+----+---------|
+|      |                | Simple                     |                               |                |       |    |          |    |         |
+|------+----------------+----------------------------+-------------------------------+----------------+-------+----+----------+----+---------|
+| X    | tau'           | itau fitting std err (se)  | tauDer                        | dTau           | I     | I  |          |    |         |
+| X    | rho'           | irho fitting std err       | rhoDer                        | dRho           | I     | I  |          |    |         |
+| X    | tau'           | itau fitting std err (se)  | TauDer                        | dTau           | I     | I  |          |    |         |
+| X    | rho'           | irho fitting std err       | RhoDer                        | dRho           | I     | I  |          |    |         |
+| X    | C'param        | gof mult                   | derCdfWrtParams               | dCdtheta       | I     |    | I ex amh |    |         |
+| X    | C'args         | gof mult, cov emp cop proc | derCdfWrtArgs                 | dCdu           | I     |    | I ex amh | P  |         |
+| X    | A'param        | EV mpl se, gof mult        | derAfunWrtParam               | dAdtheta       |       | ?  |          |    |         |
+|------+----------------+----------------------------+-------------------------------+----------------+-------+----+----------+----+---------|
+|      | Swap Args      | DEPRECATED                 |                               |                |       |    |          |    |         |
+|------+----------------+----------------------------+-------------------------------+----------------+-------+----+----------+----+---------|
+| X    | C              | gof pb and mult            | pcopula                       | pCopula        | I     | I  | I        | I  |         |
+| X    | c              | fitting ml mpl             | dcopula                       | dCopula        | I     | I  | I        | I  | P(demo) |
+| X    | sampling       | gof pb                     | rcopula                       | rCopula        | I     |    |          | I  |         |
+| X    | C              | pb and mult                | pmvdc                         | pMvdc          | I     | I  | I        | I  |         |
+| X    | c              | fitting ml mpl             | dmvdc                         | dMvdc          | I     | I  | I        | I  |         |
+| X    | sampling       | pb                         | rmvdc                         | rMvdc          | I     |    |          | I  |         |
+|------+----------------+----------------------------+-------------------------------+----------------+-------+----+----------+----+---------|
+|      | Later          |                            |                               |                |       |    |          |    |         |
+|------+----------------+----------------------------+-------------------------------+----------------+-------+----+----------+----+---------|
+|      | lambdaU,L      | pedagogy                   | tailIndex, lambda{U,L} (th) ? | lambda (! tdc) | I     |    |          | I  |         |
+|      | lambda[UL]Inv  | fitting, pedagogy          | lambda{U,L}Inv                | iLambda        |       |    |          | I  |         |
+|------+----------------+----------------------------+-------------------------------+----------------+-------+----+----------+----+---------|
+
+

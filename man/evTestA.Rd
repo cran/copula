@@ -6,22 +6,20 @@
   Test of bivariate extreme-value dependence based on the process
   comparing the empirical copula with a natural nonparametric
   estimator of the unknown copula derived under extreme-value
-  dependence. The test statistics are defined in the third reference.
+  dependence.  The test statistics are defined in the third reference.
   Approximate p-values for the test statistics are obtained
   by means of a \emph{multiplier} technique.
 }
 \usage{
-evTestA(x, N = 1000, derivatives = "An")
+evTestA(x, N = 1000, derivatives = c("An","Cn"))
 }
 \arguments{
   \item{x}{ a data matrix that will be transformed to pseudo-observations. }
-  \item{N}{ number of multiplier iterations to be used to
-    simulate realizations of the test statistic under the null
-    hypothesis.}
-   \item{derivatives}{ specifies how the derivatives of the unknown
-    copula are estimated; can be either
-    \code{"An"} or \code{"Cn"}. The former gives better results for
-    samples smaller than 400 but is slower.}
+  \item{N}{number of multiplier iterations to be used to simulate
+    realizations of the test statistic under the null hypothesis.}
+  \item{derivatives}{string specifying how the derivatives of the unknown
+    copula are estimated, either \code{"An"} or \code{"Cn"}.  The former
+    gives better results for samples smaller than 400 but is slower.}
 }
 \details{
   More details are available in the third reference.
@@ -52,27 +50,36 @@ evTestA(x, N = 1000, derivatives = "An")
 }
 \note{
   This test was derived under the assumption of continuous margins,
-  which implies that ties occur with probability zero. The
+  which implies that ties occur with probability zero.  The
   presence of ties in the data might substantially affect the
-  approximate p-value. One way of dealing with ties was suggested in the
-  last reference.
+  approximate p-value.  One way of dealing with ties was suggested in
+  the last reference.
 }
-\seealso{ \code{\link{evTestK}}, \code{\link{evTestC}}, \code{\link{evCopula}},
-  \code{\link{gofEVCopula}}, \code{\link{An}}. }
+\seealso{ \code{\link{evTestK}}, \code{\link{evTestC}},
+  \code{\link{evCopula}},
+  \code{\link{gofEVCopula}}, \code{\link{An}}.
+}
 \examples{
 ## Do these data come from an extreme-value copula?
+set.seed(63)
 uG <- rCopula(100, gumbelCopula(3))
 uC <- rCopula(100, claytonCopula(3))
-\donttest{% 48 seconds on MM's lynne (2012-06)
+\donttest{## takes time: 48 seconds on MM's lynne (2012-06)
 evTestA(uG)
 evTestA(uG, derivatives = "Cn")
 
 evTestA(uC)
 }
-\dontshow{% testonly
-evTestA(uG[1:10,])
-evTestA(uG[1:10,], derivatives = "Cn")
-}
+\dontshow{% test only: very small subset to be fast
+tG   <- evTestA(uG[1:10,])
+tC.A <- evTestA(uC[1:12,])
+tC.C <- evTestA(uC[1:20,], derivatives = "Cn")
+stopifnot(
+all.equal(all.equal(tG  $p.value, 47/2002, tol= 1e-15),
+	  all.equal(tC.C$p.value,  1/154 , tol= 1e-15),
+	  all.equal(tC.C$p.value, tC.A$p.value, tol = 1e-15)
+))
+}%dont
 }
 \keyword{htest}
 \keyword{multivariate}

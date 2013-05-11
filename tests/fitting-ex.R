@@ -16,6 +16,8 @@
 
 require(copula)
 source(system.file("Rsource", "tstFit-fn.R", package="copula", mustWork=TRUE))
+source(system.file("Rsource", "utils.R",     package="copula", mustWork=TRUE))
+##-> assertError()
 
 (doExtras <- copula:::doExtras())
 
@@ -65,13 +67,73 @@ if(doExtras) {
 
 showProc.time()
 
+set.seed(17)
+d <- 5 # dimension
+nu <- 4 # degrees of freedom
+## define and sample the copula, build pseudo-observations
+ec4 <- ellipCopula("t", dim=d, df=nu, df.fixed=TRUE) # <- copula with param NA
+(r <- iTau(ec4, tau <- c(0.2, 0.4, 0.6)))
+P <- c(r[2], r[1], r[1], r[1], # upper triangle (w/o diagonal) of corr.matrix
+             r[1], r[1], r[1],
+                   r[3], r[3],
+                         r[3])
+assertError( setTheta(ec4, value = P) )
+## rather need "un" dispersion: Now with smarter tCopula():
+(uc4 <- tCopula(dim=d, df=nu, disp = "un", df.fixed=TRUE))
+validObject(copt4 <- setTheta(uc4, value = P))
+U. <- pobs(rCopula(n=1000, copula=copt4))
+pairs(U., gap=0) # => now correct dependency
+(cU <- cor(U., method="kendall")) # => correct:
+stopifnot(cor(P, cU[lower.tri(cU)]) > 0.99)
+
+
+
+### Fitting  multivariate incl margins --- mvdc --------------------------------------
+### ===========================================
+
+set.seed(121)
+gumbelC <- gumbelCopula(3, dim=2)
+gMvGam <- mvdc(gumbelC, c("gamma","gamma"), param = list(list(2,3), list(4,1)))
+gMvGam # now nicely show()s -- the *AUTO*-constructed parameter names
+stopifnot(identical(gMvGam@paramMargins,
+                    list(list(shape = 2, rate = 3),
+                         list(shape = 4, rate = 1))))
+X <- rMvdc(16000, gMvGam)
+plot(X, cex = 1/4)
+
+persp  (gMvGam, dMvdc, xlim = c(0,4), ylim=c(0,8)) ## almost discrete ????
+contour(gMvGam, dMvdc, xlim = c(0,2), ylim=c(0,8))
+points(X, cex = 1/16, col=adjustcolor("blue", 0.5))
+
+if(FALSE)# unfinished --- TODO maybe move below ('doExtras')!
+fMv <- fitMvdc(X, gMvGam)
+
+pFoo <- function(x, lower.tail=TRUE, log.p=FALSE)
+     pnorm((x - 5)/20, lower.tail=lower.tail, log.p=log.p)
+dFoo <- function(x, lower.tail=TRUE, log.p=FALSE)
+     1/20* dnorm((x - 5)/20, lower.tail=lower.tail, log.p=log.p)
+qFoo <- qunif
+
+## 'Foo' distribution has *no* parameters:
+mv1 <- mvdc(gumbelC, c("gamma","Foo"), param= list(list(3,1), list()))
+validObject(mv1)
+stopifnot(nrow(R <- rMvdc(3, mv1)) == 3, ncol(R) == 2)
+## a wrong way:
+assertError(
+  mvW <- mvdc(gumbelC, c("gamma","Foo"), param= list(list(3,1), list(NULL)))
+)
+## must not valid: stopifnot(!isTRUE(validObject(mvW, test=TRUE)))
+
+showProc.time()
+
 if(!doExtras && !interactive()) q(save="no") ## so the following auto prints
 ##--------------------------------------------------------------------------
 
 ## d = 2 :
-try( ## fails for tau = 0.8 in optim(), "non-finite finite-difference" ... FIXME
-rtx <- tstFit1cop(tCopula(df.fixed=TRUE), tau.set=c(.4, .8), n.set=c(10, 25), N=64)
-)
+## ----- catching fitCopula() error: 'Lapack routine dgesv: system is exactly singular: U[2,2] = 0'
+rtx <- tstFit1cop(tCopula(df.fixed=TRUE), tau.set=c(.4, .8),
+                  n.set= c(10, 25), N=64)
+
 ## for df.fixed=FALSE, have 2 parameters ==> cannot use "fit1":
 ## ....
 ## .... TODO
@@ -89,7 +151,7 @@ fitCopula(tevCopula(df.fixed=TRUE), x, estimate.variance=FALSE)
 fitCopula(tevCopula(df.fixed=TRUE), x, method="ml")
 fitCopula(tevCopula(),		    x)
 fitCopula(tevCopula(), 		    x, estimate.variance=FALSE)
-try(
+try( ## 'df' is not estimated, but it should
 fitCopula(tevCopula(), 		    x, method="ml")
 )
 
@@ -117,23 +179,3 @@ stopifnot(all.equal(unname(coef(ffc)),
 
 showProc.time()
 
-
-set.seed(121)
-
-### Fitting  multivariate incl margins --- mvdc
-gumbelC <- gumbelCopula(3, dim=2)
-gMvGam <- mvdc(gumbelC, c("gamma","gamma"), param = list(list(2,3), list(4,1)))
-gMvGam # now nicely show()s -- the *AUTO*-constructed parameter names
-X <- rMvdc(16000, gMvGam)
-plot(X, cex = 1/4)
-
-persp  (gMvGam, dMvdc, xlim = c(0,4), ylim=c(0,8)) ## almost discrete ????
-contour(gMvGam, dMvdc, xlim = c(0,2), ylim=c(0,8))
-points(X, cex = 1/16, col=adjustcolor("blue", 0.5))
-
-
-if(FALSE)# unfinished
-fMv <- fitMvdc(X, gMvGam)
-
-
-showProc.time()

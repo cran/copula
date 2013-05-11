@@ -91,8 +91,6 @@ huslerReissCopula <- function(param = NA_real_) {
 
 phuslerReissCopula <- function(u, copula) {
   dim <- copula@dimension
-  if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-  ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   u1 <- u[,1]
   u2 <- u[,2]
   alpha <- copula@parameters[1]
@@ -104,8 +102,6 @@ phuslerReissCopula <- function(u, copula) {
 
 dhuslerReissCopula <- function(u, copula, log=FALSE, ...) {
   dim <- copula@dimension
-  if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-  ## for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
   u1 <- u[,1]
   u2 <- u[,2]
   alpha <- copula@parameters[1]

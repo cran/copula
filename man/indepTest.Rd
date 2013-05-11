@@ -119,7 +119,7 @@ x[,5] <- x[,4]/2 + sqrt(3) * x[,5]/2
 ## {1,...,5} whose cardinality is between 2 and 5, we set p=m=5.
 ## This may take a while...
 
-if(copula:::doExtras()) { ## not run, typically:%--------------------------------------
+if(copula:::doExtras()) { ## not run, typically:% ------------------------------
 print(system.time(
 d <- indepTestSim(100,5)
 ))
@@ -132,7 +132,7 @@ print(test)
 
 ## Display the dependogram with the details:
 dependogram(test, print=TRUE)
-}# (not in CRAN checks)%-------------------------------- not on CRAN ---------------
+}# (not in CRAN checks)% ------------------ not on CRAN ------------------------
 
 ## We could have tested for a weaker form of independence, for instance,
 ## by only computing statistics for subsets whose cardinality is between 2

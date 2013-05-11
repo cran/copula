@@ -1,18 +1,36 @@
 ##-*- org -*-->  Emacs .. [Tab] key + [Org] menu; C-c C-o to follow links
 * Very Short Term
-** DONE fitCopula() for 2-dim tCopula() *AND* 2-dim  tevCopula();  latter clearly fails
-
-** TODO mvdc() -- fitMvdc() and generate data from fit -- currently wrong on help page;
- - see FIXMEs in R/fitMvdc.R  man/fitMvdc.Rd and man/fitCopula-class.Rd -- think of
-   class slots etc.
-** DONE rPosStable() is wrong --> use rstable1() [unless options(..) for back compatibility]
+** DONE fitCopula() for 2-dim tCopula() *AND* 2-dim tevCopula(); latter clearly fails
+** DONE mvdc() -- fitMvdc() and generate data from fit:
+ - fitMvdc()@mvdc  must contain the *fitted* parameters, the same as
+   fitCopula()@copula does already.
+** DONE rPosStable() is "wrong", actually just rstable1() *scaled* unusually
+   --> use rstable1() [unless options(..) for back compatibility]
 ** DONE no longer try() in loglikCopula()
-   MM: "hideWarnings" seems "wrong by design", notably there.
-** TODO try() in loglikMvdc()
-MM+MH: may be differently *report* reports in loglikMvdc() [margins: *their* errors].
+  - "hideWarnings" seems "wrong by design", there.
+  - *However* fitCopula() now uses 'hideWarnings' (again): should *not*
+    report warnings by default: They are too disturbing for 'Joe Average'
+    fitCopula() user.
+** DONE tryCatch() in loglikMvdc(), but not longer hideWarnings there.
+   OTOH, hideWarnins now in fitMvdc().
 ** DONE timings() function name -- changed to nacFrail.time()
-* Short Term
-** DONE persp(), contour() should work with pCopula / dCopula
+** DONE setTheta() bug: see tests/fitting-ex.R ..seed(17)
+** DONE stopifnot(ncol(u) == (d <- copula@dimension))  *not* ok:
+stopifnot(NULL == 1) is not stopping
+** DONE matrix(x, ncol=.) is really slower than rbind(x, deparse.level=0L)
+** DONE implement uscore for MMMH's A, C, F, G, J (note MH: haven't done any testing)
+** DONE MH: in man/empcop.Rd, document 'method' "C"/"R"
+* Short Term: Before 1.0.0
+** TODO pCopula(u,..) and dCopula(u,..) should work for u outside [0,1]^d  & NA/NaN
+*** DONE for pCopula(): using  u[] <- pmax(0, pmin(1, u))  {subtlety!}
+*** DONE dCopula() = 0 {log = -Inf} for u "outside"
+*** TODO both should keep NA & NaN. Maybe keep them different, as  pnorm(c(2,NA,NaN));
+however relax, as  NA+NaN or NaN+NA  differ, too.
+** DONE largely improve on gofTests.R: should be made more modular, so that users can provide functions for the parametric bootstrap (gofPB) and the multiplier boostrap (gofMB). Furthermore, checking and documentation have to be improved (see already improved gofPB());
+** TODO deprecate gnacopula() [see 'Note' there!!!]
+ MH: already 'prepared' a lot; only difficulty: many calls of gnacopula()
+ => ideally, the checks should be done with gofCopula() instead of gnacopula()!!!!
+** DONE persp(), contour() should work with pCopula / dCopula.
 ** DONE getAcop(gumbelCopula()) should work
  => we could then write general methods for all Archimedean objects.
 Possible problem (for now): negative concordance case for AMH, Clayton, and Frank
@@ -26,38 +44,39 @@ JY: I agree
 IK: Me too
 => MH: done on 2012-03-25 (for simplicity, I used "2012" everywhere)
 ** TODO Renaming of current "base" functions see [[file:feature-table.org][Feature table]] and [[file:do-now.org][do-now table]]
-    remaining: lambdaL/U
-** TODO Rebuild R-forge structure nacopula -> copula
+    remaining: lambdaL/U and inverse ("iLambda").
+** TODO fitCopula("itau") for "tCopula(df.fixed=FALSE)": (and tevCopula?):
+use itau for P matrix, then ML for df. {see also ggraph.Rnw}
 ** DONE show(<mvdc>) method needed; otherwise printing mvdc(.) looks ugly.
-** TODO Deprecation of Old Stuff /  towards more consistency / Cleanup
+** TODO Deprecation of Old Stuff / towards more consistency / Cleanup
 - with warning
 - on help pages
 *** TODO NAC Archimedean families <--> archmCopula  unification
-- The NAC Archimedean families are partly 'better' and partly "worse" than
+**** TODO The NAC Archimedean families are partly 'better' and partly "worse" than
   archmCop: need 'uscore'
-- Write testing code that compares the two classes numerically.
-**** TODO (MM): Make  pcopula(<archm>) and dcopula(<archm>)
+**** TODO JY: For score & uscore (see [[file:feature-table.org][Feature table]]); write testing code
+ based on IJ-"papers" that compares the two classes numerically.
+**** DONE MM: pCopula(<archm>) and dCopula(<archm>)
  use the the numerically good formulae rather than the "exprDist".
 **** TODO d=2 is special: allows negative tau, MH-code now does partly.
  done for Clayton, Frank, AMH.  BUT not for the R/cop_objects.R slots
-*** TODO "copula" class:  slot re-definitions
+*** DONE "copula" class:  slot re-definitions
 **** DONE 'message' --> 'fullname'
-**** TODO 'param.lowbnd' / 'param.upbnd' --- use "interval" as in nacopula
+**** no longer TODO: 'param.lowbnd' / 'param.upbnd' --- use "interval" as in nacopula
 *** TODO nparam() "wrapper" for  length(.@parameters)
-*** TODO dTau() = tau'() and dRho() = rho'() -- to get S.Err. for  "itau" and "irho"
-**** TODO these are *one* of the things where IJ-archmCopula' are better
-*** TODO dAduGalambos() and similar: Use  list() instead of data.frame() as return value  (?)
+*** no longer TODO: dTau() = tau'(), rho() and dRho() = rho'() -- to get std.err. for  "itau" and "irho"
+**** these are *one* of the things where IJ-archmCopula' are better
 ** TODO MM: former nacopula  c_longNames etc  --> rename to .ac_longNames *and* export
 (ac = Archimedean copula)
-** TODO Exporting a bit more of hidden internal functions:
-*** JY: Ivan, I think we should export an empCopula function. I always
+** TODO Exporting/Documenting of "internal" functions:
+*** DONE JY: Ivan, I think we should export an empCopula function. I always
 thought it was unnecessary because it can be obtained with R package mecdf.
 But people have asked for it.
-*** MM: Also, look at ./man/copula-internal.Rd :
-**** schlatherCopula:  JY: The implementation of schlatherCopula is not ready for release.
+*** Also, look at ./man/copula-internal.Rd :
+*** no longer TODO: schlatherCopula:  JY: The implementation of schlatherCopula is not ready for release.
  More ev copulas will come from max-stable processes.
-**** asymCopula (-class) -- *.Rd document properly (incl some examples)
-** DONE New(?) (Super)classes for "merging the class structure"
+*** TODO JY: asymCopula (-class) -- *.Rd document properly (incl some examples!)
+** DONE New (Super)classes for "merging the class structure"
 - new class "Copula" := {copula, nacopula}
 ** DONE C code
 *** DONE [src/init.c] enable registration for the old 'copula' part
@@ -65,23 +84,6 @@ But people have asked for it.
 *** DONE IK: in all *.c files from former copula: use Doxygen
 instead of hand made function header documentation.
 
-** TODO need a "getTheta" analogously to "setTheta" which extracts the parameter (vector) from any copula object
-** TODO Write a function "checkTheta" or "thetaConstr" which proves for a given parameter (vector) and Copula object, if the parameters are all admissible.
-** TODO Miscellaneous Functions (bugs etc)
-*** DONE (MH) rtrafo() {and probably htrafo()} --- "fail" (are *wrong*!) for n = 1
-*** DONE (MH) copFrank@psi(1/1e20, theta=200) == Inf instead of 1
-*** TODO see TODO in  R/tCopula.R :  ndim() utility function; test pos.def.
-*** TODO tCopula() / normalCopula() allow alternative specification of cor.matrix at least for the "un" dispersion structure
-*** TODO opower() and GIG --> either produce acopula with parameter *vector*, or
---- maybe in any case ---
-produce an object of class 'opacopula' ("outer power Archimedean copula")
-which is just 'acopula' with a new show method ("thetabase" at least!),
-possibly a new slot ...
-Longer term: want to *estimate* those correctly [MLE at least].
-*** TODO rtrafo() is now "available" for "t" and "normal" thanks to the Master thesis of Yongsheng Wang.  (--> ...../function-gof.R )
-**** DONE implement it,
-**** TODO write a better wrapper for  gnacopula()/gofCopula()
-**** TODO Extend  rtrafo() to other (d > 2)-copula families
 ** TODO New Wrapper functions or rather extending one or the other function names
 *** TODO distribution/density/ ... functions
 **** DONE dcopula(), pcopula(), rcopula()  (for "nacopula")
@@ -89,8 +91,14 @@ Longer term: want to *estimate* those correctly [MLE at least].
 **** DONE d*():  allow  log=TRUE and use that in loglikCopula()
 **** TODO fitCopula() should encompass all methods of enacopula()
 *** DONE MMMH: Use new rCopula() in ggraph *instead* of wrappers
+** TODO rCopula() for archmCopula's should allow to use MH's racopula()
+*but* for back compatibility allow *global* options(....) to still get old
+random numbers.
 ** TODO MM: data(rdj) should have a "Date" in column 1, not a factor !
 
+** DONE tests/pdf.R should use "all" copulas, similar to tests/moments.R.
+*** DONE Then, test that  exp(dCopula(*, log=TRUE)) "==" dCopula(*)
+{to test the bug, fixed in r954, reported by Benedikt}
 * Mid Term
 ** DONE R/sysdata.rda:
 CLOSED: [2012-07-17 Tue 11:10]
@@ -112,15 +120,38 @@ We can put them back. The best place is under inst?
  ## or even
  print(ls.str(pos=2, all=TRUE), max.level = 3)
 
+** TODO Extend polynEval() with the methods of polyJ();
+ this can be called from polyJ() and uscore of Joe.
+** TODO MH: something more sophisticated than persp(): lattice's wireframe() is the best I know w.r.t to many things
 ** TODO Deprecation of Old Stuff / more consistency / Cleanup
 *** TODO loglikCopula() --- try(), hidemessages should "go" eventually
 *** TODO varPL(): TODO's there
 *** TODO dTau() = tau'() and dRho() = rho'() -- to get S.Err. for  "itau" and "irho"
 these are *one* of the things where IJ-archmCopula' are better
+*** TODO dAduGalambos() and similar: Use  list() instead of data.frame() as return value  (?)
 *** TODO dCdthetaEvCopula() cannot work (as dAdtheta() has no methods) and is used nowhere
-** TODO rCopula() for archmCopula's should allow to use MH's racopula()
-*but* for back compatibility allow *global* options(....) to still get old
-random numbers.
+** TODO need a "getTheta" analogously to "setTheta"
+which extracts the parameter (vector) from any copula object
+** TODO Write a function "checkTheta" or "thetaConstr"(param_vector, Copula):
+ checks if the parameters are all admissible.
+** TODO Rebuild R-forge structure nacopula -> copula
+
+** TODO Miscellaneous Functions (& bugs: all DONE)
+*** DONE (MH) rtrafo() {and probably htrafo()} --- "fail" (are *wrong*!) for n = 1
+*** DONE (MH) copFrank@psi(1/1e20, theta=200) == Inf instead of 1
+*** TODO see TODO in R/tCopula.R : npar.ellip() function;-> nparam(); test pos.def.
+*** TODO tCopula() / normalCopula() allow alternative specification of cor.matrix at least for the "un" dispersion structure
+*** TODO opower() and GIG --> either produce acopula with parameter *vector*, or
+--- maybe in any case ---
+produce an object of class 'opacopula' ("outer power Archimedean copula")
+which is just 'acopula' with a new show method ("thetabase" at least!),
+possibly a new slot ...
+Longer term: want to *estimate* those correctly [MLE at least].
+*** TODO rtrafo() is now "available" for "t" and "normal" thanks to the Master thesis of Yongsheng Wang.  (--> ...../function-gof.R )
+**** DONE implement it,
+**** TODO Extend  rtrafo() to other (d > 2)-copula families
+** TODO evTestA(), evTestC(), evTestK()  have basically no tests {but improvable code}
+ [[file:man/evTestA.Rd][evTestA.Rd]], [[file:man/evTestC.Rd][evTestC.Rd]], [[file:man/evTestK.Rd][evTestK.Rd]]
 ** TODO C code
 *** DONE [src/init.c] enable registration for the old 'copula' part
 *** TODO use 'static' "everywhere" +  attribute_hidden "otherwise"/sometimes
@@ -130,10 +161,9 @@ random numbers.
 *** TODO \link{} between  old-copula and old-nacopula  functionality
 *** TODO small vignette with table of function names providing the same functionality (nacopula / old_copula)
 *** DONE (MH) fixed long lines in all .Rd
-** TODO pCopula() should also accept a  'log.p = FALSE' argument and provide more accurate log.p=TRUE.
-
+** TODO pCopula() should also accept a  'log.p = FALSE' argument
+ and provide more accurate results in the lower tail for log.p=TRUE.
 ** TODO Miscellaneous functions
-*** TODO iTau(): must use tau.checker() [R/estimation.R]
 *** TODO MM, MH: indepTest()  takes a while {ok}, *BUT* cannot be interrupted (quickly enough)
     - shouldn't it {and all other tests} return a (valid) object of class
     "htest" (maybe "htest" in addition to the specific S3 class)?
@@ -141,7 +171,11 @@ random numbers.
 *** DONE MH: @ Jun, Ivan: file R/E.R  only defines E <- exp(1). Reason(MM): work around silly 'CMD check' warnings.
 But we should move that to another R/*.R
 
-*** TODO makeposdef() -- think of using a version of sfsmisc::posdefify()
+*** TODO iTau(): must use tau.checker() [R/estimation.R]
+*** TODO makePosDef() -- think of using a version of sfsmisc::posdefify() or nearPD()
+*** TODO R/fitCopula.R : method="itau" & "irho": parallelize double for-loop in
+ fitKendall() & fitSpearman() :  tests/moments.R must
+ check that vectorized iTau() and iRho() work for all families
 *** TODO t / normal : allow  "block" dispersion structure {including  fitCopula() working}
 
 **** --> e-mail and example: /u/maechler/R/MM/Pkg-ex/copula/mvdc-ex.R
@@ -162,7 +196,7 @@ maybe take  ./tests/copula-play.R  as sophisticated role model.
   arguments except the first one).
 
 ** TODO Use  paste0()  where possible in IJ-code
-** TODO Replace ccop in ggraph by cCopula
+** DONE Replace ccop in ggraph by cCopula
 
 ** DONE cacopula(): generalize to elliptical ("and more") -> cCopula(), (<==> rtrafo())
 

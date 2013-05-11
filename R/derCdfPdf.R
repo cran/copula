@@ -267,7 +267,7 @@ dCdthetaEllipCopula <- function(cop, u)
                 for (k in 1:(p-1))
                   {
                     m <- row(sigma) == col(sigma) + k
-                    coef[,k] <- m[lower.tri(m)]
+                    coef[,k] <- P2p(m)
                   }
                 return(mat %*% coef)
               }
@@ -441,7 +441,7 @@ derPdfWrtParamsEllipCopula <- function(cop, u)
                 for (k in 1:(p-1))
                 {
                     m <- row(sigma) == col(sigma) + k
-                    coef[,k] <- m[lower.tri(m)]
+                    coef[,k] <- P2p(m)
                 }
                 mat %*% coef
             }

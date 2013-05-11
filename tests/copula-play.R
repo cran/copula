@@ -14,6 +14,8 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
+### (Nested) Archimedean Copulas -----------------------------------------------
+
 require(copula)
 
 if(!dev.interactive(orNone=TRUE)) pdf("copula-play.pdf")
@@ -69,7 +71,7 @@ checkifnot <- function(expr, prefix = "check if", true = "[Ok]")
 }
 
 
-##' @title Perform a set of checks on a copula object (with theta set)
+##' @title Perform a set of checks on a Archimedean copula object (with theta set)
 ##' @param cop acopula
 ##' @param theta1 parameter theta1
 ##' @param thetavec vector of parameters
@@ -191,34 +193,32 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     stopifnot(is.vector(cac), length(cac) == length(u01), 0 <= cac, cac <= 1)
     print(cac)
 
-    ### (6) dnacopula (log = TRUE)
+    ### (6) dCopula (log = TRUE) {was dnacopula()}
 
     u <- matrix(runif(400),ncol=20)
-    ocop.2d <- onacopulaL(cop@name,list(theta0,1:2))
+    ocop.2d  <- onacopulaL(cop@name,list(theta0,1:2))
     ocop.20d <- onacopulaL(cop@name,list(theta0,1:20))
 
     ## d = 2
-    cat("\n(6) check dnacopula with log = TRUE for u being a random (20x2)-matrix:\n")
-    CT <- c(CT, list(dnacopula. =
-                     system.time(lD <- dnacopula(ocop.2d, u[,1:2], log = TRUE))))
+    cat("\n(6) check dCopula(*, log = TRUE) for u being a random (20x2)-matrix:\n")
+    CT <- c(CT, list(dCopula. =
+                     system.time(lD <- dCopula(u[,1:2], ocop.2d, log = TRUE))))
     print(lD); stopifnot(is.numeric(lD), is.finite(lD)); cat0("[Ok]")
     cat("check at (0,0.5) and (1,0.5):\n")
-    stopifnot(is.nan(dnacopula(ocop.2d, c(0,0.5), log = FALSE)),
-	      is.nan(dnacopula(ocop.2d, c(0,0.5), log = TRUE)),
-	      is.nan(dnacopula(ocop.2d, c(1,0.5), log = FALSE)),
-	      is.nan(dnacopula(ocop.2d, c(1,0.5), log = TRUE)))
+    stopifnot(dCopula(cbind(0:1,0.5), ocop.2d, log = FALSE) == 0,
+	      dCopula(cbind(0:1,0.5), ocop.2d, log = TRUE ) == -Inf)
     cat0("[Ok]")
 
     ## d = 20, n.MC = 0
-    cat("\n check dnacopula with log = TRUE for u being a random (20x20)-matrix:\n")
-    CT <- c(CT, list(dnacopula. =
-                     system.time(lD. <- dnacopula(ocop.20d, u, log = TRUE))))
+    cat("\n check dCopula(*, log = TRUE) for u being a random (20x20)-matrix:\n")
+    CT <- c(CT, list(dCopula. =
+                     system.time(lD. <- dCopula(u, ocop.20d, log = TRUE))))
     print(lD.); stopifnot(is.numeric(lD.), is.finite(lD.)); cat0("[Ok]")
 
     ## d = 20, n.MC > 0
-    cat("\n check dnacopula with log = TRUE and MC for u being a random (20x20)-matrix:\n")
-    CT <- c(CT, list(dnacopula. =
-                     system.time(lD.. <- dnacopula(ocop.20d, u, n.MC = 1000, log = TRUE))))
+    cat("\n check dCopula(*, log = TRUE) and MC for u being a random (20x20)-matrix:\n")
+    CT <- c(CT, list(dCopula. =
+                     system.time(lD.. <- dCopula(u, ocop.20d, n.MC = 1000, log = TRUE))))
     print(lD..); stopifnot(is.numeric(lD..), is.finite(lD..)); cat0("[Ok]")
 
     ## d = 20, check if n.MC > 0 is close to n.MC = 0

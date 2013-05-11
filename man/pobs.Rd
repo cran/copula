@@ -40,16 +40,20 @@ pobs(x, na.last = "keep",
 pobs
 
 ## Draw from a multivariate normal distribution
-d <- 20
-P <- matrix(rep(0.75, d*d), ncol=d)
+d <- 10
+set.seed(1)
+P <- Matrix::nearPD(matrix(pmin(pmax(runif(d*d), 0.3), 0.99), ncol=d))$mat
 diag(P) <- rep(1, d)
-n <- 1000
+n <- 500
 x <- MASS::mvrnorm(n, mu = rep(0, d), Sigma = P)
 
 ## Compute pseudo-observations (should roughly follow a Gaussian
 ## copula with correlation matrix P)
 u <- pobs(x)
-plot(u[,1],u[,2])
+plot(u[,5],u[,10], xlab=expression(italic(U)[1]), ylab=expression(italic(U)[2]))
+
+## All components: pairwise plot
+pairs(u, gap=0, pch=".", labels=as.expression( sapply(1:d, function(j) bquote(italic(U[.(j)]))) ))
 }
 
 

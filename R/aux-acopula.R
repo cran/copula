@@ -466,7 +466,7 @@ coeffG <- function(d, alpha, method = c("sort", "horner", "direct", "dsumSibuya"
 		   if(log) log(abs(sm)) else (-1)^(d-k.)*sm
 	       }, NA_real_)
 	   },
-	   stop(sprintf("unsupported method '%s' in coeffG", method))
+	   stop(gettextf("unsupported method '%s' in coeffG", method), domain=NA)
 	   ) ## switch()
 } ## coeffG()
 
@@ -539,7 +539,7 @@ polyG <- function(lx, alpha, d, method= c("default", "default2012", "default2011
 	       }
 	       else if (d <= 170) {
 		   if (alpha < 0.01) "sort"
-		   else	 if (alpha <= 0.3) "direct"
+		   else	if (alpha <= 0.3) "direct"
 		   else if (alpha >= 0.9) "dsSib.log"
 		   else if (lx <= 3.55) "pois"
 		   else "dsSib.Rmpfr"
@@ -644,9 +644,9 @@ polyG <- function(lx, alpha, d, method= c("default", "default2012", "default2011
                ## compute log(colSums(exp(B))) stably (no overflow) with the idea of
                ## pulling out the maxima
                lsum(logx)
-           }else colSums(exp(logx))
+           } else colSums(exp(logx))
        },
-	   stop(sprintf("unsupported method '%s' in polyG", method))
+	   stop(gettextf("unsupported method '%s' in polyG", method), domain=NA)
 	   ) # end{switch}
 }## {polyG}
 
@@ -893,7 +893,7 @@ dsumSibuya <- function(x, n, alpha,
 		   trms <- c.n * ca.j
 		   S <- sum(trms) # <-- sum of *huge* (partly alternating) terms getting almost 0
 		   ## } else {	      # "new", typically faster
-		   ##	  ## FIXME: extend  sumBinMpfr() so it accepts a *vector* f.x
+### FIXME: Use *faster*
 		   ##	  ## sumBinomMpfr(n, FUN, n0, alternating=TRUE, precBits) is not yet available
 		   ##	  S <- sum(chooseZ(n,j) * (-1)^(x-j) * chooseMpfr(alpha * j, x))
 		   ## }
@@ -953,7 +953,7 @@ dsumSibuya <- function(x, n, alpha,
 	   if(log) log(S) else S
        },
 	   ## otherwise
-	   stop(sprintf("unsupported method '%s' in dsumSibuya", method)))
+	   stop(gettextf("unsupported method '%s' in dsumSibuya", method)), domain=NA)
 }
 
 ..dsSib.mpfr.prec <- function(d,k,alpha)
@@ -1017,9 +1017,12 @@ dsumSibuya <- function(x, n, alpha,
 ##' @param log boolean which determines if the logarithm is returned
 ##' @return \sum_{k=1}^d a_{d,k}(theta) exp((k-1)*lx) = \sum_{k=0}^{d-1} a_{d,k+1}(theta) x^k
 ##'         where a_{d,k}(theta) = S(d,k)*(k-1-alpha)_{k-1} = S(d,k)*Gamma((1:d)-alpha)/Gamma(1-alpha)
+##'         Note: these a_{d,k}(theta) here are not those of Hofert, Maechler, McNeil (2012)
+##'               (they are the a_{d,k-1}(theta))
 ##' @author Marius Hofert and Martin Maechler
 polyJ <- function(lx, alpha, d, method=c("log.poly","log1p","poly"), log=FALSE) {
     stopifnot(length(alpha)==1, 0 < alpha, alpha <= 1)
+    if(!length(lx)) return(numeric())
     ## compute the log of the coefficients a_{dk}(theta)
     if(d > 220) stop("d > 220 not yet supported")# would need Stirling2.all(d, log=TRUE)
     k <- 1:d
@@ -1056,7 +1059,7 @@ polyJ <- function(lx, alpha, d, method=c("log.poly","log1p","poly"), log=FALSE) 
                res <- colSums(exp(B))
                if(log) log(res) else res
            },
-       stop(sprintf("unsupported method '%s' in polyJ", method)))
+       stop(gettextf("unsupported method '%s' in polyJ", method)), domain=NA)
 }
 
 ##' Circular/Rational function	(1 - x^d)/(1 - x) for x ~~ 1, i.e.,
@@ -1252,7 +1255,7 @@ absdPsiMC <- function(t, family, theta, degree=1, n.MC,
                }
                if(log) res else exp(res)
            },
-	   stop(sprintf("unsupported method '%s' in absdPsiMC", method)))
+	   stop(gettextf("unsupported method '%s' in absdPsiMC", method)), domain=NA)
 }
 
 psiDabsMC <- function(t, family, theta, degree=1, n.MC,
@@ -1302,7 +1305,6 @@ setMethod("setTheta", signature(x="outer_nacopula", value="numeric"),
 ##               ... x@copula <- setTheta(x@copula, value, na.ok=na.ok, noCheck=noCheck)
 ##           })
 
-## FIXME: This is "wrong" for  tCopula(df.fixed = FALSE) :  value should encompass (rho,df)
 setMethod("setTheta", "copula",
 	  function(x, value, na.ok = TRUE, noCheck = FALSE, ...)
       {
@@ -1312,16 +1314,49 @@ setMethod("setTheta", "copula",
 	      ## vectorized (and partial)  value <- NA_real_
 	      if(!is.double(value)) storage.mode(value) <- "double"
 	  }
+	  ## not using has.par.df(), as have "ellipCopula" method below
+	  if(is(x, "tevCopula")) {
+	      p <- (!x@df.fixed) + 1
+	      if(length(value) != p)
+		  stop(gettextf("'length(value)' must be %d for tevCopula(dim=%d)",
+				p, x@dimension), domain=NA)
+	  }
 	  ##if(ina || noCheck || x@paraConstr(value)) ## parameter constraints are fulfilled
 	  if(all(ina) || noCheck || {
 	      all(is.na(value) | (x@param.lowbnd <= value & value <= x@param.upbnd))
 	  }) ## parameter constraints are fulfilled
 	      x@parameters[seq_along(value)] <- value
 	  else
-	      stop("theta (=", format(value), ") is not inside parameter bounds")
+	      stop(gettextf("theta (=%s) is not inside parameter bounds",
+			    format(value)), domain=NA)
 	  x
       })
 
+
+## NB:  for tCopula(df.fixed = FALSE), value now is (rho,df)
+setMethod("setTheta", "ellipCopula",
+	  function(x, value, na.ok = TRUE, noCheck = FALSE, ...)
+      {
+	  stopifnot(is.numeric(value) | (ina <- is.na(value)))
+	  if(any(ina)) {
+	      if(!na.ok) stop("NA value, but 'na.ok' is not TRUE")
+	      ## vectorized (and partial)  value <- NA_real_
+	      if(!is.double(value)) storage.mode(value) <- "double"
+	  }
+          df.f <- if(is(x, "tCopula")) x@df.fixed else TRUE
+          p <- npar.ellip(x@dimension, dispstr = x@dispstr, df.fixed = df.f)
+          if(length(value) != p)
+              stop(gettextf("'length(value)' must be %d for this elliptical copula (dim=%d, dispstr=\"%s\")",
+                            p, x@dimension, x@dispstr), domain=NA)
+	  if(all(ina) || noCheck || {
+	      all(is.na(value) | (x@param.lowbnd <= value & value <= x@param.upbnd))
+	  }) ## parameter constraints are fulfilled
+	      x@parameters[seq_along(value)] <- value
+	  else
+	      stop(gettextf("theta (=%s) is not inside parameter bounds",
+			    format(value)), domain=NA)
+	  x
+      })
 
 
 ##' Construct "paraConstr" function from an "interval"
@@ -1462,3 +1497,5 @@ getAcop <- function(family, check=TRUE) {
 
 coeffG.methods <- eval(formals(coeffG)$method)# - namespace hidden
 ## --> accesses formals(dsumSibuya) .. hence at end
+
+

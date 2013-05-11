@@ -78,5 +78,5 @@ curve(vapply(x, function(x) tau(tevCopula(x)), 0.), -1, 1,
       col=2, n=257, ylim=0:1, ylab=bquote(tau), xlab=bquote(rho),
       main= expression(tau( tevCopula(rho) )))
 }
-\keyword{ distribution }
-\keyword{ multivariate }
+\keyword{distribution}
+\keyword{multivariate}

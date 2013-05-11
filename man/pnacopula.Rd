@@ -1,19 +1,30 @@
 \name{pnacopula}
 \alias{pnacopula}
+\alias{pCopula,matrix,nacopula-method}
+\alias{pCopula,numeric,nacopula-method}
 \title{Evaluation of (Nested) Archimedean Copulas}
 \description{
-  \code{pnacopula} evaluates a (nested) Archimedean copula (object of class
-  \code{\linkS4class{nacopula}}) at the given vector or matrix \code{u}.
+  For a (nested) Archimedean copula (object of class \code{\linkS4class{nacopula}})
+  \code{x}, \code{pCopula(u, x)} (or also currently still \code{pnacopula(x, u)})
+  evaluates the copula \code{x} at the given vector or matrix \code{u}.
 }
 \usage{
+\S4method{pCopula}{matrix,nacopula}(u, copula, \dots)
+
+## *Deprecated*:
 pnacopula(x, u)
 }
 \arguments{
-  \item{x}{(nested) Archimedean copula of dimension \eqn{d}, that is, an
+  \item{copula, x}{(nested) Archimedean copula of dimension \eqn{d}, that is, an
     object of class \code{\linkS4class{nacopula}}, typically from
     \code{\link{onacopula}(..)}.}
   \item{u}{a \code{\link{numeric}} vector of length \eqn{d} or matrix
     with \eqn{d} columns.}
+  \item{\dots}{unused: potential optional arguments passed from and to methods.}
+}
+\note{
+  \code{\link{pCopula}(u, copula)} is a \emph{generic} function with
+  methods for \emph{all} our copula classes, see \code{\link{pCopula}}.
 }
 \details{
   The value of an Archimedean copula \eqn{C} with generator \eqn{\psi}{psi} at
@@ -40,11 +51,17 @@ C3 <- onacopula("J", C(theta0, 1, C(theta1, c(2,3))))
 
 ## Evaluate this copula at the vector u
 u <- c(.7,.8,.6)
-pnacopula(C3, u)
+pCopula(u, C3)
 
 ## Evaluate this copula at the matrix v
 v <- matrix(runif(300), ncol=3)
-pnacopula(C3, v)
+pCopula(v, C3)
+
+## Back-compatibility check
+stopifnot(identical( pCopula (u, C3), suppressWarnings(
+                    pnacopula(C3, u))),
+          identical( pCopula (v, C3), suppressWarnings(
+                    pnacopula(C3, v))))
 }
 \keyword{multivariate}
 \keyword{distribution}

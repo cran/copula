@@ -57,6 +57,8 @@
     \item{\code{score}:}{a \code{\link{function}} computing the
       \emph{derivative} of the density with respect to the parameter
       \eqn{\theta}{theta}.}
+    \item{\code{uscore}:}{a \code{\link{function}} computing the
+      \emph{derivative} of the density with respect to the each of the arguments.}
     \item{\code{paraInterval}:}{Either \code{\link{NULL}} or an object of class
       \code{"\linkS4class{interval}"}, which is typically obtained from a call
       such as \code{\link{interval}("[a,b)")}.}

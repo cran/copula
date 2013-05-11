@@ -14,78 +14,7 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-### Goodness-of-fit testing for nested Archimedean copulas
-
-### test statistics ############################################################
-
-##' Test statistics for various goodness-of-fit tests of (supposedly) U[0,1]^d
-##' distributed vectors of random variates
-##'
-##' @title Test statistics for U[0,1]^d
-##' @param u matrix of supposedly  U[0,1]^d observations
-##' @param method various test statistics. Available are:
-##'        "AnChisq": Anderson-Darling test statistic after map to a chi-square
-##'                   distribution using the standard normal quantile function
-##'        "AnGamma": Anderson-Darling test statistic after map to an Erlang/Gamma
-##'                   distribution using the logarithm
-##'        "SnB"  : the test statistic S_n^{(B)} in Genest, Remillard, Beaudoin (2009)
-##'        "SnC"  : the test statistic S_n^{(C)} in Genest, Remillard, Beaudoin (2009)
-##' @return values of the chosen test statistic
-##' @author Marius Hofert and Martin Maechler
-gofTstat <- function(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
-{
-    if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-    d <- ncol(u)
-    n <- nrow(u)
-    method <- match.arg(method)
-    switch(method,
-	   "AnChisq" = ad.test( pchisq(rowSums(qnorm(u)^2), d) )$statistic,
-	   "AnGamma" = ad.test( pgamma(rowSums(-log(u)), shape=d) )$statistic,
-	   "SnB" =
-       { ## S_n(B)
-           lu2 <- log1p(-u^2) # n x d matrix of log(1-u_{ij}^2)
-           ## Note (modulo rowSums/colSums):
-           ## Idea: sum1 = sum(prod(1-u^2)) = sum(exp(sum(lu2)))
-           ## = exp(log( sum(exp(rowSums(lu2))) )) = exp(lsum(rowSums(lu2)))
-           slu2 <- rowSums(lu2) # vector of length n
-	   sum1 <- exp(lsum(matrix(slu2, ncol=1))) # lsum() needs a matrix; result: 1 value
-           ## 2) The notation here is similar to Genest, Remillard,
-           ## Beaudoin (2009) but we interchange k and j (since j always runs
-           ## in 1:d). That being said...
-	   lu <- t(log1p(-u)) # t(n x d matrix of log(1-u_{ij})) --> accessing columns
-           ln <- log(n)
-           ## Idea:
-           ##   1/n sum_i sum_k prod_j (1-max(u_{ij},u_{kj}))
-           ## = 1/n sum_i sum_k exp( sum_j log(1-max{.,.}) )
-           ## = 1/n sum_i sum_k exp( sum_j log(min{1-u_{ij},1-u_{kj}}) )
-           ## = 1/n sum_i sum_k exp( sum_j min{ log(1-u_{ij}), log(1-u_{kj}) })
-           ## = 1/n sum_i sum_k exp( sum(pmin{ lu[i,], lu[k,]}) )
-           ## = 1/n sum_i exp( log(sum_k exp( sum(pmin{ lu[i,], lu[k,]}) )) )
-           ## = 1/n sum_i exp( lsum( sum(pmin{ lu[i,], lu[k,]}) ) )
-           ## = sum_i exp(-log(n) + lsum( sum(pmin{ lu[i,], lu[k,]}) ))
-           ## = sum_i exp(-log(n) + lsum_{over k in 1:n}( sum(pmin{ lu[i,], lu[k,]}) ))
-           ## => for each fixed i, (l)apply lsum()
-	   sum2mands <- unlist(lapply(1:n, function(i){
-	       lu.i <- lu[,i] ## now i is fixed
-	       sum.k <- vapply(1:n, function(k)# sum over k (n-dim. vector)
-			       sum(pmin(lu.i, lu[,k])), 0.)
-	       ls.i <- lsum(matrix(sum.k, ncol=1)) # lsum( sum(pmin(...)) ) for fixed i; 1 value
-	       exp(-ln + ls.i)
-	   }))
-	   n/3^d - sum1/2^(d-1) + sum(sum2mands)
-       },
-	   "SnC" =
-       { ## S_n(C)
-	   Dn <- apply(u, 1, function(u.){ # Dn is a vector of length n
-	       ## u. is one row. We want to know the number of rows of u
-	       ## that are (all) componentwise <= u.
-	       mean(apply(t(u) <= u., 2, all)) # TRUE <=> the whole row in u is <= u.
-	   })
-           Cperp <- apply(u, 1, prod)
-	   sum((Dn-Cperp)^2)
-       },
-	   stop("unsupported method ", method))
-}
+### Goodness-of-fit test transformations #######################################
 
 
 ### multivariate transformations ###############################################
@@ -101,9 +30,11 @@ gofTstat <- function(u, method = c("AnChisq", "AnGamma", "SnB", "SnC"))
 ##'        C(u_j | u_1,...,u_{j-1})
 ##' @param m (deprecated)
 ##' @param n.MC parameter n.MC for evaluating the derivatives via Monte Carlo
-##' @param log
-##' @param trafo.only
-##' @return matrix U (n x k) of supposedly U[0,1]^k realizations, where k=1+length(j.ind);
+##' @param log logical indicating whether the log-transform is computed
+##' @param trafo.only logical indicating whether the transformed data (only) is
+##'        returned, that is, the transformed components with index j.ind
+##' @return matrix U (n x k) of supposedly U[0,1]^k realizations, where
+##'         k=1+length(j.ind) or length(j.ind) if trafo.only=TRUE, and
 ##'         where U[,1] == u[,1] in any case.
 ##' @author Marius Hofert and Martin Maechler
 rtrafo <- function(u, cop, j.ind=2:d, m, n.MC=0, log=FALSE, trafo.only=log)
@@ -121,7 +52,7 @@ rtrafo <- function(u, cop, j.ind=2:d, m, n.MC=0, log=FALSE, trafo.only=log)
     stopifnot(0 <= u, u <= 1,
 	      2 <= j.ind, j.ind <= d)
 
-    if((nac <- is(cop, "outer_nacopula")) ||
+    if((nac <- is(cop, "outer_nacopula")) || ## outer_nacopula #################
        is(cop, "archmCopula")) {
 	if(nac) {
 	    if(length(cop@childCops))
@@ -163,7 +94,7 @@ rtrafo <- function(u, cop, j.ind=2:d, m, n.MC=0, log=FALSE, trafo.only=log)
 		if(log) res else exp(res)
 	    }
 	}
-    } else if(is(cop, "normalCopula")) {
+    } else if(is(cop, "normalCopula")) { ## normalCopula #######################
 	sigma <- getSigma(cop)
 	n <- nrow(X <- qnorm(u))
 	C.j <- function(j) { ## j is the dimension -- really a function of (j, X := F(u))
@@ -203,7 +134,7 @@ rtrafo <- function(u, cop, j.ind=2:d, m, n.MC=0, log=FALSE, trafo.only=log)
 
 	} ## C.j
 
-    } else if(is(cop, "tCopula")) {
+    } else if(is(cop, "tCopula")) { ## tCopula #################################
 	sigma <- getSigma(cop)
 	df <- getdf(cop)
 	n <- nrow(X <- qt(u, df=df))
@@ -281,15 +212,14 @@ rtrafo <- function(u, cop, j.ind=2:d, m, n.MC=0, log=FALSE, trafo.only=log)
 ##' @return matrix of transformed realizations
 ##' @author Marius Hofert and Martin Maechler
 htrafo <- function(u, cop, include.K=TRUE, n.MC=0, inverse=FALSE,
-                   method = formals(qK)$method, u.grid, ...)
+                   method=formals(qK)$method, u.grid, ...)
 {
     ## checks
     stopifnot(is(cop, "outer_nacopula"))
     if(length(cop@childCops))
         stop("currently, only Archimedean copulas are provided")
     if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-    stopifnot((d <- ncol(u)) >= 2,
-	      0 <= u, u <= 1)
+    stopifnot((d <- ncol(u)) >= 2, 0 <= u, u <= 1)
     ## trafos
     th <- cop@copula@theta
     if(inverse){ # "simulation trafo" of Wu, Valdez, Sherris (2006)
@@ -346,12 +276,20 @@ htrafo <- function(u, cop, include.K=TRUE, n.MC=0, inverse=FALSE,
 ##' @param ... additional arguments to enacopula
 ##' @return htest object
 ##' @author Marius Hofert and Martin Maechler
+##' TODO: - deprecate it!
+##'       - call the following instead:
+##'              gofCopula(cop, x=u, N=n.bootstrap, method=method,
+##'              estim.method=<one of fitCopula() instead of enacopula()>,
+##'              simulation="pb", verbose=verbose,
+##'              trafo.method=<trafo, but rename "Hering.Hofert" to "htrafo" and "Rosenblatt" to "rtrafo">)
+##'        - note: gnacopula() shouldn't be used with other methods than MPLE
+##'               anyways => use fitCopula() as engine, not enacopula().
 gnacopula <- function(u, cop, n.bootstrap,
-		      estim.method= eval(formals(enacopula)$method),
-		      include.K= TRUE, n.MC= 0,
-		      trafo= c("Hering.Hofert", "Rosenblatt"),
-		      method= eval(formals(gofTstat)$method),
-		      verbose= TRUE, ...)
+		      estim.method=eval(formals(enacopula)$method),
+		      include.K=TRUE, n.MC=0,
+		      trafo=c("Hering.Hofert", "Rosenblatt"),
+		      method=eval(formals(gofTstat)$method),
+		      verbose=TRUE, ...)
 {
     ## setup
     if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
@@ -389,14 +327,15 @@ apply the transformations yourself,  see ?gnacopula.")
     meth2 <- paste0(method,", est.method = ", estim.method)
     meth <-
 	switch(method,
-	       "AnChisq" =,  ## A_n
-	       "AnGamma" = { ## A_n with gamma distribution
+               "Sn" = {
+                   paste0(meth, meth2)
+               },
+               "SnB" =, "SnC" = {
+		   paste0(meth, meth2," (with trafo = ", trafo, ")")
+	       },
+	       "AnChisq" =, "AnGamma" = {
 		   paste0(meth, "Anderson and Darling (with trafo = ",
                           trafo, " and method = ", meth2, ")")
-	       },
-	       "SnB" =, ## S_n(B) and S_n(C)
-	       "SnC" = {
-		   paste0(meth, meth2," (with trafo = ", trafo, ")")
 	       },
 	       stop("wrong 'method' argument"))
 
@@ -409,8 +348,10 @@ apply the transformations yourself,  see ?gnacopula.")
 
     ## (2) transform the data with the copula with estimated parameter
     u.prime <- gtrafomulti(u, cop=cop.hat) # transformed data in the unit hypercube
+
     ## (3) conduct the Anderson-Darling test or compute the test statistic (depends on method)
-    T <- gofTstat(u.prime, method=method)  # transformed data
+    T <- if(method=="Sn") gofTstat(u.prime, method=method, copula=cop.hat)
+         else gofTstat(u.prime, method=method)
 
     ## (4) conduct the parametric bootstrap
     theta.hat. <- numeric(n.bootstrap) # vector of estimators
@@ -434,7 +375,8 @@ apply the transformations yourself,  see ?gnacopula.")
 	u.prime. <- gtrafomulti(u., cop=cop.hat.)
 
 	## (4.4) compute the test statistic
-        T.[k] <- gofTstat(u.prime., method=method)
+        T.[k] <- if(method=="Sn") gofTstat(u.prime., method=method, copula=cop.hat.)
+        else gofTstat(u.prime., method=method)
         if(verbose) setTxtProgressBar(pb, k) # update progress bar
     }
 

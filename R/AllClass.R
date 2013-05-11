@@ -43,6 +43,7 @@ setClass("acopula",
 			dacopula = "function",	  # of (u, theta, n.MC=0, log=FALSE) -- computes the (log-)density of the Archimedean
 					# copula with parameter theta at the vector/matrix u (n.MC > 0: apply Monte Carlo with sample size n.MC)
 			score = "function",	  # of (u, theta) -- computes the score function
+                        uscore = "function",      # of (u, theta, d) -- computed (dC/du)(u) / C(u) for each u_j => for all components simultaneously
 			V0 = "function",	  # of (n,theta) -- RNGenerator
 			dV0 = "function",	  # of (x,theta,log=FALSE) -- density of F=LS^{-1}[psi]
 			tau = "function",	  # of (theta)
@@ -67,8 +68,8 @@ setClass("acopula",
 	     checkFun <- function(sName, nArgs, chkVectorizing=TRUE) {
 		 f <- slot(object, sName)
 		 if (length(formals(f)) < nArgs)
-		     paste("slot '",sName,"' must be a function of at least ",nArgs,
-			   " arguments", sep="")
+		     paste0("slot '",sName,"' must be a function of at least ",nArgs,
+                            " arguments")
 		 else if(chkVectorizing && nArgs <= 2) {
 		     ## test that the function can be called with NULL
 		     r0 <- tryCatch(if(nArgs == 2) f(NULL, theta = th) else f(NULL),
@@ -190,7 +191,7 @@ setClass("outer_nacopula", contains = "nacopula",
 
 ## The dim() method is nicely defined  *recursive*ly :
 setMethod("dim", signature(x = "nacopula"),
-	  function(x) length(x@comp) + sum(unlist(lapply(x@childCops, dim))))
+	  function(x) length(x@comp) + sum(vapply(x@childCops, dim, 1L)))
 
 
 ##' @title nesting depth of a NAcopula
@@ -207,3 +208,34 @@ allComp <- function(x) {
 }
 ##' no check version:
 .allComp <- function(x) c(x@comp, unlist(lapply(x@childCops, .allComp)))
+
+##' Which values u are "inside (0,1)^d", for which dCopula(u) *can* be non-zero
+##'
+##' In ./cop_objects.R (for M+H's Archimedean's we have had for years
+##'   ## indices for which density has to be evaluated:
+##'   n01 <- apply(u,1,function(x) all(0 < x, x < 1))
+##'
+##' @title Those values u for which dCopula(u) *can* be non-zero
+##' @param u  n x d numeric matrix
+##' @return logical vector of length nrow(u) - with*out* any NAs
+##' @author Martin Maechler
+u.in.01 <- function(u) apply(u, 1, function(x)
+			     !any(is.na(x)) && all(0 < x, x < 1))
+## TODO? rather use		                   0 < x, x <= 1  ??
+
+
+##' Which values u are "outside (0,1)^d" ?
+##'
+##' @title Those values u for which dCopula(u) should be zero
+##' @param u  n x d numeric matrix
+##' @return logical vector of length nrow(u), possibly with NA
+##'         wherever a row u[i,] contains NA or NaN and all other values in (0,1)
+##' !@author Martin Maechler
+outside.01 <- function(u, strictly=TRUE) {
+    if(strictly)
+	apply(u, 1, function(x) any(x <	 0, 1 <	 x))
+    else
+	apply(u, 1, function(x) any(x <= 0, 1 <= x))
+}
+## TODO? rather use		                        x <= 0, 1 <  x
+## ----  or even    		                        x <  0, 1 <  x

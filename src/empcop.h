@@ -15,15 +15,6 @@
   this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-/**
- * @file   empcop.h
- * @author Ivan Kojadinovic
- * @date   Sat Jul 21 17:25:20 2012
- *
- * @brief  Bivariate and multivariate versions of the empirical copula
- *         and related estimators of the partial derivatives
- *
- */
 
 #ifndef EMPCOP_H
 #define EMPCOP_H
@@ -37,7 +28,7 @@ double der2bivCn(const double U[], const double V[], int n, double u, double v);
 double multCn(const double U[], int n, int p, const double V[], int m, int k, double o);
 double der_multCn(const double U[], int n, int p, const double u[], const double v[], double denom);
 
-// called .C 
-void RmultCn(double *U, int *n, int *p, double *V, int *m, double *ec);
+// called .C
+void Cn_C(double *U, int *n, int *p, double *V, int *m, double *ec, double *offset);
 
 #endif

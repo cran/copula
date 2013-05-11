@@ -86,4 +86,4 @@ Stirling2(7,3)
 Stirling1.all(9)
 Stirling2.all(9)
 }
-\keyword{arithmetic}
+\keyword{arith}

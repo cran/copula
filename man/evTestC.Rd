@@ -55,6 +55,15 @@ evTestC(rCopula(200, claytonCopula(3)))
 ## Three-dimensional examples
 evTestC(rCopula(200, gumbelCopula(3, dim=3)))
 evTestC(rCopula(200, claytonCopula(3, dim=3)))
+\dontshow{
+ set.seed(101)
+ G.t <- evTestC(rCopula(200, gumbelCopula(3, dim=3)))
+ C.t <- evTestC(rCopula(200, claytonCopula(3, dim=3)))
+ eT3 <- evTestC(rCopula(200, tevCopula(.8, df=3)))
+ stopifnot(all.equal(G.t$p.value, 0.1543, tol=.001),
+           all.equal(C.t$p.value, 4995/9999990, tol= 1e-7),
+           all.equal(eT3$p.value, 0.407092907092907, tol= 1e-7))
+}
 }
 \keyword{htest}
 \keyword{multivariate}

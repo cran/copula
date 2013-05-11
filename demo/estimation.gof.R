@@ -89,7 +89,7 @@ copFamily <- "Joe" # family to be estimated
 cop.hat <- onacopulaL(copFamily,list(NA,1:d))
 mLogL <- function(theta,cop.hat,u){
     cop.hat@copula@theta <- theta
-    -sum(dnacopula(cop.hat, u, log=TRUE))
+    -sum(dCopula(u, cop.hat, log=TRUE))
 }
 (est <- optimize(mLogL, interval=initOpt(copFamily), cop.hat=cop.hat,
                  u=u))
@@ -97,7 +97,7 @@ mLogL <- function(theta,cop.hat,u){
 ## evaluate the density at u for a specified parameter
 theta <- 14
 cop.hat@copula@theta <- theta
-(log.dens <- dnacopula(cop.hat, u, log=TRUE))
+(log.dens <- dCopula(u, cop.hat, log=TRUE))
 -sum(log.dens)
 
 ### Plots ######################################################################

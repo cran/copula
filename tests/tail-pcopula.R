@@ -14,6 +14,9 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 require(copula)
+source(system.file("Rsource", "utils.R", package="copula", mustWork=TRUE))
+##-> assertError()
+
 ## fCopulae: don't do on CRAN, and really "can not" suggest fCopulae
 tryfCop <- TRUE # for interactive convenience
 ## when run as BATCH:
@@ -25,15 +28,6 @@ if(tryfCop) { ## will only "work" if not "--as-cran"
     tryfCop <- suppressWarnings(.r(fCopulae, quietly=TRUE)) }
 tryfCop
 
-## From system.file("test-tools-1.R", package="Matrix"):
-## Make sure errors are signaled
-assertError <- function(expr) {
-    d.expr <- deparse(substitute(expr))
-    t.res <- tryCatch(expr, error = function(e) e)
-    if(!inherits(t.res, "error"))
-	stop(d.expr, "\n\t did not give an error", call. = FALSE)
-    invisible(t.res)
-}
 numTailIndexLower <- function(copula, u) {
   ## u is a vector approaching 0
   pCopula(cbind(u, u, deparse.level = 0), copula) / u

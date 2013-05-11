@@ -14,10 +14,10 @@ splom2(data, varnames=NULL, Vname="U", xlab="",
        col.mat = NULL, bg.col.mat = NULL, \dots)
 }
 \arguments{
-  \item{data}{numeric matrix or as.matrix(.)able}
-  \item{varnames}{variable names, typically unspecified}
-  \item{Vname}{character string to become the "base name" of the variables}
-  \item{xlab}{x-axis label}
+  \item{data}{numeric matrix or as.matrix(.)able.}
+  \item{varnames}{variable names, typically unspecified.}
+  \item{Vname}{character string to become the "base name" of the variables.}
+  \item{xlab}{x-axis label.}
   \item{col.mat}{matrix of colors for the plot symbols (the default is the
     setting as obtained from
     \code{\link[lattice]{trellis.par.get}("plot.symbol")$col}).}

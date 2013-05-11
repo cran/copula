@@ -74,4 +74,4 @@ assign("Bern.tab", list(), envir = copula:::.nacopEnv)
 
 ## More experiments in the source of the copula package ../tests/Stirling-etc.R
 }
-\keyword{arithmetic}
+\keyword{arith}

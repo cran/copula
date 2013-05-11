@@ -5,15 +5,15 @@
 \description{
   Fits a copula model to multivariate data belonging to the unit
   hypercube. The data can be pseudo-observations constructed from
-  empirical or parametric marginal c.d.f.s, or true observations
-  from the copula.
+  empirical or parametric marginal distribution functions, or
+  true observations from the copula.
 }
 \usage{
 loglikCopula(param, x, copula, hideWarnings)
 fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
           start = NULL, lower = NULL, upper = NULL,
           optim.method = "BFGS", optim.control = list(maxit=1000),
-          estimate.variance = TRUE, hideWarnings = FALSE)
+          estimate.variance = TRUE, hideWarnings = TRUE)
 }
 \arguments{
   \item{param}{ a vector of parameter values. }
@@ -21,10 +21,11 @@ fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
     (for \code{"mpl"} and \code{"ml"} with values necessarily in
     \eqn{[0,1]}) from the copula to be estimated, where \eqn{n} denotes
     the sample size and \eqn{d} the dimension.  Consider applying the function
-    \code{\link{pobs}} first in order to obtain values in \eqn{[0,1]}.}
+    \code{\link{pobs}()} first in order to obtain values in \eqn{[0,1]}.}
   \item{copula}{a \code{"\linkS4class{copula}"} object.}
-  \item{hideWarnings}{deprecated and no longer used; if desired, warning messages
-    must be suppressed by \code{\link{suppressWarnings}(.)} now.}
+  \item{hideWarnings}{\emph{deprecated} and unused for \code{loglikCopula()};
+    logical; if TRUE, warning messages from likelihood maximization
+    (mostly evaluating at invalid parameter values) are suppressed.}
   \item{method}{a \code{\link{character}} string specifying the method;
     can be either
     \code{"ml"} (maximum likelihood),
@@ -39,7 +40,7 @@ fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
     or \code{"L-BFGS-B"} method.}
   \item{optim.control}{a \code{\link{list}} of control parameters to be
     passed to \code{\link{optim}(*, control=optim.control)}.}
-  \item{optim.method}{the \code{method} for \code{\link{optim}}.}
+  \item{optim.method}{the \code{method} for \code{\link{optim}()}.}
   \item{estimate.variance}{logical; if TRUE, the asymptotic variance is
     estimated.}
 }
@@ -115,7 +116,13 @@ fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
   from method \code{"itau"} are used as initial values in
   the optimization.
 
-  For the t copula with \code{df.fixed=FALSE} (see \code{\link{ellipCopula}}),
+  If methods \code{"itau"} or \code{"itau"} are used in
+  \code{fitCopula()}, an estimate of the asymptotic variance (if
+  available for the copula under consideration) will be correctly
+  computed only if the argument \code{data} consists of pseudo-observations
+  (see \code{\link{pobs}()}).
+
+  For the t copula with \code{df.fixed=FALSE} (see \code{\link{ellipCopula}()}),
   the methods \code{"itau"} and \code{"irho"} cannot be used in
   \code{fitCopula()}.  For the methods \code{"ml"} and \code{"mpl"},
   when \code{start} is not specified, the starting value for \code{df} is
@@ -123,14 +130,14 @@ fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
   cannot (yet) be estimated for method \code{"mpl"}.
 
   To implement the \dQuote{\emph{inference functions for margins}}
-  method (see e.g., Joe 2005), the \code{data} need to be pseudo-observations
-  obtained from fitted parametric marginal c.d.f.s and \code{method}
-  needs to be set to \code{"ml"}.  The returned large-sample variance
-  will then underestimate the true variance.
+  method (see, e.g., Joe 2005), the \code{data} need to be pseudo-observations
+  obtained from fitted parametric marginal distribution functions and
+  \code{method} needs to be set to \code{"ml"}.  The returned
+  large-sample variance will then underestimate the true variance.
 
   Finally, note that the fitting functions generate error messages
   because invalid parameter values are tried during the optimization
-  process (see \code{\link{optim}}).  When the number of parameters is
+  process (see \code{\link{optim}()}).  When the number of parameters is
   one and the parameter space is bounded, using
   \code{optim.method="Brent"} is likely to give less warnings.
   Furthermore, from experience, \code{optim.method="Nelder-Mead"} is
@@ -144,7 +151,9 @@ fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
 \examples{
 gumbel.cop <- gumbelCopula(3, dim=2)
 
-n <- 200
+(Xtras <- copula:::doExtras())
+n <- if(Xtras) 200 else 64
+
 x <- rCopula(n, gumbel.cop)## "true" observations
 u <- pobs(x)               ## pseudo-observations
 ## inverting Kendall's tau
@@ -160,6 +169,10 @@ fit.mpl
 ## maximum likelihood
 fit.ml <- fitCopula(gumbel.cop, x, method="ml")
 fit.ml # print()ing works via summary() ...
+## and of that, what's the log likelihood (in two different ways):
+(ll. <- logLik(fit.ml))
+stopifnot(all.equal(as.numeric(ll.),
+    loglikCopula(coef(fit.ml), x=x, copula=gumbel.cop)))
 
 ## a multiparameter example
 normal.cop <- normalCopula(c(0.6,0.36, 0.6),dim=3,dispstr="un")
@@ -221,6 +234,9 @@ u <- pobs(x)          ## pseudo-observations
 ## maximum pseudo-likelihood; the asymptotic variance cannot be estimated
 (tc.mpl <- fitCopula(tCop, u, method="mpl", estimate.variance=FALSE,
                      start= c(0,0,0,10)))
+
+if(Xtras) { ##---- typically not run with CRAN checking: ---
+
 ## without start:
 (tc.mp. <- fitCopula(tCop, u, method="mpl", estimate.variance=FALSE))
 all.eqCop <- function(x,y, ...) {
@@ -243,6 +259,9 @@ vcov(tcF.ml)
                       start=c(0,0,0)))
 (tcF.mp. <- fitCopula(tC.f, u, method="mpl", estimate.variance=FALSE))
 stopifnot(all.eqCop(tcF.mpl,tcF.mp., tol= 1e-5))
+
+}## end{typically not run ...}
+
 }
 \keyword{ models }
 \keyword{ multivariate }

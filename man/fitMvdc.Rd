@@ -11,7 +11,7 @@
   estimating both the marginal and the copula parameters.
 }
 \usage{
-loglikMvdc(param, x, mvdc, hideWarnings = FALSE)
+loglikMvdc(param, x, mvdc, hideWarnings)
 fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
         estimate.variance = TRUE, hideWarnings = TRUE)
 
@@ -27,9 +27,9 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
     parameters of one marginal must be specified.}
   \item{x}{a data matrix.}
   \item{mvdc}{a \code{"\linkS4class{mvdc}"} object. }
-  \item{hideWarnings}{logical; if TRUE, warning messages from
-    evaluating loglikelihood at invalid parameter values are
-    suppressed.}
+  \item{hideWarnings}{\emph{deprecated} and unused for \code{loglikMvdc};
+    logical; if TRUE, warning messages from likelihood maximization
+    (mostly evaluating at invalid parameter values) are suppressed.}
   \item{data}{a data matrix.}
   \item{start}{a vector of starting value for \code{"param"}. See
     \code{"param"} above for ordering of this vector.}
@@ -51,8 +51,7 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
   \item{estimate}{the estimate of the parameters.}
   \item{var.est}{large-sample (i.e., asymptotic) variance estimate of the parameter
     estimator (filled with \code{NA} if \code{estimate.variance = FALSE}).}
-  %%
-  \item{mvdc}{the fitted multivariate distribution, see
+  \item{mvdc}{the \emph{fitted} multivariate distribution, see
     \code{\linkS4class{mvdc}}.}
 
 %% FIXME -- formatting -- because of the special way \item is handled
@@ -92,12 +91,14 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
 gumbel.cop <- gumbelCopula(3, dim=2)
 gMvd2 <- mvdc(gumbel.cop, c("exp","exp"),
               list(list(rate=2), list(rate=4)))
+set.seed(11)
 x <- rMvdc(10000, gMvd2)
 ## with identical margins:
 gMvd.I <- mvdc(gumbel.cop, "exp", param = list(rate=3), marginsIdentical=TRUE)
-if(copula:::doExtras()) { ## these are is typically not run with CRAN checking:
- ## Takes about  25 sec. [2012-07]:
- fit2 <- fitMvdc(x, gMvd2, start = c(1,1, 2))
+if(copula:::doExtras()) { ## these are typically not run with CRAN checking:
+ ## Takes about 25 sec. [2012-07]:
+ fit2 <- fitMvdc(x, gMvd2, start = c(1,1, 2),
+                 hideWarnings=FALSE) ## <- show warnings here
  print(fit2)
  ## The (estimated, asymptotic) var-cov matrix:
  print( vcov(fit2) )
@@ -107,9 +108,9 @@ if(copula:::doExtras()) { ## these are is typically not run with CRAN checking:
  print(coef(summary(fitI)))
  print(fitI)
 
-  ## a wrong starting value  can already be *the* problem:
-  try(f2 <- fitMvdc(x, gMvd.I, start = c(1, 1),
-		     optim.control=list(trace= TRUE, REPORT= 2)))
+  ## a wrong starting value can already be *the* problem:
+  f2 <- try(fitMvdc(x, gMvd.I, start = c(1, 1),
+	            optim.control=list(trace= TRUE, REPORT= 2)))
   ##--> Error in optim( ... : non-finite finite-difference value [2]
 
   ##==> "Solution" :  Using a more robust (but slower) optim() method:
@@ -122,8 +123,8 @@ if(copula:::doExtras()) { ## these are is typically not run with CRAN checking:
  stopifnot(is.matrix(coef(sfI)))
 \dontshow{
  stopifnot(all.equal(coef(sfI),
-                     coef(summary(fI.2)), tol = 1e-4),
-           all.equal(coef(fitI), coef(fI.2), tol = 1e-4))
+		     coef(summary(fI.2)),    tol = 2e-4),
+	   all.equal(coef(fitI), coef(fI.2), tol = 1e-4))
 }%dont...
 }% if(..doExtras())
 
