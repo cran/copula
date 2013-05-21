@@ -1,7 +1,7 @@
 b2b727bf24d7f00faefe80b34135da73 *ChangeLog
-8cb197c5ed21c2f48bae694548957c84 *DESCRIPTION
+dc46237501664730f6f2dc03a93d4fa3 *DESCRIPTION
 35020cdf0f6debb5ef3cdc5bb48f8ef7 *LICENCE
-5e008069804d4c61af475b6d0ebae52b *NAMESPACE
+c9bcba4a189425fc9c0cc243f0752c63 *NAMESPACE
 26066ae2be465307a7ffe3e6cb261611 *R/AllClass.R
 762f7664f21f0e571622f11eb897956c *R/An.R
 970feca40c249879f9df817ea2c03d03 *R/Auxiliaries.R
@@ -21,7 +21,7 @@ ef8bde33b562ba9f9411f37347a78633 *R/cop_objects.R
 289cde1ad79b57e9c0aa7eae1c348d44 *R/derCdfPdf.R
 ac25a2f1ef9809cfb0d591ed63ce96e9 *R/ellipCopula.R
 c32825c764fa85a176bd0f035e7b7c93 *R/empPsi.R
-01a50aab90168cd0d92cc4502d516ccd *R/empcop.R
+5b5c6de68491ff8f49912327498767ce *R/empcop.R
 cefcaead65c656afb643acd570db0df2 *R/estimation.R
 32376e85b9dc7b726f47ac85175814c0 *R/evCopula.R
 160e1a6cc4f665d0dbb3fd0da2d7eb03 *R/evTests.R
@@ -36,7 +36,7 @@ ec9ce5a3a54af4229c6d7a7275987215 *R/galambosCopula.R
 19396bc15b6af98037751d6fcec4ed4f *R/galambosExpr.R
 0e293ff669e0c45415e0450f976f744a *R/ggraph-tools.R
 b314e39d84211bd29a6d66008c63f30b *R/gofEVTests.R
-c976ca13e273677a289ec9c9bb6fd923 *R/gofTests.R
+432e05ad95e37f1285b97d1336e41446 *R/gofTests.R
 375e29aefb5c26bb5a8df559ccc11c12 *R/gofTrafos.R
 0289c0e7f2d01bfcf1548d97319f95d8 *R/graphics.R
 54570ce5396182bd038b5695c675a956 *R/gumbelCopula.R
@@ -103,10 +103,10 @@ f37cb10ffb81b89e048b80446ba44c15 *inst/Rsource/AC-Liouville.R
 e72f0fb69a5cf14a41c20f0d1722a652 *inst/Rsource/utils.R
 ba26ed7af5c3c7156772758c2287f564 *inst/doc/Frank-Rmpfr.R
 069064d76b45930e434cfcb4fc9f7192 *inst/doc/Frank-Rmpfr.Rnw
-3802ac530bb87eb57211137d65136900 *inst/doc/Frank-Rmpfr.pdf
+9b0fb041528d4e4c5312f85417eb05bb *inst/doc/Frank-Rmpfr.pdf
 18f066ac428c5c26f8c1c8f3210ab3db *inst/doc/nacopula-pkg.R
 89f6f26a99a1c414d91f9e4e60ba2ac5 *inst/doc/nacopula-pkg.Rnw
-5163889d082e5c461cb8ada9908a2be3 *inst/doc/nacopula-pkg.pdf
+3b52a551ed0d1f1b6ff953858108389d *inst/doc/nacopula-pkg.pdf
 e53b44576aeeaf4060333fd3b9eb7eac *inst/docs/mathnb/README
 d5d9a616711271a879cc868f78e90ec0 *inst/docs/mathnb/amhCopula.cdf.expr
 1a4a238485ab89994d7df8865b8f0d9e *inst/docs/mathnb/amhCopula.cdfDerWrtArg.expr
@@ -200,7 +200,7 @@ a29e960c10ef9f377b01a228dc544431 *man/ellipCopula-class.Rd
 6e7d3508d0fa4add3e50516d8c9abaab *man/ellipCopula.Rd
 f88dc54f45e957649521bd18c06ba46d *man/emde.Rd
 636608bf58d3df25bab3bacd733fb5b5 *man/emle.Rd
-2011cf2e9aa8cb6ec6bf7238316a883d *man/empcop.Rd
+dba39dec0e3faf99d012f12deeb5d74d *man/empcop.Rd
 0deef73d82714caf8f959e505703ef64 *man/enacopula.Rd
 48c5c50b9006be4e04394b756312f8c5 *man/estim-misc.Rd
 3f6ff8371d3ff3e85ea41252e7110ccd *man/evCopula-class.Rd
@@ -219,7 +219,7 @@ e5a471dffaf643a9b1c655b26908b9be *man/fitMvdc.Rd
 fa8adffec01df5a950d1b1ea4e6a6e6b *man/getAcop.Rd
 5f9648c969fa488ba6395a050022f7ee *man/ggraph-tools.Rd
 ac9c312abf4771fd4b8ac71f5e2ca46d *man/gnacopula.Rd
-398de06d32789b3bef01a3e325b007a4 *man/gofCopula.Rd
+acdd6884a02c63c0b4ea5ac9f812c9d3 *man/gofCopula.Rd
 8ed52fb6cb63b1c19bdc638bdbf3a920 *man/gofEVCopula.Rd
 3cfbb4e2c81beb9e44af919335dce9cf *man/gofOtherTstat.Rd
 0aea2f1df8cfef65f71961040d213642 *man/gofTrafos.Rd

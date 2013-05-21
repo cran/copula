@@ -1,17 +1,23 @@
 \name{gofCopula}
 \alias{gofCopula}
+\alias{gofMB}
+\alias{gofPB}
 \title{Goodness-of-fit Tests for Copulas}
 \description{
   Goodness-of-fit tests for copulas based on the empirical process
-  comparing the empirical copula with a
-  parametric estimate of the copula derived under the null hypothesis.
-  The test statistic is the Cramer-von Mises functional
-  \eqn{\mathrm{S_n}}{S[n]} defined
-  in Equation (2) of Genest, Remillard and Beaudoin (2009).
+  comparing the empirical copula with a parametric estimate of the
+  copula derived under the null hypothesis.
   Approximate p-values for the test statistic can be obtained either
   using the \emph{parametric bootstrap} (see the two first
-  references) or by means of a fast \emph{multiplier} approach (see the
-  last two references).
+  references) or by means of a fast \emph{multiplier} approach
+  (see references three and four).
+
+  The default test statistic, "Sn", is the Cramer-von Mises functional
+  \eqn{\mathrm{S_n}}{S[n]} defined
+  in Equation (2) of Genest, Remillard and Beaudoin (2009).
+
+  The prinicipal function is \code{gofCopula()} which, depending on
+  \code{simulation} either calls \code{gofPB()} or \code{gofMB()}.
 }
 \usage{
 gofCopula(copula, x, N=1000,
@@ -20,6 +26,16 @@ gofCopula(copula, x, N=1000,
           simulation=c("pb", "mult"),
 	  verbose=TRUE, print.every=NULL,
           optim.method="BFGS", optim.control=list(maxit=20), ...)
+
+gofPB(copula, x, N, method = eval(formals(gofTstat)$method),
+      estim.method = eval(formals(fitCopula)$method),
+      optim.method = "BFGS", optim.control,
+      trafo.method = c("none", "rtrafo", "htrafo"), verbose = TRUE, ...)
+
+gofMB(copula, x, N, method = c("Sn", "Rn"),
+      estim.method = eval(formals(fitCopula)$method),
+      optim.method = "BFGS", optim.control, verbose = TRUE, useR = FALSE,
+      m = 1/2, zeta.m = 0, b = 0.05)
 }
 \arguments{
   \item{copula}{object of class \code{"\linkS4class{copula}"} representing the
@@ -29,7 +45,8 @@ gofCopula(copula, x, N=1000,
     simulate realizations of the test statistic under the null
     hypothesis.}
   \item{method}{a \code{\link{character}} string specifying the
-    goodness-of-fit test statistic to be used; see \code{\link{gofTstat}()}.}
+    goodness-of-fit test statistic to be used; currently, one of "Sn",
+      "SnB", "SnC", "AnChisq", or "AnGamma", see \code{\link{gofTstat}()}.}
   \item{estim.method}{a character string specifying the estimation method to
     be used to estimate the dependence parameter(s); see \code{\link{fitCopula}()}.}
   \item{simulation}{a string specifying the simulation method for
@@ -41,8 +58,20 @@ gofCopula(copula, x, N=1000,
     should be displayed via \code{\link[utils]{txtProgressBar}}.}
   \item{optim.method, optim.control}{the \code{method} and
     \code{control} arguments for \code{\link{optim}()}, see there.}
-  \item{\dots}{additional arguments passed to the underlying main
-    auxiliary functions (see the code for details).}
+  \item{\dots}{for \code{gofCopula}, additional arguments passed to
+    \code{gofPB()} or \code{gofMB()};
+
+    for \code{gofPB()}: additional arguments passed to \code{htrafo()}
+    or \code{rtrafo()}.}
+  \item{trafo.method}{string specifying the transformation to
+    \eqn{U[0,1]^d}; either \code{"none"} or one of \code{"rtrafo"},
+    see \code{\link{rtrafo}}, or \code{"htrafo"}, see \code{\link{htrafo}}.}
+  \item{useR}{logical indicating whether an R or the C implementation is used.}
+  \item{m, zeta.m, b}{only for method \code{"Rn"} in \dQuote{MB}, the
+    multiplier bootstrap. \code{m} is the power, \code{zeta.m} the adjustment
+    parameter \eqn{\zeta_m}{zeta.m} for the denominator of the test
+    statistic, and \code{b} is the bandwidth required for the estimation
+    of the first-order partial derivatives based on the empirical copula.}
 }
 \details{
   If the parametric bootstrap is used, the dependence parameters of
@@ -67,11 +96,15 @@ gofCopula(copula, x, N=1000,
   note that the finite-sample behavior of the two tests might differ
   significantly.
 
-  Also note that in case of the parametric bootstrap, a finite-sample
-  correction of type \eqn{(0.5+\sum_{b=1}^N\mathbf{1}_{\{T_b\ge
-      T\}})/(N+1)}{(0.5 + sum(T[b] >= T, b=1, .., N)) / (N+1)} is made,
-  where \eqn{T} and \eqn{T_b}{T[b]} denote the the test statistic and
-  bootstrapped test statistc, respectively. See Pesarin (2001) for details.
+  Also note that in the case of the parametric and multiplier bootstraps,
+  the approximate p-value is computed as
+  \deqn{(0.5 +\sum_{b=1}^N\mathbf{1}_{\{T_b\ge T\}})/(N+1),}{%
+        (0.5 + sum(T[b] >= T, b=1, .., N)) / (N+1),}
+  where \eqn{T} and \eqn{T_b}{T[b]} denote the test statistic and
+  the bootstrapped test statistc, respectively. This ensures that the
+  approximate p-value is a number strictly between 0 and 1, which is
+  sometimes necessary for further treatments. See Pesarin (2001) for
+  more details.
 }
 \value{
   An object of \code{\link{class}} \code{htest} which is a list,
@@ -114,7 +147,7 @@ gofCopula(copula, x, N=1000,
   which implies that ties occur with probability zero. The
   presence of ties in the data might substantially affect the
   approximate p-values. One way of dealing with ties was suggested in the
-  last reference.
+  Journal of Statistical Software reference.
 
   Since \R is widely used by practitioners, a word of warning concerning
   goodness-of-fit tests \emph{in general} is also advisable.

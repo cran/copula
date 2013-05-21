@@ -36,7 +36,8 @@
 ##' @param ... additional arguments for the different methods
 ##' @return n-vector of values of the chosen test statistic
 ##' @author Marius Hofert and Martin Maechler
-gofTstat <- function(u, method=c("Sn", "SnB", "SnC", "AnChisq", "AnGamma"), useR=FALSE, ...)
+gofTstat <- function(u, method=c("Sn", "SnB", "SnC", "AnChisq", "AnGamma"),
+		     useR=FALSE, ...)
 {
     if(!is.matrix(u)) u <- rbind(u, deparse.level=0L)
     d <- ncol(u)
@@ -133,7 +134,7 @@ gofTstat <- function(u, method=c("Sn", "SnB", "SnC", "AnChisq", "AnGamma"), useR
 gofPB <- function(copula, x, N, method=eval(formals(gofTstat)$method),
                   estim.method=eval(formals(fitCopula)$method),
                   optim.method="BFGS", optim.control,
-                  trafo.method=c("rtrafo", "htrafo"),
+                  trafo.method=c("none", "rtrafo", "htrafo"),
                   verbose=TRUE, ...)
 {
     ## checks
@@ -144,8 +145,10 @@ gofPB <- function(copula, x, N, method=eval(formals(gofTstat)$method),
     estim.method <- match.arg(estim.method)
     trafo.method <- match.arg(trafo.method)
     if(trafo.method=="htrafo"){
-        if(!is(copula, "outer_nacopula")) stop("trafo.method='htrafo' only implemented for copula objects of type 'outer_nacopula'")
-        if(length(copula@childCops)) stop("currently, only Archimedean copulas are provided")
+	if(!is(copula, "outer_nacopula"))
+	    stop("trafo.method='htrafo' only implemented for copula objects of type 'outer_nacopula'")
+	if(length(copula@childCops))
+	    stop("currently, only Archimedean copulas are provided")
     }
 
     ## 1) Compute the pseudo-observations
@@ -158,12 +161,9 @@ gofPB <- function(copula, x, N, method=eval(formals(gofTstat)$method),
     ## 3) Compute the realized test statistic
     u <- if(method=="Sn"){
         switch(trafo.method,
-               "rtrafo"={
-                   rtrafo(uhat, C.th.n, ...)
-               },
-               "htrafo"={
-                   htrafo(uhat, C.th.n, ...)
-               },
+	       "none"= uhat,
+	       "rtrafo"= rtrafo(uhat, C.th.n, ...),
+	       "htrafo"= htrafo(uhat, C.th.n, ...),
                stop("wrong transformation method"))
     } else uhat
     T <- if(method=="Sn") gofTstat(u, method=method, copula=C.th.n)
@@ -185,12 +185,9 @@ gofPB <- function(copula, x, N, method=eval(formals(gofTstat)$method),
         ## 4.3) Compute the test statistic
         u. <- if(method=="Sn"){
             switch(trafo.method,
-                   "rtrafo"={
-                       rtrafo(Uhat, C.th.n., ...)
-                   },
-                   "htrafo"={
-                       htrafo(Uhat, C.th.n., ...)
-                   },
+		   "none"= Uhat,
+		   "rtrafo"= rtrafo(Uhat, C.th.n., ...),
+		   "htrafo"= htrafo(Uhat, C.th.n., ...),
                    stop("wrong transformation method"))
         } else Uhat
         T0. <- if(method=="Sn") gofTstat(u., method=method, copula=C.th.n.)
@@ -305,7 +302,8 @@ Jscore <- function(copula, u, method)
 ##'         the realized test statistic and the bootstrapped one are computationally different
 gofMB <- function(copula, x, N, method=c("Sn", "Rn"),
                   estim.method=eval(formals(fitCopula)$method),
-                  optim.method="BFGS", optim.control, verbose=TRUE, useR=FALSE, ...)
+                  optim.method="BFGS", optim.control, verbose=TRUE, useR=FALSE,
+                  m = 1/2, zeta.m = 0, b = 0.05)
 {
     ## checks
     stopifnot(is(copula, "copula"), N>=1)
@@ -359,20 +357,8 @@ gofMB <- function(copula, x, N, method=c("Sn", "Rn"),
            "Rn"=
        {
            ## checks
-           if(estim.method!="itau") stop("Currently only estim.method='itau' available for method='Rn'")
-           if(!hasArg(m)){
-               if(verbose) warning("power 'm' required; m=1/2 is used instead")
-               m <- 1/2
-           } else m <- list(...)$m
-           if(!hasArg(zeta.m)){
-               if(verbose) warning("adjustment parameter 'zeta.m' required for the denominator of the test statistic; zeta.m=0 is used instead")
-               zeta.m <- 0
-           } else zeta.m <- list(...)$zeta.m
-           if(!hasArg(b)){
-               if(verbose) warning("bandwidth 'b' required for the estimation of the first-order partial derivatives based on the empirical copula; b=0.05 is used instead")
-               b <- 0.05
-           } else b <- list(...)$b
-
+	   if(estim.method!="itau")
+	       stop("Currently only estim.method='itau' available for method='Rn'")
            ## 3) Compute the realized test statistic
            C.th.n. <- pCopula(u., C.th.n) # n-vector
            denom <- (C.th.n.*(1-C.th.n.) + zeta.m)^m # n-vector
@@ -464,6 +450,7 @@ gofCopula <- function(copula, x, N=1000,
     method <- match.arg(method)
     estim.method <- match.arg(estim.method)
     optim.method <- match.arg(optim.method)
+    simulation <- match.arg(simulation)
     stopifnot(optim.method %in% eval(formals(optim)$method))
     ## deprecation
     if (!is.null(print.every)) {
@@ -481,9 +468,6 @@ gofCopula <- function(copula, x, N=1000,
     }
 
     ## distinguish the methods
-    method <- match.arg(method)
-    estim.method <- match.arg(estim.method)
-    simulation <- match.arg(simulation)
     switch(simulation,
            "pb" = { ## parametric bootstrap
                gofPB(copula, x, N=N, method=method, estim.method=estim.method,
@@ -494,5 +478,5 @@ gofCopula <- function(copula, x, N=1000,
                gofMB(copula, x=x, N=N, method=method, estim.method=estim.method,
                      optim.method=optim.method, optim.control=optim.control, ...)
            },
-           stop("Invalid simulation method ", match.arg(simulation)))
+           stop("Invalid simulation method ", simulation))
 }

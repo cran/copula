@@ -83,7 +83,7 @@ export(indepTestSim, indepTest, multIndepTest,
        dependogram)
 
 ## gof tests
-export(gofCopula, gofEVCopula)
+export(gofCopula, gofMB, gofPB, gofEVCopula)
 
 ## ggraph utils
 export(pairwiseCcop, pairwiseIndepTest, pviTest, gpviTest, RSpobs, gofBTstat) # R/ggraph-tools.R

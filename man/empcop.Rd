@@ -9,12 +9,12 @@
   C.  The function \code{C.n()} computes the empirical copula.
 
   The function \code{dCn()} approximates first-order partial derivatives
-  of the limiting copula.
+  of the unknown copula.
 }
 \usage{
  Cn(x, w) ## <-- deprecated!  use  C.n(w, U=pobs(x)) instead!
 C.n(u, U, offset=0, method=c("C", "R"))
-dCn(u, U, j.ind=1:d, b=0.05, ...)
+dCn(u, U, j.ind=1:d, b=1/sqrt(nrow(U)), ...)
 }
 \arguments{
   \item{u,w}{an \eqn{(m, d)}-\code{\link{matrix}} with elements in
@@ -43,41 +43,33 @@ dCn(u, U, j.ind=1:d, b=0.05, ...)
 
   \code{dCn()} returns a \eqn{(m, l)}-matrix or an \eqn{m}-vector (for
   \eqn{l=1}; here, \eqn{l} is the length of \code{j.ind}), containing
-  the approximated first-order partial derivatives of the limiting
+  the approximated first-order partial derivatives of the unknown
   copula at \code{u}.
 }
 \note{
   The first version of our empirical copula implementation, \code{Cn()},
   had its two arguments \emph{inverse} compared to \code{C.n()}, and is
-  deprecated now.
-  You \bold{must} swap the arguments, and possibly use
-  \code{\link{pobs}}, i.e,
-
-  \bold{ instead of \code{Cn(x, u)}, use \code{C.n(u, U=pobs(x))} !}
+  deprecated now. You \bold{must} swap the arguments, and possibly use
+  \code{\link{pobs}}, i.e, \bold{ instead of \code{Cn(x, u)}, use
+    \code{C.n(u, U=pobs(x))} !}
 }
 \details{
   There are several asymptotically equivalent definitions of the
   empirical copula.  Here, the empirical copula is simply defined as
   the empirical distribution function computed from the
   pseudo-observations, that is,
-  \deqn{C_n(\bm{u})=\frac{1}{n}\sum_{i=1}^n\mathbf{1}_{\{\hat{\bm{U}}_i\le\bm{u}\}},}{(1/(n+1))
+  \deqn{C_n(\bm{u})=\frac{1}{n}\sum_{i=1}^n\mathbf{1}_{\{\hat{\bm{U}}_i\le\bm{u}\}},}{(1/n)
   sum(I_{U_i<=u}, i=1, .., n),}
   where \eqn{\hat{\bm{U}}_i}{U_i}, \eqn{i\in\{1,\dots,n\}}{i=1,..,n},
   denote the pseudo-observations (rows in \code{U}) and \eqn{n} the sample size.
 
-  The approximation for the \eqn{j}th partial derivative of the limiting
-  copula \eqn{C} is implemented as in Genest et al. (2012), and given, for
-  \eqn{u_j\in[0,b)}{u[j] in [0, b)}, by
-  \deqn{\hat{\dot{C}}_{jn}(\bm{u}) =\frac{C_n(u_1,\dots,u_{j-1},2b,u_{j+1},\dots,u_d)}{2b},}{%
-              hat(C.)[jn](u)  =  C[n](u[1], .., u[j-1], 2b, u[j+1], .., u[d]) / (2b),}
-  for \eqn{u_j\in[b,1-b]}{u[j] in [b, 1-b]} by
-  \deqn{\hat{\dot{C}}_{jn}(\bm{u})=\frac{C_n(u_1,\dots,u_{j-1},u_j+b,u_{j+1},\dots,u_d)-C_n(u_1,\dots,u_{j-1},u_j-b,u_{j+1},\dots,u_d)}{2b},}{%
-    hat(C.)[jn](u) = (C[n](u[1], .., u[j-1], u[j]+b, u[j+1], .., u[d]) -
-                      C[n](u[1], .., u[j-1], u[j]-b, u[j+1], .., u[d])) / (2b),}
-  and for \eqn{u_j\in(1-b,1]}{u[j] in (1-b, 1]} by
-  \deqn{\hat{\dot{C}}_{jn}(\bm{u})=\frac{C_n(u_1,\dots,u_{j-1},1,u_{j+1},\dots,u_d)-C_n(u_1,\dots,u_{j-1},1-2b,u_{j+1},\dots,u_d)}{2b},}{%
-    hat(C.)[jn](u) = (C[n](u[1], .., u[j-1], 1, u[j+1], .., u[d]) -
-                      C[n](u[1], .., u[j-1], 1-2b, u[j+1], .., u[d])) / (2b),}
+  The approximation for the \eqn{j}th partial derivative of the unknown
+  copula \eqn{C} is implemented as, for example, in Rémillard and Scaillet
+  (2009), % see also Genest et al. (2012)
+  and given by
+  \deqn{\hat{\dot{C}}_{jn}(\bm{u})=\frac{C_n(u_1,..,u_{j-1},min(u_j+b,1),u_{j+1},..,u_d)-C_n(u_1,..,u_{j-1},max(u_j-b,0),u_{j+1},..,u_d)}{2b},}{%
+    hat(C.)[jn](u) = (C[n](u[1], .., u[j-1], min(u[j]+b, 1), u[j+1], .., u[d]) -
+                      C[n](u[1], .., u[j-1], max(u[j]-b, 0), u[j+1], .., u[d])) / (2b),}
   where \eqn{b} denotes the bandwidth and \eqn{C_n}{C[n]} the empirical copula.
 }
 \author{Ivan Kojadinovic, Marius Hofert}
@@ -93,9 +85,13 @@ dCn(u, U, j.ind=1:d, b=0.05, ...)
   Deheuvels, P. (1981).  A non parametric test for independence,
   \emph{Publ. Inst. Statist. Univ. Paris} \bold{26}, 29--50.
 
-  Genest, C., G. \enc{Nešlehová}{Neslehova}, J., and Quessy, J.-F. (2012).
-  Tests of symmetry for bivariate copulas,
-  \emph{Ann. Inst. Stat. Math.} \bold{64}, 811--834.
+  R\enc{é}{e}millard, B. and Scaillet, O. (2009). Testing for equality
+  between two copulas. \emph{Journal of Multivariate Analysis}, 100(3),
+  pages 377-386.
+
+  %% Genest, C., G. \enc{Nešlehová}{Neslehova}, J., and Quessy, J.-F. (2012).
+  %% Tests of symmetry for bivariate copulas,
+  %% \emph{Ann. Inst. Stat. Math.} \bold{64}, 811--834.
 }
 \seealso{\code{\link{pobs}()} for computing pseudo-observations,
   \code{\link{pCopula}()} for evaluating a copula.}

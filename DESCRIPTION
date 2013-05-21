@@ -1,7 +1,7 @@
 Package: copula
-Version: 0.999-6
-Date: $Date: 2013-05-11 23:24:46 +0200 (Sat, 11. May 2013) $
-SVNrev: $Revision: 1016 $
+Version: 0.999-7
+Date: $Date: 2013-05-21 11:21:17 +0200 (Tue, 21. May 2013) $
+SVNrev: $Revision: 1026 $
 Title: Multivariate Dependence with Copulas
 Author: Marius Hofert <marius.hofert@math.ethz.ch>, Ivan Kojadinovic
         <ivan.kojadinovic@univ-pau.fr>, Martin Maechler
@@ -43,7 +43,7 @@ Collate: AllClass.R Classes.R Copula.R Auxiliaries.R aux-acopula.R
         schlatherCopula.R stable.R timing.R trafos.R tCopula.R
         tawnCopula.R tawnExpr.R tevCopula.R wrapper.R zzz.R
 Encoding: UTF-8
-Packaged: 2013-05-12 20:41:44 UTC; maechler
+Packaged: 2013-05-21 09:23:31 UTC; maechler
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2013-05-14 10:07:44
+Date/Publication: 2013-05-21 14:59:21

@@ -81,7 +81,7 @@ Cn <- function(x,w) {
 ##'         derivatives with index j.ind of the empirical copula of U at u
 ##' @author Marius Hofert
 ##' Note: maybe provide a C version (as for Cn) with .Call
-dCn <- function(u, U, j.ind=1:d, b=0.05, ...)
+dCn <- function(u, U, j.ind=1:d, b=1/sqrt(nrow(U)), ...)
 {
     ## check
     if(!is.matrix(u)) u <- rbind(u, deparse.level=0L)
