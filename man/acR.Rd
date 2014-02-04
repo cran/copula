@@ -15,7 +15,8 @@
 }
 \usage{
 pacR(x, family, theta, d, lower.tail = TRUE, log.p = FALSE, \dots)
-qacR(p, family, theta, d, log.p = FALSE, interval, \dots)
+qacR(p, family, theta, d, log.p = FALSE, interval,
+     tol = .Machine$double.eps^0.25, maxiter = 1000, \dots)
 }
 \arguments{
   \item{x}{numeric vector of nonnegative evaluation points for \eqn{F_R}.}
@@ -29,6 +30,8 @@ qacR(p, family, theta, d, log.p = FALSE, interval, \dots)
   \item{log.p}{\code{\link{logical}}; if \code{TRUE}, probabilities
     \eqn{p} are given as \eqn{\log p}{log(p)}.}
   \item{interval}{root-search interval.}
+  \item{tol}{see \code{\link{uniroot}()}.}
+  \item{maxiter}{see \code{\link{uniroot}()}.}
   \item{\dots}{additional arguments passed to the procedure for
     computing derivatives.}
 }

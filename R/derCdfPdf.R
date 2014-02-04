@@ -27,7 +27,7 @@ dCduExplicitCopula <- function(cop, u)
     algNm <- paste(class(cop)[1], "cdfDerWrtArg.algr", sep=".")
     if(exists(algNm)) {
         der.cdf.u <- get(algNm)[p]
-        unames0 <- paste("u",1:p,sep="")
+        unames0 <- paste0("u",1:p)
         for (j in 1:p)
         {
             unames <- unames0; unames[1] <- unames0[j]; unames[j] <- unames0[1]
@@ -182,7 +182,7 @@ dCdthetaExplicitCopula <- function(cop, u)
     algNm <- paste(class(cop)[1], "cdfDerWrtPar.algr", sep=".")
     if(exists(algNm)) {
         der.cdf.alpha <- get(algNm)[p]
-        colnames(u) <- paste("u",1:p,sep="")
+        colnames(u) <- paste0("u", 1:p)
         as.matrix(eval(der.cdf.alpha, data.frame(u)))
     } else {
         warning("there is no formula for dCdtheta*() for this copula")
@@ -241,9 +241,9 @@ dCdthetaEllipCopula <- function(cop, u)
                     mat[k,1] <- mat[k,1] + (i - j) * rho ^ (i - j - 1) *
                       plackettFormula(cop, p, rho, s, m, v[k,], i, j)
 
-            return(mat)
+            mat
           }
-        else # unstructured or toeplitz
+	else # unstructured or toeplitz or ...
           {
             mat <- matrix(0,n,p*(p-1)/2)
             l <- 1
@@ -260,17 +260,17 @@ dCdthetaEllipCopula <- function(cop, u)
                   l <- l + 1
                 }
             if (cop@dispstr == "un") ## unstructured
-              return(mat)
-            else ## toeplitz: p-1 parameters
-              {
+                mat
+            else if (cop@dispstr == "toep") {
                 coef <- matrix(0,p*(p-1)/2,p-1)
                 for (k in 1:(p-1))
                   {
                     m <- row(sigma) == col(sigma) + k
                     coef[,k] <- P2p(m)
                   }
-                return(mat %*% coef)
-              }
+                mat %*% coef
+            }
+            else stop("Not implemented yet for the dispersion structure ", cop@dispstr)
           }
       }
   }
@@ -290,7 +290,7 @@ derPdfWrtArgsExplicitCopula <- function(cop, u)
     mat <- matrix(NA_real_, nrow(u),p)
     if(exists(algNm)) {
         der.pdf.u <- get(algNm)[p]
-        unames0 <- paste("u",1:p,sep="")
+        unames0 <- paste0("u", 1:p)
         for (j in 1:p)
         {
             unames <- unames0; unames[1] <- unames0[j]; unames[j] <- unames0[1]
@@ -340,7 +340,7 @@ derPdfWrtParamsExplicitCopula <- function(cop, u)
     algNm <- paste(class(cop)[1], "pdfDerWrtPar.algr", sep=".")
     if(exists(algNm)) {
         der.pdf.alpha <- get(algNm)[p]
-        colnames(u) <- paste("u",1:p,sep="")
+        colnames(u) <- paste0("u", 1:p)
         as.matrix(eval(der.pdf.alpha, data.frame(u)))
     } else {
         warning("there is no formula for derPdfWrtParam*() for this copula")
@@ -413,8 +413,8 @@ derPdfWrtParamsEllipCopula <- function(cop, u)
 			  / (df +  rowSums((v %*% invsig) * v)) ) / 2)
             as.matrix(mat)
         }
-        else ## unstructured or toeplitz
-        {
+	else # unstructured or toeplitz or ...
+	  {
             mat <- matrix(0,n,p*(p-1)/2)
             l <- 1
             for (j in 1:(p-1))
@@ -435,8 +435,7 @@ derPdfWrtParamsEllipCopula <- function(cop, u)
                 }
             if (cop@dispstr == "un") ## unstructured
                 mat
-            else ## toeplitz: p-1 parameters
-            {
+            else if (cop@dispstr == "toep") { ## toeplitz: p-1 parameters
                 coef <- matrix(0,p*(p-1)/2,p-1)
                 for (k in 1:(p-1))
                 {
@@ -445,6 +444,7 @@ derPdfWrtParamsEllipCopula <- function(cop, u)
                 }
                 mat %*% coef
             }
+            else stop("Not implemented yet for the dispersion structure ", cop@dispstr)
         }
     } ## p >= 3
 }

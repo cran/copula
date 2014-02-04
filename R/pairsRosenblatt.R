@@ -61,16 +61,16 @@
 ##' Note: - based on pairs.default() and filled.contour() from R-2.14.1
 ##'       - used in Hofert and Maechler (2013)
 .pairsCond <- function(gcu.u,
-		   panel=points, colList, col = par("col"), bg = par("bg"),
-		   labels, ..., text.panel=textPanel,
-		   label.pos=0.5, cex.labels=NULL, font.labels=1, gap=0,
-		   axes=TRUE, panel.border=TRUE,
-		   key=TRUE, keyOpt=list(space=2.5, width=1.5, axis=TRUE,
-			     rug.at = numeric(), title=NULL, line=5),
-		   main=NULL, main.centered=FALSE,
-		   line.main= if(is.list(main)) 5/4*par("cex.main")*rev(seq_along(main)) else 2,
-		   sub=NULL, sub.centered=FALSE,
-		   line.sub=4)
+                       panel=points, colList, col = par("col"), bg = par("bg"),
+                       labels, ..., text.panel=textPanel,
+                       label.pos=0.5, cex.labels=NULL, font.labels=1, gap=0,
+                       axes=TRUE, panel.border=TRUE,
+                       key=TRUE, keyOpt=list(space=2.5, width=1.5, axis=TRUE,
+                                             rug.at = numeric(), title=NULL, line=5),
+                       main=NULL, main.centered=FALSE,
+                       line.main= if(is.list(main)) 5/4*par("cex.main")*rev(seq_along(main)) else 2,
+                       sub=NULL, sub.centered=FALSE,
+                       line.sub=4)
 {
     ## checking
     stopifnot(is.array(gcu.u), is.numeric(gcu.u), length(dc <- dim(gcu.u)) == 3,
@@ -572,11 +572,9 @@ pairsColList <- function(P, pdiv=c(1e-4, 1e-3, 1e-2, 0.05, 0.1, 0.5),
 ##'        used to construct the points' color.
 ##' @param colList list of colors and information as returned by pairsColList()
 ##' @param main title
-##' @param key.title title of the color key
 ##' @param sub sub-title with a smart default
 ##' @param panel
 ##' @param do.qqline
-##' @param key.rug logical indicating whether the key rugs are printed.
 ##' @param ... additional arguments passed to .pairsCond()
 ##' @return invisible
 ##' @author Marius Hofert and Martin Maechler
@@ -586,9 +584,11 @@ pairsRosenblatt <- function(cu.u, pvalueMat=pviTest(pairwiseIndepTest(cu.u)),
 			    "PPchisq", "PPgamma", "none"),
 			    g1, g2, col = "B&W.contrast",
 			    colList = pairsColList(pvalueMat, col=col),
-			    main=NULL, key.title = "pp-value",
-                            sub = gpviString(pvalueMat, name=paste0(key.title,"s")),
-			    panel = NULL, do.qqline = TRUE, key.rug = TRUE, ...)
+			    main=NULL,
+                            sub = gpviString(pvalueMat, name="pp-values"),
+			    panel = NULL, do.qqline = TRUE,
+                            keyOpt = list(title="pp-value", rug.at=pvalueMat),
+                            ...)
 {
     stopifnot(is.array(cu.u), length(dc <- dim(cu.u)) == 3,
 	      dc == c((n <- dc[1]),(d <- dc[2]), d),
@@ -667,7 +667,7 @@ pairsRosenblatt <- function(cu.u, pvalueMat=pviTest(pairwiseIndepTest(cu.u)),
 
     ## plot
     .pairsCond(gcu.u, colList=colList, main=main, sub=sub, panel=panel,
-	   keyOpt=list(title=key.title, rug.at = if(key.rug) pvalueMat), ...)
+               keyOpt=keyOpt, ...)
 }
 
 

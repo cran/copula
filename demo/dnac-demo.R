@@ -27,7 +27,7 @@ source(srcFn)#--> a.coeff(),  b.coeff()  nacLL()
 require(copula)
 require(grid)
 require(lattice)
-## NB:  nacLL() will use package  partitions  and  polynom
+## NB: nacLL() will use package partitions and polynom
 
 ### Example 1: ((1,2), (3,4,5))-Gumbel #########################################
 

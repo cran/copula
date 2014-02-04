@@ -28,13 +28,26 @@ psiFrank <- function(copula, s) {
 ##   eval(psiDerFrank.expr[n + 1], list(s=s, alpha=copula@parameters[1]))
 ## }
 
-frankCopula <- function(param = NA_real_, dim = 2L) {
+frankCopula <- function(param = NA_real_, dim = 2L,
+			use.indepC = c("message", "TRUE", "FALSE"))
+{
   stopifnot(length(param) == 1)
+  if((dim <- as.integer(dim)) > 2 && !is.na(param) && param < 0)
+    stop("param can be negative only for dim = 2")
+  if(!is.na(param) && param == 0) {
+      use.indepC <- match.arg(use.indepC)
+      if(!identical(use.indepC, "FALSE")) {
+	  if(identical(use.indepC, "message"))
+	      message("parameter at boundary ==> returning indepCopula()")
+	  return( indepCopula(dim=dim) )
+      }
+  }
+
   ## get expressions of cdf and pdf
   cdfExpr <- function(n) {
     expr <-   "- log( (exp(- alpha * u1) - 1) / (exp(- alpha) - 1) )"
     for (i in 2:n) {
-      cur <- paste("- log( (exp(- alpha * u", i, ") - 1) / (exp(- alpha) - 1))", sep="")
+      cur <- paste0("- log( (exp(- alpha * u", i, ") - 1) / (exp(- alpha) - 1))")
       expr <- paste(expr, cur, sep=" + ")
     }
     expr <- paste("-1/alpha * log(1 + exp(-(", expr, ")) * (exp(-alpha) - 1))")
@@ -44,13 +57,11 @@ frankCopula <- function(param = NA_real_, dim = 2L) {
   pdfExpr <- function(cdf, n) {
     val <- cdf
     for (i in 1:n) {
-      val <- D(val, paste("u", i, sep=""))
+      val <- D(val, paste0("u", i))
     }
     val
   }
 
-  if((dim <- as.integer(dim)) > 2 && !is.na(param) && param < 0)
-    stop("param can be negative only for dim = 2")
   cdf <- cdfExpr(dim)
   pdf <- if (dim <= 6) pdfExpr(cdf, dim) # else NULL
   new("frankCopula",
@@ -102,7 +113,7 @@ pfrankCopula <- function(copula, u) {
   dim <- copula@dimension
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (apply(u, 1, prod))
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  for (i in 1:dim) assign(paste0("u", i), u[,i])
   eval(cdf)
 }
 
@@ -110,7 +121,7 @@ dfrankCopula <- function(u, copula, log=FALSE, ...) {
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   pdf <- copula@exprdist$pdf
   dim <- copula@dimension
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  for (i in 1:dim) assign(paste0("u", i), u[,i])
   alpha <- copula@parameters[1]
   if(log) stop("'log=TRUE' not yet implemented")
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
@@ -132,7 +143,7 @@ dfrankCopula.pdf <- function(u, copula, log=FALSE) {
   dim <- copula@dimension
   if (dim > 6) stop("Frank copula PDF not implemented for dimension > 6.")
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  for (i in 1:dim) assign(paste0("u", i), u[,i])
   alpha <- copula@parameters[1]
   ## FIXME: improve log-case
   if(log)
@@ -176,14 +187,14 @@ pMatFrank <- function (u, copula, ...) {
         pacopula(u, copFrank, theta=copula@parameters, ...)
 }
 
-dMatFrank <- function (u, copula, log = FALSE, ...) {
+dMatFrank <- function (u, copula, log = FALSE, checkPar=TRUE, ...) {
     ## was  dfrankCopula.pdf
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
     th <- copula@parameters
     if(d == 2 && th < 0) # for now, copFrank does not yet support negative tau
         dfrankCopula.pdf(u, copula, log=log)
     else
-        copFrank@dacopula(u, theta=th, log=log, ...)
+        copFrank@dacopula(u, theta=th, log=log, checkPar=checkPar, ...)
 }
 setMethod("rCopula", signature("numeric", "frankCopula"), rfrankCopula)
 

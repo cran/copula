@@ -247,7 +247,7 @@ M.v <- c(362.38428102, 422.83827969, 435.36899283)
 v1 <- polyG(log(77), alpha=0.01, d=100, log=TRUE)
 v2 <- polyG(log(77), alpha=0.5 , d=100, log=TRUE)
 v3 <- polyG(log(77), alpha=0.99, d=100, log=TRUE)
-stopifnot(all.equal(c(v1,v2,v3), M.v, tol=1e-6))
+stopifnot(all.equal(c(v1,v2,v3), M.v, tolerance=1e-6))
 
 
 ### more detailed graphical precision comparison in d = 100

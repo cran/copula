@@ -1,6 +1,8 @@
-\name{Cn}
-\alias{Cn}
+\name{C.n}
 \alias{C.n}
+\alias{Cn}% <- deprecated, but of course keep here
+\alias{F.n}
+%% \alias{.Fn}
 \alias{dCn}
 \title{The Empirical Copula}
 \description{
@@ -12,35 +14,49 @@
   of the unknown copula.
 }
 \usage{
- Cn(x, w) ## <-- deprecated!  use  C.n(w, U=pobs(x)) instead!
 C.n(u, U, offset=0, method=c("C", "R"))
+F.n(x, X, offset=0, method=c("C", "R"))
 dCn(u, U, j.ind=1:d, b=1/sqrt(nrow(U)), ...)
+
+Cn(x, w) ## <-- deprecated!  use  C.n(w, U=pobs(x)) instead!
 }
 \arguments{
-  \item{u,w}{an \eqn{(m, d)}-\code{\link{matrix}} with elements in
-    \eqn{[0,1]} whose lines contain the evaluation points of the
+  \item{u,x,w}{an \eqn{(m, d)}-\code{\link{matrix}} with elements in
+    \eqn{[0,1]} whose rows contain the evaluation points of the
     empirical copula.}
-  \item{U,x}{an \eqn{(n, d)}-\code{\link{matrix}} with elements in
-    \eqn{[0,1]} and with the same number \eqn{d} of columns as
-    \code{u}.  The rows of \code{U} contain the (pseudo-)data on which
-    the empirical copula is built.  A multivariate random sample can be
-    transformed to an appropriate \code{U} via \code{\link{pobs}()}.}
+  \item{U,X}{(and \code{x} for \code{Cn()}:) an \eqn{(n,
+      d)}-\code{\link{matrix}}, for \code{C.n()} and \code{Cn()} with
+    elements in \eqn{[0,1]} and with the same number \eqn{d} of columns as 
+    \code{u} (or \code{x} respectively.  The rows of \code{U} are the
+    (pseudo-)data on which the empirical copula is built.  The rows of
+    \code{X} are the \dQuote{raw} observations. A multivariate random
+    sample (such as \code{X}) can be transformed to an appropriate
+    \code{U} via \code{\link{pobs}()}.}
   \item{j.ind}{\code{\link{integer}} vector of indices \eqn{j} between 1
     and \eqn{d} indicating the dimensions with respect to which
     first-order partial derivatives are approximated.}
   \item{b}{\code{\link{numeric}} giving the bandwidth for approximating
     first-order partial derivatives.}
-  \item{offset}{scaling factor (defaults to 0) of the form
-    \code{sum(..)/(n+offset)}.}
+  \item{offset}{used in scaling the result which is of the form
+    \code{sum(....)/(n+offset)}; defaults to zero.}
   \item{method}{\code{\link{character}} string indicating which method
-    is applied to compute the empirical copula. \code{method="C"} uses a
-    an implmentation in C, \code{method="R"} uses an \R implementation.}
-  \item{\dots}{additional argumets passed to \code{C.n()}.}
+    is applied to compute the empirical CDF or copula.
+    \code{method="C"} uses a an implementation in C,
+    \code{method="R"} uses an \R implementation.}
+  \item{\dots}{additional arguments passed to \code{C.n()}.}
 }
 \value{
-  \code{C.n()} returns a vector of length \code{m} containing the values
-  of the empirical copula of \code{U} at \code{u}.
-
+  \code{C.n()} and \code{F.n()} a numeric vector of length
+  \code{m} with the values 
+  for \code{C.n()} of the empirical copula of \code{U} at \code{u}, and
+  for \code{F.n()} of the empirical CDF (cumulative distribution
+  function) of \code{X} at \code{x}.
+  %% The result is slightly wrapped as \code{"mvFn"} (S3) class object,
+  %% with a \code{\link{persp}} and \code{\link{print}} method, but behaves
+  %% otherwise a simple \code{\link{numeric}} vector.
+  %% As pure computational tool, \code{.Fn()} returns the same raw numeric
+  %% vector.
+  
   \code{dCn()} returns a \eqn{(m, l)}-matrix or an \eqn{m}-vector (for
   \eqn{l=1}; here, \eqn{l} is the length of \code{j.ind}), containing
   the approximated first-order partial derivatives of the unknown
@@ -48,8 +64,8 @@ dCn(u, U, j.ind=1:d, b=1/sqrt(nrow(U)), ...)
 }
 \note{
   The first version of our empirical copula implementation, \code{Cn()},
-  had its two arguments \emph{inverse} compared to \code{C.n()}, and is
-  deprecated now. You \bold{must} swap the arguments, and possibly use
+  had its two arguments \emph{reversed} compared to \code{C.n()}, and is
+  deprecated now.  You \bold{must} swap the arguments, and possibly use
   \code{\link{pobs}}, i.e, \bold{ instead of \code{Cn(x, u)}, use
     \code{C.n(u, U=pobs(x))} !}
 }
@@ -94,7 +110,8 @@ dCn(u, U, j.ind=1:d, b=1/sqrt(nrow(U)), ...)
   %% \emph{Ann. Inst. Stat. Math.} \bold{64}, 811--834.
 }
 \seealso{\code{\link{pobs}()} for computing pseudo-observations,
-  \code{\link{pCopula}()} for evaluating a copula.}
+  \code{\link{pCopula}()} for evaluating a copula.
+}
 \examples{
 n <- 100
 d <- 3
@@ -135,6 +152,6 @@ summary(as.vector(abs(der23-der23.))) # approximation error summary
     identical(C.n(u, pobs(U)),
               Cn (U, u))))
 }
+## For an example of using F.n(), see  help(mvdc)% ./Mvdc.Rd
 }
 \keyword{multivariate}
-

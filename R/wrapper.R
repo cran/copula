@@ -17,8 +17,6 @@
 ### Wrappers and auxiliary functions for dealing with elliptical (Gauss, t_nu)
 ### and Archimedean copulas
 
-##' Determine the copula class for a given copula object
-##'
 ##' @title Copula class for the given copula object
 ##' @param cop copula object
 ##' @return "ellipCopula" or "outer_nacopula" depending on the given copula object
@@ -31,8 +29,6 @@ copClass <- function(cop)
     else stop("not yet supported copula object")
 }
 
-##' Determine the copula family for a given copula object
-##'
 ##' @title Copula family for the given copula object
 ##' @param cop copula object (either elliptical or (nested) Archimedean)
 ##' @return family string
@@ -49,8 +45,6 @@ copFamily <- function(cop)
     } else stop("not yet supported copula object")
 }
 
-##' Determine the copula family for a given copula object
-##'
 ##' @title Copula family for the given copula object
 ##' @param cop copula object (either elliptical or (nested) Archimedean)
 ##' @return family string
@@ -87,8 +81,6 @@ p2P <- function(param, d)
 ##' Note: This is used "by foot" at several points in the package.
 P2p <- function(P) P[lower.tri(P)]
 
-##' Construct matrix Sigma from a given copula
-##'
 ##' @title Construct matrix Sigma from a given elliptical copula
 ##' @param copula copula
 ##' @return (d, d) matrix Sigma containing the parameter vector rho

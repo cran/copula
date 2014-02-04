@@ -288,7 +288,7 @@ p.nCorr(n.c, i.th= 12, d= 7, u=u, leg = "left")
 
 ## Ok, and now do all of them
 
-if(newPDF <- !dev.interactive(orNone=TRUE)) pdf("dDiag-Frank-accuracy.pdf")
+if(doPDF <- !dev.interactive(orNone=TRUE)) pdf("dDiag-Frank-accuracy.pdf")
 
 ## tau ~= 0.75 :
 p.nCorr(n.c, i.th= which(abs(taus - 0.75) < .01),
@@ -298,4 +298,4 @@ p.nCorr(n.c, i.th= which(abs(taus - 0.75) < .01),
 p.nCorr(n.c, i.th= seq_along(thetas), d= c(2, 4, 10, 50, 180),
         u=u, leg = "left")
 
-if(newPDF) dev.off()
+if(doPDF) dev.off()

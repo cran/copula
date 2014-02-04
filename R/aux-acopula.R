@@ -293,7 +293,7 @@ rFFrank <- function(n, theta0, theta1, rej)
 
 ## see documentation for more information
 dDiagFrank <- function(u, theta, d, log=FALSE,
-		       method = c("auto", paste("poly",1:4,sep=""),
+		       method = c("auto", paste0("poly",1:4),
                        "polyFull",  "m1", "MH", "MMH"))
 {
     stopifnot(length(d <- as.integer(d)) == 1, d >= 1)
@@ -304,7 +304,7 @@ dDiagFrank <- function(u, theta, d, log=FALSE,
     if(method == "auto")
 	method <- {
 	    if(d <= 3) "poly1" else # d in {1,2,3}
-	    if(d <= 6) paste("poly", d-2, sep="") # d in {4,5,6}
+	    if(d <= 6) paste0("poly", d-2) # d in {4,5,6}
 	    else ## this is not really good: but (u*th) is *vector*
 		"polyFull"
     }
@@ -1390,9 +1390,8 @@ printAcopula <- function(x, slots = TRUE, indent = 0,
     stopifnot(indent >= 0, extends(cld, "acopula"))
     ch.thet <- {
         if(!all(is.na(x@theta)))## show theta
-            paste(", theta= (",
-                  paste(sapply(x@theta, format, digits=digits), collapse=", "),
-                  ")", sep="")
+	    paste0(", theta= (",
+		   paste(sapply(x@theta, format, digits=digits), collapse=", "), ")") 
         else ""
     }
     bl <- paste(rep.int(" ",indent), collapse="")
@@ -1431,7 +1430,7 @@ printNacopula <-
                    indent.str, ccl)
     ch2 <- if(length(c.j <- x@comp)) {
         sprintf("slot \n%s'comp'   = %s", bl,
-                paste("(",paste(c.j, collapse=", "),")", sep=""))
+		paste0("(",paste(c.j, collapse=", "),")"))
     } else "empty slot 'comp'"
     cat(ch1, ch2, sprintf("  and root\n%s'copula' = ", bl), sep="")
     printAcopula(x@copula, slots=FALSE, digits=digits, width=width, ...)

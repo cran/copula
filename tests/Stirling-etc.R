@@ -63,7 +63,7 @@ ls.str(copula:::.nacopEnv)
 showSys.time(S  <- Stirling2(30, 7))# updating table -> typically not zero
 showSys.time(S. <- Stirling2(30, 7))# lookup  -->  should be zero
 stopifnot(identical(S, S.),
-          all.equal(S, Stirling2(30,7, method="direct"), tol=1e-15))
+          all.equal(S, Stirling2(30,7, method="direct"), tolerance=1e-15))
 
 ls.str(copula:::.nacopEnv)
 
@@ -71,7 +71,7 @@ rbind(C.direct = system.time(Sd <- Stirling2(100,10, method="direct")),
       C.lookup = system.time(Sl <- Stirling2(100,10, method="lookup")))
 ## should be equal; and lookup time should be "zero" when called again:
 (s3 <- system.time(for(i in 1:20) S. <- Stirling2(100, 10))[[1]])
-stopifnot(all.equal(Sd, Sl, tol = 1e-15), !isLinux || s3 <= 0.020)
+stopifnot(all.equal(Sd, Sl, tolerance = 1e-15), !isLinux || s3 <= 0.020)
 ## 0.010 fails on good ole' Solaris when that is busy..
 ## Here, the direct method already overflows, but the "lookup" still works
 rbind(C.direct = system.time(Sd <- Stirling2(200,190, method="direct")),
@@ -108,7 +108,7 @@ p.Eul <- function(n) {
 
 if(!dev.interactive(orNone=TRUE)) pdf("Eulerian-ex.pdf")
 
-e60 <- p.Eul(60); all.equal(e60[,2],e60[,1], tol=0) ## 3.82e-09
+e60 <- p.Eul(60); all.equal(e60[,2],e60[,1], tolerance=0) ## 3.82e-09
 e70 <- p.Eul(70); all.equal(e70[,2],e70[,1])      ## 2.97e-6
 e90 <- p.Eul(90); all.equal(e90[,2],e90[,1])      ## 0.032
 e100 <- p.Eul(100); all.equal(e100[,2],e100[,1])  ## 0.80028 --- visible in center
@@ -171,7 +171,7 @@ if(doExtras && require("Rmpfr")) { ## note that it has its own Bernoulli() !
 
 ### Polylogarithm Function #####################################################
 
-EQ <- function(x,y, tol = 1e-15) all.equal(x,y, tol=tol)
+EQ <- function(x,y, tol = 1e-15) all.equal(x,y, tolerance=tol)
 
 x <- (0:127)/128 # < 1
 stopifnot(EQ(polylog(s =  1,  x, n.sum=10000), -log(1-x)),

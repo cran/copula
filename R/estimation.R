@@ -514,10 +514,18 @@ emle <- function(u, cop, n.MC=0, optimizer="optimize", method,
 ##'
 ##' @title Pseudo-observations
 ##' @param x matrix of random variates to be converted to pseudo-observations
+##' @param na.last passed to rank()
+##' @param ties.method passed to rank()
+##' @param lower.tail if FALSE, pseudo-observations when apply the empirical
+##'        marginal survival functions are returned.
 ##' @return pseudo-observations (matrix of the same dimensions as x)
 ##' @author Marius Hofert
-pobs <- function(x, na.last="keep", ties.method=c("average", "first", "random", "max", "min"))
-    apply(x,2,rank, na.last=na.last, ties.method=ties.method)/(nrow(x)+1)
+pobs <- function(x, na.last="keep",
+                 ties.method=c("average", "first", "random", "max", "min"),
+                 lower.tail=TRUE) {
+    U <- apply(x, 2, rank, na.last=na.last, ties.method=ties.method) / (nrow(x)+1)
+    if(lower.tail) U else 1-U
+}
 
 ##' Computes different parameter estimates for a nested Archimedean copula
 ##'

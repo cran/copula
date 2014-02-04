@@ -13,11 +13,16 @@
 \usage{
 archmCopula(family, param = NA_real_, dim = 2, ...)
 
-claytonCopula(param = NA_real_, dim = 2)
-frankCopula(param = NA_real_, dim = 2)
-gumbelCopula(param = NA_real_, dim = 2)
-amhCopula(param = NA_real_, dim = 2)
-joeCopula(param = NA_real_, dim = 2)
+claytonCopula(param = NA_real_, dim = 2,
+          use.indepC = c("message", "TRUE", "FALSE"))
+frankCopula(param = NA_real_, dim = 2,
+          use.indepC = c("message", "TRUE", "FALSE"))
+gumbelCopula(param = NA_real_, dim = 2,
+          use.indepC = c("message", "TRUE", "FALSE"))
+amhCopula(param = NA_real_, dim = 2,
+          use.indepC = c("message", "TRUE", "FALSE"))
+joeCopula(param = NA_real_, dim = 2,
+          use.indepC = c("message", "TRUE", "FALSE"))
 }
 \arguments{
   \item{family}{a character string specifying the family of an
@@ -26,7 +31,18 @@ joeCopula(param = NA_real_, dim = 2)
   }
   \item{param}{number (\code{\link{numeric}}) specifying the copula parameter.}
   \item{dim}{the dimension of the copula.}
-  \item{\dots}{ currently nothing. }
+  \item{\dots}{further arguments, passed to the individual creator
+    functions (\code{claytonCopula()}, etc).}
+  \item{use.indepC}{a string specifying if the independence copula
+    \code{\link{indepCopula}}, should be returned in the case where the
+    parameter \eqn{\theta}, \code{param}, is at the boundary or limit
+    case where the corresponding Archimedean copula is the independence
+    copula.
+    The default does return \code{indepCopula()} with a message, using
+    \code{"TRUE"} does it without a message.  This makes the resulting
+    object more useful typically, but does not return a formal
+    Archimedean copula of the desired family, something needed e.g., for
+    fitting purposes, where you'd use \code{use.indepC="FALSE"}.}
 }
 \value{
   An Archimedean copula object of class \code{"claytonCopula"},
@@ -60,8 +76,10 @@ joeCopula(param = NA_real_, dim = 2)
 \seealso{
   \code{\link{ellipCopula}}, \code{\link{evCopula}}.
 
+  %% -> ./copFamilies.Rd
   \code{\linkS4class{acopula}}-classed Archimedean copulas, such as
-  \code{\link{copClayton}}, \code{\link{copGumbel}}, etc.
+  \code{\link{copClayton}}, \code{\link{copGumbel}}, etc, notably for
+  mathematical definitions including the meaning of \code{param}.
 }
 \examples{
 clayton.cop <- claytonCopula(2, dim = 3)

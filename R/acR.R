@@ -32,7 +32,7 @@
 pacR <- function(x, family, theta, d, lower.tail = TRUE, log.p = FALSE, ...)
 {
     ## basic checks
-    stopifnot(family %in% c_longNames, d >= 1, (n <- length(x)) >= 1)
+    stopifnot(family %in% c_longNames, d >= 1, (n <- length(x)) >= 1, x >= 0)
     family <- match.arg(family, choices=c_longNames)
 
     ## d == 1
@@ -65,22 +65,28 @@ pacR <- function(x, family, theta, d, lower.tail = TRUE, log.p = FALSE, ...)
 ##' Computing the quantile function of pacR()
 ##'
 ##' Compute x = F_R^{-1}(p) by solving F_R(x) = p w.r.t. p
-##' Equivalently, solve log(1-F_R(x)) = log1p(-p) w.r.t. x (numerically more stable)
+##' Equivalently, solve log(1-F_R(x)) = log1p(-p) w.r.t. x
+##' (numerically more stable; what we do here)
 ##' For log.p = TRUE, compute x = log(F_R^{-1}(exp(p)))
 ##' @title Computing the Quantile Function of pacR()
 ##' @param p probability in (0,1) where to evaluate qacR()
-##' @param family Archimedean family
+##' @param family Archimedean family (e.g., "AMH", "Clayton", "Frank", "Gumbel", "Joe")
 ##' @param theta parameter
 ##' @param d dimension
 ##' @param log.p logical; if TRUE, probabilities p are given as log(p).
+##' @param interval interval for uniroot() [theoretically [0, Inf))
+##' @param tol see ?uniroot()
+##' @param maxiter see ?uniroot()
 ##' @param ... additional arguments passed to pacR()
 ##' @return the quantile function of F_R at x
 ##' @author Marius Hofert
-qacR <- function(p, family, theta, d, log.p = FALSE, interval, ...)
+qacR <- function(p, family, theta, d, log.p = FALSE, interval,
+                 tol=.Machine$double.eps^0.25, maxiter=1000, ...)
 {
-    stopifnot(family %in% c_longNames, d >= 1, (n <- length(p)) >= 1)
+    stopifnot(family %in% c_longNames, d >= 1, (n <- length(p)) >= 1, 0 < p,  p < 1)
     if(log.p) p <- exp(p) # not very efficient yet
     y <- log1p(-p) # to be able to work with highest precision with pacR()
     f <- function(x, y) pacR(x, family=family, theta=theta, d=d, lower.tail=FALSE, log.p=TRUE, ...) - y
-    vapply(y, function(y.) uniroot(f, interval=interval, y=y.)$root, NA_real_)
+    vapply(y, function(y.) uniroot(f, interval=interval, y=y.,
+                                   tol=tol, maxiter=maxiter)$root, NA_real_)
 }

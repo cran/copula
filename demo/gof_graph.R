@@ -18,6 +18,8 @@
 
 require(copula)
 
+doPDF <- !dev.interactive(orNone=TRUE)
+
 if(!(exists("setSeeds") && is.logical(as.logical(setSeeds))))
 setSeeds <- TRUE # for reproducibility
 ##  maybe set to FALSE *before* running this demo
@@ -93,9 +95,9 @@ sub. <- paste(paste(sub[1:3], collapse=", "), "\n",
               paste(sub[4:7], collapse=", "), sep="")
 pairsRosenblatt(cu.u, pvalueMat=pmat, pch=".", main=pwRoto, sub=sub., line.sub=5.4)
 
-## 4) two-line title including expressions, and centered  --- JCGS, Fig.3(left) ---
+## 4) two-line title including expressions, and centered --- JCGS, Fig.3 (left) ---
 title <- list(paste(pwRoto, "to test"),
-              substitute(italic(H[0]:C~~bold("is Gumbel with"~~tau==tau.)),
+              substitute(italic(H[0]^s:C~~bold("is Gumbel with"~~tau==tau.)),
                          list(tau.=tau)))
 pairsRosenblatt(cu.u, pvalueMat=pmat, pch=".",
                 main=title, line.main=c(4, 1.4), main.centered=TRUE)
@@ -240,16 +242,24 @@ which(pmat < 0.05, arr.ind=TRUE)
 
 ## pairwise Rosenblatt plot
 title <- list(paste(pwRoto, "to test"),
-              substitute(italic(H[0]:C~~bold("is nested Gumbel with"~~
+              substitute(italic(H[0]^s:C~~bold("is nested Gumbel with"~~
                                              tau[0]==tau0*","~~
                                              tau[1]==tau1*","~~
                                              tau[2]==tau2)),
                          list(tau0=tau0[1], tau1=tau0[2], tau2=tau0[3])))
 pairsRosenblatt(cu.u, pvalueMat=pmat, pch=".", main=title)
 
-## --- JCGS, Fig.3(right) ---
-pairsRosenblatt(cu.u, pvalueMat=pmat, pch=".", main=title, line.main=c(4, 1.4),
-                main.centered=TRUE)
+## --- JCGS, Fig.4 (left) ---
+if(doPDF) pdf(file=(file <- "gof_graph_fig-nG-scatter.pdf"))
+pairsRosenblatt(cu.u, pvalueMat=pmat, pch=".", main=title,
+                line.main=c(4, 1.4), main.centered=TRUE)
+if(doPDF) copula:::dev.off.pdf(file=file)
+
+## --- JCGS, Fig.4 (right) ---
+if(doPDF) pdf(file=(file <- "gof_graph_fig-nG-QQ.pdf"))
+pairsRosenblatt(cu.u, pvalueMat=pmat, method="QQchisq", cex=0.2, main=title,
+                line.main=c(4, 1.4), main.centered=TRUE)
+if(doPDF) copula:::dev.off.pdf(file=file)
 
 
 ### Example 3: 5d t_4 copula (fixed/known d.o.f., estimated P) #################
@@ -276,7 +286,7 @@ U. <- pobs(U)
 ## Note: that's the same result when using pseudo-observations since estimation via
 ##       tau is invariant strictly increasing transformations
 stopifnot(require(Matrix))
-P. <- nearPD(iTau(tCopula(), cor(U., method="kendall")))$mat # estimate P
+P. <- nearPD(iTau(tCopula(), cor(U., method="kendall")), corr=TRUE)$mat # estimate P
 P.. <- P2p(P.)
 plot(P, P.., asp=1); abline(0,1, col=adjustcolor("gray", 0.9)) # P. should be close to P
 copH0 <- ellipCopula(family, param=P.., dim=d, dispstr="un", df=df, df.fixed=TRUE)
@@ -294,13 +304,13 @@ which(pmat < 0.05, arr.ind=TRUE) # [none]
 
 ## pairwise Rosenblatt plot
 title <- list("Pairwise Rosenblatt transformed pseudo-observations",
-              expression(bold("to test")~~italic(H[0]:C~~bold("is t")[4])))
-## --- JCGS, Fig.4(left) ---
-pairsRosenblatt(cu.u, pvalueMat=pmat, pch=".", main=title, line.main=c(4, 1.4),
-                main.centered=TRUE)
-## --- JCGS, Fig.4(right) ---
-pairsRosenblatt(cu.u, pvalueMat=pmat, pch=".", main=title, line.main=c(4, 1.4),
-                method = "QQchisq", main.centered=TRUE)
+              expression(bold("to test")~~italic(H[0]^s:C~~bold("is t")[4])))
+## --- JCGS, Fig.5 (left) ---
+pairsRosenblatt(cu.u, pvalueMat=pmat, pch=".", main=title,
+                line.main=c(4, 1.4), main.centered=TRUE)
+## --- JCGS, Fig.5 (right) ---
+pairsRosenblatt(cu.u, pvalueMat=pmat, method = "QQchisq", pch=".", main=title,
+                line.main=c(4, 1.4), main.centered=TRUE)
 
 ### Example 4: SMI constituents ################################################
 
@@ -311,7 +321,7 @@ d <- ncol(SMI.12)
 x <- diff(log(SMI.12)) # build log-returns
 u <- pobs(x) # build pseudo-observations
 
-## --- JCGS, Fig.5 ---
+## --- JCGS, Fig.6 ---
 pairs(u, gap=0, pch=".", xaxt="n", yaxt="n", main="Pseudo-observations of the log-returns of the SMI",
       labels=as.expression( sapply(1:d, function(j) bquote(italic(hat(U)[.(j)]))) ))
 
@@ -343,16 +353,16 @@ nLLt <- function(nu, P, u){
 
 ## Note:  nLLt() is ~ 30% faster than these  {where  p := P2p(P) } :
 t.20 <- tCopula(dim=d, dispstr="un")
-nLLt2 <- function(nu, p, u) -loglikCopula(c(p, df=nu), x=u, copula=t.20)
-nLLt3 <- function(nu, p, u) -sum(dCopula(u, setTheta(t.20, c(p, nu)), log=TRUE))
+nLLt2 <- function(nu, P, u) -loglikCopula(c(P, df=nu), x=u, copula=t.20)
+nLLt3 <- function(nu, P, u) -sum(dCopula(u, setTheta(t.20, c(P, nu)), log=TRUE))
 
 ## confirm the "equivalence" of nLLt(), nLLt2() and nLLt3()
 nu. <- if(doX) seq(.5, 128, by=.5) else 1:15
 system.time(nL1 <- vapply(nu., nLLt , .0, P=mP, u=u))
-system.time(nL2 <- vapply(nu., nLLt2, .0, p= p, u=u))
-system.time(nL3 <- vapply(nu., nLLt3, .0, p= p, u=u))
-stopifnot(all.equal(nL1, nL2, tol = 1e-14))
-stopifnot(all.equal(nL2, nL3, tol = 1e-14))
+system.time(nL2 <- vapply(nu., nLLt2, .0, P= p, u=u))
+system.time(nL3 <- vapply(nu., nLLt3, .0, P= p, u=u))
+stopifnot(all.equal(nL1, nL2, tolerance = 1e-14))
+stopifnot(all.equal(nL2, nL3, tolerance = 1e-14))
 
 ## estimate nu via MLE for given P
 nus <- if(doX) seq(.5, 128, by=.5) else 2^seq(-1,7, by=.5)
@@ -370,7 +380,7 @@ plot(nus, nLLt.nu + 1200, type="l", xlab=bquote(nu),
 ##       tau is invariant under strictly increasing transformations
 P.. <- P2p(P.)
 cop.N <- ellipCopula("normal", param=P.., dim=ncol(P.), dispstr="un")
-## The correct H0 copula:
+## The estimated H0 copula:
 cop.t <- ellipCopula("t", df=nuOpt, param=P.., dim=ncol(P.), dispstr="un")
 
 ## create array of pairwise copH0-transformed data columns
@@ -385,8 +395,8 @@ pmatN <- pviTest(pwITN) # pick out p-values
 pmatt <- pviTest(pwITt)
 
 ## which pairs violate H0?
-which(pmatN < 0.05, arr.ind=TRUE) # => none!
-which(pmatt < 0.05, arr.ind=TRUE) # => a couple
+which(pmatN < 0.05, arr.ind=TRUE) # => none (so the margins cause non-normality (see below))
+which(pmatt < 0.05, arr.ind=TRUE) # => none (fine)
 
 ## testing *multivariate normality*
 stopifnot(require(mvnormtest))
@@ -403,23 +413,17 @@ abline(0,1, lty=2, col="gray")
 
 ## test for Gaussian copula
 title <- list("Pairwise Rosenblatt transformed pseudo-observations",
-              expression(bold("to test")~~italic(H[0]:C~~bold("is Gaussian"))))
+              expression(bold("to test")~~italic(H[0]^c:C~~bold("is Gaussian"))))
 pairsRosenblatt(cu.uN, pvalueMat=pmatN, method="none", cex.labels=0.7,
                 key.space=1.5, main.centered=TRUE, main=title, line.main=c(3, 0.4))
 
-## pairwise Rosenblatt plot (test for t_nuOpt) --- JCGS, Fig.6 --
+## pairwise Rosenblatt plot (test for t_nuOpt) --- JCGS, Fig.7 --
 nuOpt. <- round(nuOpt, 2)
 title <- list("Pairwise Rosenblatt transformed pseudo-observations",
-              bquote(bold("to test")~~italic(H[0]:C)~~"is"~~italic(t)[.(nuOpt.)]))
-PDF <- FALSE
-if(PDF){ # for plotting to pdf
-    file <- paste0("SMI.12_CH0=t_", nuOpt.,".pdf")
-    pdf(file=file)
-}
+              bquote(bold("to test")~~italic(H[0]^c:C)~~"is"~~italic(t)))
+if(doPDF) pdf(file=(file <- "gof_graph_fig-SMI-ex.pdf"))
 pairsRosenblatt(cu.ut, pvalueMat=pmatt, method="none", cex.labels=0.7,
-                key.space=1.5, main.centered=TRUE, main=title, line.main=c(3, 0.4))
-if(PDF){
-    dev.off()
-    f <- file.path(getwd(), file)
-    if(crop) system(paste("pdfcrop --pdftexcmd pdftex", f, f, "1>/dev/null 2>&1"), intern=FALSE)
-}
+                key.space=1.5, main.centered=TRUE, main=title, line.main=c(3, 0.4),
+                keyOpt=list(space=1.5, width=1.5, axis=TRUE,
+                            rug.at = numeric(), title=NULL, line=5))
+if(doPDF) copula:::dev.off.pdf(file=file)

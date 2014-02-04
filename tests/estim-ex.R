@@ -166,9 +166,9 @@ showProc.time()
 ## Some basic  dDiag() checks  {that failed earlier}:
 stopifnot(identical(0, dDiag(0, onacopulaL("AMH", list(0.5, 1:4)))),
           all.equal(dDiag(.9, onacopulaL("Frank", list(44, 1:3))),
-                    1.008252, tol= 1e-5),
+                    1.008252, tolerance= 1e-5),
           all.equal(dDiag(.9, onacopulaL("Joe",   list(44, 1:3))),
-                    1.025283, tol= 1e-5),
+                    1.025283, tolerance= 1e-5),
           TRUE)
 
 demo("dDiag-plots", package = "copula")

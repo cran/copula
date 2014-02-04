@@ -36,12 +36,16 @@
     \item{rCopula}{\code{signature(copula = "indepCopula")}: ... }
   }
 }
-% \section{Extends}{
-%   Class \code{"indepCopula"} does not extend class \code{"copula"}.
-%   It is simpler than \code{"copula"}.
-% }
+\section{Extends}{
+  Class \code{"indepCopula"} extends classes
+  \code{"\linkS4class{archmCopula}"} and
+  \code{"\linkS4class{evCopula}"} directly.
+}
 \seealso{
   \code{\link{indepCopula}},
   \code{\link{copula-class}}.
+}
+\examples{
+getClass("indepCopula")
 }
 \keyword{classes}

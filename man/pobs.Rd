@@ -6,12 +6,17 @@
 }
 \usage{
 pobs(x, na.last = "keep",
-     ties.method = c("average", "first", "random", "max", "min"))
+     ties.method = c("average", "first", "random", "max", "min"),
+     lower.tail = TRUE)
 }
 \arguments{
   \item{x}{\eqn{n\times d}{n x d}-matrix of random variates to be converted to
     pseudo-observations.}
-  \item{na.last, ties.method}{are passed to \code{\link{rank}}; see there.}
+  \item{na.last, ties.method}{are passed to \code{\link{rank}}; see
+    there.}
+  \item{lower.tail}{\code{\link{logical}} which, if \code{FALSE},
+    returns the pseudo-observations when applying the
+    empirical marginal survival functions.}
 }
 \value{matrix of the same dimensions as \code{x} containing the
   pseudo-observations.
@@ -28,7 +33,8 @@ pobs(x, na.last = "keep",
   empirical distribution functions to the data and scaling the result by
   \eqn{n/(n+1)}.  This asymptotically negligible scaling factor is used to
   force the variates to fall inside the open unit hypercube, for example, to
-  avoid problems with density evaluation at the boundaries.
+  avoid problems with density evaluation at the boundaries. Note that
+  \code{pobs(, lower.tail=FALSE)} simply returns \code{1-pobs()}.
 }
 \author{Marius Hofert}
 \seealso{

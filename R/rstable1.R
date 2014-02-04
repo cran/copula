@@ -32,28 +32,21 @@ A..Z <- function(x, alpha, I.alpha = 1 - alpha)
 ##' @param x numeric vector
 ##' @return numeric vector of values tan(pi*x)
 ##' @author Martin Maechler
-tanpi <- function(x) {
-    r <- x
-    if(any(i <- x == round(x)))
-	r[i] <- 0
-    io <- which(!i)
-    r[io] <- tan(pi* x[io])
-    r
-}
+tanpi <- function(x) tan(pi * (x %% 1))
 
 ##' @title cos(pi/2 * x), exact for integer x
 ##' @param x numeric vector
 ##' @return numeric vector of values cos(pi/2 *x)
 ##' @author Martin Maechler
 cospi2 <- function(x) {
-    r <- x
-    if(any(i <- x == round(x))) {
-        xi.4 <- x[i] %% 4
-	r[xi.4 == 0     ] <-  1
-	r[xi.4 == 2     ] <- -1
-	r[xi.4 %% 2 != 0] <-  0
+    x <- r <- (x %% 4)## cos(pi/2 x) == cos(pi/2(x + 4k))  \forall k \in \Z
+    if(any(isI <- x == round(x))) {
+	i <- which(isI)
+	r[i	      ] <-  0 # for those where x is 1 or 3
+	r[i[x[i] == 0]] <-  1
+	r[i[x[i] == 2]] <- -1
     }
-    io <- which(!i)
+    io <- which(!isI)
     r[io] <- cos(pi/2 * x[io])
     r
 }

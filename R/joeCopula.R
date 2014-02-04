@@ -14,7 +14,18 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-joeCopula <- function(param = NA_real_, dim = 2L) {
+joeCopula <- function(param = NA_real_, dim = 2L,
+		      use.indepC = c("message", "TRUE", "FALSE"))
+{
+  stopifnot(length(param) == 1)
+  if(!is.na(param) && param == 1) {
+      use.indepC <- match.arg(use.indepC)
+      if(!identical(use.indepC, "FALSE")) {
+	  if(identical(use.indepC, "message"))
+	      message("parameter at boundary ==> returning indepCopula()")
+	  return( indepCopula(dim=dim) )
+      }
+  }
   new("joeCopula",
       dimension = as.integer(dim),
       parameters = param[1],

@@ -1,4 +1,4 @@
-\name{AssocMeasures}
+\name{assocMeasures}
 % \docType{methods}
 \alias{tau}
 \alias{rho}
@@ -18,6 +18,7 @@
 \alias{tau,claytonCopula-method}
 \alias{tau,frankCopula-method}
 \alias{tau,gumbelCopula-method}
+\alias{tau,indepCopula-method}
 \alias{tau,joeCopula-method}
 \alias{tau,normalCopula-method}
 \alias{tau,tCopula-method}
@@ -44,6 +45,7 @@
 \alias{rho,plackettCopula-method}
 \alias{rho,galambosCopula-method}
 \alias{rho,huslerReissCopula-method}
+\alias{rho,indepCopula-method}
 \alias{rho,tawnCopula-method}
 \alias{rho,tevCopula-method}
 \alias{rho,evCopula-method}
@@ -57,6 +59,7 @@
 \alias{tailIndex,claytonCopula-method}
 \alias{tailIndex,frankCopula-method}
 \alias{tailIndex,gumbelCopula-method}
+\alias{tailIndex,indepCopula-method}
 \alias{tailIndex,amhCopula-method}
 \alias{tailIndex,joeCopula-method}
 \alias{tailIndex,normalCopula-method}
@@ -100,12 +103,13 @@
 \alias{iRho,plackettCopula-method}
 \alias{iRho,fgmCopula-method}
 \alias{iRho,nacopula-method}
-\title{Dependence Measures for Copulas}
+\title{Dependence Measures for Bivariate Copulas}
 \description{
   These functions compute Kendall's tau, Spearman's rho, and the tail
-  dependence index for bivariate copulas. Calibration is the inverse
-  function: it calibrates the copula parameter given the value of
-  Kendall's tau or Spearman's rho.
+  dependence index for \emph{bivariate} copulas.  \code{iTau} and \code{iRho},
+  sometimes called \dQuote{calibration} functions are the inverses: they
+  determine (\dQuote{calibrate}) the copula parameter (which must be
+  one-dimensional!) given the value of Kendall's tau or Spearman's rho.
 }
 \usage{
 tau (copula, \dots)
@@ -124,13 +128,13 @@ iRho (copula, rho, \dots)
   \item{\dots}{ currently nothing. }
 }
 \details{
-  The calibration function in fact returns a moment estimate of the
-  parameter for one-parameter copulas.
+  The calibration functions \code{iTau()} and \code{iRho()} in fact
+  return a moment estimate of the parameter for one-parameter copulas.
 
   When there are no closed-form expressions for Kendall's tau or
   Spearman's rho, the calibration functions use numerical
-  approximation techniques (see the last reference). For closed-form
-  expressions, see Frees and Valdez (1998). For the t copula, the
+  approximation techniques (see the last reference).  For closed-form
+  expressions, see Frees and Valdez (1998).  For the t copula, the
   calibration function based on Spearman's rho uses the corresponding
   expression for the normal copula as an approximation.
 }
@@ -162,7 +166,7 @@ stopifnot(all.equal(tau(gumbel.cop), copGumbel@tau(3)),
 
           all.equal(tailIndex(gumbel.cop),
                     c(copGumbel@lambdaL(3), copGumbel@lambdaU(3)),
-                    check.attr=FALSE),
+                    check.attributes=FALSE),
 
           all.equal(iTau (gumbel.cop, 0.681),
                     copGumbel@iTau(0.681))

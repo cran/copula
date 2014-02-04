@@ -1,7 +1,6 @@
 
-R version 2.15.2 Patched (2012-12-25 r61440) -- "Trick or Treat"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
+R version 3.0.2 Patched (2014-02-01 r64910) -- "Frisbee Sailing"
+Copyright (C) 2014 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -78,16 +77,16 @@ Loading required package: copula
 > 
 > stopifnot(
 +  all.equal(tailIndex(gumbC20)[["upper"]],
-+            numTailIndexUpper(gumbC20, 1 - 1e-7), tol=1e-8)
++            numTailIndexUpper(gumbC20, 1 - 1e-7), tolerance=1e-8)
 +  ,
 +  all.equal(tailIndex(gumbC40)[["upper"]],
-+            numTailIndexUpper(gumbC40, 1 - 1e-7), tol=1e-8)
++            numTailIndexUpper(gumbC40, 1 - 1e-7), tolerance=1e-8)
 + )
 > 
 > if(tryfCop) { ## Rmetrics
 +     C <- parchmCopula(u.1,u.1, alpha=40, type = "4", alternative = TRUE)
 +     stopifnot(all.equal(ut40,     (1-2*u.1+C)/(1-u.1),
-+                         check.attr=FALSE, tol= 1e-14))
++                         check.attributes=FALSE, tolerance= 1e-14))
 + }
 > 
 > 
@@ -103,7 +102,7 @@ Loading required package: copula
 > 
 > if(tryfCop) { ## Rmetrics
 +     C <-  parchmCopula(S, alpha=20, type = "4", alternative = FALSE)
-+     stopifnot(all.equal(lt20, C/u.0, check.attr=FALSE, tol= 1e-14))
++     stopifnot(all.equal(lt20, C/u.0, check.attributes=FALSE, tolerance= 1e-14))
 + }
 > 
 > signif(numTailIndexLower(gumbC3, 10^-(5*(1:40))),   3)#--> 0
@@ -132,16 +131,16 @@ lower upper
  [1] 1.937118e-01 1.052856e-01 4.449229e-02 2.267824e-02 1.145085e-02
  [6] 4.607652e-03 2.308420e-03 1.155362e-03 4.624221e-04 2.312573e-04
 [11] 1.156402e-04 4.625886e-05 2.312989e-05
-> stopifnot(all.equal(tl, numTailIndexUpper(Frank2, u.1), tol=1e-10))
+> stopifnot(all.equal(tl, numTailIndexUpper(Frank2, u.1), tolerance=1e-10))
 > 
 > stopifnot(
 +   (tu1 <- numTailIndexUpper(Frank2, .99999)) < .00003
 + ,
-+   all.equal(tu1, numTailIndexLower(Frank2, .00001), tol=1e-6)
++   all.equal(tu1, numTailIndexLower(Frank2, .00001), tolerance=1e-6)
 + ,
 +   (tu2 <- numTailIndexUpper(Frank2, 1-1e-6)) < 3e-6
 + ,
-+   all.equal(tu2, numTailIndexLower(Frank2, 1e-6), tol= 1e-4)
++   all.equal(tu2, numTailIndexLower(Frank2, 1e-6), tolerance= 1e-4)
 + )
 > 
 > 
@@ -169,21 +168,21 @@ Parameters:
 > 
 > stopifnot( {
 +     ft <- dCopula(u2, t.frac)
-+     all.equal(ft, dCopula(u2[,2:1], t.frac), tol=1e-15)
++     all.equal(ft, dCopula(u2[,2:1], t.frac), tolerance=1e-15)
 +  },
 +  !is.unsorted(ft)
 +  ,
 +  all.equal(tailIndex(t.7.3)[["upper"]],
-+            numTailIndexUpper(t.7.3, 1 - 1e-8), tol=1e-5)
++            numTailIndexUpper(t.7.3, 1 - 1e-8), tolerance=1e-5)
 +  ,
 +  all.equal(tailIndex(t.9.2)[["upper"]],
-+            numTailIndexUpper(t.9.2, 1 - 1e-8), tol=1e-7)
++            numTailIndexUpper(t.9.2, 1 - 1e-8), tolerance=1e-7)
 +  ,
 +  all.equal(tailIndex(t.7.3)[["lower"]],
-+            numTailIndexLower(t.7.3, 1e-8), tol=1e-5)
++            numTailIndexLower(t.7.3, 1e-8), tolerance=1e-5)
 +  ,
 +  all.equal(tailIndex(t.9.2)[["lower"]],
-+            numTailIndexLower(t.9.2, 1e-8), tol=1e-7)
++            numTailIndexLower(t.9.2, 1e-8), tolerance=1e-7)
 + )
 > 
 > (ut. <- numTailIndexUpper(t.7.3, u.1))
@@ -195,15 +194,15 @@ Parameters:
 +     p. <- pCopula(u = cbind(u.1, u.1), t.7.3)
 +     ## they are really not "so equal"
 +     stopifnot(
-+     all.equal(p.fC, p., check.attr=FALSE, tol= 0.002)
++     all.equal(p.fC, p., check.attributes=FALSE, tolerance= 0.002)
 +     )
 + }
 > 
 > 
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ''statistical reasons''
-Time elapsed:  0.788 0.056 0.842 0 0 
+Time elapsed:  5.516 0.096 5.703 0 0 
 > 
 > proc.time()
    user  system elapsed 
-  0.788   0.056   0.842 
+  5.516   0.096   5.703 

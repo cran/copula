@@ -1,5 +1,7 @@
 ##-*- org -*-->  Emacs .. [Tab] key + [Org] menu; C-c C-o to follow links
 * Very Short Term
+** TODO ~/R/MM/Pkg-ex/maryamS-ex.R : negative correlation data has BAD error message
+ now see FIXME in   tests/fitting-ex.R  'msg <- tryCatch(fitCopula(gumbelCopula(), ....'
 ** DONE fitCopula() for 2-dim tCopula() *AND* 2-dim tevCopula(); latter clearly fails
 ** DONE mvdc() -- fitMvdc() and generate data from fit:
  - fitMvdc()@mvdc  must contain the *fitted* parameters, the same as
@@ -21,11 +23,28 @@ stopifnot(NULL == 1) is not stopping
 ** DONE implement uscore for MMMH's A, C, F, G, J (note MH: haven't done any testing)
 ** DONE MH: in man/empcop.Rd, document 'method' "C"/"R"
 * Short Term: Before 1.0.0
+** TODO introduce "empiricalCopula" (or "empCopula") as new subclass of "Copula" (not "copula")
+   and maybe *additionally* "empiricalDist" / "empMvdc", inheriting from 
+   new "Mvdc" which would contain "mvdc" and "empMvdc".
+*** -> nice persp() {and maybe contour()} method via perspCopula(*, fun=C.n, ....) and
+   perspMvdc(*, fun=F.n, ....). ---> man/Mvdc.Rd and R/graphics.R
+** TODO print(summary(<fitCop>)) prints *less* than print(.): not R like; -> R/fitCopula.R summary.fitCopula
 ** TODO pCopula(u,..) and dCopula(u,..) should work for u outside [0,1]^d  & NA/NaN
 *** DONE for pCopula(): using  u[] <- pmax(0, pmin(1, u))  {subtlety!}
 *** DONE dCopula() = 0 {log = -Inf} for u "outside"
 *** TODO both should keep NA & NaN. Maybe keep them different, as  pnorm(c(2,NA,NaN));
 however relax, as  NA+NaN or NaN+NA  differ, too.
+** TODO frankCopula(0) and similar should create indepCopula(), and hence work in all cases.
+ E-mail From Benedikt Gräler, Subject: frankCopula(0), Fri, 26 Apr 2013:
+ dCopula(c(0.3,0.7), frankCopula(0))  gives NaN   but should not
+** TODO why does onacopulaL("Clayton", *) work, but onacopulaL("clayton",*) does not?  
+Specifically,
+   onacopulaL("Clayton", list(th=iTau(archmCopula("clayton"), tau=0.5), seq_len(3)))
+works but
+   onacopulaL("clayton", list(th=iTau(archmCopula("clayton"), tau=0.5), seq_len(3)))
+doesn't.  Note the 2nd  "clayton", i.e. as arg to archmCopula(.) it _does_ work.
+ => essentially, we always want to use the capitalized versions, but it might
+    still be a bug that it doesn't work otherwise
 ** DONE largely improve on gofTests.R: should be made more modular, so that users can provide functions for the parametric bootstrap (gofPB) and the multiplier boostrap (gofMB). Furthermore, checking and documentation have to be improved (see already improved gofPB());
 ** TODO deprecate gnacopula() [see 'Note' there!!!]
  MH: already 'prepared' a lot; only difficulty: many calls of gnacopula()
@@ -46,7 +65,7 @@ IK: Me too
 ** TODO Renaming of current "base" functions see [[file:feature-table.org][Feature table]] and [[file:do-now.org][do-now table]]
     remaining: lambdaL/U and inverse ("iLambda").
 ** TODO fitCopula("itau") for "tCopula(df.fixed=FALSE)": (and tevCopula?):
-use itau for P matrix, then ML for df. {see also ggraph.Rnw}
+ use itau for P matrix, then ML for df. {see also ggraph.Rnw}
 ** DONE show(<mvdc>) method needed; otherwise printing mvdc(.) looks ugly.
 ** TODO Deprecation of Old Stuff / towards more consistency / Cleanup
 - with warning
@@ -95,11 +114,15 @@ instead of hand made function header documentation.
 *but* for back compatibility allow *global* options(....) to still get old
 random numbers.
 ** TODO MM: data(rdj) should have a "Date" in column 1, not a factor !
-
 ** DONE tests/pdf.R should use "all" copulas, similar to tests/moments.R.
 *** DONE Then, test that  exp(dCopula(*, log=TRUE)) "==" dCopula(*)
 {to test the bug, fixed in r954, reported by Benedikt}
 * Mid Term
+** TODO Daniel Alai's email from 2013-10-24 (to MH): implement a new correlation structure "min" (row-wise the same rho)
+MH: doesn't seem complicated, but wouldn't feel comfortable to do this since
+this is old+stable code from Ivan/Jun
+** TODO add *transformations* (for each copula): survival copula, convex combis (see Martin's nor1mix), Liebscher
+** TODO implement Joe's BB copulas!
 ** DONE R/sysdata.rda:
 CLOSED: [2012-07-17 Tue 11:10]
 MM, MH: Please tell us more about this,
@@ -135,7 +158,6 @@ which extracts the parameter (vector) from any copula object
 ** TODO Write a function "checkTheta" or "thetaConstr"(param_vector, Copula):
  checks if the parameters are all admissible.
 ** TODO Rebuild R-forge structure nacopula -> copula
-
 ** TODO Miscellaneous Functions (& bugs: all DONE)
 *** DONE (MH) rtrafo() {and probably htrafo()} --- "fail" (are *wrong*!) for n = 1
 *** DONE (MH) copFrank@psi(1/1e20, theta=200) == Inf instead of 1

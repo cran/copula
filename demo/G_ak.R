@@ -209,7 +209,7 @@ chk1 <- function(ak.mat, tol = 1e-7) {
     stopifnot(is.matrix(ak.mat), (d <- nrow(ak.mat)) >= 2)
     n.meth <- ncol(ak.mat)
     med <- apply(ak.mat, 1, median, na.rm=TRUE)
-    apply(ak.mat, 2, all.equal, target=med, tol=tol)
+    apply(ak.mat, 2, all.equal, target=med, tolarance=tol)
 }
 
 chk1(ak.all$`d=20`[,,"alpha=0.3"])

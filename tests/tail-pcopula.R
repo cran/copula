@@ -54,16 +54,16 @@ ut20 <- numTailIndexUpper(gumbC20, u.1)
 
 stopifnot(
  all.equal(tailIndex(gumbC20)[["upper"]],
-           numTailIndexUpper(gumbC20, 1 - 1e-7), tol=1e-8)
+           numTailIndexUpper(gumbC20, 1 - 1e-7), tolerance=1e-8)
  ,
  all.equal(tailIndex(gumbC40)[["upper"]],
-           numTailIndexUpper(gumbC40, 1 - 1e-7), tol=1e-8)
+           numTailIndexUpper(gumbC40, 1 - 1e-7), tolerance=1e-8)
 )
 
 if(tryfCop) { ## Rmetrics
     C <- parchmCopula(u.1,u.1, alpha=40, type = "4", alternative = TRUE)
     stopifnot(all.equal(ut40,     (1-2*u.1+C)/(1-u.1),
-                        check.attr=FALSE, tol= 1e-14))
+                        check.attributes=FALSE, tolerance= 1e-14))
 }
 
 
@@ -77,7 +77,7 @@ S <- cbind(u.0,u.0)
 
 if(tryfCop) { ## Rmetrics
     C <-  parchmCopula(S, alpha=20, type = "4", alternative = FALSE)
-    stopifnot(all.equal(lt20, C/u.0, check.attr=FALSE, tol= 1e-14))
+    stopifnot(all.equal(lt20, C/u.0, check.attributes=FALSE, tolerance= 1e-14))
 }
 
 signif(numTailIndexLower(gumbC3, 10^-(5*(1:40))),   3)#--> 0
@@ -91,16 +91,16 @@ tailIndex(Frank2) # 0 0
 
 ## Upper and lower tail dependence
 (tl <- numTailIndexLower(Frank2, u.0))
-stopifnot(all.equal(tl, numTailIndexUpper(Frank2, u.1), tol=1e-10))
+stopifnot(all.equal(tl, numTailIndexUpper(Frank2, u.1), tolerance=1e-10))
 
 stopifnot(
   (tu1 <- numTailIndexUpper(Frank2, .99999)) < .00003
 ,
-  all.equal(tu1, numTailIndexLower(Frank2, .00001), tol=1e-6)
+  all.equal(tu1, numTailIndexLower(Frank2, .00001), tolerance=1e-6)
 ,
   (tu2 <- numTailIndexUpper(Frank2, 1-1e-6)) < 3e-6
 ,
-  all.equal(tu2, numTailIndexLower(Frank2, 1e-6), tol= 1e-4)
+  all.equal(tu2, numTailIndexLower(Frank2, 1e-6), tolerance= 1e-4)
 )
 
 
@@ -118,21 +118,21 @@ assertError(pCopula(cbind(u.0,u.1), t.frac))
 
 stopifnot( {
     ft <- dCopula(u2, t.frac)
-    all.equal(ft, dCopula(u2[,2:1], t.frac), tol=1e-15)
+    all.equal(ft, dCopula(u2[,2:1], t.frac), tolerance=1e-15)
  },
  !is.unsorted(ft)
  ,
  all.equal(tailIndex(t.7.3)[["upper"]],
-           numTailIndexUpper(t.7.3, 1 - 1e-8), tol=1e-5)
+           numTailIndexUpper(t.7.3, 1 - 1e-8), tolerance=1e-5)
  ,
  all.equal(tailIndex(t.9.2)[["upper"]],
-           numTailIndexUpper(t.9.2, 1 - 1e-8), tol=1e-7)
+           numTailIndexUpper(t.9.2, 1 - 1e-8), tolerance=1e-7)
  ,
  all.equal(tailIndex(t.7.3)[["lower"]],
-           numTailIndexLower(t.7.3, 1e-8), tol=1e-5)
+           numTailIndexLower(t.7.3, 1e-8), tolerance=1e-5)
  ,
  all.equal(tailIndex(t.9.2)[["lower"]],
-           numTailIndexLower(t.9.2, 1e-8), tol=1e-7)
+           numTailIndexLower(t.9.2, 1e-8), tolerance=1e-7)
 )
 
 (ut. <- numTailIndexUpper(t.7.3, u.1))
@@ -142,7 +142,7 @@ if(tryfCop && .r(fCopulae)) { ## Rmetrics
     p. <- pCopula(u = cbind(u.1, u.1), t.7.3)
     ## they are really not "so equal"
     stopifnot(
-    all.equal(p.fC, p., check.attr=FALSE, tol= 0.002)
+    all.equal(p.fC, p., check.attributes=FALSE, tolerance= 0.002)
     )
 }
 

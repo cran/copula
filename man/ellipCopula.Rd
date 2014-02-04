@@ -63,7 +63,7 @@ if(require("scatterplot3d")) {
 
 ## Versions with unspecified parameters:
 tCopula()
-allEQ <- function(u,v) all.equal(u, v, tol=0)
+allEQ <- function(u,v) all.equal(u, v, tolerance=0)
 stopifnot(allEQ(ellipCopula("norm"), normalCopula()),
           allEQ(ellipCopula("t"), tCopula()))
 tCopula(dim=3)

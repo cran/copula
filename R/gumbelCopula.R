@@ -60,13 +60,24 @@ psiGumbel <- function(copula, s) {
   exp( -s^(1 / alpha) )
 }
 
-gumbelCopula <- function(param = NA_real_, dim = 2L) {
+gumbelCopula <- function(param = NA_real_, dim = 2L,
+			 use.indepC = c("message", "TRUE", "FALSE"))
+{
   stopifnot(length(param) == 1)
+  if(!is.na(param) && param == 1) {
+      use.indepC <- match.arg(use.indepC)
+      if(!identical(use.indepC, "FALSE")) {
+	  if(identical(use.indepC, "message"))
+	      message("parameter at boundary ==> returning indepCopula()")
+	  return( indepCopula(dim=dim) )
+      }
+  }
+
   ## get expressions of cdf and pdf
   cdfExpr <- function(n) {
     expr <- "( - log(u1))^alpha"
     for (i in 2:n) {
-      cur <- paste( "(-log(u", i, "))^alpha", sep = "")
+      cur <- paste0( "(-log(u", i, "))^alpha")
       expr <- paste(expr, cur, sep=" + ")
     }
     expr <- paste("exp(- (", expr, ")^ (1/alpha))")
@@ -76,7 +87,7 @@ gumbelCopula <- function(param = NA_real_, dim = 2L) {
   pdfExpr <- function(cdf, n) {
     val <- cdf
     for (i in 1:n) {
-      val <- D(val, paste("u", i, sep=""))
+      val <- D(val, paste0("u", i))
     }
     val
   }
@@ -116,7 +127,7 @@ pgumbelCopula <- function(copula, u) {
   dim <- copula@dimension
   if(!is.matrix(u)) u <- matrix(u, ncol = dim)
   cdf <- copula@exprdist$cdf
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  for (i in 1:dim) assign(paste0("u", i), u[,i])
   alpha <- copula@parameters[1]
   val <- eval(cdf)
   pmax(val, 0)
@@ -126,7 +137,7 @@ dgumbelCopula <- function(u, copula, log=FALSE, ...) {
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   pdf <- copula@exprdist$pdf
   dim <- copula@dimension
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  for (i in 1:dim) assign(paste0("u", i), u[,i])
   alpha <- copula@parameters[1]
   if(log) stop("'log=TRUE' not yet implemented")
   eval(pdf)
@@ -136,7 +147,7 @@ dgumbelCopula.pdf <- function(u, copula, log=FALSE) {
   dim <- copula@dimension
   if (dim > 10) stop("Gumbel copula PDF not implemented for dimension > 10.")
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  for (i in 1:dim) assign(paste0("u", i), u[,i])
   alpha <- copula@parameters[1]
   ## FIXME: improve log-case
   if(log)
@@ -218,10 +229,10 @@ setMethod("pCopula", signature("numeric", "gumbelCopula"),
 
 setMethod("dCopula", signature("matrix", "gumbelCopula"),
 	  ## was  dgumbelCopula.pdf
-	  function (u, copula, log = FALSE, ...)
-	  copGumbel@dacopula(u, theta=copula@parameters, log=log, ...))
+	  function (u, copula, log = FALSE, checkPar=TRUE, ...)
+	  copGumbel@dacopula(u, theta=copula@parameters, log=log, checkPar=checkPar, ...))
 setMethod("dCopula", signature("numeric", "gumbelCopula"),
-	  function (u, copula, log = FALSE, ...)
+	  function (u, copula, log = FALSE, checkPar=TRUE, ...)
 	  copGumbel@dacopula(rbind(u, deparse.level=0L), theta=copula@parameters,
 			     log=log, ...))
 
@@ -244,7 +255,6 @@ setMethod("diPsi", signature("gumbelCopula"),
 	  s <- if(log || degree %% 2 == 0) 1. else -1.
 	  s* copGumbel@absdiPsi(u, theta=copula@parameters, degree=degree, log=log, ...)
       })
-
 
 
 

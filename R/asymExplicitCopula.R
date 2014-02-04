@@ -44,8 +44,8 @@ asymExplicitCopula <- function(shapes, copula1, copula2) {
     if (d >= 10) stop("The maximum implemented dim is 9.")
     cdf <- deparse(cdf)
     for (i in 1:d) {
-      ui <- paste("u", i, sep="")
-      shpi <- paste("shp", i, sep="")
+      ui <- paste0("u", i)
+      shpi <- paste0("shp", i)
       if (om) shpi <- paste("(1 - ", shpi, ")")
       replacement <- paste("(", ui, "^", shpi, ")")
       cdf <- gsub(ui, replacement, cdf)
@@ -61,7 +61,7 @@ asymExplicitCopula <- function(shapes, copula1, copula2) {
   pdfExpr <- function(cdf, n) {
     val <- cdf
     for (i in 1:n) {
-      val <- D(val, paste("u", i, sep=""))
+      val <- D(val, paste0("u", i))
     }
     val
   }
@@ -73,13 +73,13 @@ asymExplicitCopula <- function(shapes, copula1, copula2) {
   derExprs <- function(cdf, n) {
     val <- as.expression(cdf)
     for (i in 1:n) {
-      val <- c(val, D(val[i], paste("u", i , sep="")))
+      val <- c(val, D(val[i], paste0("u", i )))
     }
     val
   }
   derExprs1 <- derExprs(copula1@exprdist$cdf, d)
   derExprs2 <- derExprs(copula2@exprdist$cdf, d)
-  shapes.names <- paste("shape", 1:d, sep="")
+  shapes.names <- paste0("shape", 1:d)
   val <- new("asymExplicitCopula",
              dimension = d,
              parameters = c(copula1@parameters, copula2@parameters, shapes),
@@ -138,7 +138,7 @@ densDers <- function(idx, u, dg, copula, derExprs) {
   d <- copula@dimension
   newidx <- c((1:d)[idx], (1:d)[!idx])
   u <- u[, newidx]
-  for (i in 1:d) assign(paste("u", i, sep=""), u[,i])
+  for (i in 1:d) assign(paste0("u", i), u[,i])
   dgu <- if(sum(idx) == 0) 1 else apply(dg[,idx,drop=FALSE], 1, prod)
   c(eval(derExprs[dorder + 1])) * dgu
 }

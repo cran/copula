@@ -1,32 +1,32 @@
 Package: copula
-Version: 0.999-7
-Date: $Date: 2013-05-21 11:21:17 +0200 (Tue, 21. May 2013) $
-SVNrev: $Revision: 1026 $
+Version: 0.999-8
+Date: $Date: 2014-02-04 08:49:31 +0100 (Tue, 04. Feb 2014) $
+Subversion: $Revision: 1074 $
 Title: Multivariate Dependence with Copulas
-Author: Marius Hofert <marius.hofert@math.ethz.ch>, Ivan Kojadinovic
-        <ivan.kojadinovic@univ-pau.fr>, Martin Maechler
-        <maechler@stat.math.ethz.ch>, and Jun Yan <jun.yan@uconn.edu>
+Author: Marius Hofert <marius.hofert@math.ethz.ch>,
+ Ivan Kojadinovic <ivan.kojadinovic@univ-pau.fr>,
+ Martin Maechler <maechler@stat.math.ethz.ch>, and
+ Jun Yan <jun.yan@uconn.edu>
 Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
-Depends: R (>= 2.15.2), methods
-Imports: stats4, stats, graphics, Matrix, gsl, ADGofTest, stabledist
-        (>= 0.6-4), mvtnorm, pspline
+Depends: R (>= 2.15.2)
+Imports: stats, graphics, methods, stats4, Matrix, gsl, ADGofTest,
+        stabledist (>= 0.6-4), mvtnorm, pspline
 Suggests: lattice, MASS, KernSmooth, sfsmisc, bbmle, scatterplot3d,
         Rmpfr, colorspace, mvnormtest, tseries, zoo
-SuggestComments: packages colorspace, mvnormtest, tseries, zoo are only
+SuggestsNote: packages colorspace, mvnormtest, tseries, zoo are only
         used in demos
 Enhances: nor1mix
-Description: Classes (S4) of commonly used elliptical, Archimedean,
-        extreme value and some more copula families.  Methods for
-        density, distribution, random number generation, bivariate
-        dependence measures, perspective and contour plots.  Fitting
-        copula models including variance estimates.  Independence and
-        serial (univariate and multivariate) independence tests, and
-        other copula related tests.  Goodness-of-fit tests for copulas
-        based on multipliers, the parametric bootstrap with several
-        transformation options.  Merged former package 'nacopula' for
-        nested Archimedean copulas: Efficient sampling algorithms,
-        various estimators, goodness-of-fit tests and related tools and
-        special functions.
+Description: Classes (S4) of commonly used elliptical, Archimedean, extreme
+ value and some more copula families.  Methods for density, distribution,
+ random number generation, bivariate dependence measures, perspective and
+ contour plots.  Fitting copula models including variance estimates.
+ Independence and serial (univariate and multivariate) independence tests,
+ and other copula related tests. Empirical copula and multivariate CDF.
+ Goodness-of-fit tests for copulas based on multipliers, the parametric
+ bootstrap with several transformation options.
+ Merged former package 'nacopula' for nested Archimedean copulas: Efficient
+ sampling algorithms, various estimators, goodness-of-fit tests and related
+ tools and special functions.
 License: GPL (>= 3) | file LICENCE
 Collate: AllClass.R Classes.R Copula.R Auxiliaries.R aux-acopula.R
         special-func.R cop_objects.R nacopula.R derCdfPdf.R amhCopula.R
@@ -35,15 +35,16 @@ Collate: AllClass.R Classes.R Copula.R Auxiliaries.R aux-acopula.R
         acR.R estimation.R evCopula.R evTests.R exchTests.R fgmCopula.R
         fitCopula.R fitMvdc.R frankCopula.R frankExpr.R
         galambosCopula.R galambosExpr-math.R galambosExpr.R
-        ggraph-tools.R pairsRosenblatt.R gofTrafos.R gofEVTests.R
-        gofTests.R graphics.R gumbelCopula.R gumbelExpr.R
+        ggraph-tools.R pairsRosenblatt.R device.R gofTrafos.R
+        gofEVTests.R gofTests.R graphics.R gumbelCopula.R gumbelExpr.R
         huslerReissCopula.R huslerReissExpr.R indepCopula.R
         indepTests.R joeCopula.R K.R logseries.R mvdc.R normalCopula.R
         plackettCopula.R plackettExpr.R rstable1.R safeUroot.R
         schlatherCopula.R stable.R timing.R trafos.R tCopula.R
         tawnCopula.R tawnExpr.R tevCopula.R wrapper.R zzz.R
 Encoding: UTF-8
-Packaged: 2013-05-21 09:23:31 UTC; maechler
+URL: http://nacopula.r-forge.r-project.org/
+Packaged: 2014-02-04 11:14:36 UTC; maechler
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2013-05-21 14:59:21
+Date/Publication: 2014-02-04 16:12:44

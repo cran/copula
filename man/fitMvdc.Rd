@@ -123,8 +123,8 @@ if(copula:::doExtras()) { ## these are typically not run with CRAN checking:
  stopifnot(is.matrix(coef(sfI)))
 \dontshow{
  stopifnot(all.equal(coef(sfI),
-		     coef(summary(fI.2)),    tol = 2e-4),
-	   all.equal(coef(fitI), coef(fI.2), tol = 1e-4))
+		     coef(summary(fI.2)),    tolerance = 2e-4),
+	   all.equal(coef(fitI), coef(fI.2), tolerance = 1e-4))
 }%dont...
 }% if(..doExtras())
 

@@ -37,20 +37,20 @@ emle(u, cop, n.MC=0, optimizer="optimize", method,
     \code{"optim"}, the method to be used for \code{\link{optim}}.}
   \item{interval}{bivariate vector denoting the interval where
     optimization takes place.  The default is computed as described in
-    Hofert et al. (2011a).}
+    Hofert et al. (2012).}
   \item{start}{\code{\link{list}} of initial values, passed through.}
   \item{\dots}{additional parameters passed to \code{\link{optimize}}.}
 }
 \details{
    Exact formulas for the generator derivatives were derived in Hofert
-   et al. (2011b).  Based on these formulas one can compute the
+   et al. (2012).  Based on these formulas one can compute the
    (log-)densities of the Archimedean copulas.  Note that for some
    densities, the formulas are numerically highly non-trivial to compute
    and considerable efforts were put in to make the computations
    numerically feasible even in large dimensions (see the source code of
    the Gumbel copula, for example).  Both MLE and SMLE showed good
    performance in the simulation study conducted by Hofert et
-   al. (2011a) including the challenging 100-dimensional case.
+   al. (2013) including the challenging 100-dimensional case.
    Alternative estimators (see also \code{\link{enacopula}}) often used
    because of their numerical feasibility, might break down in much
    smaller dimensions.
@@ -73,14 +73,16 @@ emle(u, cop, n.MC=0, optimizer="optimize", method,
 }
 \author{Martin Maechler, Marius Hofert.}
 \references{
-  Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011a).
-  Estimators for Archimedean copulas in high dimensions: A comparison;
-  submitted.
-
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2012).
   Likelihood inference for Archimedean copulas in high dimensions
   under known margins. \emph{Journal of Multivariate Analysis}
   \bold{110}, 133--150.
+
+  Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2013).
+  Archimedean Copulas in High Dimensions: Estimators and Numerical
+  Challenges Motivated by Financial Applications.
+  \emph{Journal de la Soci\enc{é}{e}t\enc{é}{e} Fran\enc{ç}{c}aise de
+    Statistique} \bold{154}(1), 25--63.
 }
 \seealso{
   \code{\link[bbmle]{mle2}} from package \pkg{bbmle} and

@@ -15,9 +15,10 @@ pairsRosenblatt(cu.u, pvalueMat=pviTest(pairwiseIndepTest(cu.u)),
                 "PPchisq", "PPgamma", "none"),
                 g1, g2, col = "B&W.contrast",
                 colList = pairsColList(pvalueMat, col=col),
-                main=NULL, key.title = "pp-value",
-                sub = gpviString(pvalueMat, name = paste0(key.title,"s")),
-		panel = NULL, do.qqline = TRUE, key.rug = TRUE, ...)
+                main=NULL,
+                sub = gpviString(pvalueMat, name = "pp-values"),
+		panel = NULL, do.qqline = TRUE,
+                keyOpt = list(title="pp-value", rug.at=pvalueMat), ...)
 
 pairsColList(P, pdiv = c(1e-04, 0.001, 0.01, 0.05, 0.1, 0.5),
              signif.P = 0.05, pmin0 = 1e-05, bucketCols = NULL,
@@ -66,9 +67,8 @@ pairsColList(P, pdiv = c(1e-04, 0.001, 0.01, 0.05, 0.1, 0.5),
     "QQ...." and \code{do.qqline} is true.}
   \item{do.qqline}{if \code{method = "QQ...."}, specify if the plot
     panels should also draw a \code{\link{qqline}()}.}
-  \item{key.title}{title of the color key.}
-  \item{key.rug}{\code{\link{logical}} indicationg whether key
-    rugs are printed (small ticks on the left side of the color key).}
+  \item{keyOpt}{argument passed to \code{\link{.pairsCond}()} for
+    options for the key.}
   \item{\dots}{additional arguments passed to \code{\link{.pairsCond}()}
     (for \code{pairsRosenblatt()})
     and to \code{heat_hcl()} (for \code{pairsColList};

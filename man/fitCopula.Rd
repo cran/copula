@@ -147,6 +147,9 @@ fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
   \code{\link{mvdc}} for fitting multivariate distributions
   \emph{including} the margins aka \dQuote{meta copula}s;
   \code{\link{gofCopula}}.
+
+  For maximum likelihood of (nested) archimedean copulas:
+  \code{\link{emle}}, etc.
 }
 \examples{
 gumbel.cop <- gumbelCopula(3, dim=2)
@@ -242,15 +245,15 @@ if(Xtras) { ##---- typically not run with CRAN checking: ---
 all.eqCop <- function(x,y, ...) {
    x@fitting.stats$counts <- y@fitting.stats$counts <- NULL
    all.equal(x,y, ...) }
-stopifnot(all.eqCop(tc.ml , tc.ml., tol= .005),
-          all.eqCop(tc.mpl, tc.mp., tol= .005))
+stopifnot(all.eqCop(tc.ml , tc.ml., tolerance= .005),
+          all.eqCop(tc.mpl, tc.mp., tolerance= .005))
 
 ## same t copula but with df.fixed=TRUE	 (--> use same data!)
 (tC.f <- tCopula(c(0.2,0.4,0.6), dim=3, dispstr="un", df=5, df.fixed=TRUE))
 ## maximum likelihood;  start := rho[1:3]		    -------------
 (tcF.ml  <- fitCopula(tC.f, x, method="ml", start=c(0,0,0)))
 (tcF.ml. <- fitCopula(tC.f, x, method="ml"))# without 'start'
-stopifnot(all.eqCop(tcF.ml,tcF.ml., tol= 4e-4))
+stopifnot(all.eqCop(tcF.ml,tcF.ml., tolerance= 4e-4))
 ## the (estimated, asymptotic) var-cov matrix:
 vcov(tcF.ml)
 
@@ -258,7 +261,7 @@ vcov(tcF.ml)
 (tcF.mpl <- fitCopula(tC.f, u, method="mpl", estimate.variance=FALSE,
                       start=c(0,0,0)))
 (tcF.mp. <- fitCopula(tC.f, u, method="mpl", estimate.variance=FALSE))
-stopifnot(all.eqCop(tcF.mpl,tcF.mp., tol= 1e-5))
+stopifnot(all.eqCop(tcF.mpl,tcF.mp., tolerance= 1e-5))
 
 }## end{typically not run ...}
 

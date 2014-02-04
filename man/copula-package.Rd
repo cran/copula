@@ -82,7 +82,7 @@
 \references{
   Yan, J. (2007)
   Enjoy the Joy of Copulas: With a Package \pkg{copula}.
-  \emph{Journal of Statistical Software}, \bold{21}(4), 1--21.
+  \emph{Journal of Statistical Software} \bold{21}(4), 1--21.
   \url{http://www.jstatsoft.org/v21/i04/}.
 
   Kojadinovic, I. and Yan, J. (2010).

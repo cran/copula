@@ -17,7 +17,7 @@
 indepCopula <- function(dim = 2L) {
     ## get expressions of cdf and pdf
   cdfExpr <- function(n) {
-    uis <- paste("u", 1:n, sep="")
+    uis <- paste0("u", 1:n)
     expr <- paste(uis, collapse="*")
     parse(text = expr)
   }
@@ -25,7 +25,7 @@ indepCopula <- function(dim = 2L) {
   pdfExpr <- function(cdf, n) {
     val <- cdf
     for (i in 1:n) {
-      val <- D(val, paste("u", i, sep=""))
+      val <- D(val, paste0("u", i))
     }
     val
   }
@@ -56,16 +56,8 @@ dindepCopula <- function(u, copula, log=FALSE, ...) {
   rep.int(if(log) 0 else 1, nrow(u))
 }
 
-## tauIndepCopula <- function(copula) {
-##   0
-## }
-
 ## iTauIndepCopula <- function(copula, tau) {
 ##   cat("No need to calibrate an independent copula.\n")
-## }
-
-## rhoIndepCopula <- function(copula) {
-##   0
 ## }
 
 ## iRhoIndepCopula <- function(copula, rho) {
@@ -82,9 +74,11 @@ setMethod("dCopula", signature("matrix", "indepCopula"), dindepCopula)
 
 
 setMethod("A", signature("indepCopula"), AIndep)
-# setMethod("tau", signature("indepCopula"), tauIndepCopula)
-# setMethod("rho", signature("indepCopula"), rhoIndepCopula)
-# setMethod("tailIndex", signature("indepCopula"), tailIndexIndepCopula)
+
+setMethod("tau", "indepCopula", function(copula, ...) 0)
+setMethod("rho", "indepCopula", function(copula, ...) 0)
+setMethod("tailIndex", "indepCopula",
+          function(copula, ...)  c(lower=0, upper = 0))
 
 # setMethod("iTau", signature("indepCopula"), iTauIndepCopula)
 # setMethod("iRho", signature("indepCopula"), iRhoIndepCopula)

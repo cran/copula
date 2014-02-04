@@ -75,9 +75,9 @@ tG   <- evTestA(uG[1:10,])
 tC.A <- evTestA(uC[1:12,])
 tC.C <- evTestA(uC[1:20,], derivatives = "Cn")
 stopifnot(
-all.equal(all.equal(tG  $p.value, 47/2002, tol= 1e-15),
-	  all.equal(tC.C$p.value,  1/154 , tol= 1e-15),
-	  all.equal(tC.C$p.value, tC.A$p.value, tol = 1e-15)
+all.equal(all.equal(tG  $p.value, 47/2002, tolerance= 1e-15),
+	  all.equal(tC.C$p.value,  1/154 , tolerance= 1e-15),
+	  all.equal(tC.C$p.value, tC.A$p.value, tolerance = 1e-15)
 ))
 }%dont
 }

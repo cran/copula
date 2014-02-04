@@ -63,7 +63,7 @@ initOpt(family, tau.range=NULL, interval = TRUE, u,
   (still) too small, one can adjust it by providing \code{tau.range}. If it is
   too large, a \sQuote{distance to concordance} can be used to determine
   parameter values such that the corresponding Kendall's taus share a certain
-  distance to the initial value.  For more details, see Hofert et al. (2011b).
+  distance to the initial value.  For more details, see Hofert et al. (2012).
   Finally, let us note that for the case \code{interval=TRUE}, \code{u} is not
   required.
 }

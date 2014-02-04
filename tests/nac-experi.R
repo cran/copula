@@ -209,7 +209,7 @@ stopifnot(identical(AMH3d, rr), identical(rr, r0),
 l <- c(.1, .05, .3)
 u <- c(.4, .7,  .6)
 stopifnot(all.equal(print(  prob(AMH3d,l,u)),
-		    probin3dcube(AMH3d,l,u), tol=1e-14))
+		    probin3dcube(AMH3d,l,u), tolerance=1e-14))
 
 ### Clayton ####################################################################
 
@@ -230,7 +230,7 @@ Clayton3d <- onacopula("Clayton", C(theta0, 1, C(theta1, 2:3)))
 
 ## check probability
 stopifnot(all.equal(print(  prob(Clayton3d,l,u)),
-		    probin3dcube(Clayton3d,l,u), tol=1e-14))
+		    probin3dcube(Clayton3d,l,u), tolerance=1e-14))
 
 ### Frank ######################################################################
 
@@ -248,7 +248,7 @@ Frank3d <- onacopula("F", C(theta0, 1, C(theta1, 2:3)))
 
 ## check probability
 stopifnot(all.equal(print(  prob(Frank3d,l,u)),
-		    probin3dcube(Frank3d,l,u), tol=1e-14))
+		    probin3dcube(Frank3d,l,u), tolerance=1e-14))
 
 ### Gumbel #####################################################################
 
@@ -268,7 +268,7 @@ Gumbel3d <- onacopula("Gumbel", C(theta0, 1, C(theta1, 2:3)))
 
 ## check probability
 stopifnot(all.equal(print(  prob(Gumbel3d,l,u)),
-		    probin3dcube(Gumbel3d,l,u), tol=1e-14))
+		    probin3dcube(Gumbel3d,l,u), tolerance=1e-14))
 
 ### Joe ########################################################################
 
@@ -286,7 +286,7 @@ Joe3d <- onacopula("J", C(theta0, 1, C(theta1, 2:3)))
 
 ## check probability
 stopifnot(all.equal(print(  prob(Joe3d,l,u)),
-		    probin3dcube(Joe3d,l,u), tol=1e-14))
+		    probin3dcube(Joe3d,l,u), tolerance=1e-14))
 
 ### Examples that check pnacopula() and rnacopula() ############################
 
@@ -318,7 +318,7 @@ th0 <- 0.7135
 th1 <- 0.9430
 level1 <- psi(iPsi(u[2],th1) + iPsi(u[3],th1), th1)
 level0 <- psi(iPsi(u[1],th0) + iPsi(level1, th0), th0)
-stopifnot(all.equal(v, level0, tol = 1e-14))
+stopifnot(all.equal(v, level0, tolerance = 1e-14))
 
 ## test rnacopula()
 rt <- system.time(rC3 <- rnacopula(n,c3))
@@ -349,7 +349,7 @@ v <- pCopula(c(.3, .4), c2)
 stopifnot(all.equal(v,
                     local( { u1 <- .3; u2 <- .4
                              (u1^(-1/2)+u2^(-1/2)-1)^(-2) }),
-                    tol = 1e-14))
+                    tolerance = 1e-14))
 
 ## test rnacopula()
 racopula <- copula:::racopula
@@ -381,7 +381,7 @@ v <- pCopula(c(.3, .4, .5), c3)
 stopifnot(all.equal(v,
                     local( { u1 <- .3; u2 <- .4; u3 <- .5
                              1/((1/u2^2 +1/u3^2 -1)^(1/4) -1 +1/sqrt(u1))^2 }),
-                    tol = 1e-14))
+                    tolerance = 1e-14))
 
 ## test rnacopula()
 rt <- system.time(rC3 <- rnacopula(n,c3))
@@ -433,7 +433,7 @@ level0 <- psi(iPsi(u[3],th0)+
               iPsi(u[6],th0)+
               iPsi(u[1],th0)+
               iPsi(level1, th0), th0)
-stopifnot(all.equal(v, level0, tol = 1e-14))
+stopifnot(all.equal(v, level0, tolerance = 1e-14))
 
 ## test rnacopula()
 rt <- system.time(rC9 <- rnacopula(n,c9))

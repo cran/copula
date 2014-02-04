@@ -56,9 +56,12 @@ absdPsiMC(t, family, theta, degree = 1, n.MC,
 }
 \author{Marius Hofert (and Martin M.)}
 \references{
-  Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011a),
-  Estimators for Archimedean copulas in high dimensions: A comparison,
-  submitted.
+  Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2013).
+  Archimedean Copulas in High Dimensions: Estimators and Numerical
+  Challenges Motivated by Financial Applications.
+  \emph{Journal de la Soci\enc{é}{e}t\enc{é}{e} Fran\enc{ç}{c}aise de
+    Statistique}
+  \bold{154}(1), 25--63.
 }
 \seealso{
   \code{\link{acopula-families}}.
@@ -72,7 +75,7 @@ set.seed(1)
 set.seed(1)
 ps2 <- absdPsiMC(log(t), family="Gumbel", theta=2, degree=10,
                  n.MC=10000, log=TRUE, is.log.t = TRUE)
-stopifnot(all.equal(ps[-1], ps2[-1], tol=1e-14))
+stopifnot(all.equal(ps[-1], ps2[-1], tolerance=1e-14))
 ## Now is there an advantage of using "is.log.t" ?
 sapply(eval(formals(absdPsiMC)$method), function(MM)
        absdPsiMC(780, family="Gumbel", method = MM,

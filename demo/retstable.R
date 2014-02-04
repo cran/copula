@@ -52,7 +52,7 @@ p.A <- function(ialpha, x = seq(0, 3.1, length=100), col = "tomato") {
     lines(x, A1d, col = gray, lwd = 3)
 }
 
-if(!dev.interactive(orNone=TRUE))
+if(doPDF <- !dev.interactive(orNone=TRUE))
     pdf("retstable-ex.pdf")
 
 ## A(.) --> 1
@@ -196,7 +196,7 @@ matlines(V0s, Nst.q95, col = "gray80", lty=3)
 matplot(V0s, Nst.mns / V0s, type = "b", lty=1, log = "x")
 rug(V0s)
 
-if(dev.interactive()) par(mfrow=c(1,1)) else { dev.off(); pdf("retstable-ex-2.pdf") }
+if(doPDF) { dev.off(); pdf("retstable-ex-2.pdf") } else par(mfrow=c(1,1))
 
 ### --- =======      --------------------------#-----------
 ### --- Part II ---  Experiments with retstableC() methods

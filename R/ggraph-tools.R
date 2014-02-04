@@ -218,6 +218,7 @@ gpviString <- function(pvalues, name = "pp-values", sep="   ", digits=2) {
 ##'         "ellip": qQg, the quantile function of the function Q_g in Genest, Hofert, Neslehova (2013)
 ##'         "archm": iPsi, the inverse of the (assumed) generator
 ##'       - used in Genest, Hofert, Neslehova (2013)
+##'       - for qF for Q-Q plots for "archm", see acR.R
 RSpobs <- function(x, do.pobs = TRUE, method = c("ellip", "archm"), ...)
 {
     ## check
@@ -234,11 +235,11 @@ RSpobs <- function(x, do.pobs = TRUE, method = c("ellip", "archm"), ...)
                ## P_{jk} = \Sigma_{jk}/sqrt{\Sigma_{jj}\Sigma_{kk}}
                ## and compute the inverse of the corresponding Cholesky factor
                ## Note: this is *critical* !!
-               ## ----  (=> completely wrong R's) if d > n/2 (roughly)
+               ## ----  => completely wrong R's if d > n/2 (roughly)
                P <- as.matrix(nearPD(sin(cor(x, method="kendall")*pi/2),
                                       corr=TRUE)$mat)
 	       L <- t(chol(P)) # lower triangular L such that LL' = P
-	       ## TODO: stay with Matrix, use LDL'
+	       ## note: it would be better to stay with 'Matrix' package here and to use LDL
 
 	       ## compute Ys
 	       Y <- if(hasArg(qQg)) { # if qQg() has been provided
@@ -265,15 +266,16 @@ RSpobs <- function(x, do.pobs = TRUE, method = c("ellip", "archm"), ...)
            },
            "archm"={
 
-               if(hasArg(iPsi)) { # if iPsi() has been provided
+               if(hasArg(iPsi)) { # if psi^{-1} has been provided
                    iPsi <- list(...)$iPsi
                    iPsiu <- iPsi(u)
                    R <- rowSums(iPsiu)
-                   return(list(R=R, S=iPsiu/R))
+                   return(list(R=R, S=iPsiu/R)) # return
                }
 
-               ## estimate psi^{-1} via inverting  estimator of psi
-               ## of Genest, Neslehova, Ziegel(2011; Algorithm 1; Section 4.3)
+               ## ... otherwise, estimate estimate psi^{-1} via inverting
+               ## the non-parametric estimator of psi of
+               ## Genest, Neslehova, Ziegel (2011; Algorithm 1; Section 4.3)
 
                ## compute r_1,..,r_m and p_1,..,p_m
                wp <- w.p(u) # = w.p(x); p = wp[,"p"]
@@ -285,12 +287,13 @@ RSpobs <- function(x, do.pobs = TRUE, method = c("ellip", "archm"), ...)
                R <- R.pobs(r, p=wp[,"p"], n=n) # without shuffling
 
                ## compute iPsi.n(u) and return
-               iPsin <- matrix(iPsi.n(u, r=r/median(R), # scale the skewed R's (to solve numerical issues!),
+               ## note: we scale the skewed R's (to avoid numerical issues!)
+               iPsin <- matrix(iPsi.n(u, r=r/median(R), # scaling
                                       p=wp[,"p"], d=d), ncol=d)
                iPsin.sum <- rowSums(iPsin)
-               list(# R=R/med.R, => strange discrete shape of Q-Q plots
-                    # S=iPsin/(R/med.R), => strange discrete shape of Q-Q plots
-                    R=iPsin.sum, S=iPsin/iPsin.sum)
+               list(# R = R/med.R, leads to strange discrete shape of Q-Q plots
+                    # S = iPsin/(R/med.R), leads to strange discrete shape of Q-Q plots
+                    R = iPsin.sum, S = iPsin/iPsin.sum)
 
            },
            stop("wrong method"))

@@ -164,11 +164,11 @@ u.Rt <- rtrafo(u, cop= tCop)
 pairs(u.Rt, cex = 0.2)# *not* clearly visible
 \dontshow{%% consistency of  log=FALSE / TRUE:
 stopifnot(all.equal(log(u.R[,-1]),
-		    rtrafo(u, cop=copC, log=TRUE), tol=1e-14),
+		    rtrafo(u, cop=copC, log=TRUE), tolerance=1e-14),
 	  all.equal(log(rtrafo(u, cop= fN@copula, trafo.only=TRUE)),
-		    rtrafo(u, cop= fN@copula, log=TRUE), tol=1e-14),
+		    rtrafo(u, cop= fN@copula, log=TRUE), tolerance=1e-14),
 	  all.equal(log(u.Rt[,-1]),
-		    rtrafo(u, cop= tCop, log=TRUE), tol=1e-14),
+		    rtrafo(u, cop= tCop, log=TRUE), tolerance=1e-14),
 	  TRUE)
 }% only for testing
 }

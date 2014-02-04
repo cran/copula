@@ -82,14 +82,26 @@ mv.NE <- mvdc(normalCopula(0.75), c("norm", "exp"),
 dim(mv.NE)
 mv.NE  # using its print() / show() method
 
+persp  (mv.NE, dMvdc, xlim = c(-4, 4), ylim=c(0, 2), main = "dMvdc(mv.NE)")
+persp  (mv.NE, pMvdc, xlim = c(-4, 4), ylim=c(0, 2), main = "pMvdc(mv.NE)")
+contour(mv.NE, dMvdc, xlim = c(-4, 4), ylim=c(0, 2))
+\dontshow{
+set.seed(101)
+}
 # Generate (bivariate) random numbers from that, and visualize
-x.samp <- rMvdc(100, mv.NE)
+x.samp <- rMvdc(250, mv.NE)
 plot(x.samp)
-dMvdc(x.samp, mv.NE)
-pMvdc(x.samp, mv.NE)
-persp  (mv.NE, dMvdc, xlim = c(-4, 4), ylim=c(0, 1), main = "dMvdc(mv.NE)")
-persp  (mv.NE, pMvdc, xlim = c(-4, 4), ylim=c(0, 1), main = "pMvdc(mv.NE)")
-contour(mv.NE, dMvdc, xlim = c(-4, 4), ylim=c(0, 1))
+summary(fx <- dMvdc(x.samp, mv.NE))
+summary(Fx <- pMvdc(x.samp, mv.NE))
+op <- par(mfcol=c(1,2))
+pp <- persp(mv.NE, pMvdc, xlim = c(-5,5), ylim=c(0,2),
+            main = "pMvdc(mv.NE)", ticktype="detail")
+%% FIXME: provide "empiricalCopula" .. with persp() method, see ../TODO !!
+px <- copula:::perspMvdc(x.samp, fun = F.n, xlim = c(-5,5), ylim=c(0,2),
+                         main = "F.n(x.samp)", ticktype="detail")
+par(op)
+all.equal(px, pp)# about 5\% difference 
+\dontshow{stopifnot(all.equal(px, pp, tolerance = 0.08))}
 }
 \keyword{distribution}
 \keyword{multivariate}

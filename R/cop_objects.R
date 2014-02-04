@@ -83,14 +83,18 @@ copAMH <-
 		      else d* x^(d-1) * ((x-theta)/(x^d-theta))^2
                   },
 		  ## density  AMH
-		  dacopula = function(u, theta, n.MC=0, log=FALSE,
+		  dacopula = function(u, theta, n.MC=0, log=FALSE, checkPar=TRUE,
 				      method = "negI-s-Eulerian", Li.log.arg=TRUE)
               {
 		  ## if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
                   if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
-		  if(d > 2) stopifnot(C.@paraConstr(theta))
+                  n <- nrow(u)
+		  if(d > 2 && !C.@paraConstr(theta)) {
+		      if(checkPar) stop("theta is outside its defined interval")
+		      return(rep.int(if(log) -Inf else 0, n))
+		  }
                   ## f() := NaN outside and on the boundary of the unit hypercube
-                  res <- rep.int(NaN, n <- nrow(u))
+                  res <- rep.int(NaN, n)
 		  n01 <- u.in.01(u)## indices for which density has to be evaluated
                   ## if(!any(n01)) return(res)
                   if(theta == 0) { res[n01] <- if(log) 0 else 1; return(res) } # independence
@@ -161,7 +165,7 @@ copAMH <-
                   iTau = function(tau, tol=.Machine$double.eps^0.25, check=TRUE, warn=TRUE, ...) {
 		      if((L <- any(tau > 1/3)) || any(tau < 0)) {
 			  ct <- if(length(ct <- sort(tau, decreasing = L)) > 3)
-			      paste(paste(format(ct[1:3]),collapse=", "),", ...",sep="") else format(ct)
+			      paste0(paste(format(ct[1:3]),collapse=", "),", ...") else format(ct)
 			  msg <- "For AMH, Kendall's tau must be in [0, 1/3], but ("
 			  if(check)
 			      stop(msg, if(L) "largest" else "smallest", " sorted) tau = ", ct)
@@ -246,12 +250,16 @@ copClayton <-
                       d*(1+(d-1)*(1-u^theta))^(-(1+1/theta))
                   },
 		  ## density  Clayton
-		  dacopula = function(u, theta, n.MC=0, log=FALSE) {
+		  dacopula = function(u, theta, n.MC=0, log=FALSE, checkPar=TRUE) {
 		      ## if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
 		      if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
-		      if(d > 2) stopifnot(C.@paraConstr(theta))
+		      n <- nrow(u)
+		      if(d > 2 && !C.@paraConstr(theta)) {
+			  if(checkPar) stop("theta is outside its defined interval")
+			  return(rep.int(if(log) -Inf else 0, n))
+		      }
 		      ## f() := NaN outside and on the boundary of the unit hypercube
-		      res <- rep.int(NaN, n <- nrow(u))
+		      res <- rep.int(NaN, n)
 		      n01 <- u.in.01(u)## indices for which density has to be evaluated
 		      ## if(!any(n01)) return(res)
 		      ## auxiliary results
@@ -421,14 +429,18 @@ copFrank <-
 		      r
 		  },
 		  ## density  Frank
-		  dacopula = function(u, theta, n.MC=0, log=FALSE,
+		  dacopula = function(u, theta, n.MC=0, log=FALSE, checkPar=TRUE,
 				      method = "negI-s-Eulerian", Li.log.arg=TRUE)
 	      {
 		  ## if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
 		  if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
-		  if(d > 2) stopifnot(C.@paraConstr(theta))
-		  ## f() := NaN outside and on the boundary of the unit hypercube
-		  res <- rep.int(NaN, n <- nrow(u))
+		  n <- nrow(u)
+		  if(d > 2 && !C.@paraConstr(theta)) {
+		      if(checkPar) stop("theta is outside its defined interval")
+		      return(rep.int(if(log) -Inf else 0, n))
+		  }
+                  ## f() := NaN outside and on the boundary of the unit hypercube
+                  res <- rep.int(NaN, n)
 		  n01 <- u.in.01(u)## indices for which density has to be evaluated
 		  ## if(!any(n01)) return(res)
 		  ## auxiliary results
@@ -626,14 +638,18 @@ copGumbel <-
                       if(log) (da-1)*log(u) + alpha*log(d) else da*u^(da-1)
                   },
 		  ## density  Gumbel
-		  dacopula = function(u, theta, n.MC=0,
+		  dacopula = function(u, theta, n.MC=0, checkPar=TRUE,
 				      method = eval(formals(polyG)$method), log=FALSE)
               {
                   ## if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
                   if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
-		  stopifnot(C.@paraConstr(theta))
-                  ## f() := NaN outside and on the boundary of the unit hypercube
-                  res <- rep.int(NaN, n <- nrow(u))
+		  n <- nrow(u)
+		  if(!C.@paraConstr(theta)) {
+		      if(checkPar) stop("theta is outside its defined interval")
+		      return(rep.int(if(log) -Inf else 0, n))
+		  }
+		  ## f() := NaN outside and on the boundary of the unit hypercube
+		  res <- rep.int(NaN, n)
 		  n01 <- u.in.01(u)## indices for which density has to be evaluated
                   ## if(!any(n01)) return(res)
                   if(theta == 1) { res[n01] <- if(log) 0 else 1; return(res) } # independence
@@ -641,20 +657,23 @@ copGumbel <-
                   u. <- u[n01,, drop=FALSE]
                   mlu <- -log(u.) # -log(u)
                   lmlu <- log(mlu) # log(-log(u))
-                  t <- rowSums(C.@iPsi(u., theta))
+                  ## may overflow to Inf: t <- rowSums(C.@iPsi(u., theta))
+                  l.iP <- C.@iPsi(u., theta, log=TRUE)
+                  ln.t <- copula:::lsum(t(l.iP))
                   ## main part
                   if(n.MC > 0) { # Monte Carlo
                       V <- C.@V0(n.MC, theta)
                       sum. <- rowSums((theta-1)*lmlu + mlu)
                       sum.mat <- matrix(rep(sum., n.MC), nrow=n.MC, byrow=TRUE)
                       ## stably compute log(colMeans(exp(lx)))
+                      t <- exp(ln.t)## quickly overflows to +Inf ( <==> lx[.] == -Inf )
                       lx <- d*(log(theta)+log(V)) - log(n.MC) - V %*% t(t) + sum.mat  # matrix of exponents; dimension n.MC x n ["V x u"]
                       res[n01] <- lsum(lx)
                       if(log) res else exp(res)
                   } else { # explicit
                       alpha <- 1/theta
                       ## compute lx = alpha*log(sum(iPsi(u., theta)))
-                      lx <- alpha*log(t) ## == log(t^alpha) == log( t^(1/theta) )
+		      lx <- alpha*ln.t ## == log(t^alpha) == log( t^(1/theta) )
                       ## ==== former version [start] (numerically slightly more stable but slower) ====
                       ## im <- apply(u., 1, which.max)
                       ## mat.ind <- cbind(seq_len(n), im) # indices that pick out maxima from u.
@@ -873,14 +892,18 @@ copJoe <-
 		      else d* x^(d-1) * circRat(Ix, d)^(1/theta-1)
 		  },
 		  ## density  Joe
-		  dacopula = function(u, theta, n.MC=0,
+		  dacopula = function(u, theta, n.MC=0, checkPar=TRUE,
 				      method = eval(formals(polyJ)$method), log = FALSE)
               {
                   ## if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
                   if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
-		  stopifnot(C.@paraConstr(theta))
-                  ## f() := NaN outside and on the boundary of the unit hypercube
-                  res <- rep.int(NaN, n <- nrow(u))
+		  n <- nrow(u)
+		  if(d > 2 && !C.@paraConstr(theta)) {
+		      if(checkPar) stop("theta is outside its defined interval")
+		      return(rep.int(if(log) -Inf else 0, n))
+		  }
+		  ## f() := NaN outside and on the boundary of the unit hypercube
+		  res <- rep.int(NaN, n)
 		  n01 <- u.in.01(u)## indices for which density has to be evaluated
                   ## if(!any(n01)) return(res)
                   if(theta == 1) { res[n01] <- if(log) 0 else 1; return(res) } # independence
@@ -944,7 +967,7 @@ copJoe <-
                       ## compute log(P'(log(h/(1-h))))
                       ## Note: this is similar to polyJ() (see there for the comments!)
                       k <- 2:d # 2:d instead of 1:d
-                      l.a.k <- log(Stirling2.all(d)) + lgamma(k-alpha) - lgamma(1-alpha) # log(a_{dk}(theta)*(k+1)), k = 1,..,d; note: these are not the a's of Hofert, Maechler, McNeil (2012); see polyJ()
+                      l.a.k <- log(Stirling2.all(d)) + lgamma(k-alpha) - lgamma(1-alpha) # log(a_{dk}(theta)*(k+1)), k = 1,..,d; note: these are not the a's of Hofert, Maechler, McNeil (2013); see polyJ()
                       l.a.k. <- log(k-1) + l.a.k
                       B <- l.a.k. + (k-2) %*% t(lh_l1_h) # new: new l.a.k. and k-2 instead of k-1
                       ## the following part is taken from polyJ() (but only the log cases)

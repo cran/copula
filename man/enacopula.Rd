@@ -55,7 +55,7 @@ enacopula(u, cop,
     sample size for simulated maximum likelihood estimation.}
   \item{interval}{bivariate vector denoting the interval where
     optimization takes place.  The default is computed as described in
-    Hofert et al. (2011a).  Used for all methods except
+    Hofert et al. (2012).  Used for all methods except
     \code{"tau.tau.mean"} and \code{"tau.theta.mean"}.}
   \item{xargs}{list of additional arguments for the chosen estimation method.}
   \item{\dots}{additional arguments passed to \code{\link{optimize}}.}
@@ -66,7 +66,7 @@ enacopula(u, cop,
   them.  For more information, see the single estimators as given in the
   section \sQuote{See Also}.
 
-  Note that Hofert, \enc{Mächler}{Maechler}, and McNeil (2011a) compared these
+  Note that Hofert, \enc{Mächler}{Maechler}, and McNeil (2013) compared these
   estimators. Their findings include a rather poor performance and numerically
   challenging problems of some of these estimators. In particular, the
   estimators obtained by \code{method="mde.gamma.CvM"},
@@ -80,14 +80,17 @@ enacopula(u, cop,
 }
 \author{Marius Hofert, Martin Maechler.}
 \references{
-  Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2011a).
-  Estimators for Archimedean copulas in high dimensions: A comparison,
-  submitted.
-
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2012).
   Likelihood inference for Archimedean copulas in high dimensions
   under known margins. \emph{Journal of Multivariate Analysis}
   \bold{110}, 133--150.
+
+  Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2013).
+  Archimedean Copulas in High Dimensions: Estimators and Numerical
+  Challenges Motivated by Financial Applications.
+  \emph{Journal de la Soci\enc{é}{e}t\enc{é}{e} Fran\enc{ç}{c}aise de
+    Statistique}
+  \bold{154}(1), 25--63.
 }
 \seealso{
   \code{\link{emle}} which returns an object of \code{"\linkS4class{mle}"}

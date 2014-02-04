@@ -121,7 +121,7 @@ b.coeff <- function(t, cop)
 
     ## build b_k, k=d0,..,d
     n <- nrow(t)
-    b <- matrix(, nrow=n, ncol=d-d0+1)
+    b <- matrix(NA, nrow=n, ncol=d-d0+1)
     for(k in d0:d){ # compute b_k=b[,k-d0+1] (first arg = t)
         ind <- k-d0+1
         Q.k <- Q[[ind]] # pick out Q for this fixed k
@@ -161,8 +161,8 @@ nacLL <- function(cop, u)
     lcomp <- length(C@comp) # if > 0 there is a non-sectorial part
     d0 <- S+lcomp # dim(C_0)
     n <- nrow(u)
-    liPsiD1. <- matrix(, nrow=n, ncol=if(lcomp>0) S+1 else S) # n x S(+1) matrix of log(absdiPsi()); the "+1" comes from the non-sectorial part (if there is one)
-    eta0. <- matrix(, nrow=n, ncol=d0) # n x d_0 matrix containing C_s(u_s)'s and u_0's (if there is a non-sectorial part)
+    liPsiD1. <- matrix(NA, nrow=n, ncol=if(lcomp>0) S+1 else S) # n x S(+1) matrix of log(absdiPsi()); the "+1" comes from the non-sectorial part (if there is one)
+    eta0. <- matrix(NA, nrow=n, ncol=d0) # n x d_0 matrix containing C_s(u_s)'s and u_0's (if there is a non-sectorial part)
 
     ## walk over the non-sectorial part (if available)
     if(lcomp > 0){
@@ -173,7 +173,7 @@ nacLL <- function(cop, u)
     }
 
     ## now walk over all sectors
-    t. <- matrix(, nrow=n, ncol=S) # n x S matrix of t's
+    t. <- matrix(NA, nrow=n, ncol=S) # n x S matrix of t's
     for(s in 1:S){
         Cs <- C@childCops[[s]] # sector s copula list
         us <- u[, Cs@comp] # col-indices of u that belong to sector s

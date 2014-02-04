@@ -16,6 +16,15 @@
 
 useDynLib(copula, .registration=TRUE)
 
+## import all we need, but not more..
+importFrom("methods", ## incl generics for which we export new methods:
+	   coerce, show
+	   , callGeneric, as, is, extends, new
+	   , getClass, getClassDef, validObject
+	   , setClass, setClassUnion, setMethod, setOldClass
+	   , setValidity, slot, "slot<-"
+	   , signature, representation, prototype)
+
 ### Part I: Mainly former copula ###############################################
 
 importFrom("graphics", persp, contour)
@@ -26,6 +35,7 @@ importFrom("mvtnorm",
             dmvt, pmvt, rmvt)
 
 importFrom("Matrix", nearPD)
+## NB: "Dangerous" to not also depend on Matrix; as 'methods' for Matrixclasses are not seen.
 
 ## FIXME: we would only want importS3MethodsFrom("pspline", predict)
 import("pspline")
@@ -70,7 +80,7 @@ exportMethods(show)
 exportMethods(persp, contour)
 
 ## empirical copula
-export(Cn, C.n, dCn)
+export(F.n, C.n, dCn, Cn)# .Fn
 
 ## fitting copula
 export(loglikCopula, loglikMvdc)
@@ -111,6 +121,9 @@ S3method(coef, fittedMV)
 S3method(nobs, fittedMV)
 S3method(vcov, fittedMV)
 S3method(logLik, fittedMV)
+
+## pdf device
+export(dev.off.pdf)
 
 
 ##_TESTING_

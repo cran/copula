@@ -96,9 +96,9 @@ mL.tr <- c(-3558.5, -3734.4, -3299.5, -2505.)
 mLt1 <- sapply(th4, function(th) mLogL(th, cop@copula, U1, method="log.poly")) # default
 mLt2 <- sapply(th4, function(th) mLogL(th, cop@copula, U1, method="log1p"))
 mLt3 <- sapply(th4, function(th) mLogL(th, cop@copula, U1, method="poly"))
-stopifnot(all.equal(mLt1, mL.tr, tol=5e-5),
-          all.equal(mLt2, mL.tr, tol=5e-5),
-          all.equal(mLt3, mL.tr, tol=5e-5))
+stopifnot(all.equal(mLt1, mL.tr, tolerance=5e-5),
+          all.equal(mLt2, mL.tr, tolerance=5e-5),
+          all.equal(mLt3, mL.tr, tolerance=5e-5))
 
 system.time(r1l  <- curveLogL(cop, U1, c(1, 2.5), X=list(method="log.poly")))
 if(doExtras) {
@@ -117,8 +117,8 @@ summary(dCopula(U2, cop))
 ## hmm:  max = 5.5e177
 if(doExtras)
 system.time(r2 <- curveLogL(cop, U2, c(1, 2.5)))
-stopifnot(all.equal(enacopula(U2, cop, "mle"), 1.43992755, tol=1e-5),
-          all.equal(mLogL(1.8, cop@copula, U2), -4070.1953,tol=1e-5))# (was -Inf)
+stopifnot(all.equal(enacopula(U2, cop, "mle"), 1.43992755, tolerance=1e-5),
+          all.equal(mLogL(1.8, cop@copula, U2), -4070.1953,tolerance=1e-5))# (was -Inf)
 
 U3 <- rnacopula(n,cop)
 enacopula(U3, cop, "mle") # 1.4495
@@ -147,7 +147,7 @@ if(doExtras) # each curve takes almost 2 sec
 stopifnot(identical(setTheta(cop, 1.164), onacopula(cop@copula, C(1.164, 1:100))),
 	  all.equal(600.59577,
 		    cop@copula@dacopula(U4[118,,drop=FALSE],
-					theta=1.164, log = TRUE), tol=1e-5))## was "Inf"
+					theta=1.164, log = TRUE), tolerance=1e-5))## was "Inf"
 ## FIXME find a way to use dCopula(U4[118,], ......)
 ## this is *not* it :
 ## stopifnot(all.equal(600.59261959,
@@ -229,7 +229,7 @@ dput(ee.)# in case the following fails
 ##   c(2.47567251789004, 2.48424484287686, 2.50410767129408)
 ##   c(2.475672518,      2.484244763,      2.504107671),
 stopifnot(all.equal(ee., c(2.475672518, 2.484244763, 2.504107671),
-		    tol= max(1e-7, 16*tol)))
+		    tolerance= max(1e-7, 16*tol)))
 }
 
 ##--> Plots with "many" likelihood evaluations
@@ -241,8 +241,8 @@ system.time(r4.p <- sapply(th., mLogL, acop=cG.5@copula, u=U4, method="pois"))
 r4. <- c(0, -18375.33, -21948.033, -24294.995, -25775.502,
          -26562.609, -26772.767, -26490.809, -25781.224)
 stopifnot(!doExtras ||
-          all.equal(r4,   r4., tol = 8e-8),
-          all.equal(r4.p, r4., tol = 8e-8))
+          all.equal(r4,   r4., tolerance = 8e-8),
+          all.equal(r4.p, r4., tolerance = 8e-8))
 ##--> use fast method here as well:
 system.time(r5.p <- sapply(th., mLogL, acop=cG.5@copula, u=U5, method="pois"))
 system.time(r6.p <- sapply(th., mLogL, acop=cG.5@copula, u=U6, method="pois"))
@@ -275,12 +275,12 @@ if(doExtras)## with MC :
     system.time(f.mlMC <- emle(U., cop, n.MC = 1e4))## takes a while
     ## (7.5 sec on nb-mm3 2010)
 stopifnot(
-          all.equal(unname(coef(f.ML)), 18.03331, tol= 1e-6)
+          all.equal(unname(coef(f.ML)), 18.03331, tolerance= 1e-6)
 	  ,
-	  all.equal(f.ML@min, -314.0143, tol=1e-6)
+	  all.equal(f.ML@min, -314.0143, tolerance=1e-6)
 	  ,
 	  !doExtras || ## Simulate MLE (= SMLE) is "extra" random,  hmm...
-	  all.equal(unname(coef(f.mlMC)), 17.8, tol= 0.01)
+	  all.equal(unname(coef(f.mlMC)), 17.8, tolerance= 0.01)
 	  ##		   64-bit ubuntu: 17.817523
 	  ##		 ? 64-bit Mac:	  17.741
 	 )

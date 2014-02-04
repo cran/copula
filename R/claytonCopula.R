@@ -26,13 +26,24 @@ psiClayton <- function(copula, s) {
   (1 + s)^(-1/alpha)
 }
 
-claytonCopula <- function(param = NA_real_, dim = 2L) {
+claytonCopula <- function(param = NA_real_, dim = 2L,
+			  use.indepC = c("message", "TRUE", "FALSE")) {
   stopifnot(length(param) == 1)
+  if((dim <- as.integer(dim)) > 2 && !is.na(param) && param < 0)
+    stop("param can be negative only for dim = 2")
+  if(!is.na(param) && param == 0) {
+      use.indepC <- match.arg(use.indepC)
+      if(!identical(use.indepC, "FALSE")) {
+	  if(identical(use.indepC, "message"))
+	      message("parameter at boundary ==> returning indepCopula()")
+	  return( indepCopula(dim=dim) )
+      }
+  }
   ## get expressions of cdf and pdf
   cdfExpr <- function(n) {
     expr <- "u1^(-alpha) - 1"
     for (i in 2:n) {
-      cur <- paste( "u", i, "^(-alpha) - 1", sep = "")
+      cur <- paste0("u", i, "^(-alpha) - 1")
       expr <- paste(expr, cur, sep=" + ")
     }
     expr <- paste("(1 + (", expr, "))^ (-1/alpha)")
@@ -42,13 +53,11 @@ claytonCopula <- function(param = NA_real_, dim = 2L) {
   pdfExpr <- function(cdf, n) {
     val <- cdf
     for (i in 1:n) {
-      val <- D(val, paste("u", i, sep=""))
+      val <- D(val, paste0("u", i))
     }
     val
   }
 
-  if((dim <- as.integer(dim)) > 2 && !is.na(param) && param < 0)
-    stop("param can be negative only for dim = 2")
   cdf <- cdfExpr(dim)
   pdf <- if (dim <= 6) pdfExpr(cdf, dim) # else NULL
   new("claytonCopula",
@@ -97,7 +106,7 @@ pclaytonCopula <- function(copula, u) {
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (apply(u, 1, prod))
   cdf <- copula@exprdist$cdf
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  for (i in 1:dim) assign(paste0("u", i), u[,i])
   pmax(eval(cdf), 0)
 }
 
@@ -108,7 +117,7 @@ dclaytonCopula <- function(copula, u, ...) {
   ## if(!is.matrix(u)) u <- matrix(u, ncol = dim)
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  for (i in 1:dim) assign(paste0("u", i), u[,i])
   val <- c(eval(copula@exprdist$pdf))
   ## val[apply(u, 1, function(v) any(v < 0))] <- 0
   ## val[apply(u, 1, function(v) any(v > 1))] <- 0
@@ -125,7 +134,7 @@ dclaytonCopula.pdf <- function(u, copula, log=FALSE) {
   if (dim > 10) stop("Clayton copula PDF not implemented for dimension > 10.")
   ## if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   stopifnot(!is.null(d <- ncol(u)), dim == d)
-  for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
+  for (i in 1:dim) assign(paste0("u", i), u[,i])
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9)
     return(rep.int(if(log) 0 else 1, nrow(u)))
@@ -213,13 +222,13 @@ pMatClayton <- function (u, copula, ...) {
         pacopula(u, copClayton, theta=copula@parameters, ...)
 }
 
-dMatClayton <- function (u, copula, log = FALSE, ...) {
+dMatClayton <- function (u, copula, log = FALSE, checkPar=TRUE, ...) {
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
     th <- copula@parameters
     if(d == 2 && !copClayton@paraConstr(th)) # for now, .. to support negative tau
         dclaytonCopula.pdf(u, copula, log=log)
     else
-        copClayton@dacopula(u, theta=copula@parameters, log=log, ...)
+        copClayton@dacopula(u, theta=copula@parameters, log=log, checkPar=checkPar, ...)
 }
 
 setMethod("rCopula", signature("numeric", "claytonCopula"), rclaytonCopula)

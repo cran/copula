@@ -14,16 +14,17 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 ##' @title Check if function 'fun' is like pcopula or like pCopula
-##' @param fun function such as pCopula, dcopula, ..
-##' @return logical: TRUE if "like pCopula"
+##' @param fun function such as pCopula, dcopula _or_ F.n()
+##' @return logical: TRUE if "like pCopula" _or_ F.n()
 ##' @author Martin Maechler
 chkFun <- function(fun) {
     stopifnot(is.function(fun))
-    isObj <- function(nm) any(nm == c("copula","mvdc"))
+    isObj <- function(nm) any(nm == c("copula", "mvdc")) ## [pdq][Cc]opula
     nf <- names(formals(fun))
-    if(isObj(nf[2])) TRUE
+    if(isObj(nf[2]) || nf[1:2] == c("x","X")) ## || is F.n() 
+        TRUE
     else if(isObj(nf[1])) FALSE
-    else NA # and the caller will get an error eventually
+    else NA # and the caller will produce an error eventually
 }
 
 
@@ -80,6 +81,15 @@ setMethod("contour", signature("indepCopula"), contourCopula)
 ## all other copulas:
 setMethod("persp", signature("copula"), perspCopula)
 setMethod("contour", signature("copula"), contourCopula)
+
+## F.n(), C.n():
+## setMethod("persp", signature("mvFn"),
+##           function(x, ...) {
+##               perspCopula(x, F.n, ...)
+##               warning("persp(<mvFn>, ..)  implementation unfinished;
+##  contact maintainer(\"copula\")") ## FIXME : use trans3d() to add data; *or*
+##               ## ensure seeing vertical jumps, by using {x_i-eps, x_i+eps} or ..
+##           })
 
 setMethod("persp", signature("mvdc"), perspMvdc)
 setMethod("contour", signature("mvdc"), contourMvdc)
@@ -196,6 +206,8 @@ splom2 <- function(data, varnames=NULL, Vname="U", xlab="",
 ##' @title Q-Q plot with rugs and pointwise asymptotic confidence intervals
 ##' @param x data (n-vector)
 ##' @param qF theoretical quantile function
+##' @param log character string indicating whether log-scale should be used; see
+##'        ?plot.default
 ##' @param qqline.args argument list passed to qqline(); use NULL to omit Q-Q line
 ##' @param rug.args argument list passed to rug(); use NULL to omit rugs
 ##' @param alpha significance level
@@ -207,11 +219,21 @@ splom2 <- function(data, varnames=NULL, Vname="U", xlab="",
 ##'        to omit title
 ##' @param xlab x axis label
 ##' @param ylab y axis label
+##' @param doPDF logical indicating whether plotting is to pdf
+##' @param file file name (with extension .pdf)
+##' @param width width parameter of pdf()
+##' @param height height parameter of pdf()
+##' @param crop crop command
+##'        - NULL: crop with a (Unix-)suitable default commands;
+##'        - "...": own crop command;
+##'        - "": no cropping
 ##' @param ... additional arguments passed to plot()
 ##' @return Q-Q plot
 ##' @author Marius Hofert
-##' Note: used in Genest, Hofert, Neslehova (2013)
-qqplot2 <- function(x, qF, qqline.args=list(distribution=qF),
+##' Note: - used in Genest, Hofert, Neslehova (2013)
+##'       - better than pointwise asymptotic CIs would be (non-parametric)
+##'         bootstrapped ones
+qqplot2 <- function(x, qF, log="", qqline.args=if(log=="x" || log=="y") list(untf=TRUE) else list(),
                     rug.args=list(tcl=-0.6*par("tcl")),
                     alpha=0.05, CI.args=list(col="gray50"),
                     CI.mtext=list(text=paste0("Pointwise asymptotic ", 100*(1-alpha),
@@ -220,20 +242,31 @@ qqplot2 <- function(x, qF, qqline.args=list(distribution=qF),
                     main.args=list(text=expression(bold(italic(F)~~"Q-Q plot")),
                                    side=3, line=1.1, cex=par("cex.main"), font=par("font.main"),
                                    adj=par("adj"), xpd=NA),
-                    xlab="Theoretical quantiles", ylab="Sample quantiles", ...)
+                    xlab="Theoretical quantiles", ylab="Sample quantiles",
+                    doPDF=FALSE, file="Rplots.pdf", width=6, height=6, crop=NULL, ...)
 {
     x. <- sort(x) # drops NA
     n <- length(x.)
     p <- ppoints(n)
     q <- qF(p)
     ## plot points
-    plot(q, x., xlab=xlab, ylab=ylab, ...) # empirical vs. theoretical quantiles
+    if(doPDF) pdf(file=file, width=width, height=height)
+    plot(q, x., xlab=xlab, ylab=ylab, log=log, ...) # empirical vs. theoretical quantiles
     do.call(mtext, main.args)
     ## plot the line (overplots points, but that's good for the eye!)
     if(!is.null(qqline.args))
-        ## draw the line (through the first and third quartile; see ??qqline)
-        ## note: abline(a=0, b=1) only true if data is standardized (mu=0, sig2=1)
-        do.call(qqline, c(list(y=x.), qqline.args))
+        if(nchar(log)==1 && (is.null(untf <- qqline.args$untf) || !untf))
+            warning("for a Q-Q line in x-log- or y-log-scale, specify 'untf = TRUE' in qqline.args")
+    ## draw the line (through the first and third quartile; see ?qqline)
+    ## note: - abline(a=0, b=1) only true if data is standardized (mu=0, sig2=1)
+    ##       - abline(..., untf=TRUE) displays a curve (proper line in log-space)
+    ##         *unless* both axes are in log-scale
+        else {
+            if(log=="xy") do.call(qqline, args=c(list(y=log10(x.),
+                                                 distribution=function(p) log10(qF(p))),
+                                          qqline.args))
+            else do.call(qqline, args=c(list(y=x., distribution=qF), qqline.args))
+        }
     ## rugs
     if(!is.null(rug.args)) {
         do.call(rug, c(list(q, side=1), rug.args))
@@ -267,6 +300,6 @@ qqplot2 <- function(x, qF, qqline.args=list(distribution=qF),
         ## info
         if(!is.null(CI.mtext)) do.call(mtext, CI.mtext)
     }
-    ## return
+    if(doPDF) dev.off.pdf(file=file)
     invisible()
 }

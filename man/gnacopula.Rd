@@ -75,7 +75,7 @@ gnacopula(u, cop, n.bootstrap,
   statistic, it is theoretically not clear whether the parametric bootstrap
   converges.  Consequently, the results obtained should be treated with
   care.  Moreover, several estimation methods are known to be prone to
-  numerical errors (see Hofert et al. (2011a)) and are thus not
+  numerical errors (see Hofert et al. (2013)) and are thus not
   recommended to be used in the parametric bootstrap. A warning is given if
   \code{gnacopula()} is called with a method not being MLE.
 }

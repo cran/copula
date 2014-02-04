@@ -17,18 +17,9 @@
 require(copula)
 source(system.file("Rsource", "tstFit-fn.R", package="copula", mustWork=TRUE))
 source(system.file("Rsource", "utils.R",     package="copula", mustWork=TRUE))
-##-> assertError()
+##-> assertError(), ... showProc.time()
 
 (doExtras <- copula:::doExtras())
-
-## From source(system.file("test-tools-1.R", package = "Matrix")) :
-showProc.time <- local({
-    pct <- proc.time()
-    function() { ## CPU elapsed __since last called__
-	ot <- pct ; pct <<- proc.time()
-	cat('Time elapsed: ', (pct - ot)[1:3],'\n')
-    }
-})
 
 
 uu <- array(c(9, 7, 8, 3, 2,   4, 1, 5, 6, 10,
@@ -58,8 +49,8 @@ tC3f <- tCopula(c(.2,.7, .8), dim=3, dispstr="un", df.fixed=TRUE)
 print(f3 <- fitCopula(tC3f, u3, method="itau"))
 
 tC3 <- tCopula(c(.2,.7, .8), dim=3, dispstr="un")
-	 (f3.t <- fitCopula(tC3, u3, method="itau"))
-	 (f3.r <- fitCopula(tC3, u3, method="irho"))
+(f3.t <- fitCopula(tC3, u3, method="itau"))
+(f3.r <- fitCopula(tC3, u3, method="irho"))
 if(doExtras) {
     print(f3.m <- fitCopula(tC3, u3, method=  "ml"))
     print(f3.M <- fitCopula(tC3, u3, method= "mpl"))
@@ -126,6 +117,43 @@ assertError(
 
 showProc.time()
 
+## An example which fails (and should)? --
+## From: Suzanne Li  @...queensu.ca, Date: Fri, 9 Aug 2013
+gumbel <- archmCopula(family = "gumbel",dim = 2)
+
+set.seed(47)# MM {not important, but still want sure reproducibility}
+u <- cbind(runif(10),runif(10))
+## this now (newly) gives an error:
+assertError(fgu <- fitCopula(gumbel, u, method = "ml"))
+copGumbel@paraInterval # -> [1, Inf) = exp([0, Inf))
+par <- 2^c((0:32)/16, 2+(1:10)/8)
+llg <- sapply(par, function(p) loglikCopula(param=p, u, gumbel))
+if(dev.interactive()) plot(par, llg, type="b", col=2)
+stopifnot(diff(llg) < 0) # so the maximum is for par = 2^0 = 1
+## is it just this problem?
+## well, the likelihood was not ok for large param=theta; now is:
+lrgP <- 100*seq(8, 100, by = 3)
+llrg <- vapply(lrgP, function(P) loglikCopula(param = P, u, gumbel), NA_real_)
+stopifnot(is.finite(llrg), diff(llrg) < 0, llrg < -11990)## no longer NaN
+
+## Now is it because we *really* should use  elme()  and the "nacopula" families?
+## No, this fails too: "outside interval" error {instead of just -Inf !}:
+(copG <- onacopulaL("Gumbel", list(NaN,1:2)))
+## Estimation -> error for now:
+try(efm <- emle(u, copG))
+
+
+## A simple example with *negative* correlation;
+## Want *more helpful* error message here:
+set.seed(7)
+u1 <- seq(0,1, by=1/128)[2:127]; u2 <- -u1 + round(rnorm(u1)/4,2); u <- pobs(cbind(u1,u2))
+plot(u)
+msg <- tryCatch(fitCopula(gumbelCopula(), data = u), error=function(e)e$message)
+## check error message __FIXME__ want "negative correlation not possible"
+## or NO ERROR and a best fit to tau=0 [and the same for other Archimedean families!]
+
+
+
 if(!doExtras && !interactive()) q(save="no") ## so the following auto prints
 ##--------------------------------------------------------------------------
 
@@ -175,7 +203,7 @@ ffc <- fitCopula(fc, u) ## (failed in 0.999-4 {param constraints})
 ffc
 summary(ffc)
 stopifnot(all.equal(unname(coef(ffc)),
-                    2.866564929, tol = 1e-5))
+                    2.866564929, tolerance = 1e-5))
 
 showProc.time()
 

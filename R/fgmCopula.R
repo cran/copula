@@ -41,15 +41,15 @@ fgmCopula <- function(param = NA_real_, dim = 2L) {
 
         expr1 <- "u1"
         for (i in 2:n)
-            expr1 <- paste(expr1, " * u", i, sep="")
+            expr1 <- paste0(expr1, " * u", i)
 
         expr2 <- "1"
         for (i in (dim + 2):2^dim)
         {
-            expr3 <- paste("alpha",i,sep="")
+            expr3 <- paste0("alpha",i)
             sub <- substr(sc[i],2,nchar(sc[i])-1)
             for (j in eval(strsplit(sub,",")[[1]]))
-                expr3 <- paste(expr3, " * (1 - u", j, ")", sep="")
+                expr3 <- paste0(expr3, " * (1 - u", j, ")")
             expr2 <- paste(expr2,"+",expr3)
         }
 
@@ -62,10 +62,10 @@ fgmCopula <- function(param = NA_real_, dim = 2L) {
         expr2 <- "1"
         for (i in (dim + 2):2^dim)
         {
-            expr3 <- paste("alpha",i,sep="")
+            expr3 <- paste0("alpha",i)
             sub <- substr(sc[i],2,nchar(sc[i])-1)
             for (j in eval(strsplit(sub,",")[[1]]))
-                expr3 <- paste(expr3, " * (1 - 2 * u", j, ")", sep="")
+                expr3 <- paste0(expr3, " * (1 - 2 * u", j, ")")
             expr2 <- paste(expr2,"+",expr3)
         }
         parse(text = expr2)
@@ -79,7 +79,7 @@ fgmCopula <- function(param = NA_real_, dim = 2L) {
                dimension = dim,
                parameters = param,
                exprdist = c(cdf = cdf, pdf = pdf),
-               param.names = paste("param",subsets.char[(dim+2):2^dim],sep=""),
+               param.names = paste0("param",subsets.char[(dim+2):2^dim]),
                param.lowbnd = rep(-1, 2^dim - dim - 1),
                param.upbnd = rep(1, 2^dim - dim - 1),
                fullname = "Farlie-Gumbel-Morgenstern copula family")
@@ -111,8 +111,8 @@ pfgmCopula <- function(u, copula) {
     dim <- copula@dimension
     param <- copula@parameters
     cdf <- copula@exprdist$cdf
-    for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
-    for (i in (dim + 2):2^dim) assign(paste("alpha", i, sep=""), param[i - dim - 1])
+    for (i in 1:dim) assign(paste0("u", i), u[,i])
+    for (i in (dim + 2):2^dim) assign(paste0("alpha", i), param[i - dim - 1])
     eval(cdf)
 }
 
@@ -125,8 +125,8 @@ dfgmCopula <- function(u, copula, log=FALSE, ...) {
     dim <- copula@dimension
     param <- copula@parameters
     pdf <- copula@exprdist$pdf
-    for (i in 1:dim) assign(paste("u", i, sep=""), u[,i])
-    for (i in (dim + 2):2^dim) assign(paste("alpha", i, sep=""), param[i - dim - 1])
+    for (i in 1:dim) assign(paste0("u", i), u[,i])
+    for (i in (dim + 2):2^dim) assign(paste0("alpha", i), param[i - dim - 1])
     ## FIXME: improve log-case
     if(log) log(eval(pdf)) else eval(pdf)
 }

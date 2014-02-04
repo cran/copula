@@ -347,9 +347,9 @@ tstCop(myFrank, 5.736283, thetavec)
 ## with a slightly more extensive test:
 tau.th <- c(0.055417, 0.11002, 0.21389, 0.4567, 0.66578)
 tau.F <- myFrank@tau(thetavec)
-stopifnot(all.equal(tau.th, tau.F, tol = 0.0001),
+stopifnot(all.equal(tau.th, tau.F, tolerance = 0.0001),
           all.equal(.9999, copFrank@tau(copFrank@iTau(0.9999))),
-          all.equal(myFrank@iTau(tau.F, tol = 1e-14), thetavec, tol=1e-11))
+	  all.equal(myFrank@iTau(tau.F, tol = 1e-14), thetavec, tolerance=1e-11))
 
 
 ### copGumbel ##################################################################

@@ -14,16 +14,15 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-### Note:
-### - Random number generation (RNG) for Archimedean-Simplex copulas, Liouville
-###   copulas, and Archimedean-Liouville copulas
-### - based on code of Alexander J. McNeil
+## Note:
+## - Random number generation (RNG) for simplex Archimedean copulas, Liouville
+##   copulas, and Archimedean-Liouville copulas
+## - Kendall's tau + inverse for simplex Archimedean copulas
+## - Partly based on code from Alexander J. McNeil
+
 
 ### RNG for several ingredient distributions ###################################
 
-##' Generating vectors of random variates from a d-dimensional simplex
-##' distribution
-##'
 ##' @title Generating vectors of random variates from a d-dimensional simplex
 ##'        distribution
 ##' @param n sample size
@@ -37,13 +36,10 @@ rSimplex <- function(n, d) {
     E/matrix(rowSums(E), nrow=n, ncol=d)
 }
 
-##' Generating vectors of random variates from a d-dimensional simplex
-##' distribution
-##'
 ##' @title Generating vectors of random variates from a d-dimensional simplex
 ##'        distribution
 ##' @param n sample size
-##' @param alpha  numeric positive vector of length d
+##' @param alpha vector of alphas for the Dirichlet distribution (positive integers)
 ##' @return (n, d) matrix
 ##' @author Marius Hofert
 rDirichlet <- function(n, alpha) {
@@ -69,8 +65,6 @@ rGPD <- function(n, xi, beta) {
     if(any(is0)) -beta*log1p(-u) else (beta/xi)*((1-u)^(-xi)-1)
 }
 
-##' Generating random variates from a Pareto distribution on [1,Inf)
-##'
 ##' @title Generating random variates from a Pareto distribution on [1,Inf)
 ##' @param n sample size
 ##' @return n random variates
@@ -78,35 +72,76 @@ rGPD <- function(n, xi, beta) {
 rPareto <- function(n, kappa) (1-runif(n))^(-1/kappa)
 
 
-### RNG for Archimedean-Simplex copulas ########################################
+### Kendall's tau + inverse for simplex Archimedean copulas ####################
 
-## auxiliary function for g()
-lg <- function(a, x, z){
-    res <- numeric(length(x))
+##' @title Multivariate Kendall's tau for Simplex ACs
+##' @param theta parameter
+##' @param d dimension
+##' @param Rdist distribution of the radial part
+##' @param ... additional arguments passed to integrate()
+##' @return Kendall's tau
+##' @author Marius Hofert
+##' @note *Multivariate* Kendall's tau according to Joe (1990)
+tauACsimplex <- function(theta, d=2, Rdist=c("Gamma", "IGamma"), ...) {
+    Rdist <- match.arg(Rdist)
+    switch(Rdist,
+           "Gamma" = {
+               integrand <- function(y, d, th) (1-y)^(d-1) * y^(th-1) * (1+y)^(-2*th)
+               ## note: numerically critical for small theta (large tau) or large theta
+               Int <- integrate(integrand, lower=0, upper=1, d=d, th=theta)$value / beta(theta, theta)
+               ## tau
+               (2^d * Int - 1) / (2^(d-1) - 1)
+           },
+           "IGamma" =, "Pareto" =, "IPareto" = {
+               stop("Not implemented yet; see McNeil, Neslehova (2010) for formulas")
+           },
+           stop("Not implemented yet"))
+}
+
+##' @title Inverse Multivariate Kendall's tau for Simplex Archimedean Copulas
+##' @param tau Kendall's tau
+##' @param d dimension
+##' @param Rdist distribution of the radial part
+##' @param interval theta-interval for uniroot()
+##' @param ... additional arguments passed to uniroot()
+##' @return theta such that tau(theta) = tau
+##' @author Marius Hofert
+##' @note non-critical numerical interval: c(1e-3, 1e2)
+iTauACsimplex <- function(tau, d=2, Rdist=c("Gamma", "IGamma"), interval, ...)
+    uniroot(function(th) tauACsimplex(th, d=d, Rdist=Rdist) - tau,
+            interval=interval, ...)$root
+
+
+### RNG for simplex Archimedean copulas ########################################
+
+## auxiliary function for g():
+## compute log(Gamma(a, x)), a in IR, x >= 0
+## note: pgamma(x, a, lower=FALSE, log.p=TRUE) + lgamma(a) only works for a > 0
+lg <- function(a, x) # vectorized in x
+{
+    stopifnot(x >= 0, length(a) == 1)
+    n <- length(x)
+    res <- numeric(n)
     i0 <- x==0
-    res[i0] <- lgamma(z)
-    res[!i0] <- log(gsl:::gamma_inc(a, x[!i0]))
+    if(any(i0)) res[i0]   <- lgamma(a)
+    if(any(!i0)) res[!i0] <- log(gsl:::gamma_inc(a, x[!i0])) # if x>0 log(int_x^Inf t^(a-1)exp(-t)dt); no 'proper' log() exists
     res
 }
 
-## function g_{alpha, d, theta}(t) from Example 9 of McNeil, Neslehova (2010)
-## with k ~> d and x ~> t
-g <- function(t, alpha, d, theta){
-    lt <- length(t)
-    k <- 1:d
-    arg <- k-alpha+theta
-    ## use gsl's upper incomplete gamma function (pgamma-construction
-    ## via uiGamma <- function(a, x) pgamma(x, a, lower=FALSE) * gamma(a)
-    ## fails here)
-    lgam <- sapply(arg, function(a) lg(a, x=t, z=d+theta-alpha)) # (length(t), length(k))-matrix
-    lc <- lchoose(d-1, k-1)
-    coeff <- exp(rep(lc, each=lt) + lgam - lgamma(theta))
-    x <- outer(-t, d-k, FUN="^") # (length(t), length(k))-matrix
-    rowSums(coeff*x)
+## function from Example 9 of McNeil, Neslehova (2010) with k ~> d, n ~> k:
+## g_{alpha, d, theta}(x) = sum_{k=1}^d (-x)^(d-k) \binom{d-1}{k-1} Gamma(k+theta-alpha, x)/Gamma(theta)
+g <- function(x, alpha, d, theta){
+    n <- length(x)
+    k <- seq_len(d)
+    sgns <- (-1)^(d-k) # d-vector
+    ## remaining part: in log-scale
+    lx <- outer(log(x), d-k) # (n, d)-matrix
+    lc <- lchoose(d-1, k-1) # d-vector
+    lgam <- sapply(k+theta-alpha, function(a) lg(a, x=x)) # (n, d)-matrix
+    x.coeff <- exp(rep(lc, each=n) + lx + lgam - lgamma(theta)) # (n, d)-matrix
+    rowSums(rep(sgns, each=n)*x.coeff)
 }
 
-##' Williamson d-transforms
-##'
 ##' @title Williamson d-transforms
 ##' @param t argument t>=0, a vector
 ##' @param d "dimension" d
@@ -120,7 +155,12 @@ psiW <- function(t, d, theta, Rdist=c("Gamma", "IGamma", "Pareto", "IPareto"))
     Rdist <- match.arg(Rdist)
     switch(Rdist,
            "Gamma"={ # see Example 1 in McNeil, Neslehova (2010)
-               g(t, alpha=d, d=d, theta=theta)
+               n <- length(t)
+               res <- numeric(n)
+               i0 <- t==0
+               if(any(i0))  res[i0]  <- 1
+               if(any(!i0)) res[!i0] <- g(t[!i0], alpha=d, d=d, theta=theta)
+               res
            },
            "IGamma"={ # see Example 2 in McNeil, Neslehova (2010)
                k <- 1:d
@@ -151,14 +191,11 @@ psiW <- function(t, d, theta, Rdist=c("Gamma", "IGamma", "Pareto", "IPareto"))
            stop("wrong Rdist"))
 }
 
-##' Generating vectors of random variates from a d-dimensional Archimedean-Simplex
-##' distribution
-##'
-##' @title Generating vectors of random variates from a d-dimensional Archimedean-Simplex
+##' @title Generating vectors of random variates from a d-dimensional simplex Archimedean
 ##'        distribution
 ##' @param n sample size
 ##' @param d dimension
-##' @param theta parameter theta
+##' @param theta parameter
 ##' @param Rdist distribution of the radial part
 ##' @return (n, d) matrix
 ##' @author Marius Hofert
@@ -169,24 +206,79 @@ rACsimplex <- function(n, d, theta, Rdist=c("Gamma", "IGamma", "Pareto", "IParet
               length(theta)==1, theta>0) # might have to be adjusted if other families are added
     Rdist <- match.arg(Rdist)
     R <- switch(Rdist,
-                "Gamma"=rgamma(n, theta),
-                "IGamma"=1/rgamma(n, theta),
-                "Pareto"=rPareto(n, theta),
-                "IPareto"=1/rPareto(n, theta),
+                "Gamma" = rgamma(n, theta),
+                "IGamma" = 1/rgamma(n, theta),
+                "Pareto" = rPareto(n, theta),
+                "IPareto" = 1/rPareto(n, theta),
                 stop("wrong Rdist"))
     S <- rSimplex(n, d=d)
     apply(R*S, 2, function(t) psiW(t, d=d, theta=theta, Rdist=Rdist))
 }
 
 
+### Kendall's tau + inverse for Liouville copulas ##############################
+
+##' @title Kendall's tau for Liouville copulas
+##' @param theta parameter (for Rdist)
+##' @param alpha vector of alphas for the Dirichlet distribution (positive integers)
+##' @param Rdist distribution of the radial part
+##' @param n.MC Monte Carlo sample size
+##' @return Kendall's tau
+##' @author Marius Hofert
+##' @note See Proposition 5 of McNeil, Neslehova (2010)
+tauLiouville <- function(theta, alpha, Rdist="Gamma", n.MC=1e4) {
+    stopifnot(alpha == as.integer(alpha), alpha >= 1, length(alpha) == 2)
+    Rdist <- match.arg(Rdist)
+    Y <- switch(Rdist,
+                "Gamma" = {
+                    R  <- rgamma(n.MC, theta)
+                    R. <- rgamma(n.MC, theta)
+                    R/R.
+                },
+                stop("Not implemented yet"))
+    asum <- sum(alpha)
+    ## EY1Y
+    lEY1Y <- numeric(asum-1) # at least length 1
+    for(l in seq_len(asum-1)) lEY1Y[l] <- log(mean(Y^(l-1) * pmax(1-Y, 0)^(asum-l)))
+    ## compute the double sum (use index shift here)
+    a1 <- alpha[1]
+    a2 <- alpha[2]
+    lga <- lgamma(asum)
+    lb <- lbeta(a1, a2)
+    S <- 0
+    for(i in seq_len(a1)) {
+        for(j in seq_len(a2)) {
+            k <- i+j
+            lfctr <- lbeta(a1+i-1, a2+j-1) + lga - lb - lfactorial(i-1) -
+                lfactorial(j-1) - lgamma(asum-k+2)
+            S <- S + exp(lfctr + lEY1Y[k-1]) # could be done more intelligently
+        }
+    }
+    ## tau
+    4*S-1
+}
+
+##' @title Inverse Kendall's tau for Liouville copulas
+##' @param tau Kendall's tau
+##' @param alpha vector of alphas for the Dirichlet distribution (positive integers)
+##' @param Rdist distribution of the radial part
+##' @param n.MC Monte Carlo sample size
+##' @param interval theta-interval for uniroot()
+##' @param tol tolerance for uniroot()
+##' @param ... additional arguments passed to uniroot()
+##' @return theta such that tau(theta) = tau
+##' @author Marius Hofert
+iTauLiouville <- function(tau, alpha, Rdist="Gamma", n.MC=1e4, interval, tol=1e-4, ...)
+    uniroot(function(th) tauLiouville(th, alpha=alpha, Rdist=Rdist, n.MC=n.MC) - tau,
+            interval=interval, tol=tol, ...)$root
+
+
 ### RNG for Liouville copulas (with given frailty distribution) ################
 
-##' Marginal survival function of Liouville distributions
-##'
 ##' @title Marginal survival function of Liouville distributions
 ##' @param x numeric vector
 ##' @param j index of the marginal
-##' @param alpha vector of alphas for the Dirichlet distribution
+##' @param alpha vector of alphas for the Dirichlet distribution (positive integers)
 ##' @param theta parameter theta
 ##' @param Rdist distribution of the radial part
 ##' @return vector of length as x
@@ -196,24 +288,25 @@ HbarL <- function(x, j, alpha, theta, Rdist=c("Gamma", "IGamma", "Clayton"))
     stopifnot(x>=0, alpha==as.integer(alpha), (d <- length(alpha))>=1,
               j==as.integer(j), length(j)==1, 1<=j, j<=d)
     Rdist <- match.arg(Rdist)
-    switch(Rdist,
+    switch(Rdist, # general formula: after Theorem 2 in McNeil, Neslehova (2010)
            "Gamma"={ # see Example 9 in McNeil, Neslehova (2010)
-               aj <- alpha[j]
+               ## bar(H)_j(x) = sum_{k=1}^{alpha_j} \binom{alpha-1}{k-1} x^{k-1} g_{alpha, alpha-k+1, theta}(x)
                asum <- sum(alpha)
-               k <- 1:aj
-               c. <- choose(asum-1, k-1) # length(k) = aj
-               g. <- sapply(asum-k+1, function(d) g(x, alpha=asum, d=d, theta=theta))
-               x. <- outer(x, k-1, FUN="^") # (length(x), length(k))-matrix
-               rowSums(rep(c., each=length(x))*g.*x.)
+               aj <- alpha[j]
+               k <- seq_len(aj)
+               c. <- choose(asum-1, k-1) # aj-vector
+               x. <- outer(x, k-1, FUN="^") # (length(x), aj)-matrix
+               g. <- sapply(asum-k+1, function(d.) g(x, alpha=asum, d=d., theta=theta)) # (length(x), aj)-matrix
+               rowSums(rep(c., each=length(x))*x.*g.)
            },
            "IGamma"={ # see Example 10 in McNeil, Neslehova (2010)
-               aj <- alpha[j]
                asum <- sum(alpha)
+               aj <- alpha[j]
                k <- 1:aj
                c. <- choose(asum-1, k-1)
+               x. <- outer(x, k-1, FUN="^") # (length(x), length(k))-matrix
                g. <- exp(lgamma(theta+k-1)-lgamma(theta))
                p. <- sapply(k-1, function(k.) psiW(x, d=asum-k., theta=theta+k., Rdist=Rdist))
-               x. <- outer(x, k-1, FUN="^") # (length(x), length(k))-matrix
                rowSums(rep(c.*g., each=length(x))*p.*x.)
            },
            "Clayton"={ # note: we use the simplified generator (!)
@@ -226,15 +319,14 @@ HbarL <- function(x, j, alpha, theta, Rdist=c("Gamma", "IGamma", "Clayton"))
            stop("wrong Rdist"))
 }
 
-##' Generating vectors of random variates from a Liouville copula
-##'
 ##' @title Generating vectors of random variates from a Liouville copula
 ##' @param n sample size
-##' @param alpha vector of alphas for the Dirichlet distribution
+##' @param alpha vector of alphas for the Dirichlet distribution (positive integers)
 ##' @param theta parameter theta
 ##' @param Rdist distribution of the radial part
 ##' @return (n, d=length(alpha)) matrix
 ##' @author Marius Hofert
+##' @note See, for example, Example 9 and 10 in McNeil, Neslehova (2010)
 rLiouville <- function(n, alpha, theta, Rdist=c("Gamma", "IGamma"))
 {
     stopifnot(n==as.integer(n), length(n)==1, n>=0,
@@ -245,24 +337,24 @@ rLiouville <- function(n, alpha, theta, Rdist=c("Gamma", "IGamma"))
                 "Gamma"=rgamma(n, theta),
                 "IGamma"=1/rgamma(n, theta),
                 stop("wrong Rdist"))
-    D <- rDirichlet(n, alpha=alpha)
-    X <- R*D
-    sapply(1:d, function(j) HbarL(X[,j], j=j, alpha=alpha, theta=theta, Rdist=Rdist))
+    D <- rDirichlet(n, alpha=alpha) # (n,d)
+    X <- R*D # (n,d)
+    sapply(1:d, function(j) HbarL(X[,j], j=j, alpha=alpha, theta=theta,
+                                  Rdist=Rdist))
 }
 
 
 ### RNG for Archimedean-Liouville copulas ######################################
 ### (with frailty distribution given by Williamson trafos) #####################
 
-##' Generating vectors of random variates from an Archimedean-Liouville copula
-##'
 ##' @title Generating vectors of random variates from an Archimedean-Liouville copula
 ##' @param n sample size
-##' @param alpha vector of alphas for the Dirichlet distribution
+##' @param alpha vector of alphas for the Dirichlet distribution (positive integers)
 ##' @param theta parameter theta
 ##' @param family Archimedean family
 ##' @return (n, d=length(alpha)) matrix
 ##' @author Marius Hofert
+##' @note See, for example, Example 11 in McNeil, Neslehova (2010)
 rACLiouville <- function(n, alpha, theta, family=c("Clayton")){
     stopifnot(theta>=-1/((asum <- sum(alpha))-1),
               alpha==as.integer(alpha))
@@ -272,10 +364,7 @@ rACLiouville <- function(n, alpha, theta, family=c("Clayton")){
     cop <- getAcop(family)
     V0 <- cop@V0(n, theta=theta)
     E <- matrix(rexp(n*asum), nrow=n, ncol=asum)
-    ## deprecated code to transform to the non-simplified generator (for Clayton)
-    ## U <- cop@psi(E/V0, theta=theta)
-    ## X. <- (U^(-theta)-1)/theta
-    X. <- E/V0
+    X. <- E/V0 # psi^{-1}(U)
     ca <- c(0, cumsum(alpha))
     X <- sapply(2:length(ca), function(i)
                 rowSums(X.[,(ca[i-1]+1):ca[i], drop=FALSE]))

@@ -74,7 +74,7 @@ signFF <- function(alpha, j, d) {
 
 ##' Properly compute log(x_1 + .. + x_n) for a given (n x d)-matrix of n row
 ##' vectors log(x_1),..,log(x_n) (each of dimension d)
-##'
+##' Here, x_i > 0  for all i
 ##' @title Properly compute the logarithm of a sum
 ##' @param lx (n,d)-matrix containing the row vectors log(x_1),..,log(x_n)
 ##'        each of dimension d
@@ -86,7 +86,7 @@ signFF <- function(alpha, j, d) {
 ##'         = log(x_max) + log(sum(exp(log(x)-log(x_max)))))
 ##'         = lx.max + log(sum(exp(lx-lx.max)))
 ##'         => VECTOR OF DIMENSION d
-##' @author Marius Hofert (implementation), Martin Maechler (concept)
+##' @author Marius Hofert, Martin Maechler
 lsum <- function(lx, l.off = apply(lx, 2, max)) {
     ## do not use cbind or rbind here, since it is not clear if the user specified
     ## only one vector log(x) or several vectors of dimension 1 !!!
@@ -94,9 +94,9 @@ lsum <- function(lx, l.off = apply(lx, 2, max)) {
     l.off + log(colSums(exp(lx - rep(l.off, each=nrow(lx)))))
 }
 
-##' Properly compute log(-+x_1 -+ .. -+ x_n) for a given matrix of column vectors
+##' Properly compute log(x_1 + .. + x_n) for a given matrix of column vectors
 ##' log(|x_1|),.., log(|x_n|) and corresponding signs sign(x_1),.., sign(x_n)
-##'
+##' Here, x_i is of arbitrary sign
 ##' @title compute logarithm of a sum with signed large coefficients
 ##' @param lxabs (d,n)-matrix containing the column vectors log(|x_1|),..,log(|x_n|)
 ##'        each of dimension d
@@ -104,7 +104,7 @@ lsum <- function(lx, l.off = apply(lx, 2, max)) {
 ##' @param l.off the offset to substract and re-add; ideally in the order of max(.)
 ##' @param strict logical indicating if it should stop on some negative sums
 ##' @return log(x_1 + .. + x_n) [i.e., of dimension d] computed via
-##'         log(sum(x)) = log(sum(sign(|x|)*exp(log(|x|))))
+##'         log(sum(x)) = log(sum(sign(x)*|x|)) = log(sum(sign(x)*exp(log(|x|))))
 ##'         = log(exp(log(x0))*sum(signs*exp(log(|x|)-log(x0))))
 ##'         = log(x0) + log(sum(signs* exp(log(|x|)-log(x0))))
 ##'         = l.off   + log(sum(signs* exp(lxabs -  l.off  )))

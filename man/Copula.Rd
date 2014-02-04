@@ -200,8 +200,8 @@ fu2 <- copClayton@dacopula(v, theta = 2)
 Fu1 <- pCopula(v, cl3)
 Fu2 <- pCopula(v, onacopula("Clayton", C(2.0, 1:3)))
 ## The density and cumulative values are the same:
-stopifnot(all.equal(fu1, fu2, tol= 1e-14),
-          all.equal(Fu1, Fu2, tol= 1e-15))
+stopifnot(all.equal(fu1, fu2, tolerance= 1e-14),
+          all.equal(Fu1, Fu2, tolerance= 1e-15))
 }
 \keyword{distribution}
 \keyword{multivariate}
