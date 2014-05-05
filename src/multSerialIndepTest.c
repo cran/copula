@@ -71,9 +71,16 @@ void bootstrap_serial(int *n, int *N, int *p, int *q, double *U, int *m,
 		      int *verbose)
 {
   int i, k, np = *n + *p - 1, p1[1], m1[1], sb[1];
+  size_t max_size = (size_t)-1,// C99 has SIZE_MAX
+      n_ = (size_t)(*n);
+  double J_size = ((double)n_) * n_ * (*p);
+  if(J_size > max_size)
+      error(_("** bootstrap_serial(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"), 
+	    J_size, (double)max_size);
+
   int *B = Calloc(np, int);
-  double *J = Calloc((*n) * (*n) * (*p), double);
-  double *K = Calloc((*n) * (*p), double);
+  double *J = Calloc((size_t) J_size, double);
+  double *K = Calloc(n_ * (*p), double);
   double *L = Calloc(*p, double);
 
   /* for the random permutation */
@@ -165,10 +172,17 @@ void empirical_copula_test_rv_serial(double *U, int *n, int *p, int *q, int *m, 
 				     double *pval, double *fisher, double *tippett, double *Ipval)
 {
   int i, j, k, count, sb = (int)sum_binom(*p-1,*m-1), np = *n + *p - 1;
+  size_t max_size = (size_t)-1,// C99 has SIZE_MAX
+      n_ = (size_t)(*n);
+  double J_size = ((double)n_) * n_ * (*p);
+  if(J_size > max_size)
+      error(_("** empirical_copula_t.r.s(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"), 
+	    J_size, (double)max_size);
+
   double *fisher0 = Calloc(*N, double);
   double *tippett0 = Calloc(*N, double);
-  double *J = Calloc((*n) * (*n) * (*p), double);
-  double *K = Calloc((*n) * (*p), double);
+  double *J = Calloc((size_t) J_size, double);
+  double *K = Calloc(n_ * (*p), double);
   double *L = Calloc(*p, double);
   int *B = Calloc(np, int);
   double pvalue;

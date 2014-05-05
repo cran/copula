@@ -21,7 +21,7 @@ chkFun <- function(fun) {
     stopifnot(is.function(fun))
     isObj <- function(nm) any(nm == c("copula", "mvdc")) ## [pdq][Cc]opula
     nf <- names(formals(fun))
-    if(isObj(nf[2]) || nf[1:2] == c("x","X")) ## || is F.n() 
+    if(isObj(nf[2]) || nf[1:2] == c("x","X")) ## || is F.n()
         TRUE
     else if(isObj(nf[1])) FALSE
     else NA # and the caller will produce an error eventually
@@ -215,12 +215,11 @@ splom2 <- function(data, varnames=NULL, Vname="U", xlab="",
 ##'        use NULL to omit confidence intervals
 ##' @param CI.mtext argument list for information about confidence intervals; use
 ##'        NULL to omit information about confidence intervals
-##' @param main.args argument list passed to mtext() for drawing title; use NULL
-##'        to omit title
+##' @param main title (can be an expression; use "" for no title)
+##' @param main.args argument list passed to mtext() for drawing title
 ##' @param xlab x axis label
 ##' @param ylab y axis label
-##' @param doPDF logical indicating whether plotting is to pdf
-##' @param file file name (with extension .pdf)
+##' @param file file name (with extension .pdf) or "" (no pdf)
 ##' @param width width parameter of pdf()
 ##' @param height height parameter of pdf()
 ##' @param crop crop command
@@ -239,20 +238,22 @@ qqplot2 <- function(x, qF, log="", qqline.args=if(log=="x" || log=="y") list(unt
                     CI.mtext=list(text=paste0("Pointwise asymptotic ", 100*(1-alpha),
                                   "% confidence intervals"), side=4,
                                   cex=0.6*par("cex.main"), adj=0, col="gray50"),
-                    main.args=list(text=expression(bold(italic(F)~~"Q-Q plot")),
-                                   side=3, line=1.1, cex=par("cex.main"), font=par("font.main"),
+                    main=expression(bold(italic(F)~~"Q-Q plot")),
+                    main.args=list(text=main, side=3, line=1.1,
+                                   cex=par("cex.main"), font=par("font.main"),
                                    adj=par("adj"), xpd=NA),
                     xlab="Theoretical quantiles", ylab="Sample quantiles",
-                    doPDF=FALSE, file="Rplots.pdf", width=6, height=6, crop=NULL, ...)
+                    file="", width=6, height=6, crop=NULL, ...)
 {
     x. <- sort(x) # drops NA
     n <- length(x.)
     p <- ppoints(n)
     q <- qF(p)
     ## plot points
+    doPDF <- nchar(file)
     if(doPDF) pdf(file=file, width=width, height=height)
     plot(q, x., xlab=xlab, ylab=ylab, log=log, ...) # empirical vs. theoretical quantiles
-    do.call(mtext, main.args)
+    if(nchar(main)) do.call(mtext, main.args)
     ## plot the line (overplots points, but that's good for the eye!)
     if(!is.null(qqline.args))
         if(nchar(log)==1 && (is.null(untf <- qqline.args$untf) || !untf))

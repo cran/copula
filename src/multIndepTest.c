@@ -70,9 +70,16 @@ void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
 		    int *verbose)
 {
   int i, j, k, sb[1];
-  int *R = Calloc((*n) * (*p), int);
-  double *J = Calloc((*n) * (*n) * (*p), double);
-  double *K = Calloc((*n) * (*p), double);
+  size_t max_size = (size_t)-1,// C99 has SIZE_MAX
+      n_ = (size_t)(*n);
+  double J_size = ((double)n_) * n_ * (*p);
+  if(J_size > max_size)
+      error(_("** bootstrap_MA_I(): n and/or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"), 
+	    J_size, (double)max_size);
+
+  int *R = Calloc(n_ * (*p), int);
+  double *J = Calloc((size_t) J_size, double);
+  double *K = Calloc(n_ * (*p), double);
   double *L = Calloc(*p, double);
 
   /* number of subsets */
@@ -179,12 +186,19 @@ void empirical_copula_test_rv(double *U, int *n, int *p, int *b, int *m, double 
 			      double *pval, double *fisher, double *tippett, double *Ipval)
 {
   int i, j, k, count, sb = (int)sum_binom(*p,*m);
+  size_t max_size = (size_t)-1,// C99 has SIZE_MAX
+      n_ = (size_t)(*n);
+  double J_size = ((double)n_) * n_ * (*p);
+  if(J_size > max_size)
+      error(_("** empirical_copula.._rv(): n and/or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"), 
+	    J_size, (double)max_size);
+
   double *fisher0 = Calloc(*N, double);
   double *tippett0 = Calloc(*N, double);
-  double *J = Calloc((*n) * (*n) * (*p), double);
-  double *K = Calloc((*n) * (*p), double);
+  double *J = Calloc((size_t) J_size, double);
+  double *K = Calloc(n_ * (*p), double);
   double *L = Calloc(*p, double);
-  int *R = Calloc((*n) * (*p), int);
+  int *R = Calloc(n_ * (*p), int);
   double pvalue;
 
   /* generate identity selection within the blocks */

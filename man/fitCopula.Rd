@@ -157,6 +157,7 @@ gumbel.cop <- gumbelCopula(3, dim=2)
 (Xtras <- copula:::doExtras())
 n <- if(Xtras) 200 else 64
 
+set.seed(7) # for reproducibility
 x <- rCopula(n, gumbel.cop)## "true" observations
 u <- pobs(x)               ## pseudo-observations
 ## inverting Kendall's tau
@@ -178,6 +179,7 @@ stopifnot(all.equal(as.numeric(ll.),
     loglikCopula(coef(fit.ml), x=x, copula=gumbel.cop)))
 
 ## a multiparameter example
+set.seed(6)
 normal.cop <- normalCopula(c(0.6,0.36, 0.6),dim=3,dispstr="un")
 x <- rCopula(n, normal.cop) ## "true" observations
 u <- pobs(x)                ## pseudo-observations

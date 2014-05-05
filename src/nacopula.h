@@ -21,15 +21,7 @@
 
 #include <R.h>
 #include <Rinternals.h>
-
-/**< For internationalized messages */
-#ifdef ENABLE_NLS
-#include <libintl.h>
-#define _(String) dgettext ("Matrix", String)
-#else
-#define _(String) (String)
-#define dngettext(pkg, String, StringP, N) (N > 1 ? StringP : String)
-#endif
+#include "copula_int.h"
 
 SEXP sinc_c(SEXP x_);
 SEXP A__c(SEXP x_, SEXP alpha, SEXP I_alpha);

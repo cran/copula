@@ -35,14 +35,11 @@
 /// Temporary array J
 void J_u(int n, int p, const double R[], double *J)
 {
-  int i, j, l, m;
-
-  m=0;
-  for (j=0;j<p;j++)
-    for (l=0;l<n;l++)
-      for (i=0;i<n;i++)
-	J[m++] = 1.0 - fmax2(R[i + n*j], R[l + n*j])/n;
-
+    size_t m = 0;// m in 0:(p*n^2 - 1) can be large [checked in caller!]
+    for (int j=0; j < p; j++)
+	for (int l=0; l < n; l++)
+	    for (int i=0; i < n; i++)
+		J[m++] = 1.0 - fmax2(R[i + n*j], R[l + n*j])/n;
 }
 
 /**
@@ -68,11 +65,21 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
 			       double *fisher0, double *tippett0, int *verbose)
 {
   int i, j, k, index, sb[1];
-  double *R = Calloc((*n) * (*p), double);
-  double *J = Calloc((*n) * (*n) * (*p), double);
-  double *K = Calloc((*n) * (*p), double);
+  size_t max_size = (size_t)-1,// C99 has SIZE_MAX
+      n_ = (size_t)(*n);
+  double J_size = ((double)n_) * n_ * (*p);
+  if(J_size > max_size)
+      error(_("** simulate_empirical..(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"), 
+	    J_size, (double)max_size);
+
+  double *J = Calloc((size_t) J_size, double);
+  double *R = Calloc(n_ * (*p), double);
+  double *K = Calloc(n_ * (*p), double);
   double *L = Calloc(*p, double);
 
+  if (*verbose && J_size > 100000)
+      Rprintf("simulate_empirical() working with double array J of size %ld",
+	      (size_t) J_size);
   /* number of subsets */
   *sb = (int)sum_binom(*p,*m);
 
@@ -87,16 +94,16 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
   GetRNGstate();
 
   /* N repetitions */
-  for (k=0;k<*N;k++)
+  for (k=0; k<*N; k++)
     {
       /* generate data */
-      for (j=0;j<*p;j++)
+      for (j=0; j<*p; j++)
 	{
-	  for (i=0;i<*n;i++)
+	  for (i=0; i<*n; i++)
 	    R[i + (*n) * j] = i+1;
 
 	  /* permutation = random ranks in column j */
-	  for (i=*n-1;i>=0;i--)
+	  for (i=*n-1; i>=0; i--)
 	    {
 	      double r = R[j * (*n) + i];
 	      index = (int)((i + 1) *  unif_rand());
@@ -195,9 +202,15 @@ void empirical_copula_test(double *R, int *n, int *p, int *m, double *TA0, doubl
 			   double *fisher0, double *tippett0)
 {
   int k, count, sb = (int)sum_binom(*p,*m);
+  size_t max_size = (size_t)-1,// C99 has SIZE_MAX
+      n_ = (size_t)(*n);
+  double J_size = ((double)n_) * n_ * (*p);
+  if(J_size > max_size)
+      error(_("** empirical_copula_test(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"), 
+	    J_size, (double)max_size);
 
-  double *J = Calloc((*n) * (*n) * (*p), double);
-  double *K = Calloc((*n) * (*p), double);
+  double *J = Calloc((size_t) J_size, double);
+  double *K = Calloc(n_ * (*p), double);
   double *L = Calloc(*p, double);
 
   /* compute arrays J, K, L */

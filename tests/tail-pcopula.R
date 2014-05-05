@@ -25,7 +25,8 @@ tryfCop <- nzchar(Sys.getenv("R_copula_check_fCop")) ||
 
 if(tryfCop) { ## will only "work" if not "--as-cran"
     .r <- require
-    tryfCop <- suppressWarnings(.r(fCopulae, quietly=TRUE)) }
+    tryfCop <- suppressWarnings(.r(fCopulae, quietly=TRUE))
+}
 tryfCop
 
 numTailIndexLower <- function(copula, u) {
@@ -70,7 +71,7 @@ if(tryfCop) { ## Rmetrics
 ### Lower Tail Dependence-------------------------
 
 S <- cbind(u.0,u.0)
-# R/Copula:
+## R/Copula:
 ## C  <- pCopula(dim = 2, copula = gumbelCopula(param=20), S)
 ## (C1  <- C/u.0)
 (lt20 <- numTailIndexLower(gumbC20, u.0))
@@ -116,10 +117,10 @@ t.frac <- tCopula(0.9, df=2.5, dim = 2)
 ## fractional df  currently (must) *fail* for pCopula
 assertError(pCopula(cbind(u.0,u.1), t.frac))
 
-stopifnot( {
-    ft <- dCopula(u2, t.frac)
-    all.equal(ft, dCopula(u2[,2:1], t.frac), tolerance=1e-15)
- },
+ft <- dCopula(u2, t.frac)
+stopifnot(
+    all.equal(ft, dCopula(u2[,2:1], t.frac), tolerance= 8e-15)
+ ,
  !is.unsorted(ft)
  ,
  all.equal(tailIndex(t.7.3)[["upper"]],

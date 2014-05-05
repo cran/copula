@@ -129,12 +129,13 @@ retstablerej <- function(m,V0,alpha) {
 	       ))
 }
 
-### fast rejection, R version
+### fast rejection algorithm, R version
 
-##' Sample a vector of random variates St ~ \tilde{S}(alpha, 1, (cos(alpha*pi/2)
-##' *V_0)^{1/alpha}, V_0*I_{alpha = 1}, h*I_{alpha != 1}; 1) with
-##' Laplace-Stieltjes transform exp(-V_0((h+t)^alpha-h^alpha)), see Nolan's book for
-##' the parametrization, with the fast rejection. This procedure calls retstablerej.
+##' Sample a vector of random variates St ~ \tilde{S}(alpha, 1,
+##' (cos(alpha*pi/2)*V_0)^{1/alpha}, V_0*I_{alpha = 1},
+##' h*I_{alpha != 1}; 1) with LS transform
+##' exp(-V_0((h+t)^alpha-h^alpha)) with the fast rejection
+##' algorithm; see Nolan's book for the parametrization
 ##'
 ##' @title Sampling an exponentially tilted stable distribution
 ##' @param alpha parameter in (0,1]
@@ -143,14 +144,12 @@ retstablerej <- function(m,V0,alpha) {
 ##' @return vector of variates St
 ##' @author Marius Hofert, Martin Maechler
 retstableR <- function(alpha, V0, h=1) {
-    n <- length(V0)
     stopifnot(is.numeric(alpha), length(alpha) == 1,
-	      0 <= alpha, alpha <= 1) ## <- alpha > 1 ==> cos(pi/2 *alpha) < 0
-    ## case alpha==1
-    if(alpha == 1 || n == 0) { # alpha == 1 => St corresponds to a point mass at V0 with
-	return(V0) # Laplace-Stieltjes transform exp(-V0*t)
-    }
-    ## else alpha != 1 : call fast rejection algorithm with optimal m
+	      0 <= alpha, alpha <= 1) # alpha > 1 => cos(pi/2 *alpha) < 0
+    n <- length(V0)
+    ## case alpha == 1
+    if(alpha == 1 || n == 0) return(V0) # alpha == 1 => point mass at V0
+    ## else alpha != 1 => call fast rejection algorithm with optimal m
     m <- m.opt.retst(V0)
     mapply(retstablerej, m=m, V0=V0, alpha=alpha)
 }

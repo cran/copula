@@ -13,11 +13,11 @@ qqplot2(x, qF, log = "", qqline.args = if(log=="x" || log=="y")
         CI.mtext = list(text=paste0("Pointwise asymptotic ", 100*(1-alpha),
                         "\% confidence intervals"), side=4,
                         cex=0.6*par("cex.main"), adj=0, col="gray50"),
-        main.args = list(text=expression(bold(italic(F)~~"Q-Q plot")),
-                         side=3, line=1.1, cex=par("cex.main"),
+        main = expression(bold(italic(F)~~"Q-Q plot")),
+        main.args = list(text=main, side=3, line=1.1, cex=par("cex.main"),
                          font=par("font.main"), adj=par("adj"), xpd=NA),
         xlab = "Theoretical quantiles", ylab = "Sample quantiles",
-        doPDF=FALSE, file="Rplots.pdf", width=6, height=6, crop=NULL, \dots)
+        file="", width=6, height=6, crop=NULL, \dots)
 }
 \arguments{
   \item{x}{\code{\link{numeric}}.}
@@ -38,13 +38,12 @@ qqplot2(x, qF, log = "", qqline.args = if(log=="x" || log=="y")
   \item{CI.mtext}{argument \code{\link{list}} passed to
     \code{\link{mtext}()} for plotting information about the confidence
     intervals. Use \code{CI.mtext=NULL} to omit the information.}
+  \item{main}{title (can be an expression; use "" for no title).}
   \item{main.args}{argument \code{\link{list}} passed to
     \code{\link{mtext}()} for plotting the title. Use
     \code{main.args=NULL} to omit the title.}
   \item{xlab}{x axis label.}
   \item{ylab}{y axis label.}
-  \item{doPDF}{\code{\link{logical}} indicating whether plotting is done
-    to pdf.}
   \item{file}{file name including the extension \dQuote{.pdf}.}
   \item{width}{width parameter of \code{\link{pdf}()}.}
   \item{height}{height parameter of \code{\link{pdf}()}.}
@@ -83,17 +82,16 @@ x <- rchisq(n, df=df)
 
 ## Q-Q plot against the true quantiles (of a chi^2_3 distribution)
 qqplot2(x, qF=function(p) qchisq(p, df=df),
-        main.args=list(text=as.expression(substitute(bold(italic(chi[nu])~~"Q-Q Plot"),
-                       list(nu=df))), side=3, cex=1.3, line=1.1, xpd=NA))
+        main=as.expression(substitute(bold(italic(chi[nu])~~"Q-Q Plot"),
+                                      list(nu=df))))
 
 ## in log-log scale
 qqplot2(x, qF=function(p) qchisq(p, df=df), log="xy",
-        main.args=list(text=as.expression(substitute(bold(italic(chi[nu])~~"Q-Q Plot"),
-                       list(nu=df))), side=3, cex=1.3, line=1.1, xpd=NA))
+        main=as.expression(substitute(bold(italic(chi[nu])~~"Q-Q Plot"),
+                                      list(nu=df))))
 
 ## Q-Q plot against wrong quantiles (of an Exp(1) distribution)
 qqplot2(x, qF=qexp,
-        main.args=list(text=expression(bold(Exp(1)~~"Q-Q Plot")),
-                       side=3, cex=1.3, line=1.1, xpd=NA))
+        main=expression(bold(Exp(1)~~"Q-Q Plot")))
 }
 \keyword{hplot}% from doc/KEYWORDS

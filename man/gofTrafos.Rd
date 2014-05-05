@@ -11,13 +11,17 @@
 \usage{
 htrafo(u, cop, include.K=TRUE, n.MC=0, inverse=FALSE,
        method=formals(qK)$method, u.grid, ...)
-rtrafo(u, cop, j.ind = 2:d, m, n.MC=0, log=FALSE, trafo.only=log)
+rtrafo(u, cop, j.ind = 2:d, m, n.MC=0, inverse=FALSE,
+       log=FALSE, trafo.only=log)
 }
 \arguments{
-  \item{u}{\eqn{n\times d}{n x d}-matrix of (pseudo-/copula-)observations (each
-    value in \eqn{[0,1]}) from the copula \code{cop} based on which the
-    transformation is carried out. Consider applying the function
-    \code{\link{pobs}} first in order to obtain \code{u}.}
+  \item{u}{\eqn{n\times d}{n x d}-matrix with values in \eqn{[0,1]}. If
+      \code{inverse=FALSE} (the default), \code{u} contains
+      (pseudo-/copula-)observations from the copula \code{cop} based on which the
+    transformation is carried out; consider applying the function
+    \code{\link{pobs}()} first in order to obtain \code{u}. If
+    \code{inverse=TRUE}, \code{u} contains \eqn{U[0,1]^d} distributed
+    values which are transformed to copula-based (\code{cop}) ones.}
   \item{cop}{the \code{"\linkS4class{outer_nacopula}"} with specified
     parameters based on which the transformation is computed (currently only
     Archimedean copulas are provided).}
@@ -81,7 +85,9 @@ rtrafo(u, cop, j.ind = 2:d, m, n.MC=0, log=FALSE, trafo.only=log)
       {U'_m=C(U_m|U_1,...,U_{m-1})}.
       \code{rtrafo} applies this transformation row-wise to
       \code{u} (with default \eqn{m=d}) and thus returns an
-      \eqn{n\times m}{n x m}-matrix.
+      \eqn{n\times m}{n x m}-matrix. The inverse transformation
+      (choose \code{inverse=TRUE}) applied to \eqn{U[0,1]^d} data
+      is known as \dQuote{conditional distribution method} for sampling.
     }
   }
 }

@@ -24,7 +24,7 @@ stopifnot(NULL == 1) is not stopping
 ** DONE MH: in man/empcop.Rd, document 'method' "C"/"R"
 * Short Term: Before 1.0.0
 ** TODO introduce "empiricalCopula" (or "empCopula") as new subclass of "Copula" (not "copula")
-   and maybe *additionally* "empiricalDist" / "empMvdc", inheriting from 
+   and maybe *additionally* "empiricalDist" / "empMvdc", inheriting from
    new "Mvdc" which would contain "mvdc" and "empMvdc".
 *** -> nice persp() {and maybe contour()} method via perspCopula(*, fun=C.n, ....) and
    perspMvdc(*, fun=F.n, ....). ---> man/Mvdc.Rd and R/graphics.R
@@ -37,7 +37,7 @@ however relax, as  NA+NaN or NaN+NA  differ, too.
 ** TODO frankCopula(0) and similar should create indepCopula(), and hence work in all cases.
  E-mail From Benedikt Gräler, Subject: frankCopula(0), Fri, 26 Apr 2013:
  dCopula(c(0.3,0.7), frankCopula(0))  gives NaN   but should not
-** TODO why does onacopulaL("Clayton", *) work, but onacopulaL("clayton",*) does not?  
+** TODO why does onacopulaL("Clayton", *) work, but onacopulaL("clayton",*) does not?
 Specifically,
    onacopulaL("Clayton", list(th=iTau(archmCopula("clayton"), tau=0.5), seq_len(3)))
 works but
@@ -118,6 +118,12 @@ random numbers.
 *** DONE Then, test that  exp(dCopula(*, log=TRUE)) "==" dCopula(*)
 {to test the bug, fixed in r954, reported by Benedikt}
 * Mid Term
+** TODO Ulf Schepsmeier's email to Marius on 2014-04-23: VineCopulas now has wrappers for 'copula' => Ulf suggested to refer to them / their copulas which are not in our package:
+library(copula)
+persp(BB1Copula(c(1,1.5)),dCopula, zlim=c(0,10))
+persp(surBB1Copula(c(1,1.5)),dCopula, zlim=c(0,10))
+persp(r90BB1Copula(c(-1,-1.5)),dCopula, zlim=c(0,10))
+persp(r270BB1Copula(c(-1,-1.5)),dCopula, zlim=c(0,10))
 ** TODO Daniel Alai's email from 2013-10-24 (to MH): implement a new correlation structure "min" (row-wise the same rho)
 MH: doesn't seem complicated, but wouldn't feel comfortable to do this since
 this is old+stable code from Ivan/Jun

@@ -197,14 +197,14 @@ gofPB <- function(copula, x, N, method=eval(formals(gofTstat)$method),
         T0. # return
     }, NA_real_)
 
-    ## return result object
+    ## 5) return result object
     structure(class = "htest",
 	      list(method = sprintf(
                    "Parametric bootstrap goodness-of-fit test with 'method'=\"%s\", 'estim.method'=\"%s\"",
 		   method, estim.method),
                    parameter = c(parameter = C.th.n@parameters),
                    statistic = c(statistic = T),
-                   p.value = (sum(T0 >= T) + 0.5) / (N + 1), # typical correction =>  p-values in (0, 1)
+                   p.value = (sum(T0 >= T) + 0.5) / (N + 1), # typical correction => p-values in (0, 1)
                    data.name = deparse(substitute(x))))
 }
 

@@ -1,5 +1,5 @@
 
-R version 3.0.2 Patched (2014-02-01 r64910) -- "Frisbee Sailing"
+R version 3.1.0 Patched (2014-05-05 r65522) -- "Spring Dance"
 Copyright (C) 2014 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
@@ -33,6 +33,7 @@ Type 'q()' to quit R.
 > require(copula)
 Loading required package: copula
 > source(system.file("Rsource", "utils.R", package="copula", mustWork=TRUE))
+Loading required package: tools
 > ##-> assertError()
 > 
 > ## fCopulae: don't do on CRAN, and really "can not" suggest fCopulae
@@ -43,7 +44,8 @@ Loading required package: copula
 > 
 > if(tryfCop) { ## will only "work" if not "--as-cran"
 +     .r <- require
-+     tryfCop <- suppressWarnings(.r(fCopulae, quietly=TRUE)) }
++     tryfCop <- suppressWarnings(.r(fCopulae, quietly=TRUE))
++ }
 > tryfCop
 [1] FALSE
 > 
@@ -93,7 +95,7 @@ Loading required package: copula
 > ### Lower Tail Dependence-------------------------
 > 
 > S <- cbind(u.0,u.0)
-> # R/Copula:
+> ## R/Copula:
 > ## C  <- pCopula(dim = 2, copula = gumbelCopula(param=20), S)
 > ## (C1  <- C/u.0)
 > (lt20 <- numTailIndexLower(gumbC20, u.0))
@@ -166,10 +168,10 @@ Parameters:
 > ## fractional df  currently (must) *fail* for pCopula
 > assertError(pCopula(cbind(u.0,u.1), t.frac))
 > 
-> stopifnot( {
-+     ft <- dCopula(u2, t.frac)
-+     all.equal(ft, dCopula(u2[,2:1], t.frac), tolerance=1e-15)
-+  },
+> ft <- dCopula(u2, t.frac)
+> stopifnot(
++     all.equal(ft, dCopula(u2[,2:1], t.frac), tolerance= 8e-15)
++  ,
 +  !is.unsorted(ft)
 +  ,
 +  all.equal(tailIndex(t.7.3)[["upper"]],
@@ -201,8 +203,8 @@ Parameters:
 > 
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ''statistical reasons''
-Time elapsed:  5.516 0.096 5.703 0 0 
+Time elapsed:  1.937 0.048 2.143 0 0 
 > 
 > proc.time()
    user  system elapsed 
-  5.516   0.096   5.703 
+  1.937   0.048   2.143 

@@ -76,29 +76,56 @@ fgmCopula <- function(param = NA_real_, dim = 2L) {
 
     ## create new object
     new("fgmCopula",
-               dimension = dim,
-               parameters = param,
-               exprdist = c(cdf = cdf, pdf = pdf),
-               param.names = paste0("param",subsets.char[(dim+2):2^dim]),
-               param.lowbnd = rep(-1, 2^dim - dim - 1),
-               param.upbnd = rep(1, 2^dim - dim - 1),
-               fullname = "Farlie-Gumbel-Morgenstern copula family")
+        dimension = dim,
+        parameters = param,
+        exprdist = c(cdf = cdf, pdf = pdf),
+        param.names = paste0("param",subsets.char[(dim+2):2^dim]),
+        param.lowbnd = rep(-1, 2^dim - dim - 1),
+        param.upbnd = rep(1, 2^dim - dim - 1),
+        fullname = "Farlie-Gumbel-Morgenstern copula family")
 }
 
 
 ### random number generation ###################################################
 
-rfgmCopula <- function(n, copula) {
-    dim <- copula@dimension
+##' @title Random number generation for a FGM copula
+##' @param n sample size
+##' @param copula object of type 'fgmCopula'
+##' @param method method (R code based on Remillard (2013, p. 310); C code from
+##'        C code from Ivan Kojadinovic)
+##' @return (n, d) matrix of copula samples
+##' @author Marius Hofert
+rfgmCopula <- function(n, copula, method=c("C", "R"))
+{
+    stopifnot(is(object = copula, "fgmCopula"))
+    d <- copula@dimension
     alpha <- copula@parameters
-    if (dim > 2)
-        warning("random generation needs to be properly tested")
-    val <- .C(rfgm,
-              as.integer(dim),
-	      c(rep.int(0., dim+1), alpha),
-              as.integer(n),
-              out = double(n * dim))$out
-    matrix(val, n, dim, byrow=TRUE)
+    stopifnot(d >= 2, -1 <= alpha, alpha <= 1)
+    method <- match.arg(method)
+
+    switch(method,
+           "R" = {
+               ## note: this is *only* for the case where S = {1,...,d}
+               ##       => the FGM has only one parameter in this case
+               ##       see Jaworski, Durante, Haerdle, Rychlik (2009, p. 19)
+               warning("random number generation only for homogeneous (one-parameter) case")
+               stopifnot(n >= 1, d >= 2, -1 <= alpha, alpha <= 1)
+               U <- matrix(runif(n*d), nrow=n, ncol=d)
+               B <- alpha * apply(1-2*U[,-d, drop=FALSE], 1, prod)
+               C <- sqrt( (1 + B)^2 - 4 * B * U[,d])
+               U[,d] <- 2 * U[,d] / (1 + B + C)
+               U
+           },
+           "C" = {
+               if (d > 2)
+                   warning("random generation in C needs to be properly tested")
+               matrix(.C(rfgm,
+                         as.integer(d),
+                         c(rep.int(0., d+1), alpha),
+                         as.integer(n),
+                         out = double(n * d))$out, n, d, byrow=TRUE)
+           },
+           stop("wrong 'method': ", method))
 }
 
 

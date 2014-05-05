@@ -58,6 +58,41 @@ dnormalCopula <- function(u, copula, log=FALSE, ...) {
   if(log) r else exp(r)
 }
 
+if(FALSE)# Note this was mvtnorm::dmvnorm() up to .. 2014-03-..
+    ## it had the big advantage of given 'NaN' in case of a non-pos.def. sigma
+## MM: We could use the new version *when* that allows to pass
+## chol(sigma) as an alternative to sigm
+dmvnorm <- function (x, mean, sigma, log=FALSE)
+{
+    if (is.vector(x)) {
+        x <- matrix(x, ncol = length(x))
+    }
+    if (missing(mean)) {
+        mean <- rep(0, length = ncol(x))
+    }
+    if (missing(sigma)) {
+        sigma <- diag(ncol(x))
+    }
+    if (NCOL(x) != NCOL(sigma)) {
+        stop("x and sigma have non-conforming size")
+    }
+    if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps), 
+                     check.attributes = FALSE)) {
+        stop("sigma must be a symmetric matrix")
+    }
+    if (length(mean) != NROW(sigma)) {
+        stop("mean and sigma have non-conforming size")
+    }
+### MM: this is *really* poor : mahalanobis() computes solve(sigma) !
+    distval <- mahalanobis(x, center = mean, cov = sigma)
+    logdet <- sum(log(eigen(sigma, symmetric=TRUE,
+                                   only.values=TRUE)$values))
+    logretval <- -(ncol(x)*log(2*pi) + logdet + distval)/2
+    if(log) return(logretval)
+    exp(logretval)
+}
+  
+
 
 showNormalCopula <- function(object) {
   print.copula(object)

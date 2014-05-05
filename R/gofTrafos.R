@@ -24,12 +24,15 @@
 ##' via Rosenblatt's transformation
 ##'
 ##' @title Rosenblatt transformation for a (nested) Archimedean copula
-##' @param u matrix of (pseudo-/copula-)observations
+##' @param u data matrix in [0,1]^(n, d) ((pseudo-/copula-)observations if !inverse,
+##'        U[0,1] observations if inverse)
 ##' @param cop object of class Copula
 ##' @param j.ind indices j >= 2 for which Rosenblatt's transform is computed, i.e.,
 ##'        C(u_j | u_1,...,u_{j-1})
 ##' @param m (deprecated)
 ##' @param n.MC parameter n.MC for evaluating the derivatives via Monte Carlo
+##' @param inverse logical indicating whether the inverse of rtrafo is computed
+##'        (this is known as 'conditional distribution method' for sampling)
 ##' @param log logical indicating whether the log-transform is computed
 ##' @param trafo.only logical indicating whether the transformed data (only) is
 ##'        returned, that is, the transformed components with index j.ind
@@ -37,9 +40,12 @@
 ##'         k=1+length(j.ind) or length(j.ind) if trafo.only=TRUE, and
 ##'         where U[,1] == u[,1] in any case.
 ##' @author Marius Hofert and Martin Maechler
-rtrafo <- function(u, cop, j.ind=2:d, m, n.MC=0, log=FALSE, trafo.only=log)
+rtrafo <- function(u, cop, j.ind=2:d, m, n.MC=0, inverse=FALSE,
+                   log=FALSE, trafo.only=log)
 {
+    ## checks
     if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
+    stopifnot(0 <= u, u <= 1)
     stopifnot(is(cop, "Copula"))
     if(!missing(m)) {
 	warning("'m' is deprecated; rather specify 'j.ind = 2:m'")
@@ -49,9 +55,46 @@ rtrafo <- function(u, cop, j.ind=2:d, m, n.MC=0, log=FALSE, trafo.only=log)
     d. <- dim(u)
     n <- d.[1]
     d <- d.[2]
-    stopifnot(0 <= u, u <= 1,
-	      2 <= j.ind, j.ind <= d)
+    stopifnot(2 <= j.ind, j.ind <= d)
 
+    ## first deal with inverse=TRUE
+    if(inverse) {
+        U. <- u # U' ~ U[0,1]^d
+        U  <- u # will be adjusted so that ~ C
+        for(i in 1:n)
+            for(j in j.ind)
+                U[i,j] <- uniroot(function(x)
+                                  rtrafo(c(U[i,1:(j-1)], x), cop=cop, j.ind=j,
+                                         inverse=FALSE, trafo.only=TRUE) - U.[i,j],
+                                  interval=c(0,1))$root
+        return(U)
+
+        ## note: the following row-vectorized version (in 'i'=1:n) also works
+        ##       but (unfortunately) is not faster:
+
+        ## ## computing roots of n equations of the form f(x) = 0 simultaneously
+        ## ## (for a *vector/list* of functions f)
+        ## ## working example: multiroot(c(function(x) (x-1)^3, function(x) (x-1.5)^3), interval=c(0,2))
+        ## multiroot <- function(f, interval=c(0,1))
+        ##     vapply(seq_len(length(f)),
+        ##            function(i) uniroot(function(x) f[[i]](x), interval=interval)$root, NA_real_)
+
+        ## ## for each j in j.ind, solve C(x | U[,1:(j-1)]) = U.[,j] w.r.t. x (= n-vector!)
+        ## C.j.inv <- function(U.j, Ujm1) { # U.j = U.[,j] (n-vector); Ujm1 = U[,1:(j-1)] ((n,j-1)-matrix)
+        ##     fvec <- lapply(1:length(U.j), function(i) { # 1:n
+        ##         force(i) # force the promise (otherwise i = n)
+        ##         function(x)
+        ##             rtrafo(c(Ujm1[i,], x), cop=cop,
+        ##                    j.ind=length(Ujm1[i,])+1, trafo.only=TRUE) - U.j[i]
+        ##     })
+        ##     multiroot(fvec)
+        ## }
+
+        ## ## compute and return U
+        ## for(j in j.ind) U[,j] <- C.j.inv(U.[,j], U[,1:(j-1), drop=FALSE])
+    }
+
+    ## main
     if((nac <- is(cop, "outer_nacopula")) || ## outer_nacopula #################
        is(cop, "archmCopula")) {
 	if(nac) {
@@ -198,7 +241,7 @@ rtrafo <- function(u, cop, j.ind=2:d, m, n.MC=0, log=FALSE, trafo.only=log)
 ##' inverse
 ##'
 ##' @title Transformation of Hering and Hofert (2011) or its inverse
-##' @param u data matrix in [0,1]^d
+##' @param u data matrix in [0,1]^(n, d)
 ##' @param cop an outer_nacopula
 ##' @param include.K boolean indicating whether the last component, K, is also
 ##'        used (include.K = TRUE); ignored when inverse=TRUE since K is crucial

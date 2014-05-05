@@ -28,6 +28,8 @@
 #ifndef INDEPTESTS_H
 #define INDEPTESTS_H
 
+#include "copula_int.h"
+
 // indepTest_utils.c  --- temporary arrays -------------------------------------
 void K_array(int n, int p, const double J[], double *K);
 void L_array(int n, int p, const double K[], double *L);

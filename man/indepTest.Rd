@@ -48,8 +48,15 @@ dependogram(test, pvalues = FALSE, print = FALSE)
     drew from test statistics or the corresponding p-values.}
   \item{print}{ logical indicating whether details should be printed.}
 }
-\details{See the references below for more details, especially the third
-  one.
+\details{
+  The current (C code) implementation of \code{indepTestSim()}
+  uses (RAM) memory of size \eqn{O(n^2 p)}{O(n^2 * p)}, and time
+  % ../src/ecIndepTest.c : J_size, in simulate_empirical_copula()
+  \eqn{O(N n^2 p)}{O(N * n^2 * p)}.  This renders it unfeasible when
+  \code{n} is large.% "vague" on purpose; n=10'000 is barely "ok" w/ 8GB RAM and > 1 hour waiting
+
+  See the references below for more details, especially Genest
+  and R\enc{é}{e}millard (2004).
 }
 \value{The function \code{indepTestSim()} returns an object of class
   \code{"indepTestDist"} whose attributes are: \code{sample.size},
@@ -61,7 +68,7 @@ dependogram(test, pvalues = FALSE, print = FALSE)
   the values of the test statistics for each subset and each repetition)
   and \code{dist.global.statistic.independence} (a vector a length
   \code{N} containing the values of the global Cramér-von Mises test
-  statistic for each repetition - see last reference p.~175).
+  statistic for each repetition -- see Genest \emph{et al} (2007), p.175).
 
   The function \code{indepTest()} returns an object of class
   \code{"indepTest"} whose attributes are: \code{subsets},
@@ -74,10 +81,10 @@ dependogram(test, pvalues = FALSE, print = FALSE)
   (1 - \code{beta} is the significance level per statistic),
   \code{global.statistic} (value of the global Cramér-von Mises
   statistic derived directly from the independence empirical copula
-  process - see last reference p.~175) and
+  process - see Genest \emph{et al} (2007), p.175) and
   \code{global.statistic.pvalue} (corresponding p-value).
 }
-\references{
+\references{%% do not add or remove easily
   Deheuvels, P. (1979).
   La fonction de dépendance empirique et ses
   propriétés: un test non paramétrique d'indépendance,
@@ -145,5 +152,9 @@ test
 dependogram(test,print=TRUE)
 
 ## NB: In order to save d for future use, the save function can be used.
+
+\dontshow{
+try( indepTestSim(2e9, 5) )#-> error ".. n ... too large" % segfault previously
+}
 }
 \keyword{htest}

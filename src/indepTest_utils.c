@@ -114,21 +114,19 @@ double I_n(int n, int p, double *J, double *K, double *L)
  * @param J temporary array
  * @param K temporary array
  * @param L temporary array
- * @param A the subset A
+ * @param A the (integer coded) subset A
  * @return the Cramer-von Mises statistic for subset A
  * @author Ivan Kojadinovic
  */
 double M_A_n(int n, int p, double *J, double *K, double *L, int A)
 {
-  int i, j ,l, n2 = n * n;
-  double MAn, prod;
-
-  MAn = 0.0;
-  for (i=0;i<n;i++)
-    for (l=0;l<n;l++)
+  size_t n2 = n * n;// size_t should not overflow
+  double MAn = 0.0;
+  for (int i=0; i < n; i++)
+    for (int l=0; l < n; l++)
       {
-	prod = 1.0;
-	for (j=0;j<p;j++)
+	double prod = 1.0;
+	for (int j=0; j < p; j++)
 	  if (1<<j & A)
 	    prod *= J[n2 * j + n * l + i] - K[n * j + i] - K[n * j + l] + L[j];
 	MAn += prod;
