@@ -321,7 +321,7 @@ copClayton <-
 		  dV01 = function(x,V0,theta0,theta1,log = FALSE) {
 		      stopifnot(length(V0) == 1 || length(x) == length(V0))
 		      alpha <- theta0/theta1
-		      gamma <- (cos(pi/2*alpha)*V0)^(1/alpha)
+		      gamma <- (cospi2(alpha)*V0)^(1/alpha)
 		      delta <- V0*(alpha == 1)
 		      ## NB: new dstable() is vectorized in (x, gamma, delta) [but not the others]
 		      dst <- dstable(x, alpha=alpha, beta = 1, gamma=gamma, delta=delta,
@@ -355,7 +355,7 @@ copFrank <-
 		  ## generator
 		  psi = function(t, theta) {
                       ## = -log(1-(1-exp(-theta))*exp(-t))/theta
-		      ## -log1p(expm1(-theta)*exp(0-t))/theta #-- fails small t, theta > 38
+		      ## -log1p(expm1(-theta)*exp(0-t))/theta # fails really small t, theta > 38
 		      -log1mexp(t-log1mexp(theta))/theta
 		  },
 		  iPsi = function(u, theta, log=FALSE) {
@@ -370,7 +370,7 @@ copFrank <-
 
 ###-- do small Rmpfr-study to find the best form -- (4) above and the three forms below
 
-		      r <- ifelse(thu > .01*theta, # thu = u*th > .01*th <==> u > 0.01
+		      r <- ifelse(abs(thu) > .01*abs(theta), # thu = u*th > .01*th <==> u > 0.01
                               {   e.t <- exp(-theta)
                                   ifelse(e.t > 0 & abs(theta - thu) < 1/2,# th -th*u = th(1-u) < 1/2
                                          -log1p(e.t * expm1(theta - thu)/et1),
@@ -774,7 +774,7 @@ copGumbel <-
 			  ## Sample from S(alpha,1,(cos(alpha*pi/2))^(1/alpha),0;1)
 			  ## with Laplace-Stieltjes transform exp(-t^alpha)
 			  rstable1(n, alpha, beta=1,
-				   gamma = cos(alpha*pi/2)^(1/alpha))
+				   gamma = cospi2(alpha)^(1/alpha))
 			  ## Note: calling sequence:
 			  ##	   rstable1 == rstable1C (in rstable1.R)
 			  ##	   -> rstable_c (in retstable.c) -> rstable_vec (in retstable.c)
@@ -790,7 +790,7 @@ copGumbel <-
 			  V0
 		      } else {
 			  rstable1(length(V0), alpha, beta=1,
-				   gamma = (cos(alpha*pi/2)*V0)^(1/alpha))
+				   gamma = (cospi2(alpha)*V0)^(1/alpha))
 			  ## Sample from S(alpha,1,(cos(alpha*pi/2)V0)^(1/alpha),0;1)
 			  ## with Laplace-Stieltjes transform exp(-V0*t^alpha)
 		      }
@@ -798,7 +798,7 @@ copGumbel <-
 		  dV01 = function(x,V0,theta0,theta1,log = FALSE) {
 		      stopifnot(length(V0) == 1 || length(x) == length(V0))
 		      alpha <- theta0/theta1
-		      gamma <- (cos(pi/2*alpha)*V0)^(1/alpha)
+		      gamma <- (cospi2(alpha)*V0)^(1/alpha)
 		      delta <- V0*(alpha == 1)
 		      ## NB: new dstable() is vectorized in (x, gamma, delta) [but not the others]
 		      dstable(x, alpha=alpha, beta = 1, gamma=gamma, delta=delta, pm = 1, log=log,

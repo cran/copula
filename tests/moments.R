@@ -22,12 +22,12 @@ source(system.file("Rsource", "utils.R", package="copula", mustWork=TRUE))
 ##-> setPar(), showProc.time() etc
 ## All non-virtual copula classes:
 source(system.file("Rsource", "cops.R", package="copula", mustWork=TRUE))
-## --> copcl, copObs, copBnds,  excl.2 , copO.2, copBnd.2
+## --> copcl, copcl., copObs, copBnds,  excl.2 , copO.2, copBnd.2
 
 showProc.time()
 
-copcl ## the classes
-str(copObs, max.level=1)# copula objects
+copcl ## the classes (incl. 'indepCopula')
+str(copObs, max.level=1)# copula objects (w/o 'indepCopula')
 ## and their parameter bounds:
 t(copBnds)
 
@@ -36,13 +36,17 @@ t(copBnds)
 ## currently fails: --- FIXME?: should AMH also warn like the others?
 tau.s <- c(-.999, -.1, 0, (1:3)/10, .5, .999)
 ### give different warnings , but "work" :  { .5 , even 1/3, gives error for AMH FIXME}
+
+##
 tau(tevCopula(0)) # 0.05804811
+## restricted tau-range works better
 tau.s <- c(       -.1, 0, 0.05805, (1:2)/9, 0.3)
+
 names(tau.s) <- paste0("tau=", sub("0[.]", ".", formatC(tau.s)))
 tTau <- sapply(tau.s, function(tau)
                sapply(copObs, iTau, tau = tau))
 tTau
-tTau["joeCopula", "tau=-.1"] <- 1 # ugly hack
+tTau["joeCopula", "tau=-.1"] <- 1 # tauJoe() "works outside admissible range"
 
 stopifnot(rep(copBnds["min",],ncol(tTau)) <= tTau + 1e-7,
           tTau <= rep(copBnds["max",],ncol(tTau)),
@@ -62,10 +66,11 @@ xctTau <- matrix(tau.s, nrow = nrow(tautau), ncol=length(tau.s),
 ## The absolute errors
 errTau <- tautau-xctTau
 round(10000*errTau)
-## has two NaN .. ok, for now
+## has two NaN .. ok, for now:
 errTau["tawnCopula", 1:2] <- 0
-## These families do not support tau < 0  (currently):
-errTau[c("gumbelCopula", "joeCopula", "galambosCopula", "huslerReissCopula","tevCopula"),
+## These families do not support tau < 0
+errTau[c("gumbelCopula", "joeCopula",
+         "galambosCopula", "huslerReissCopula","tevCopula"),
        "tau=-.1"] <- 0
 ## the tevCopula cannot get a tau = 0 (for now) __FIXME?__
 errTau["tevCopula", 2] <- 0
@@ -81,14 +86,13 @@ showProc.time()
 ## NB:
 ##  iRho() method for class "amhCopula" not yet implemented
 
-### give different warnings , but "work" [not using AMH !]
+### give different warnings , but "work" [not using AMH and Joe]:
 rho.s <- c(-.999, -.1, 0, (1:3)/9, .5, .9, .999)
 names(rho.s) <- paste0("rho=", sub("0[.]", ".", formatC(rho.s)))
 tRho <- sapply(rho.s, function(rho)
                sapply(copO.2, iRho, rho = rho))
 tRho
-
-warnings()
+warnings()## 16 warnings [2014-05]
 ## and from now on, show them as they happen:
 options(warn = 1)
 

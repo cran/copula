@@ -149,7 +149,7 @@ opower <- function(copbase, thetabase) {
                   ## Sample from S(alpha,1,(cos(alpha*pi/2))^(1/alpha),0;1)
                   ## with Laplace-Stieltjes transform exp(-t^alpha)
                   S <- rstable1(n, alpha, beta=1,
-                                gamma = (cos(alpha*pi/2))^(1/alpha))
+                                gamma = cospi2(alpha)^(1/alpha))
                   S*V0base^theta
               },
               dV0 = function(x, theta, log=FALSE) {
@@ -163,7 +163,7 @@ opower <- function(copbase, thetabase) {
                       V0
                   } else {
                       rstable1(length(V0), alpha, beta=1,
-                               gamma = (cos(alpha*pi/2)*V0)^(1/alpha))
+                               gamma = (cospi2(alpha)*V0)^(1/alpha))
                       ## Sample from S(alpha,1,(cos(alpha*pi/2)V0)^(1/alpha),0;1)
                       ## with Laplace-Stieltjes transform exp(-V0*t^alpha)
                   }

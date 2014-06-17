@@ -109,7 +109,7 @@ m.opt.retst <- function(V0) {
 ##' @return St
 ##' @author Marius Hofert, Martin Maechler
 retstablerej <- function(m,V0,alpha) {
-    gamm. <- (cos(alpha*pi/2)*V0/m)^(1/alpha)
+    gamm. <- (cospi2(alpha)*V0/m)^(1/alpha)
     sum(unlist(lapply(integer(m),
 		      function(.) {
 			  ## apply standard rejection for sampling
@@ -1390,7 +1390,7 @@ printAcopula <- function(x, slots = TRUE, indent = 0,
     ch.thet <- {
         if(!all(is.na(x@theta)))## show theta
 	    paste0(", theta= (",
-		   paste(sapply(x@theta, format, digits=digits), collapse=", "), ")") 
+		   paste(sapply(x@theta, format, digits=digits), collapse=", "), ")")
         else ""
     }
     bl <- paste(rep.int(" ",indent), collapse="")
@@ -1495,5 +1495,3 @@ getAcop <- function(family, check=TRUE) {
 
 coeffG.methods <- eval(formals(coeffG)$method)# - namespace hidden
 ## --> accesses formals(dsumSibuya) .. hence at end
-
-

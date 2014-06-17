@@ -301,7 +301,7 @@ $(-1)^k\psi^{(k)}(t)\ge0$ for all $t\in(0,\infty)$ and $k\in\IN_0$, see
 \citet[p.\ 54]{hofert2010c} for a reworking in terms of copulas. Unless
  otherwise stated, we assume $\psi$ to be completely monotone in what follows.
  Finally, let us note that the most simple dependence model, namely,
- independence, is provided by $\psi(t)=\exp(-t)$, with $\psii(t)=\log(t)$, and
+ independence, is provided by $\psi(t)=\exp(-t)$, with $\psii(t)=-\log(t)$, and
  corresponding \textit{independence} copula $C({\bm u})=\prod_{j=1}^d u_j$.
 
 The class of all completely monotone Archimedean generators is denoted by

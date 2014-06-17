@@ -34,7 +34,8 @@ rnormalCopula <- function(n, copula)
     pnorm(rmvnorm(n, sigma = getSigma(copula)))
 
 
-pnormalCopula <- function(u, copula) {
+pnormalCopula <- function(u, copula, ...) {
+  chk.s(..., which.call = -2)
   dim <- copula@dimension
   i.lower <- rep.int(-Inf, dim)
   sigma <- getSigma(copula)
@@ -76,7 +77,7 @@ dmvnorm <- function (x, mean, sigma, log=FALSE)
     if (NCOL(x) != NCOL(sigma)) {
         stop("x and sigma have non-conforming size")
     }
-    if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps), 
+    if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps),
                      check.attributes = FALSE)) {
         stop("sigma must be a symmetric matrix")
     }
@@ -91,7 +92,7 @@ dmvnorm <- function (x, mean, sigma, log=FALSE)
     if(log) return(logretval)
     exp(logretval)
 }
-  
+
 
 
 showNormalCopula <- function(object) {

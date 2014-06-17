@@ -14,10 +14,13 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-AGumbel <- function(copula, w) {
-  alpha <- copula@parameters[1]
-  A <- (w^alpha + (1 - w)^alpha)^(1/alpha)
-  ifelse(w == 0 | w == 1, 1, A)
+AGumbel <- function(copula, w) .AGumbel(w, copula@parameters[1])
+.AGumbel <- function(w, alpha) {
+  r <- w
+  w <- w[i <- which(!(bnd <- w == 0 | w == 1))]
+  r[i] <- (w^alpha + (1 - w)^alpha)^(1/alpha)
+  r[bnd] <- 1
+  r
 }
 
 dAduGumbel <- function(copula, w) {
@@ -34,9 +37,8 @@ dAduGumbel <- function(copula, w) {
     .expr15 <- .expr5 * .expr14
     .expr22 <- .expr9 - 1
     .value <- .expr4^.expr5
-    .grad <- array(0, c(length(.value), 1L), list(NULL, c("w")))
-    .hessian <- array(0, c(length(.value), 1L, 1L), list(NULL,
-        c("w"), c("w")))
+    .grad <- array(0, c(length(.value), 1L), list(NULL, "w"))
+    .hessian <- array(0, c(length(.value), 1L, 1L), list(NULL, "w", "w"))
     .grad[, "w"] <- .expr8 * .expr15
     .hessian[, "w", "w"] <- .expr4^(.expr7 - 1) * (.expr7 * .expr14) *
         .expr15 + .expr8 * (.expr5 * (w^.expr22 * .expr9 * alpha +
@@ -50,15 +52,7 @@ dAduGumbel <- function(copula, w) {
   data.frame(der1=der1, der2=der2)
 }
 
-iPsiGumbel <- function(copula, u) {
-  alpha <- copula@parameters[1]
-  ( - log(u))^alpha
-}
 
-psiGumbel <- function(copula, s) {
-  alpha <- copula@parameters[1]
-  exp( -s^(1 / alpha) )
-}
 
 gumbelCopula <- function(param = NA_real_, dim = 2L,
 			 use.indepC = c("message", "TRUE", "FALSE"))
@@ -116,10 +110,11 @@ rgumbelCopula <- function(n, copula) {
   ## stable (alpha = b, beta = 1, gamma = **), 0 < b < 1
   fr <- if(identical(getOption("copula:rstable1"), "rPosStable")) ## back compatible
       rPosStableS(n, b) else rstable1(n, alpha = b, beta = 1,
-				      gamma = cos(b * pi/2)^alpha, pm=1)
+				      gamma = cospi2(b)^alpha, pm=1)
   ## now gumbel copula
   val <- matrix(runif(dim * n), nrow = n)
   psi(copula, - log(val) / fr)
+  ## = copGumbel@psi(- log(val) / fr, alpha)
 }
 
 
@@ -240,14 +235,10 @@ setMethod("dCopula", signature("numeric", "gumbelCopula"),
 setMethod("A", signature("gumbelCopula"), AGumbel)
 setMethod("dAdu", signature("gumbelCopula"), dAduGumbel)
 
-setMethod("iPsi", signature("gumbelCopula"), iPsiGumbel)
-## FIXME {negative tau}
-## setMethod("iPsi", signature("gumbelCopula"),
-## 	  function(copula, u) copGumbel@iPsi(u, theta=copula@parameters))
-setMethod("psi", signature("gumbelCopula"), psiGumbel)
-## FIXME {negative tau}
-## setMethod("psi", signature("gumbelCopula"),
-## 	  function(copula, s) copGumbel@psi(t=s, theta=copula@parameters))
+setMethod("iPsi", signature("gumbelCopula"),
+	  function(copula, u) copGumbel@iPsi(u, theta=copula@parameters))
+setMethod("psi", signature("gumbelCopula"),
+	  function(copula, s) copGumbel@psi(s, theta=copula@parameters))
 
 setMethod("diPsi", signature("gumbelCopula"),
 	  function(copula, u, degree=1, log=FALSE, ...)

@@ -29,7 +29,8 @@ polynEval <- function(coef, x) .Call(polyn_eval, coef, x)
 ##' @references Maechler(2012)
 ##' Accurately Computing log(1 - exp(-|a|)) Assessed by the Rmpfr package.
 ##' http://cran.r-project.org/web/packages/Rmpfr/vignettes/log1mexp-note.pdf
-##' MM: ~/R/Pkgs/Rmpfr/inst/doc/log1mexp-note.Rnw
+## MM: ~/R/Pkgs/Rmpfr/inst/doc/log1mexp-note.Rnw
+##--> ../man/log1mexp.Rd
 log1mexp <- function(a, cutoff = log(2)) ## << log(2) is optimal >>
 {
     if(has.na <- any(ina <- is.na(a))) {
@@ -44,6 +45,25 @@ log1mexp <- function(a, cutoff = log(2)) ## << log(2) is optimal >>
     r[!tst] <- log1p(-exp(-a[!tst]))
     if(has.na) { y[ok] <- r ; y } else r
 }
+
+##' @title Compute  f(x) = log(1 + exp(x))  stably and quickly
+##--> ../man/log1mexp.Rd
+log1pexp <- function(x, c0 = -37, c1 = 18, c2 = 33.3)
+{
+    if(has.na <- any(ina <- is.na(x))) {
+	y <- x
+	x <- x[ok <- !ina]
+    }
+    r <- exp(x)
+    if(any(i <- c0 < x & (i1 <- x <= c1)))
+	r[i] <- log1p(r[i])
+    if(any(i <- !i1 & (i2 <- x <= c2)))
+	r[i] <- x[i] + 1/r[i] # 1/exp(x) = exp(-x)
+    if(any(i3 <- !i2))
+	r[i3] <- x[i3]
+    if(has.na) { y[ok] <- r ; y } else r
+}
+
 
 ##' The sign of choose(alpha*j,d)*(-1)^(d-j) vectorized in j
 ##'
@@ -377,7 +397,7 @@ assign("Eul.full.n", 0	, envir = .nacopEnv)
 ##' @param n.sum  for "sum"--this is more for experiments etc
 ##' @return numeric/complex vector as \code{z}
 ##' @author Martin Maechler
-polylog <- function(z, s, method = c("sum", "negI-s-Stirling",
+polylog <- function(z, s, method = c("default", "sum", "negI-s-Stirling",
 			  "negI-s-Eulerian", "negI-s-asymp-w"),
 		    logarithm = FALSE, is.log.z = FALSE,
                     is.logmlog = FALSE, asymp.w.order = 0,
@@ -399,6 +419,11 @@ polylog <- function(z, s, method = c("sum", "negI-s-Stirling",
     }
     if(is.log..) z <- exp(w)
 
+    if(s == 2 && method == "default")## Dilog aka Dilogarithm, from gsl pkg -> GSL = GNU Scientific Library
+        return(if(is.numeric(z)) dilog(z) else complex_dilog(z))
+    if(method == "default")
+        method <- if(s == as.integer(s) && s <= 1)
+                      "negI-s-Stirling" else "sum"
     if(method == "sum") {
 	stopifnot((Mz <- Mod(z)) <= 1, Mz < 1 | Re(s) > 1,
 		  n.sum > 99, length(n.sum) == 1)
@@ -613,14 +638,38 @@ Bernoulli <- function(n, method = c("sumBin", "sumRamanujan", "asymptotic"),
 
 
 debye1 <- function(x) {
-    d <- debye_1(abs(x))
-    ## ifelse(x >= 0, d, d - x / 2) ## k = 1, Frees & Valdez 1998, p.9
-    d - (x<0) * x / 2
+    ## gsl's debye_1() gives *errors* on NaN/NA/Inf
+    if(any(nfin <- !(fin <- is.finite(x)))) {
+	d <- abs(x)
+	d[fin] <- debye_1(d[fin])
+	if(any(isI <- d[nfin] == Inf))
+	    d[nfin][which(isI)] <- 0 # which(.) drops NAs
+	if(length(neg <- which(x < 0))) # NA's !
+	    d[neg] <- d[neg] - x[neg]/2
+	d
+    }
+    else {
+	d <- debye_1(abs(x))
+	## ifelse(x >= 0, d, d - x / 2) ## k = 1, Frees & Valdez 1998, p.9
+	d - (x<0) * x / 2
+    }
 }
 
 
 debye2 <- function(x) {
-    d <- debye_2(abs(x))
-    ## ifelse(x >= 0, d, d - x * 2/3) ## k = 2, Frees & Valdez 1998, p.9
-    d - (x<0) * x * 2/3
+    ## gsl's debye_2() gives *errors* on NaN/NA/Inf
+    if(any(nfin <- !(fin <- is.finite(x)))) {
+	d <- abs(x)
+	d[fin] <- debye_2(d[fin])
+	if(any(isI <- d[nfin] == Inf))
+	    d[nfin][which(isI)] <- 0 # which(.) drops NAs
+	if(length(neg <- which(x < 0))) # NA's !
+	    d[neg] <- d[neg] - 2/3 * x[neg]
+	d
+    }
+    else {
+	## k = 2, Frees & Valdez 1998, p.9
+	d <- debye_2(abs(x))
+	d - 2/3 * (x<0) * x
+    }
 }

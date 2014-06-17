@@ -53,7 +53,19 @@ joeCopula(param = NA_real_, dim = 2,
   \code{frankCopula()}, \code{gumbelCopula()}, \code{amhCopula()} and
   \code{joeCopula}.
 
-%% FIXME
+  For the mathematical definitions of the give Archimedean families,
+  see \code{\link{copClayton}}.
+
+  For \eqn{d = 2}, i.e. \code{dim = 2}, the AMH, Clayton and Frank copulas
+  allow to model negative Kendall's tau (\code{\link{tau}}) behavior via
+  negative \eqn{\theta}{theta}, for AMH and Clayton
+  \eqn{-1 \le \theta}{-1 <= theta}, and for Frank
+  \eqn{-\infty < \theta}{-Inf < theta}.
+  %% AMH     :   -1 <= theta  ( tau(theta =  -1 ) = -0.1817258 )
+  %% Clayton :   -1 <= theta  ( tau(theta =  -1 ) = -1 )
+  %% Frank   : -Inf <= theta  ( tau(theta = -Inf) = -1 )
+
+%% FIXME: use copAMH instead !
   For the Ali-Mikhail-Haq copula family (\code{"amhCopula"}), only the
   bivariate case is available.
 
@@ -65,8 +77,7 @@ joeCopula(param = NA_real_, dim = 2,
   % 10 for the Clayton and Gumbel families, and 6 for the Frank family.
   % They are also the maximum dimensions for which maximum likelihood
   % estimation can be done.
-
-  It is now recommended to work with the
+  For \eqn{d > 2}, i.e. \code{dim > 2}, it is now recommended to work with the
   \code{\linkS4class{acopula}}-classed Archimedean copulas, as there is
   no restriction on the dimension there.
 }
@@ -74,19 +85,39 @@ joeCopula(param = NA_real_, dim = 2,
   R.B. Nelsen (2006), \emph{An introduction to Copulas}, Springer, New York.
 }
 \seealso{
-  \code{\link{ellipCopula}}, \code{\link{evCopula}}.
-
   %% -> ./copFamilies.Rd
   \code{\linkS4class{acopula}}-classed Archimedean copulas, such as
   \code{\link{copClayton}}, \code{\link{copGumbel}}, etc, notably for
   mathematical definitions including the meaning of \code{param}.
+
+  \code{\link{ellipCopula}}, \code{\link{evCopula}}.
 }
 \examples{
 clayton.cop <- claytonCopula(2, dim = 3)
 ## scatterplot3d(rCopula(1000, clayton.cop))
 
-frank.3D  <- frankCopula(dim = 3)# with NA parameters
-frank.cop <- frankCopula(3)
+## negative param (= theta) is allowed for dim = 2 :
+tau(claytonCopula(-0.5)) ## = -1/3
+tauClayton <- Vectorize(function(theta) tau(claytonCopula(theta, dim=2)))
+plot(tauClayton, -1, 10, xlab=quote(theta), ylim = c(-1,1), n=1025)
+abline(h=-1:1,v=0, col="#11111150", lty=2); axis(1, at=-1)
+
+tauFrank <- Vectorize(function(theta) tau(frankCopula(theta, dim=2)))
+plot(tauFrank, -40, 50, xlab=quote(theta), ylim = c(-1,1), n=1025)
+abline(h=-1:1,v=0, col="#11111150", lty=2)
+
+## tauAMH() is function in our package
+iTau(amhCopula(), -1) # -1 with a range warning
+iTau(amhCopula(), (5 - 8*log(2)) / 3) # -1 with a range warning
+
+ic <- frankCopula(0) # independence copula (with a "message")
+stopifnot(identical(ic,
+   frankCopula(0, use.indepC = "TRUE")))# indep.copula  withOUT message
+(fC <- frankCopula(0, use.indepC = "FALSE"))
+## a Frank copula which corresponds to the indep.copula (but is not)
+
+frankCopula(dim = 3)# with NA parameters
+frank.cop <- frankCopula(3)# dim=2
 persp(frank.cop, dCopula)
 
 gumbel.cop <- archmCopula("gumbel", 5)

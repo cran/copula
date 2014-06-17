@@ -34,7 +34,8 @@ stopifnot(NULL == 1) is not stopping
 *** DONE dCopula() = 0 {log = -Inf} for u "outside"
 *** TODO both should keep NA & NaN. Maybe keep them different, as  pnorm(c(2,NA,NaN));
 however relax, as  NA+NaN or NaN+NA  differ, too.
-** TODO frankCopula(0) and similar should create indepCopula(), and hence work in all cases.
+** DONE frankCopula(0) and similar should create indepCopula(), and hence work in all cases.
+ We have new argument 'use.indepC'
  E-mail From Benedikt Gräler, Subject: frankCopula(0), Fri, 26 Apr 2013:
  dCopula(c(0.3,0.7), frankCopula(0))  gives NaN   but should not
 ** TODO why does onacopulaL("Clayton", *) work, but onacopulaL("clayton",*) does not?
@@ -228,6 +229,7 @@ maybe take  ./tests/copula-play.R  as sophisticated role model.
 
 ** DONE cacopula(): generalize to elliptical ("and more") -> cCopula(), (<==> rtrafo())
 
+** TODO Once we require R >= 3.1.0, use cospi(), tanpi(), etc instead of our tanpi(), cospi2()
 * Long Term
 ** TODO ChiPlot(), KPlot() [in R/graphics.R]: Export and document ?
 ** TODO copula code which is not used --- moved to ./misc/

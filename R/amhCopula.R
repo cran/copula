@@ -14,23 +14,14 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-iPsiAmh <- function(copula, u) {
-  alpha <- copula@parameters[1]
-  log((1 - alpha * (1 - u)) / u)
-}
-
-psiAmh <- function(copula, s) {
-  alpha <- copula@parameters[1]
-  (1 - alpha) / (exp(s) - alpha)
-}
-
 amhCopula <- function(param = NA_real_, dim = 2L,
 		      use.indepC = c("message", "TRUE", "FALSE"))
 {
   stopifnot(length(param) == 1)
 ##   if (dim > 2 && param[1] < 0)
 ##     stop("param can be negative only for dim = 2")
-  if((dim <- as.integer(dim))> 2) stop("dim can only be 2 for this copula")
+## FIXME
+  if((dim <- as.integer(dim))> 2) stop("dim can currently only be 2 for this copula")
   if(!is.na(param) && param == 0) {
       use.indepC <- match.arg(use.indepC)
       if(!identical(use.indepC, "FALSE")) {
@@ -104,6 +95,10 @@ ramhCopula <- function(n, copula) {
     return (val)  ## the limit is independence
   ## Johnson (1987, p.362). Typo V_2 and p?
   ## solve quadratic equation anyway
+  ##_ dim=2 (only) ==> rather use rnacopula(n, onacopula("A", c(alpha, 1:d)))
+  ##_ FIXME: Inefficiency: val[,] already contains (u,w)
+  ## Both changes would lead to non-back compatible RNG
+  ## ==> introduce options(copula.oldRNG = TRUE)
   u <- runif(n)
   w <- runif(n)
   b <- 1 - u
@@ -113,30 +108,46 @@ ramhCopula <- function(n, copula) {
   v <- (- B + sqrt(B^2 - 4 * A * C)) / 2 / A
   ## v <- cbind(v, (- B - sqrt(B^2 - 4 * A * C)) / 2 / A) ## this root is not good
   v <- 1 - v
-  cbind(u, v)
+  cbind(u, v, deparse.level=0L)
 }
 
-iTauAmhCopula <- function(copula, tau) {
+iTauAmhCopula <- function(copula, tau, ...) {
+  ## "..." may contain uniroot args: (tol, trace, maxiter, ...)
   tauMin <- (5 - 8*log(2)) / 3
   iSml <- tau < tauMin
   iLrg <- tau > 1/3
   if(any(out <- iSml | iLrg))
       warning("tau is out of the range [(5 - 8 log 2) / 3, 1/3] ~= [-0.1817, 0.3333]")
+  else if(tau == tauMin) out <- iSml <- TRUE
+  else if(tau ==  1/3  ) out <- iLrg <- TRUE
   ## A _faster_ version of  r <- ifelse(tau < tauMin, -1, ifelse(tau > 1/3, 1, ....)):
   r <- tau
   r[iSml] <- -1.
   r[iLrg] <- +1.
   if(any(in. <- !out))
-      r[in.] <- iTauCopula(copula, tau[in.])
+      r[in.] <- iTauCopula(copula, tau[in.], ...)
   r
 }
 
-rhoAmhCopula <- function(copula) {
-  alpha <- copula@parameters[1]
-  ## Nelsen (2006, p.172); need dilog function, where his dilog(x) = Li_2(1-x) = polylog(1-x, 2)
-  ## range of rho: 33 - 48 log 2, 4 pi^2 - 39] ~= [-0.2711, 0.4784]
-  12 * (1 + alpha) / alpha^2 * polylog(alpha,2) - 24 * (1 - alpha) / alpha^2 * log1p(- alpha) -
-      3 * (alpha + 12) / alpha
+rhoAmhCopula <- function(copula, ...) {
+  chk.s(..., which.call = -2)
+  .rhoAmhCopula(copula@parameters[1])
+}
+.rhoAmhCopula <- function(a) {
+    ## Nelsen (2006, p.172); need dilog function, where his dilog(x) = Li_2(1-x) = polylog(1-x, 2)
+    ## range of rho: 33 - 48 log 2, 4 pi^2 - 39] ~= [-0.2711, 0.4784]
+    ## if |alpha| << 1, do better than the direct formula:
+    ## This is all based on "the beautiful formula" MM found on May 22, 2014:
+    aa <- abs(a)
+    if(aa < 7e-16)      a/3
+    else if(aa < 1e-4)  a/3*(1 + a/4)
+    else if(aa < 0.002) a*(1/3 + a*(1/12 + a* 3/100))
+    else if(aa < 0.007) a*(1/3 + a*(1/12 + a*(3/100 + a/75)))
+    else if(aa < 0.016) a*(1/3 + a*(1/12 + a*(3/100 + a*(1/75 + a/147))))
+    else { ## now has rel.error < 10^-10
+	3/a * (4 * (1 + 1/a) * dilog(a) -
+		(if(a < 1) 8 * (1/a - 1) * log1p(- a) else 0) - (a + 12))
+    }
 }
 
 pMatAmh <- function (u, copula, ...) {
@@ -171,13 +182,11 @@ setMethod("dCopula", signature("numeric", "amhCopula"),
 	  dMatAmh(matrix(u, ncol = dim(copula)), copula, log=log, ...))
 setMethod("dCopula", signature("matrix", "amhCopula"), dMatAmh)
 
-setMethod("iPsi", signature("amhCopula"), iPsiAmh)
-## setMethod("iPsi", signature("amhCopula"),
-## 	  function(copula, u) copAMH@iPsi(u, theta=copula@parameters))
-setMethod("psi", signature("amhCopula"), psiAmh)
-## FIXME
-## setMethod("psi", signature("amhCopula"),
-## 	  function(copula, s) copAMH@psi(t=s, theta=copula@parameters))
+setMethod("iPsi", signature("amhCopula"),
+	  function(copula, u) copAMH@iPsi(u, theta=copula@parameters))
+setMethod("psi", signature("amhCopula"),
+	  function(copula, s) copAMH@psi(t=s, theta=copula@parameters))
+
 setMethod("diPsi", signature("amhCopula"),
 	  function(copula, u, degree=1, log=FALSE, ...) {
               s <- if(log || degree %% 2 == 0) 1. else -1.
@@ -191,4 +200,4 @@ setMethod("rho", signature("amhCopula"), rhoAmhCopula)
 setMethod("tailIndex", signature("amhCopula"), function(copula) c(lower=0, upper=0))
 
 setMethod("iTau", signature("amhCopula"), iTauAmhCopula)
-
+## iRho() uses default method:  uniroot(rho(.) - rh)

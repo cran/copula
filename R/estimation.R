@@ -313,10 +313,10 @@ emde <- function(u, cop, method = c("mde.chisq.CvM", "mde.chisq.KS", "mde.gamma.
                        x
                    },
                    "Clayton"={
-                       if(inverse) tan(x*pi/2) else atan(x)*2/pi
+                       if(inverse) tanpi(x/2) else atan(x)*2/pi
                    },
                    "Frank"={
-                       if(inverse) tan(x*pi/2) else atan(x)*2/pi
+                       if(inverse) tanpi(x/2) else atan(x)*2/pi
                    },
                    "Gumbel"={
                        if(inverse) 1/(1-x) else 1-1/x

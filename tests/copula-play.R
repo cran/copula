@@ -25,12 +25,13 @@ if(!dev.interactive(orNone=TRUE)) pdf("copula-play.pdf")
 
 myCop <- setTheta(copAMH, value = 0.5) # is maybe more natural
 
-setGeneric("psi", function(cop) standardGeneric("psi"))
-setMethod(psi, "acopula",
+## Care: copula *does* define psi() already!
+setGeneric("psi.", function(cop) standardGeneric("psi."))
+setMethod(psi., "acopula",
           function(cop) { function(t) cop@psi(t, theta = cop@theta) })
-psi(myCop) # is a function
-psi(myCop)(0:4)
-curve(psi(myCop)(x), 0, 4)
+psi.(myCop) # is a function
+psi.(myCop)(0:4)
+curve(psi.(myCop)(x), 0, 4)
 ##' but this can also be done directly [ => same curve "on top" :]
 curve(myCop@psi(x, theta = myCop@theta),  0, 4, col = 2, add = TRUE)
 
@@ -368,3 +369,63 @@ myJoe <- setTheta(copJoe, 1.25)
 thetavec <- c(1.1,2,4,6,10)
 set.seed(111)
 tstCop(myJoe, 2, thetavec, lambdaL = NA, lambdaU = thetavec)
+
+
+### Regression tests ------------------------------------
+
+chkPsi <- function(copula, t = c(0, 2^c(-1000,-500, -200,-10*(10:0)), 2:3, 2^(2:40),Inf)) {
+    stopifnot(is(copula, "Copula"))
+    if(is.unsorted(t)) t <- sort(t)
+    psf  <- psi(copula, t)
+    ## and also an equidistant t --> to check convexity
+    ps.eq <- psi(copula, t. <- seq(0, 20, length=1+2^7))
+    stopifnot(is.finite(psf), 0 <= psf, psf <= 1,
+              psf[1] == 1, diff(psf) <= 0,
+              is.na (pN <- psi(copula, c(NA, NaN))),
+              is.nan(pN[2]),
+              0 <= ps.eq, ps.eq <= 1, diff(ps.eq) <= 0,
+              ## convexity (in light of finite accuracy arithmetic):
+              diff(ps.eq, diff=2) >= - 4*.Machine$double.eps *ps.eq[-(1:2)]
+              )
+
+    ## for plotting:
+    it <- sort.list(tt <- c(t,t.))
+    invisible(list(x=tt[it], y= c(psf, ps.eq)[it]))
+}
+
+### Negative tau (and dim = 2):
+
+taus <- c(-1,0,1); names(taus) <- paste0("tau=",taus)
+taus
+
+## Frank: --------------------------------------------------------
+vapply(taus, function(tau) iTau(frankCopula(), tau), 1.)
+##    tau=-1     tau=0     tau=1
+## -1.81e+16  0.00e+00  7.21e+16
+## ~= - Inf        0      + Inf
+
+r <- chkPsi(frankCopula(-2))
+plot(r, type="o")
+plot(r, type="o", log="xy")
+chkPsi(frankCopula( -800))# failed before 2014-06
+chkPsi(frankCopula(-2000))# (ditto)
+chkPsi(frankCopula(-1e10))# (ditto)
+
+
+## Clayton: ------------------------------------------------------
+
+vapply(taus, function(tau) iTau(claytonCopula(), tau), 1.)
+## tau=-1  tau=0  tau=1
+##     -1      0    Inf
+
+stopifnot(all.equal(-2/3, iTau(claytonCopula(), -1/2)))
+
+tools::assertError(chkPsi(claytonCopula(-1.1))) # par. out of bound
+chkPsi(claytonCopula(-1)) ## all failed before 2014-05
+chkPsi(claytonCopula(-.5))
+chkPsi(claytonCopula(-1/8))
+chkPsi(claytonCopula(-2^-10))
+
+## AMH:
+
+## --> ../vignettes/rhoAMH-dilog.Rnw

@@ -141,7 +141,7 @@ export(dev.off.pdf)
 importFrom("stats4", mle)
 importMethodsFrom("stats4", coef,confint, logLik, AIC, BIC, plot, profile)
 
-importFrom("gsl", debye_1, debye_2)
+importFrom("gsl", debye_1, debye_2, dilog, complex_dilog)
 
 importFrom("ADGofTest", ad.test)# really would want the ad.test.statistic() but that's hidden
 
@@ -170,6 +170,7 @@ export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        ## ,"coeffG", "polyG", "polyJ", "signFF"
        ,"initOpt"
        ,"beta.", "betan", "pobs"
+       , debye1, debye2 # <- since we extend the gsl ones
        ,"ebeta", "etau", "emde", "dDiag", "edmle", "emle", "enacopula"
        ## goodness-of-fit
        ,"gofTstat", "rtrafo", "htrafo", "gnacopula"
@@ -191,7 +192,7 @@ export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        ,"retstable", "retstableR"
        ,"dSibuya", "pSibuya", "dsumSibuya", "rSibuya", "rSibuyaR"
        ,"rlog", "rlogR", "rF01Frank", "rF01Joe", "rFFrank", "rFJoe"
-       ,"log1mexp"
+       ,"log1mexp" ,"log1pexp"
        ,"polylog", "Bernoulli", "Bernoulli.all"
        ,"Eulerian", "Stirling1", "Stirling2"
        ,"Eulerian.all", "Stirling1.all", "Stirling2.all"

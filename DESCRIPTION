@@ -1,8 +1,8 @@
 Package: copula
-Version: 0.999-9
-LastCRAN: 0.999-8 on 2014-02-04
-Date: $Date: 2014-05-05 16:15:50 +0200 (Mon, 05. May 2014) $,
-        subversion $Revision: 1085 $
+Version: 0.999-10
+LastCRAN: 0.999-9 on 2014-05-05
+Date: $Date: 2014-06-17 09:41:33 +0200 (Tue, 17. Jun 2014) $,
+        subversion $Revision: 1110 $
 Title: Multivariate Dependence with Copulas
 Author: Marius Hofert <marius.hofert@math.ethz.ch>,
  Ivan Kojadinovic <ivan.kojadinovic@univ-pau.fr>,
@@ -13,7 +13,7 @@ Depends: R (>= 2.15.2)
 Imports: stats, graphics, methods, stats4, Matrix, gsl, ADGofTest,
         stabledist (>= 0.6-4), mvtnorm, pspline
 Suggests: lattice, MASS, KernSmooth, sfsmisc, bbmle, scatterplot3d,
-        Rmpfr, colorspace, mvnormtest, tseries, zoo
+        Rmpfr, rugarch, colorspace, mvnormtest, tseries, zoo
 SuggestsNote: packages colorspace, mvnormtest, tseries, zoo are only
         used in demos
 Enhances: nor1mix
@@ -45,7 +45,7 @@ Collate: AllClass.R Classes.R Copula.R Auxiliaries.R aux-acopula.R
         tawnCopula.R tawnExpr.R tevCopula.R wrapper.R zzz.R
 Encoding: UTF-8
 URL: http://nacopula.r-forge.r-project.org/
-Packaged: 2014-05-05 14:16:55 UTC; maechler
+Packaged: 2014-06-18 18:13:38 UTC; maechler
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2014-05-05 17:37:44
+Date/Publication: 2014-06-19 09:30:39

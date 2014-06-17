@@ -38,35 +38,31 @@ ellipCopula <- function(family, param = NA_real_, dim = 2L, dispstr = "ex",
   familiesImplemented <- c("normal", "t")
   fam <- pmatch(family, familiesImplemented, -1)
   if (fam == -1)
-    stop(paste("Valid family names are", familiesImplemented))
+    stop(paste("Valid family names are", paste(familiesImplemented, collapse=", ")))
   switch(fam,
 	 normalCopula(param, dim = dim, dispstr = dispstr),
 	      tCopula(param, dim = dim, dispstr = dispstr, df = df, ...)
          )
 }
 
-iTauEllipCopula <- function(copula, tau) {
-  sin((tau * pi) / 2)
-}
+iTauEllipCopula <- function(copula, tau) sin((tau * pi) / 2)
 
-iRhoEllipCopula <- function(copula, rho) {
-  sin (pi * rho / 6) * 2
-}
+iRhoEllipCopula <- function(copula, rho) sin(pi * rho / 6) * 2
 
 dTauEllipCopula <- function(copula)  {
-  return( 2 / (pi * sqrt(1 - copula@getRho(copula)^2)) )
+  2 / (pi * sqrt(1 - copula@getRho(copula)^2))
 }
 
 dTauFunEllipCopula <- function(copula)  {
-  function(x) return( 2 / (pi * sqrt(1 - x^2)) )
+  function(x) 2 / (pi * sqrt(1 - x^2))
 }
 
 dRhoEllipCopula <- function(copula) {
-  return( 6 / (pi * sqrt(4 - copula@getRho(copula)^2)) )
+  6 / (pi * sqrt(4 - copula@getRho(copula)^2))
 }
 
 dRhoFunEllipCopula <- function(copula) {
-  function(x) return( 6 / (pi * sqrt(4 - x^2)) )
+  function(x) 6 / (pi * sqrt(4 - x^2))
 }
 
 setMethod("iTau", signature("ellipCopula"), iTauEllipCopula)

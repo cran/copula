@@ -14,6 +14,18 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
+## From Matrix package [ ~/R/Pkgs/Matrix/R/Auxiliaries.R ]
+chk.s <- function(..., which.call = -1) {
+    if(nx <- length(list(...)))
+	warning(sprintf(ngettext(nx,
+                                 "extra argument %s will be disregarded in\n %s",
+                                 "extra arguments %s will be disregarded in\n %s"),
+                        sub(")$", '', sub("^list\\(", '', deparse(list(...), control=c()))),
+                        deparse(sys.call(which.call), control=c())),
+                call. = FALSE, domain=NA)
+}
+
+
 ###  'interval'	 class utilities
 ###  =========================== these are small and simple
 ###  use require(package= "Intervals") if you want serious interval "work"

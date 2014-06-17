@@ -179,7 +179,7 @@ u <- rCopula(100, norm.cop)
 plot(u)
 dCopula(u, norm.cop)
 pCopula(u, norm.cop)
-persp(norm.cop, dCopula)
+persp  (norm.cop, dCopula)
 contour(norm.cop, pCopula)
 
 ## a 3-dimensional normal copula

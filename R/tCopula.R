@@ -82,22 +82,15 @@ rtCopula <- function(n, copula) {
 }
 
 
-ptCopula <- function(u, copula) {
+ptCopula <- function(u, copula, ...) {
+  chk.s(..., which.call = -2)
   dim <- copula@dimension
   i.lower <- rep.int(-Inf, dim)
   sigma <- getSigma(copula)
   df <- getdf(copula)
-  if(df != as.integer(df))
-    stop("'df' is not integer; therefore, pCopula() cannot be computed yet")
-  ## happens in pCopula() generic, now:
-  ## if(!is.matrix(u)) u <- matrix(u, ncol = dim)
-  ## u[u < 0] <- 0
-  ## u[u > 1] <- 1
-  ## FIXME: this should work, but does not --  checkmvArgs() gives
-  ## -----    ‘upper’ is not a numeric vector
-  ## apply(u, 1, pmvt,
-  ##       lower = rep.int(-Inf, dim), upper = qt(u, df = df),
-  ##       sigma = sigma, df = df)
+  if(!(df==Inf || df == as.integer(df)))
+    stop("'df' is not integer (or Inf); therefore, pCopula() cannot be computed yet")
+  ## more checks now  pCopula() *generic*
   apply(u, 1, function(x) if(any(is.na(x))) NA_real_ else
 	pmvt(lower = i.lower, upper = qt(x, df = df), sigma = sigma, df = df))
 }
@@ -106,17 +99,13 @@ dtCopula <- function(u, copula, log = FALSE, ...) {
   dim <- copula@dimension
   sigma <- getSigma(copula)
   df <- getdf(copula)
-  ## happens in dCopula() generic, now:
-  ## if(!is.matrix(u)) u <- matrix(u, ncol = dim)
+  ## more checks now  dCopula() *generic*
   r <- numeric(nrow(u)) # i.e. 0  by default (i.e. "outside")
   ok <- u.in.01(u)
   x <- qt(u[ok, , drop=FALSE], df)
   ## work in log-scale [less over-/under-flow, then (maybe) transform]:
   r[ok] <- dmvt(x, delta = rep.int(0, dim), sigma = sigma, df = df, log = TRUE) -
       rowSums(dt(x, df = df, log=TRUE))
-  ## now happens in dCopula(): -- dtCopula() is not called directly by user
-  ## if(any(out <- !is.na(u) & (u <= 0 | u >= 1)))
-  ##   val[apply(out, 1, any)] <- -Inf
   if(log) r else exp(r)
 }
 

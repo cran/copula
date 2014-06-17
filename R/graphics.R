@@ -18,7 +18,7 @@
 ##' @return logical: TRUE if "like pCopula" _or_ F.n()
 ##' @author Martin Maechler
 chkFun <- function(fun) {
-    stopifnot(is.function(fun))
+    if(!is.function(fun)) stop("the 'fun' argument is not even a function")
     isObj <- function(nm) any(nm == c("copula", "mvdc")) ## [pdq][Cc]opula
     nf <- names(formals(fun))
     if(isObj(nf[2]) || nf[1:2] == c("x","X")) ## || is F.n()
@@ -29,66 +29,71 @@ chkFun <- function(fun) {
 
 
 
-perspCopula <- function(x, fun, n = 51, theta = -30, phi = 30, expand = 0.618, ...) {
-  eps <- (.Machine$double.eps)^(1/4)
-  eps <- 0 ## FIXME - argument with default 0 ??
-  xis <- yis <- seq(0 + eps, 1 - eps, len = n)
+perspCopula <- function(x, fun, n = 51, delta = 0,
+                        xlab = "x", ylab = "y",
+                        zlab = deparse(substitute(fun))[1],
+                        theta = -30, phi = 30, expand = 0.618,
+                        ticktype = "detail", ...)
+{
+  stopifnot(0 <= delta, delta < 1/2) ## delta <- .Machine$double.eps^(1/4)
+  xis <- yis <- seq(0 + delta, 1 - delta, len = n)
   grids <- as.matrix(expand.grid(xis, yis, KEEP.OUT.ATTRS=FALSE))
   zmat <- matrix(if(chkFun(fun)) fun(grids, x) else fun(x, grids), n, n)
-  persp(xis, yis, zmat, theta = theta, phi = phi, expand = expand, ...)
-  invisible(list(x = xis, y = yis, z = zmat))
+  T <- persp(xis, yis, zmat, xlab=xlab, ylab=ylab, zlab=zlab,
+	     theta=theta, phi=phi, expand=expand, ticktype=ticktype, ...)
+  invisible(list(x = xis, y = yis, z = zmat, persp = T))
 }
 
 
-
-contourCopula <- function(x, fun, n = 51,...) {
-  eps <- (.Machine$double.eps)^(1/4)
-  eps <- 0 ## FIXME - argument with default 0 ??
-  xis <- yis <- seq(0 + eps, 1 - eps, len = n)
+contourCopula <- function(x, fun, n = 51, delta = 0, box01 = TRUE, ...) {
+  stopifnot(0 <= delta, delta < 1/2) ## delta <- .Machine$double.eps^(1/4)
+  xis <- yis <- seq(0 + delta, 1 - delta, len = n)
   grids <- as.matrix(expand.grid(xis, yis, KEEP.OUT.ATTRS=FALSE))
   zmat <- matrix(if(chkFun(fun)) fun(grids, x) else fun(x, grids), n, n)
   contour(xis, yis, zmat, ...)
+  if(box01) rect(0,0,1,1, border="gray40", lty=3)
   invisible(list(x = xis, y = yis, z = zmat))
 }
-
 
 perspMvdc <- function(x, fun,
                       xlim, ylim, nx = 51, ny = 51,
-                      theta = -30, phi = 30, expand = 0.618, ...) {
-  xis <- seq(xlim[1], xlim[2], length = nx)
-  yis <- seq(ylim[1], ylim[2], length = ny)
+                      xis = seq(xlim[1], xlim[2], length = nx),
+                      yis = seq(ylim[1], ylim[2], length = ny),
+                      xlab = "x", ylab = "y",
+                      zlab = deparse(substitute(fun))[1],
+                      theta = -30, phi = 30, expand = 0.618,
+                      ticktype = "detail", ...)
+{
   grids <- as.matrix(expand.grid(xis, yis, KEEP.OUT.ATTRS=FALSE))
   zmat <- matrix(if(chkFun(fun)) fun(grids, x) else fun(x, grids), nx, ny)
-  persp(xis, yis, zmat, theta = theta, phi = phi, expand = expand, ...)
-  invisible(list(x = xis, y = yis, z = zmat))
+  T <- persp(xis, yis, zmat, xlab=xlab, ylab=ylab, zlab=zlab,
+	     theta=theta, phi=phi, expand=expand, ticktype=ticktype, ...)
+  invisible(list(x = xis, y = yis, z = zmat, persp = T))
 }
 
 
-contourMvdc <- function(x, fun, xlim, ylim, nx = 51, ny = 51, ...)
+contourMvdc <- function(x, fun, xlim, ylim, nx = 51, ny = 51,
+                        xis = seq(xlim[1], xlim[2], length = nx),
+                        yis = seq(ylim[1], ylim[2], length = ny),
+                        box01 = TRUE, ...)
 {
-  xis <- seq(xlim[1], xlim[2], length = nx)
-  yis <- seq(ylim[1], ylim[2], length = ny)
   grids <- as.matrix(expand.grid(xis, yis, KEEP.OUT.ATTRS=FALSE))
   zmat <- matrix(if(chkFun(fun)) fun(grids, x) else fun(x, grids), nx, ny)
   contour(xis, yis, zmat, ...)
+  if(box01) rect(0,0,1,1, border="gray40", lty=3)
   invisible(list(x = xis, y = yis, z = zmat))
 }
 
-## special for independence copula:
-setMethod("persp", signature("indepCopula"), perspCopula)
-setMethod("contour", signature("indepCopula"), contourCopula)
-
-## all other copulas:
-setMethod("persp", signature("copula"), perspCopula)
+setMethod("persp",   signature("copula"), perspCopula)
 setMethod("contour", signature("copula"), contourCopula)
 
-## F.n(), C.n():
+## "F.n(), C.n()" -- once w ehave empirical
 ## setMethod("persp", signature("mvFn"),
 ##           function(x, ...) {
 ##               perspCopula(x, F.n, ...)
 ##               warning("persp(<mvFn>, ..)  implementation unfinished;
 ##  contact maintainer(\"copula\")") ## FIXME : use trans3d() to add data; *or*
-##               ## ensure seeing vertical jumps, by using {x_i-eps, x_i+eps} or ..
+##               ## ensure seeing vertical jumps, by using {x_i-delta, x_i+delta} or ..
 ##           })
 
 setMethod("persp", signature("mvdc"), perspMvdc)

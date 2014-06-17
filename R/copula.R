@@ -68,27 +68,32 @@ tailIndexCopula <- function(copula, eps = .Machine$double.eps^0.5) {
 setMethod("tailIndex", signature("copula"), tailIndexCopula)
 
 
-### numerical calibration
+### Numerical "calibration": inverse tau() and rho()
 
-## NB:  uniroot()'s  precision is tol = .Machine$double.eps^.25 = 0.000122 ~= 1e-4
-iTauCopula <- function(copula, tau, bound.eps = .Machine$double.eps^.5, ...) {
+## uniroot()'s  precision tol = .Machine$double.eps^.25 = 0.000122 ~= 1e-4  is a bit too small (for MM)
+## -> decreasing to   tol = 1e-7 [2014-05-20]
+iTauCopula <- function(copula, tau, bound.eps = .Machine$double.eps^.5, tol = 1e-7, ...) {
+  stopifnot(length(bound.eps) == 1, is.finite(bound.eps), 0 <= bound.eps,
+	    2*bound.eps < copula@param.upbnd - copula@param.lowbnd)
   myfun <- function(theta) {
     copula@parameters <- theta
     tau(copula) - tau
   }
   lower <- pmax(-sqrt(.Machine$double.xmax), copula@param.lowbnd + bound.eps)
   upper <- pmin( sqrt(.Machine$double.xmax), copula@param.upbnd  - bound.eps)
-  uniroot(myfun, interval=c(lower, upper), ...)$root
+  uniroot(myfun, interval=c(lower, upper), tol=tol, ...)$root
 }
 
-iRhoCopula <- function(copula, rho, ...) {
+iRhoCopula <- function(copula, rho, bound.eps = 0, tol = 1e-7, ...) {
+  stopifnot(length(bound.eps) == 1, is.finite(bound.eps), 0 <= bound.eps,
+	    2*bound.eps < copula@param.upbnd - copula@param.lowbnd)
   myfun <- function(theta) {
     copula@parameters <- theta
     rho(copula) - rho
   }
-  lower <- pmax(-sqrt(.Machine$double.xmax), copula@param.lowbnd)
-  upper <- pmin( sqrt(.Machine$double.xmax), copula@param.upbnd )
-  uniroot(myfun, interval=c(lower, upper), ...)$root
+  lower <- pmax(-sqrt(.Machine$double.xmax), copula@param.lowbnd + bound.eps)
+  upper <- pmin( sqrt(.Machine$double.xmax), copula@param.upbnd  - bound.eps)
+  uniroot(myfun, interval=c(lower, upper), tol=tol, ...)$root
 }
 
 setMethod("iTau", signature("copula"), iTauCopula)

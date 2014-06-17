@@ -27,7 +27,9 @@ copObs <- copObjs(copcl)
 if(FALSE) ## including the indepCopula
     str(copObjs(copcl, exclude=NULL), max.level = 1)
 
-copO.2 <- copObs[excl.2 <- !(names(copObs) %in% c("amhCopula","joeCopula"))]
+copcl. <- names(copObs)# not including "indepCopula"
+
+copO.2 <- copObs[excl.2 <- !(copcl. %in% c("amhCopula","joeCopula"))]
                                         # because AMH has limited tau-range
 copBnds <- sapply(copObs, function(C)
                   c(min= C@param.lowbnd[1], max= C@param.upbnd[1]))

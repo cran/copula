@@ -191,3 +191,18 @@ stopifnot(EQ(polylog(s =  1,  x, n.sum=10000), -log(1-x)),
 
 ##--> now do plots etc in  ../man/polylog.Rd :
 ##                         ~~~~~~~~~~~~~~~~~
+
+
+### Debye Functions ---- Better treat with (NA, NaN, Inf) than gsl's debye:
+##  --------------- -> ../R/special-func.R
+x <- c(NA, NaN, 0, 1e-100, 1e-10, .01, .1, 1:10, 20, 1e10, 1e100, Inf)
+D1 <- copula:::debye1(x)
+D2 <- copula:::debye2(x)
+(isI <- which(x == Inf))
+cbind(x, D1, D2)
+
+stopifnot(is.na(c(D1[1],D2[1])), is.nan(c(D1[2],D2[2])),
+          !is.na(D1[-(1:2)]), !is.nan(D1[-2]),
+          !is.na(D2[-(1:2)]), !is.nan(D2[-2]),
+          D1[isI] == 0,
+          D2[isI] == 0)
