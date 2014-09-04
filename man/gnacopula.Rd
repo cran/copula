@@ -4,6 +4,8 @@
 \description{
   \code{gnacopula()} conducts a goodness-of-fit test for the given
   (\eqn{H_0}-)copula \code{cop} based on the (copula-)data \code{u}.
+
+  NOTE: \code{gnacopula()} is deprecated, call \code{gofCopula()} instead.
 }
 \usage{
 gnacopula(u, cop, n.bootstrap,
@@ -124,77 +126,6 @@ gnacopula(u, cop, n.bootstrap,
 
   \code{\link{gofCopula}()} for other (parametric bootstrap) based
   goodness-of-fit tests.
-}
-\examples{
-tau <- 0.5
-(theta <- copGumbel@iTau(tau)) # 2
-d <- 5
-(copG <- onacopulaL("Gumbel", list(theta,1:d)))
-
-set.seed(1)
-n <- 1000
-x <- rnacopula(n, copG)
-x <- qnorm(x) # x now follows a meta-Gumbel model with N(0,1) marginals
-u <- pobs(x) # build pseudo-observations
-
-## check if the data comes from a meta-Gumbel model (choose larger n.bootstrap
-## in a realistic setup)
-res.H0.G <- gnacopula(u, cop=copG, n.bootstrap=10)
-## => uses the transformation of Hering and Hofert (2011), including
-##    the Kendall distribution function K and the mapping to a univariate
-##    setting via the chi-square distribution. The final test carried out
-##    is the Anderson-Darling test.
-res.H0.G$p.value # non-rejection according to 5\% level
-
-## plot of the transformed data (Rosenblatt (1952))
-uR <- rtrafo(u, cop=copG) # exact
-pairs(uR, cex=0.2, gap=.2) # looks good
-
-## plot of the transformed data (Hering and Hofert (2011))
-uH <- htrafo(u, cop=copG)
-pairs(uH, cex=0.2, gap=.2) # looks good
-
-##' QQ-plot of the supposedly U[0,1] distributed variates
-qq1dtrafo <- function(uh, ur) {
-    require(lattice)
-    d.z <- data.frame(z = c(
-                      pchisq(rowSums(qnorm(uh)^2), d), ## Chi^2 -> U[0,1]
-                      pgamma(rowSums(-log(uh)), shape=d), ## Gamma -> U[0,1]
-                      pchisq(rowSums(qnorm(ur)^2), d),    ## Chi^2 -> U[0,1]
-                      pgamma(rowSums(-log(ur)), shape=d)), ## Gamma -> U[0,1]
-                      method = rep(c("H.chi2", "H.gam", "R.chi2",
-                                     "R.gam"), each=n))
-    qqmath(~ z | method, data = d.z, distribution = qunif,
-           aspect = "xy", prepanel = prepanel.qqmathline,
-           panel = function(x, ...) {
-               panel.qqmathline(x, ...)
-               panel.qqmath(x, ...)
-           })
-}
-qq1dtrafo(uH, uR)
-
-## what about a meta-Clayton model? (choose larger n.bootstrap in a
-## realistic setup)
-## note: the parameter of the Clayton copula is only a dummy,
-##       it will be estimated anyway
-copC <- onacopulaL("Clayton", list(1, 1:d))
-res.H0.C <- gnacopula(u, cop=copC, n.bootstrap=10,
-	              estim.method="mle")
-res.H0.C$p.value # rejection according to 5\% level
-
-## plot of the transformed data (Hering and Hofert (2011)) to see the deviations
-## from uniformity
-uH <- htrafo(u, cop=copC) # transform the data
-pairs(uH, cex=0.2) # clearly visible
-
-## plot of the transformed data (Rosenblatt (1952)) to see the deviations from
-## uniformity
-uR <- rtrafo(u, cop=copC) # transform the data
-pairs(uR, cex=0.2) # clearly visible
-
-## plot the supposedly U[0,1] distributed variates
-qq1dtrafo(uH, uR)
-## clearly not uniform (as expected)
 }
 \keyword{htest}
 \keyword{distribution}

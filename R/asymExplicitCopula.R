@@ -157,8 +157,8 @@ dasymExplicitCopula <- function(u, copula, log=FALSE, ...) {
   dens <- 0
   for (i in 1:nrow(powerSet)) {
     idx1 <- c(powerSet[i,])
-    part1 <- densDers(idx1, u1, dg1, copula@copula1, copula@derExprs1)
     idx2 <- c(!powerSet[i,])
+    part1 <- densDers(idx1, u1, dg1, copula@copula1, copula@derExprs1)
     part2 <- densDers(idx2, u2, dg2, copula@copula2, copula@derExprs2)
     dens <- dens + part1 * part2
     ## print(part1); print(part2)

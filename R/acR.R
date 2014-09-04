@@ -32,8 +32,8 @@
 pacR <- function(x, family, theta, d, lower.tail = TRUE, log.p = FALSE, ...)
 {
     ## basic checks
-    stopifnot(family %in% c_longNames, d >= 1, (n <- length(x)) >= 1, x >= 0)
-    family <- match.arg(family, choices=c_longNames)
+    stopifnot(family %in% .ac.longNames, d >= 1, (n <- length(x)) >= 1, x >= 0)
+    family <- match.arg(family, choices=.ac.longNames)
 
     ## d == 1
     cop <- onacopulaL(family, list(theta, 1:d))
@@ -83,7 +83,7 @@ pacR <- function(x, family, theta, d, lower.tail = TRUE, log.p = FALSE, ...)
 qacR <- function(p, family, theta, d, log.p = FALSE, interval,
                  tol=.Machine$double.eps^0.25, maxiter=1000, ...)
 {
-    stopifnot(family %in% c_longNames, d >= 1, (n <- length(p)) >= 1, 0 < p,  p < 1)
+    stopifnot(family %in% .ac.longNames, d >= 1, (n <- length(p)) >= 1, 0 < p,  p < 1)
     if(log.p) p <- exp(p) # not very efficient yet
     y <- log1p(-p) # to be able to work with highest precision with pacR()
     f <- function(x, y) pacR(x, family=family, theta=theta, d=d, lower.tail=FALSE, log.p=TRUE, ...) - y

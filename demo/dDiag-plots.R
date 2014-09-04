@@ -91,18 +91,18 @@ doExtras
 
 par(ask = dev.interactive(orNone = TRUE))
 
-r.dDiag.3 <- lapply(copula:::c_longNames,
+r.dDiag.3 <- lapply(.ac.longNames,
                     function(family) p.dDiag(family, d = 3))
-r.dDiag.4.L <- lapply(copula:::c_longNames,
+r.dDiag.4.L <- lapply(.ac.longNames,
                     function(family) p.dDiag(family, d = 4, log=TRUE))
 
-r.dDiag.15 <- lapply(copula:::c_longNames,
+r.dDiag.15 <- lapply(.ac.longNames,
                      function(family) p.dDiag(family, d = 15))
 
-r.dDiag.75 <- lapply(copula:::c_longNames,
+r.dDiag.75 <- lapply(.ac.longNames,
                      function(family) p.dDiag(family, d = 75))
 
-r.dDiag.200.L <- lapply(copula:::c_longNames,
+r.dDiag.200.L <- lapply(.ac.longNames,
                     function(family) p.dDiag(family, d = 200, log=TRUE))
 
 if(!doExtras) q(save = "no")##-------------- and don't do those large study/computations:

@@ -29,38 +29,35 @@ f.tms <- function(x) paste(round(x),"ms") # with a space (sep=" ") !
 ##' @title Fitting and Goodness-Of-Fit for Archimedean copulas
 ##' @param n sample size
 ##' @param d dimension
-##' @param simFamily Archimedean family to be sampled
+##' @param simFamily *Archimedean* family to be sampled
 ##' @param tau degree of dependence of the sampled family in terms of Kendall's tau
-##' @param n.bootstrap
-##' @param include.K
+##' @param N number of bootstrap replications
+##' @param include.K whether or not K is included
 ##' @param n.MC if > 0 it denotes the sample size for SMLE
-##' @param estim.method estimation method (see enacopula)
-##' @param gof.method goodness-of-fit transformation (see gnacopula)
+##' @param estim.method  estimation method (see fitCopula or gofCopula)
+##' @param gof.method goodness-of-fit transformation (see gofCopula)
 ##' @param checkFamilies vector of Archimedean families to be used for gof
 ##' @param verbose
-##' @param n.bootstrap, see gnacopula()
 ##' @return a numeric matrix ...
 ##' @author Marius Hofert and Martin Maechler
+##' @note In a next step, one could include Ga and t as well, not only Archimedean copulas
 estimation.gof <- function(n, d, simFamily, tau,
-			   n.bootstrap = 1, # dummy number of bootstrap replications
-			   include.K = TRUE,
-			   n.MC = if(estim.method=="smle") 10000 else 0,
-			   estim.method = eval(formals(enacopula)$method),
-			   gof.trafo =	 eval(formals(gnacopula)$trafo),
-			   gof.method =	 eval(formals(gnacopula)$method),
-			   checkFamilies = copula:::c_longNames,
-			   verbose = TRUE)
+			   N = 1, # dummy number of bootstrap replications
+                           estim.method = eval(formals(fitCopula)$method),
+                           simulation="pb", verbose=TRUE,
+                           gof.trafo = c("rtrafo", "htrafo"),
+                           gof.method = eval(formals(gofTstat)$method),
+			   checkFamilies = setdiff(.ac.longNames, "AMH")) # as AMH is not available for d > 2
 {
     ## generate data
-    copFamily <- getAcop(simFamily)
-    theta <- copFamily@iTau(tau)
-    cop <- onacopulaL(simFamily, list(theta,1:d))
+    theta <- getAcop(simFamily)@iTau(tau)
+    simCop <- onacopulaL(simFamily, list(theta, 1:d)) # not possible with archmCopula() as AMH is not availble for d > 2
     if(verbose){
         r <- function(x) round(x,4) # for output
-	cat("\n\n### Output for estim.method = \"",estim.method,
-            "\" gof.trafo = \"",gof.trafo,"\", and gof.method = \"",gof.method,"\"\n\n",sep="")
+	cat("\n\n### Output for estim.method = \"",estim.method, "\" gof.trafo = \"",
+            gof.trafo,"\", and gof.method = \"",gof.method,"\"\n\n",sep="")
     }
-    u <- rnacopula(n,cop)
+    U <- rCopula(n, simCop)
 
     ## estimation and gof
     estim.method <- match.arg(estim.method)
@@ -70,30 +67,31 @@ estimation.gof <- function(n, d, simFamily, tau,
     sig <- logical(n.cf)
     tau <- gof <- ute <- utg <- est <- numeric(n.cf)
     for(k in seq_len(n.cf)) {
-        ## estimate the parameter with the provided method
-        cop.hat <- onacopulaL(checkFamilies[k],list(NA,1:d))
-        if(verbose) cat("Estimation and GoF for ",checkFamilies[k],":\n\n",sep="")
-	ute[k] <- utms(est[k] <- enacopula(u, cop=cop.hat,
-					   method=estim.method, n.MC=n.MC))
-        tau[k] <- cop.hat@copula@tau(est[k])
+        ## estimate the parameter with *fitCopula* and the provided method
+        cop <- archmCopula(family=checkFamilies[k], dim=d) # use archmCopula() due to fitCopula()
+        if(verbose)
+            cat("Estimation and GoF for ", checkFamilies[k], ":\n\n", sep="")
+	ute[k] <- utms(fit <- fitCopula(cop, data=U, method=estim.method,
+                                        estimate.variance=FALSE))
+        est[k] <- fit@estimate
+        tau[k] <- tau(fit@copula)
         if(verbose){
             cat("   theta hat      = ",r(est[k]),"\n",
-                "   tau hat        = ",r(cop.hat@copula@tau(est[k])),"\n",
+                "   tau hat        = ",r(tau[k]),"\n",
                 ## The exact string 'Time ' must appear at the beginning of line
                 ## for 'R CMD Rdiff' to *not* look at differences there:
                 "Time estimation   = ",f.tms(ute[k]),"\n", sep="")
 	}
-	cop.hat@copula@theta <- est[k]
+        cop@parameters <- est[k] # set the parameter of the estimated copula; or use: fit@copula
         ## apply a goodness-of-fit test to the estimated copula
         ## {{ use rtrafo() or htrafo() if you want the transformed u }}
 	utg[k] <-
 	    utms(gof[k] <-
-		 gnacopula(u, cop=cop.hat, n.bootstrap=n.bootstrap,
-			   estim.method=estim.method,
-			   include.K=include.K, n.MC=n.MC,
-			   trafo=gof.trafo, method=gof.method,
-			   verbose=FALSE)$p.value)
-	sig[k] <- (gof[k] < 0.05) # TRUE/FALSE <--> 1/0 -- Careful: may be  NA !
+		 gofCopula(cop, x=U, N=N, method=gof.method,
+			   estim.method=estim.method, simulation=simulation,
+                           verbose=verbose,
+                           trafo.method=gof.trafo)$p.value)
+	sig[k] <- (gof[k] < 0.05) # TRUE/FALSE <--> 1/0 -- Careful: may be NA !
 	if(verbose)
 	    cat("   p-value	   = ",r(gof[k]),"\n",
 		"   < 0.05	   = ", format(sig[k]), "\n",

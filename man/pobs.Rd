@@ -37,10 +37,6 @@ pobs(x, na.last = "keep",
   \code{pobs(, lower.tail=FALSE)} simply returns \code{1-pobs()}.
 }
 \author{Marius Hofert}
-\seealso{
-  \code{\link{gnacopula}} or \code{\link{enacopula}} (where this function is
-  typically applied).
-}
 \examples{
 ## Simple definition of the function:
 pobs
@@ -53,7 +49,7 @@ diag(P) <- rep(1, d)
 n <- 500
 x <- MASS::mvrnorm(n, mu = rep(0, d), Sigma = P)
 
-## Compute pseudo-observations (should roughly follow a Gaussian
+## Compute pseudo-observations (should roughly follow a Gauss
 ## copula with correlation matrix P)
 u <- pobs(x)
 plot(u[,5],u[,10], xlab=expression(italic(U)[1]), ylab=expression(italic(U)[2]))

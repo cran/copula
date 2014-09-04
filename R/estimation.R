@@ -128,7 +128,7 @@ ebeta <- function(u, cop, interval=initOpt(cop@copula@name), ...) {
     stopifnot(is(cop, "outer_nacopula"), is.numeric(d <- ncol(u)), d >= 2,
               max(cop@comp) == d)
     if(length(cop@childCops))
-        stop("currently, only Archimedean copulas are provided")
+        stop("currently, only Archimedean copulas are supported")
     ## Note: We do not need the constants 2^(d-1)/(2^(d-1)-1) and 2^(1-d) here,
     ##	     since we equate the population and sample versions of Blomqvist's
     ##       beta anyway.
@@ -204,7 +204,7 @@ etau <- function(u, cop, method = c("tau.mean", "theta.mean"), warn=TRUE, ...){
     stopifnot(is(cop, "outer_nacopula"), is.numeric(d <- ncol(u)), d >= 2,
               max(cop@comp) == d)
     if(length(cop@childCops))
-        stop("currently, only Archimedean copulas are provided")
+        stop("currently, only Archimedean copulas are supported")
     tau.hat.mat <- cor(u, method="kendall",...) # matrix of pairwise tau()
     tau.hat <- tau.hat.mat[upper.tri(tau.hat.mat)] # all tau hat's
     ## define tau^{-1}
@@ -298,7 +298,7 @@ emde <- function(u, cop, method = c("mde.chisq.CvM", "mde.chisq.KS", "mde.gamma.
     stopifnot(is(cop, "outer_nacopula"), is.numeric(d <- ncol(u)), d >= 2,
               max(cop@comp) == d)
     if(length(cop@childCops))
-        stop("currently, only Archimedean copulas are provided")
+        stop("currently, only Archimedean copulas are supported")
     method <- match.arg(method) # match argument method
     distance <- function(theta) { # distance to be minimized
         cop@copula@theta <- theta
@@ -350,7 +350,7 @@ emde <- function(u, cop, method = c("mde.chisq.CvM", "mde.chisq.KS", "mde.gamma.
 dDiag <- function(u, cop, log=FALSE) {
     stopifnot(is(cop, "outer_nacopula"), (d <- max(cop@comp)) >= 2)
     if(length(cop@childCops)) {
-        stop("currently, only Archimedean copulas are provided")
+        stop("currently, only Archimedean copulas are supported")
     }
     else ## (non-nested) Archimedean :
         ## FIXME: choose one or the other (if a family has no such slot)
@@ -399,7 +399,7 @@ edmle <- function(u, cop, interval=initOpt(cop@copula@name), warn=TRUE, ...)
     stopifnot(is(cop, "outer_nacopula"), is.numeric(d <- ncol(u)), d >= 2,
               max(cop@comp) == d) # dimension
     if(length(cop@childCops))
-        stop("currently, only Archimedean copulas are provided")
+        stop("currently, only Archimedean copulas are supported")
     x <- apply(u, 1, max) # data from the diagonal
     ## explicit estimator for Gumbel
     if(cop@copula@name == "Gumbel") {
@@ -437,7 +437,7 @@ edmle <- function(u, cop, interval=initOpt(cop@copula@name), warn=TRUE, ...)
 {
     stopifnot(is(cop, "outer_nacopula"))
     if(length(cop@childCops))
-	stop("currently, only Archimedean copulas are provided")
+	stop("currently, only Archimedean copulas are supported")
     if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
     ## optimize
     mLogL <- function(theta) { # -log-likelihood
@@ -479,7 +479,7 @@ emle <- function(u, cop, n.MC=0, optimizer="optimize", method,
     ##	   -sum(.dnacopula(u, cop, n.MC=n.MC, log=TRUE))
     ## }
     if(length(cop@childCops))
-	stop("currently, only Archimedean copulas are provided")
+	stop("currently, only Archimedean copulas are supported")
     else ## For (*non*-nested) copulas only:
 	nLL <- function(theta)  # -(log-likelihood)
 	    -sum(cop@copula@dacopula(u, theta, n.MC=n.MC, log=TRUE))
@@ -488,19 +488,18 @@ emle <- function(u, cop, n.MC=0, optimizer="optimize", method,
     if(!(is.null(optimizer) || is.na(optimizer))) {
         stopifnot(require("bbmle"))
 	if(optimizer == "optimize")
-	    mle2(minuslogl = nLL, optimizer = "optimize",
-		 lower = interval[1], upper = interval[2],
-		 ##vvv awkward to be needed, but it is - by mle2():
-		 start=start, ...)
+	    bbmle::mle2(minuslogl = nLL, optimizer = "optimize",
+                        lower = interval[1], upper = interval[2],
+                        ##vvv awkward to be needed, but it is - by mle2():
+                        start=start, ...)
 	else if(optimizer == "optim") {
 	    message(" optimizer = \"optim\" -- using mle2(); consider optimizer=NULL instead")
-	    mle2(minuslogl = nLL, optimizer = "optim", method = method,
-		 start=start, ...)
+	    bbmle::mle2(minuslogl = nLL, optimizer = "optim", method = method,
+                        start=start, ...)
 	}
 	else ## "general"
-	    mle2(minuslogl = nLL, optimizer = optimizer,
-		 ##vvv awkward to be needed, but it is - by mle2():
-		 start=start, ...)
+	    bbmle::mle2(minuslogl = nLL, optimizer = optimizer,
+                        start=start, ...)
     }
     else
 	## use optim() .. [which uses suboptimal method for 1D, but provides Hessian]
@@ -562,7 +561,7 @@ enacopula <- function(u, cop, method=c("mle", "smle", "dmle", "mde.chisq.CvM",
     stopifnot(0 <= u, u <= 1, is(cop, "outer_nacopula"), (d <- ncol(u)) >= 2,
               max(cop@comp) == d, n.MC >= 0, is.list(xargs))
     if(length(cop@childCops))
-        stop("currently, only Archimedean copulas are provided")
+	stop("currently, only Archimedean copulas are supported")
     if(n.MC > 0 && method != "smle")
 	stop("n.MC > 0  is not applicable to method '%s'", method)
     method <- match.arg(method)

@@ -86,6 +86,12 @@ str(NAlis <- list(theta0, 1, list(list(theta1, c(2,3)))))
 C3. <- onacopulaL("Gumbel", NAlis)
 stopifnot(identical(C3, C3.))
 
+## An exercise: assume you got the copula specs as character string:
+na3spec <- "C(theta0, 1, C(theta1, c(2,3)))"
+na3call <- parse(text = na3spec)[[1]]
+C3.s <- onacopula("Gumbel", na3call)
+stopifnot(identical(C3, C3.s))
+
 ## Good error message if the component ("coordinate") indices are wrong
 ## or do not match:
 err <- try(onacopula("G", C(theta0, 2, C(theta1, c(3,2)))))

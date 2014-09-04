@@ -24,109 +24,99 @@
 ##' via Rosenblatt's transformation
 ##'
 ##' @title Rosenblatt transformation for a (nested) Archimedean copula
-##' @param u data matrix in [0,1]^(n, d) ((pseudo-/copula-)observations if !inverse,
-##'        U[0,1] observations if inverse)
+##' @param u data matrix in [0,1]^(n, d) ((pseudo-/copula-)observations if
+##'        inverse==TRUE and U[0,1] observations if inverse==FALSE)
 ##' @param cop object of class Copula
-##' @param j.ind indices j >= 2 for which Rosenblatt's transform is computed, i.e.,
-##'        C(u_j | u_1,...,u_{j-1})
-##' @param m (deprecated)
+##' @param j.ind index j for which C(u_j | u_1,..,u_{j-1}) is computed
+##'        (in which case only this result is returned) or NULL
+##'        in which case C(u_j | u_1,..,u_{j-1}) is computed for all j in
+##'        {2,...,d} (in which case the non-transformed first column is returned
+##'        as well)
 ##' @param n.MC parameter n.MC for evaluating the derivatives via Monte Carlo
 ##' @param inverse logical indicating whether the inverse of rtrafo is computed
 ##'        (this is known as 'conditional distribution method' for sampling)
 ##' @param log logical indicating whether the log-transform is computed
-##' @param trafo.only logical indicating whether the transformed data (only) is
-##'        returned, that is, the transformed components with index j.ind
-##' @return matrix U (n x k) of supposedly U[0,1]^k realizations, where
-##'         k=1+length(j.ind) or length(j.ind) if trafo.only=TRUE, and
-##'         where U[,1] == u[,1] in any case.
+##' @return (n,d) matrix U supposedly U[0,1]^d (if inverse==FALSE) or 'copula'
+##'         (if inverse=TRUE) realizations (if j.ind==NULL) or
+##'         C(u_j | u_1,..,u_{j-1}) (if j.ind in {2,..,d}) [or the log of
+##'         the result if log==TRUE]
 ##' @author Marius Hofert and Martin Maechler
-rtrafo <- function(u, cop, j.ind=2:d, m, n.MC=0, inverse=FALSE,
-                   log=FALSE, trafo.only=log)
+rtrafo <- function(u, cop, j.ind=NULL, n.MC=0, inverse=FALSE, log=FALSE)
 {
     ## checks
     if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-    stopifnot(0 <= u, u <= 1)
-    stopifnot(is(cop, "Copula"))
-    if(!missing(m)) {
-	warning("'m' is deprecated; rather specify 'j.ind = 2:m'")
-	stopifnot(m >= 2)
-	j.ind <- 2:m
-    }
-    d. <- dim(u)
-    n <- d.[1]
-    d <- d.[2]
-    stopifnot(2 <= j.ind, j.ind <= d)
+    stopifnot(0 <= u, u <= 1, is(cop, "Copula"), n.MC >= 0)
+    n <- nrow(u)
+    d <- ncol(u)
+    stopifnot(d >= 2)
+    is.null.j.ind <- is.null(j.ind)
+    stopifnot(is.null.j.ind || (length(j.ind)==1 && 2 <= j.ind && j.ind <= d))
+    jj     <- if(is.null.j.ind) 2:d else j.ind
+    jj.res <- if(is.null.j.ind) 1:d else j.ind
 
-    ## first deal with inverse=TRUE
-    if(inverse) {
-        U. <- u # U' ~ U[0,1]^d
-        U  <- u # will be adjusted so that ~ C
-        for(i in 1:n)
-            for(j in j.ind)
-                U[i,j] <- uniroot(function(x)
-                                  rtrafo(c(U[i,1:(j-1)], x), cop=cop, j.ind=j,
-                                         inverse=FALSE, trafo.only=TRUE) - U.[i,j],
-                                  interval=c(0,1))$root
-        return(U)
+    ## distinguish the families (as they are quite different)
 
-        ## note: the following row-vectorized version (in 'i'=1:n) also works
-        ##       but (unfortunately) is not faster:
+    ## (nested) Archimedean case ###############################################
 
-        ## ## computing roots of n equations of the form f(x) = 0 simultaneously
-        ## ## (for a *vector/list* of functions f)
-        ## ## working example: multiroot(c(function(x) (x-1)^3, function(x) (x-1.5)^3), interval=c(0,2))
-        ## multiroot <- function(f, interval=c(0,1))
-        ##     vapply(seq_len(length(f)),
-        ##            function(i) uniroot(function(x) f[[i]](x), interval=interval)$root, NA_real_)
-
-        ## ## for each j in j.ind, solve C(x | U[,1:(j-1)]) = U.[,j] w.r.t. x (= n-vector!)
-        ## C.j.inv <- function(U.j, Ujm1) { # U.j = U.[,j] (n-vector); Ujm1 = U[,1:(j-1)] ((n,j-1)-matrix)
-        ##     fvec <- lapply(1:length(U.j), function(i) { # 1:n
-        ##         force(i) # force the promise (otherwise i = n)
-        ##         function(x)
-        ##             rtrafo(c(Ujm1[i,], x), cop=cop,
-        ##                    j.ind=length(Ujm1[i,])+1, trafo.only=TRUE) - U.j[i]
-        ##     })
-        ##     multiroot(fvec)
-        ## }
-
-        ## ## compute and return U
-        ## for(j in j.ind) U[,j] <- C.j.inv(U.[,j], U[,1:(j-1), drop=FALSE])
-    }
-
-    ## main
-    if((nac <- is(cop, "outer_nacopula")) || ## outer_nacopula #################
-       is(cop, "archmCopula")) {
+    if((nac <- is(cop, "outer_nacopula")) || is(cop, "archmCopula")) {
 	if(nac) {
 	    if(length(cop@childCops))
-		stop("currently, only Archimedean copulas are provided")
+		stop("currently, only Archimedean copulas are supported")
 	    cop <- cop@copula
 	    th <- cop@theta
 	} else { # "archmCopula"
-	    ## "claytonCopula", "frankCopula", "gumbelCopula", ...
 	    th <- cop@parameters
-	    ## ccop <- cop
 	    cop <- getAcop(cop)
 	}
 	stopifnot(cop@paraConstr(th))
-	psiI <- cop@iPsi(u, theta=th)	   # n x d
-	psiI. <- t(apply(psiI, 1, cumsum)) # n x d
-	## compute all conditional probabilities
+
+        ## compute inverse
+        if(inverse) {
+            U <- u # consider u as U[0,1]^d
+            max.col <- if(is.null(j.ind)) d else j.ind
+            ## Clayton case (explicit)
+            if(cop@name=="Clayton") {
+                sum. <- U[,1]^(-th)
+                for(j in 2:max.col) {
+                    U[,j] <- log1p((1-j+1+sum.)*(u[,j]^(-1/(j-1+1/th))-1))/(-th)
+                    eUj <- exp(U[,j])
+                    sum. <- sum. + eUj^(-th)
+                    if(!log) U[,j] <- eUj
+                }
+            } else {
+                ## general case
+                if(!n.MC) stop("the inverse of Rosenblatt's transformation with uniroot() requires n.MC=0")
+                U <- u # treat u as U[0,1]^d
+                for(i in 1:n)
+                    for(j in j.ind)
+                        U[i,j] <- uniroot(function(x)
+                                          rtrafo(c(U[i,1:(j-1)], x), cop=cop, j.ind=j) - u[i,j],
+                                          interval=c(0,1))$root
+                if(log) U <- log(U)
+            }
+            return(U[,jj.res])
+        }
+
+        ## compute conditional probabilities
+	psiI <- cop@iPsi(u, theta=th)	   # (n,d) matrix of psi^{-1}(u)
+	psiI. <- t(apply(psiI, 1, cumsum)) # corresponding (n,d) matrix of row sums
 	if(n.MC==0){
-	    ## Note: C(u_j | u_1,...,u_{j-1}) = \psi^{(j-1)}(\sum_{k=1}^j \psi^{-1}(u_k)) / \psi^{(j-1)}(\sum_{k=1}^{j-1} \psi^{-1}(u_k))
-	    C.j <- function(j) { # computes C(u_j | u_1,...,u_{j-1}) with the
-					# same idea but faster than for cacopula()
+	    ## Note: C(u_j | u_1,...,u_{j-1}) = \psi^{(j-1)}(\sum_{k=1}^j \psi^{-1}(u_k)) /
+            ##                                  \psi^{(j-1)}(\sum_{k=1}^{j-1} \psi^{-1}(u_k))
+	    C.j <- function(j) {
+                ## computes C(u_j | u_1,...,u_{j-1}) with the same idea as cacopula()
+                ## but faster
 		logD <- cop@absdPsi(as.vector(psiI.[,c(j,j-1)]), theta=th,
 				    degree=j-1, n.MC=0, log=TRUE)
 		res <- logD[1:n]-logD[(n+1):(2*n)]
 		if(log) res else exp(res)
 	    }
-	} else {			  # n.MC > 0
+	} else { ## n.MC > 0
 	    ## draw random variates
 	    V <- cop@V0(n.MC, th)
-	    C.j <- function(j){ # computes C(u_j | u_1,...,u_{j-1}) ... see above
-		## use same idea as default method of absdPsiMC
-		## only difference: only draw V's once
+	    C.j <- function(j) {
+                ## computes C(u_j | u_1,...,u_{j-1}) with the same idea as
+                ## default method of absdPsiMC (only difference: draw V's only once)
 		arg <- c(psiI.[,j], psiI.[,j-1])
 		iInf <- is.infinite(arg)
 		logD <- numeric(2*n)
@@ -137,110 +127,101 @@ rtrafo <- function(u, cop, j.ind=2:d, m, n.MC=0, inverse=FALSE,
 		if(log) res else exp(res)
 	    }
 	}
-    } else if(is(cop, "normalCopula")) { ## normalCopula #######################
-	sigma <- getSigma(cop)
-	n <- nrow(X <- qnorm(u))
-	C.j <- function(j) { ## j is the dimension -- really a function of (j, X := F(u))
-	    ## log(Determinant) :
-	    stopifnot(j >= 2, (dd <- determinant(Sd <- sigma[1:j,1:j]))$sign >= 0)
-	    logDet <- dd$modulus
-	    ## invsigma is the inverse matrix of sigma[1:j,1:j]
-	    invsigma <- solve(Sd)
+        trafo <- vapply(jj, C.j, numeric(n))
+        if(is.null.j.ind) cbind(trafo, if(log) log(u[,1]) else u[,1]) else trafo
 
-	    x <- X[,1:j, drop=FALSE]
-	    x. <- x[,1:(j-1), drop=FALSE]
-	    IS. <- invsigma[-j,-j]
-	    sid <- sqrt(invsigma[j,j])
+    } else if(is(cop, "normalCopula")) {
 
-	    ## sum1 = \sum_{i=1}^{j-1}(a_{id}+a_{di})x_i
-	    sum1 <- colSums( (invsigma[j,1:(j-1)]+invsigma[1:(j-1),j]) * t(x.) )
-	    H <- sid*x[,j] + sum1/(2*sid)
+    ## Gauss copula ############################################################
 
-	    ## calculate A
-	    ## sum2 = \sum_{j=1}^{j-1}\sum_{i=1}^{j-1}a_{ij} x_i x_j
-	    sum2 <- if (j==2) invsigma[1,1]*x.^2 else sapply(1:n,
-			function(i) crossprod(x.[i,], IS. %*% x.[i,]))
+        P <- getSigma(cop)
+        stopifnot(dim(P) == c(d,d)) # defensive programming
 
-	    A <- sum2 - sum1^2/(4*invsigma[j,j])
+        ## compute inverse
+        if(inverse) {
+            U <- u # consider u as U[0,1]^d
+            max.col <- if(is.null(j.ind)) d else j.ind
+            x <- qnorm(u[,1:max.col, drop=FALSE]) # will be updated with previously transformed U's
+            for(j in 2:max.col) {
+                P. <- P[j,1:(j-1), drop=FALSE] %*% solve(P[1:(j-1),1:(j-1), drop=FALSE]) # (1,j-1) %*% (j-1,j-1) = (1,j-1)
+                mu.cond <- as.numeric(P. %*% t(x[,1:(j-1), drop=FALSE])) # (1,j-1) %*% (j-1,n) = (1,n) = n
+                P.cond <- P[j,j] - P. %*% P[1:(j-1),j, drop=FALSE] # (1,1) - (1,j-1) %*% (j-1,1) = (1,1)
+                U[,j] <- pnorm(qnorm(u[,j], mean=mu.cond, sd=sqrt(P.cond)), log.p=log)
+                x[,j] <- qnorm(if(log) exp(U[,j]) else U[,j]) # based on previously transformed U's
+            }
+            if(log) U[,1] <- log(U[,1]) # adjust the first column for 'log'
+            return(U[,jj.res])
+        }
 
-	    ## term= (2\pi)^{(j-1)/2} |\Sigma_j|^{1/2} \sqrt{a_{dd}}
-	    term <-  if(log) (j-1)/2*log(2*pi) + logDet/2 + log(sid)
-	    else (2*pi)^((j-1)/2)*exp(logDet/2)*sid
-	    Id <- if(log) -0.5*A + pnorm(H, log.p=TRUE) - term
-	    else exp(-0.5*A)*pnorm(H)/term
+        ## compute conditional probabilities (more efficient due to vapply())
+        x <- qnorm(u[,jj.res, drop=FALSE])
+        C.j <- function(j) {
+            P. <- P[j,1:(j-1), drop=FALSE] %*% solve(P[1:(j-1),1:(j-1), drop=FALSE]) # (1,j-1) %*% (j-1,j-1) = (1,j-1)
+            mu.cond <- as.numeric(P. %*% t(x[,1:(j-1), drop=FALSE])) # (1,j-1) %*% (j-1,n) = (1,n) = n
+            P.cond <- P[j,j] - P. %*% P[1:(j-1),j, drop=FALSE] # (1,1) - (1,j-1) %*% (j-1,1) = (1,1)
+            pnorm(x[,j], mean=mu.cond, sd=sqrt(P.cond), log.p=log)
+        }
+        trafo <- vapply(jj, C.j, numeric(n))
+        if(is.null.j.ind) cbind(trafo, if(log) log(u[,1]) else u[,1]) else trafo
 
-	    ## density of Gaussian copula with dimension j-1
-	    two <- if (j==2) dnorm(x., log=log) else {
-		dmvnorm(x., sigma=sigma[1:(j-1),1:(j-1)], log=log)
-	    }
-	    if(log) Id - two else (Id/two)
+    } else if(is(cop, "tCopula")) {
 
-	} ## C.j
+    ## t Copula ################################################################
 
-    } else if(is(cop, "tCopula")) { ## tCopula #################################
-	sigma <- getSigma(cop)
-	df <- getdf(cop)
-	n <- nrow(X <- qt(u, df=df))
-	C.j <- function(j) { ## j is the dimension -- really a function of (j, df, X := F(u))
-	    ## log(Determinant) :
-	    stopifnot(j >= 2, (dd <- determinant(Sd <- sigma[1:j,1:j]))$sign >= 0)
-	    logDet <- dd$modulus
-	    ## invsigma is the inverse matrix of sigma[1:j,1:j]
-	    invsigma <- solve(Sd)
+	P <- getSigma(cop)
+        stopifnot(dim(P) == c(d,d)) # defensive programming
+	nu <- getdf(cop)
+        n <- nrow(u)
 
-	    x <- X[,1:j, drop=FALSE]
-	    x. <- x[,1:(j-1), drop=FALSE]
-	    IS. <- invsigma[-j,-j]
-	    sid <- sqrt(invsigma[j,j])
+        ## compute inverse
+        if(inverse) {
+            U <- u # consider u as U[0,1]^d
+            max.col <- if(is.null(j.ind)) d else j.ind
+            x <- qt(u[,1:max.col, drop=FALSE], df=nu) # will be updated with previously transformed U's
+            for(j in 2:max.col) {
+                P1.inv <- solve(P[1:(j-1),1:(j-1), drop=FALSE])
+                x1 <- x[,1:(j-1), drop=FALSE]
+                g  <- vapply(1:n, function(i) x1[i, ,drop=FALSE] %*% P1.inv %*%
+                             t(x1[i, ,drop=FALSE]), numeric(1))
+                P.inv <- solve(P[1:j, 1:j, drop=FALSE])
+                s1 <- sqrt((nu+j-1)/(nu+g))
+                s2 <- (x1 %*% P.inv[1:(j-1),j, drop=FALSE]) / sqrt(P.inv[j,j])
+                U[,j] <- pt((qt(u[,j], df=nu+j-1)/s1-s2) / sqrt(P.inv[j,j]),
+                            df=nu, log.p=log)
+                x[,j] <- qt(if(log) exp(U[,j]) else U[,j], df=nu) # based on previously transformed U's
+            }
+            if(log) U[,1] <- log(U[,1]) # adjust the first column for 'log'
+            return(U[,jj.res])
+        }
 
-	    ## sum1 = \sum_{i=1}^{j-1}(a_{id}+a_{di}) x_i
-	    sum1 <-  colSums( (invsigma[j,1:(j-1)]+invsigma[1:(j-1),j]) * t(x.)	)
-
-	    ## calculate A
-	    ## sum2 = \sum_{j=1}^{j-1}\sum_{i=1}^{j-1}a_{ij} x_i x_j
-	    sum2 <- if (j==2) invsigma[1,1]*x.^2 else sapply(1:n,
-			function(n) crossprod(x.[n,], IS. %*% x.[n,]))
-
-	    A <- sum2-sum1^2/(4*invsigma[j,j])
-
-	    f <- function(z,i) {
-		(1 + ((sid*z+sum1[i]/(2*sid))^2 + A[i])/df)^((-df-j)/2)
-	    }
-
-	    ## term=\frac{\Gamma{[(\nu+j)/2]}}{\Gamma{(\nu/2)}(\nu\pi)^{j/2}|\Sigma_j|^{1/2}}
-	    lterm <- lgamma((df+j)/2)-(lgamma(df/2)+log(pi*df)*(j/2)+0.5*logDet)
-	    Id <- sapply(1:n, function(i)
-			 integrate(f, lower= -Inf, upper= x[i,j], i=i)$value)
-            Id <- if(log) lterm + log(Id) else exp(lterm) * Id
-
-	    ## density of Student-t copula with dimension j-1and degrees of freedom df
-	    two <- if(j==2) dt(x.,df=df, log=log) else {
-		## require(mnormt)
-		## dmt(x. ,df=df, mean = rep(0, (d-1)),S=sigma[1:(d-1),1:(d-1)])
-		dmvt(x., df=df, sigma=sigma[1:(j-1),1:(j-1)], log=log)
-	    }
-	    if(log) pmin(0, Id - two) else pmin(1, Id/two)
-
-	} ## C.j
+        ## compute conditional probabilities (more efficient due to vapply())
+        x <- qt(u[,jj.res, drop=FALSE], df=nu)
+        C.j <- function(j) {
+            P1.inv <- solve(P[1:(j-1),1:(j-1), drop=FALSE])
+            x1 <- x[,1:(j-1), drop=FALSE]
+            g  <- vapply(1:n, function(i) x1[i, ,drop=FALSE] %*% P1.inv %*%
+                         t(x1[i, ,drop=FALSE]), numeric(1))
+            P.inv <- solve(P[1:j, 1:j, drop=FALSE])
+            s1 <- sqrt((nu+j-1)/(nu+g))
+            s2 <- (x1 %*% P.inv[1:(j-1),j, drop=FALSE]) / sqrt(P.inv[j,j])
+            lres <- pt(s1 * ( sqrt(P.inv[j,j]) * x[,j, drop=FALSE] + s2),
+                       df=nu+j-1, log.p=TRUE)
+            if(log) lres else exp(lres)
+        }
+        trafo <- vapply(jj, C.j, numeric(n))
+        if(is.null.j.ind) cbind(trafo, if(log) log(u[,1]) else u[,1]) else trafo
 
     } else {
 	stop("not yet implemented for copula class ", class(cop))
-    }
-
-    if(trafo.only)
-	vapply(j.ind, C.j, numeric(n))
-    else {
-	u[, -1] <- vapply(j.ind, C.j, numeric(n))
-	u
     }
 }
 
 ##' Transforms vectors of random variates following the given (nested) Archimedean
 ##' copula (with specified parameters) to [0,1]^d (or [0,1]^(d-1)) vectors of
-##' random variates via the transformation of Hering and Hofert (2011) or its
+##' random variates via the transformation of Hering and Hofert (2014) or its
 ##' inverse
 ##'
-##' @title Transformation of Hering and Hofert (2011) or its inverse
+##' @title Transformation of Hering and Hofert (2014) or its inverse
 ##' @param u data matrix in [0,1]^(n, d)
 ##' @param cop an outer_nacopula
 ##' @param include.K boolean indicating whether the last component, K, is also
@@ -255,7 +236,7 @@ rtrafo <- function(u, cop, j.ind=2:d, m, n.MC=0, inverse=FALSE,
 ##' @return matrix of transformed realizations
 ##' @author Marius Hofert and Martin Maechler
 htrafo <- function(u, cop, include.K=TRUE, n.MC=0, inverse=FALSE,
-                   method=formals(qK)$method, u.grid, ...)
+                   method=eval(formals(qK)$method), u.grid, ...)
 {
     ## checks
     stopifnot(is(cop, "outer_nacopula"))
@@ -283,7 +264,7 @@ htrafo <- function(u, cop, include.K=TRUE, n.MC=0, inverse=FALSE,
         ## finally, compute the transformation
         expo <- rep(lpsiIKI, d) + cslu + l1p
         cop@copula@psi(exp(expo), th)
-    } else { # "goodness-of-fit trafo" of Hofert and Hering (2011)
+    } else { # "goodness-of-fit trafo" of Hering and Hofert (2014)
         lpsiI <- cop@copula@iPsi(u, th, log=TRUE) # matrix log(psi^{-1}(u))
         lcumsum <- matrix(unlist(lapply(1:d, function(j)
                                         lsum(t(lpsiI[,1:j, drop=FALSE])))),
@@ -299,7 +280,7 @@ htrafo <- function(u, cop, include.K=TRUE, n.MC=0, inverse=FALSE,
 }
 
 
-### Gof wrapper ################################################################
+### Gof wrapper (working but deprecated) #######################################
 
 ##' Conducts a goodness-of-fit test for the given H0 copula cop based on the
 ##' (copula) data u
@@ -312,21 +293,13 @@ htrafo <- function(u, cop, include.K=TRUE, n.MC=0, inverse=FALSE,
 ##' @param include.K boolean whether K is included in the transformation
 ##' @param n.MC parameter n.MC for K
 ##' @param trafo multivariate goodness-of-fit transformation; available are:
-##'        "Hering.Hofert" the transformation of Hering, Hofert (2011)
+##'        "Hering.Hofert" the transformation of Hering, Hofert (2014)
 ##'        "Rosenblatt" the transformation of Rosenblatt (1952)
 ##' @param method test statistic for the test of U[0,1]^d; see gofTstat()
 ##' @param verbose if TRUE, the progress of the bootstrap is displayed
 ##' @param ... additional arguments to enacopula
 ##' @return htest object
 ##' @author Marius Hofert and Martin Maechler
-##' TODO: - deprecate it!
-##'       - call the following instead:
-##'              gofCopula(cop, x=u, N=n.bootstrap, method=method,
-##'              estim.method=<one of fitCopula() instead of enacopula()>,
-##'              simulation="pb", verbose=verbose,
-##'              trafo.method=<trafo, but rename "Hering.Hofert" to "htrafo" and "Rosenblatt" to "rtrafo">)
-##'        - note: gnacopula() shouldn't be used with other methods than MPLE
-##'               anyways => use fitCopula() as engine, not enacopula().
 gnacopula <- function(u, cop, n.bootstrap,
 		      estim.method=eval(formals(enacopula)$method),
 		      include.K=TRUE, n.MC=0,
@@ -334,99 +307,108 @@ gnacopula <- function(u, cop, n.bootstrap,
 		      method=eval(formals(gofTstat)$method),
 		      verbose=TRUE, ...)
 {
-    ## setup
-    if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-    stopifnot(0 <= u, u <= 1, is(cop, "outer_nacopula"), (d <- ncol(u)) >= 2,
-              max(cop@comp) == d, n.bootstrap >= 0, n.MC >= 0)
-    if(length(cop@childCops))
-	stop("currently, only Archimedean copulas are provided")
-    if(n.bootstrap == 0)
-	stop("Choose a reasonable number of bootstrap replications or
-apply the transformations yourself,  see ?gnacopula.")
-    u.name <- deparse(substitute(u))
+    .Deprecated("gofCopula")
+    gofCopula(cop, x=u, N=n.bootstrap, method=method,
+              estim.method=estim.method,
+              verbose=verbose, trafo.method=if(trafo == "Rosenblatt")
+              "rtrafo" else "htrafo", n.MC=n.MC, if(trafo == "htrafo")
+              include.K=include.K)
 
-    ## additional warnings for now
-    estim.method <- match.arg(estim.method)
-    if(estim.method != "mle"){
-	if(estim.method == "smle") warning("'estim.method = \"smle\"' may be time-consuming!") else
-	warning("Consistency for the chosen estim.method is not clear. Additionally, numerical problems might appear.")
-    }
+## working (but deprecated)
 
-    ## build multivariate transformation
-    trafo <- match.arg(trafo)
-    method <- match.arg(method)
-    gtrafomulti <-
-        switch(trafo,
-               "Hering.Hofert" = {
-                   function(u, cop) htrafo(u, cop=cop, include.K=include.K, n.MC=n.MC)
-               },
-               "Rosenblatt" = {
-                   function(u, cop) rtrafo(u, cop=cop, n.MC=n.MC)
-               },
-               stop("invalid 'trafo' argument"))
+##     ## setup
+##     if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
+##     stopifnot(0 <= u, u <= 1, is(cop, "outer_nacopula"), (d <- ncol(u)) >= 2,
+##               max(cop@comp) == d, n.bootstrap >= 0, n.MC >= 0)
+##     if(length(cop@childCops))
+## 	stop("currently, only Archimedean copulas are provided")
+##     if(n.bootstrap == 0)
+## 	stop("Choose a reasonable number of bootstrap replications or
+## apply the transformations yourself,  see ?gnacopula.")
+##     u.name <- deparse(substitute(u))
 
-    ## build test statistic function and 'meth' string describing the method
-    meth <- paste0("Bootstrapped (B =", n.bootstrap,") test of ")
-    meth2 <- paste0(method,", est.method = ", estim.method)
-    meth <-
-	switch(method,
-               "Sn" = {
-                   paste0(meth, meth2)
-               },
-               "SnB" =, "SnC" = {
-		   paste0(meth, meth2," (with trafo = ", trafo, ")")
-	       },
-	       "AnChisq" =, "AnGamma" = {
-		   paste0(meth, "Anderson and Darling (with trafo = ",
-                          trafo, " and method = ", meth2, ")")
-	       },
-	       stop("wrong 'method' argument"))
+##     ## additional warnings for now
+##     estim.method <- match.arg(estim.method)
+##     if(estim.method != "mle"){
+## 	if(estim.method == "smle") warning("'estim.method = \"smle\"' may be time-consuming!") else
+## 	warning("Consistency for the chosen estim.method is not clear. Additionally, numerical problems might appear.")
+##     }
 
-    ## main part --- Bootstrapping ------------------
+##     ## build multivariate transformation
+##     trafo <- match.arg(trafo)
+##     method <- match.arg(method)
+##     gtrafomulti <-
+##         switch(trafo,
+##                "Hering.Hofert" = {
+##                    function(u, cop) htrafo(u, cop=cop, include.K=include.K, n.MC=n.MC)
+##                },
+##                "Rosenblatt" = {
+##                    function(u, cop) rtrafo(u, cop=cop, n.MC=n.MC)
+##                },
+##                stop("invalid 'trafo' argument"))
 
-    ## (1) estimate the parameter by the provided estimation method and
-    ##	   define the estimated copula
-    theta.hat <- enacopula(u, cop, method=estim.method, ...)
-    cop.hat <- onacopulaL(cop@copula@name, list(theta.hat, 1:d)) # copula with theta.hat
+##     ## build test statistic function and 'meth' string describing the method
+##     meth <- paste0("Bootstrapped (B =", n.bootstrap,") test of ")
+##     meth2 <- paste0(method,", est.method = ", estim.method)
+##     meth <-
+## 	switch(method,
+##                "Sn" = {
+##                    paste0(meth, meth2)
+##                },
+##                "SnB" =, "SnC" = {
+## 		   paste0(meth, meth2," (with trafo = ", trafo, ")")
+## 	       },
+## 	       "AnChisq" =, "AnGamma" = {
+## 		   paste0(meth, "Anderson and Darling (with trafo = ",
+##                           trafo, " and method = ", meth2, ")")
+## 	       },
+## 	       stop("wrong 'method' argument"))
 
-    ## (2) transform the data with the copula with estimated parameter
-    u.prime <- gtrafomulti(u, cop=cop.hat) # transformed data in the unit hypercube
+##     ## main part --- Bootstrapping ------------------
 
-    ## (3) conduct the Anderson-Darling test or compute the test statistic (depends on method)
-    T <- if(method=="Sn") gofTstat(u.prime, method=method, copula=cop.hat)
-         else gofTstat(u.prime, method=method)
+##     ## (1) estimate the parameter by the provided estimation method and
+##     ##	   define the estimated copula
+##     theta.hat <- enacopula(u, cop, method=estim.method, ...)
+##     cop.hat <- onacopulaL(cop@copula@name, list(theta.hat, 1:d)) # copula with theta.hat
 
-    ## (4) conduct the parametric bootstrap
-    theta.hat. <- numeric(n.bootstrap) # vector of estimators
-    T. <- numeric(n.bootstrap)# vector of gofTstat() results
-    if(verbose) {	     # setup progress bar and close it on exit
-	pb <- txtProgressBar(max = n.bootstrap, style = if(isatty(stdout())) 3 else 1)
-	on.exit(close(pb))
-    }
-    for(k in 1:n.bootstrap) {
+##     ## (2) transform the data with the copula with estimated parameter
+##     u.prime <- gtrafomulti(u, cop=cop.hat) # transformed data in the unit hypercube
 
-	## (4.1) sample from the copula with estimated parameter and build
-	##	     the corresponding pseudo-observations
-	u. <- pobs(rnacopula(nrow(u), cop.hat))
+##     ## (3) conduct the Anderson-Darling test or compute the test statistic (depends on method)
+##     T <- if(method=="Sn") gofTstat(u.prime, method=method, copula=cop.hat)
+##          else gofTstat(u.prime, method=method)
 
-	## (4.2) estimate the parameter by the provided method and define
-	##	     the estimated copula
-	theta.hat.[k] <- enacopula(u., cop, method=estim.method, ...)
-	cop.hat. <- onacopulaL(cop@copula@name, list(theta.hat.[k], 1:d))
+##     ## (4) conduct the parametric bootstrap
+##     theta.hat. <- numeric(n.bootstrap) # vector of estimators
+##     T. <- numeric(n.bootstrap)# vector of gofTstat() results
+##     if(verbose) {	     # setup progress bar and close it on exit
+## 	pb <- txtProgressBar(max = n.bootstrap, style = if(isatty(stdout())) 3 else 1)
+## 	on.exit(close(pb))
+##     }
+##     for(k in 1:n.bootstrap) {
 
-	## (4.3) transform the data with the copula with estimated parameter
-	u.prime. <- gtrafomulti(u., cop=cop.hat.)
+## 	## (4.1) sample from the copula with estimated parameter and build
+## 	##	     the corresponding pseudo-observations
+## 	u. <- pobs(rnacopula(nrow(u), cop.hat))
 
-	## (4.4) compute the test statistic
-        T.[k] <- if(method=="Sn") gofTstat(u.prime., method=method, copula=cop.hat.)
-        else gofTstat(u.prime., method=method)
-        if(verbose) setTxtProgressBar(pb, k) # update progress bar
-    }
+## 	## (4.2) estimate the parameter by the provided method and define
+## 	##	     the estimated copula
+## 	theta.hat.[k] <- enacopula(u., cop, method=estim.method, ...)
+## 	cop.hat. <- onacopulaL(cop@copula@name, list(theta.hat.[k], 1:d))
 
-    ## (5) build and return results
-    structure(class = "htest",
-	      list(p.value= (sum(T. > T) + 0.5)/(n.bootstrap+1),
-                   statistic = T, data.name = u.name,
-		   method=meth, estimator=theta.hat,
-		   bootStats = list(estimator=theta.hat., statistic=T.)))
+## 	## (4.3) transform the data with the copula with estimated parameter
+## 	u.prime. <- gtrafomulti(u., cop=cop.hat.)
+
+## 	## (4.4) compute the test statistic
+##         T.[k] <- if(method=="Sn") gofTstat(u.prime., method=method, copula=cop.hat.)
+##         else gofTstat(u.prime., method=method)
+##         if(verbose) setTxtProgressBar(pb, k) # update progress bar
+##     }
+
+##     ## (5) build and return results
+##     structure(class = "htest",
+## 	      list(p.value= (sum(T. > T) + 0.5)/(n.bootstrap+1),
+##                    statistic = T, data.name = u.name,
+## 		   method=meth, estimator=theta.hat,
+## 		   bootStats = list(estimator=theta.hat., statistic=T.)))
 }

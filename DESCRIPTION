@@ -1,21 +1,21 @@
 Package: copula
-Version: 0.999-10
-LastCRAN: 0.999-9 on 2014-05-05
-Date: $Date: 2014-06-17 09:41:33 +0200 (Tue, 17. Jun 2014) $,
-        subversion $Revision: 1110 $
+Version: 0.999-11
+Date: $Date: 2014-09-04 12:37:17 +0200 (Thu, 04. Sep 2014) $,
+        subversion $Revision: 1138 $
 Title: Multivariate Dependence with Copulas
-Author: Marius Hofert <marius.hofert@math.ethz.ch>,
+Author: Marius Hofert <marius.hofert@uwaterloo.ca>,
  Ivan Kojadinovic <ivan.kojadinovic@univ-pau.fr>,
  Martin Maechler <maechler@stat.math.ethz.ch>, and
  Jun Yan <jun.yan@uconn.edu>
 Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
 Depends: R (>= 2.15.2)
-Imports: stats, graphics, methods, stats4, Matrix, gsl, ADGofTest,
-        stabledist (>= 0.6-4), mvtnorm, pspline
-Suggests: lattice, MASS, KernSmooth, sfsmisc, bbmle, scatterplot3d,
-        Rmpfr, rugarch, colorspace, mvnormtest, tseries, zoo
-SuggestsNote: packages colorspace, mvnormtest, tseries, zoo are only
-        used in demos
+Imports: stats, graphics, methods, stats4, Matrix, lattice, gsl,
+        ADGofTest, stabledist (>= 0.6-4), mvtnorm, pspline
+Suggests: MASS, KernSmooth, sfsmisc, bbmle, scatterplot3d, Rmpfr,
+        partitions, polynom, rugarch, colorspace, mvnormtest, tseries,
+        zoo
+SuggestsNote: the last line packages partitions, ..., zoo are only used
+        in demos
 Enhances: nor1mix
 Description: Classes (S4) of commonly used elliptical, Archimedean, extreme
  value and some more copula families.  Methods for density, distribution,
@@ -45,7 +45,7 @@ Collate: AllClass.R Classes.R Copula.R Auxiliaries.R aux-acopula.R
         tawnCopula.R tawnExpr.R tevCopula.R wrapper.R zzz.R
 Encoding: UTF-8
 URL: http://nacopula.r-forge.r-project.org/
-Packaged: 2014-06-18 18:13:38 UTC; maechler
+Packaged: 2014-09-05 10:04:09 UTC; maechler
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2014-06-19 09:30:39
+Date/Publication: 2014-09-05 17:54:42

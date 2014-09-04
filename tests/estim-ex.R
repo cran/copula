@@ -151,7 +151,7 @@ if(FALSE)
 ##     (d-1)*log(theta) + Li. - theta*u.sum - lu
 ## the terms     Li. - (theta * u.sum)
 ## 'more or less cancel' -- so if we could compute a
-###  *different* rescaled polylog() .. maybe we can get better
+##  *different* rescaled polylog() .. maybe we can get better
 
 untrace(polylog)
 
@@ -205,5 +205,11 @@ rr <- sapply(estMeth, function(e) {
 })
 
 round(cbind(rr, bias = rr - theta), 3)
+
+showProc.time()
+
+### 2-level nested Archimedean copulas :
+if(doExtras)
+  demo("dnac-demo")
 
 showProc.time()

@@ -26,7 +26,7 @@ Cn(x, w) ## <-- deprecated!  use  C.n(w, U=pobs(x)) instead!
     empirical copula.}
   \item{U,X}{(and \code{x} for \code{Cn()}:) an \eqn{(n,
       d)}-\code{\link{matrix}}, for \code{C.n()} and \code{Cn()} with
-    elements in \eqn{[0,1]} and with the same number \eqn{d} of columns as 
+    elements in \eqn{[0,1]} and with the same number \eqn{d} of columns as
     \code{u} (or \code{x} respectively.  The rows of \code{U} are the
     (pseudo-)data on which the empirical copula is built.  The rows of
     \code{X} are the \dQuote{raw} observations. A multivariate random
@@ -47,7 +47,7 @@ Cn(x, w) ## <-- deprecated!  use  C.n(w, U=pobs(x)) instead!
 }
 \value{
   \code{C.n()} and \code{F.n()} a numeric vector of length
-  \code{m} with the values 
+  \code{m} with the values
   for \code{C.n()} of the empirical copula of \code{U} at \code{u}, and
   for \code{F.n()} of the empirical CDF (cumulative distribution
   function) of \code{X} at \code{x}.
@@ -56,7 +56,7 @@ Cn(x, w) ## <-- deprecated!  use  C.n(w, U=pobs(x)) instead!
   %% otherwise a simple \code{\link{numeric}} vector.
   %% As pure computational tool, \code{.Fn()} returns the same raw numeric
   %% vector.
-  
+
   \code{dCn()} returns a \eqn{(m, l)}-matrix or an \eqn{m}-vector (for
   \eqn{l=1}; here, \eqn{l} is the length of \code{j.ind}), containing
   the approximated first-order partial derivatives of the unknown
@@ -80,7 +80,7 @@ Cn(x, w) ## <-- deprecated!  use  C.n(w, U=pobs(x)) instead!
   denote the pseudo-observations (rows in \code{U}) and \eqn{n} the sample size.
 
   The approximation for the \eqn{j}th partial derivative of the unknown
-  copula \eqn{C} is implemented as, for example, in Rémillard and Scaillet
+  copula \eqn{C} is implemented as, for example, in R\enc{é}{e'}millard and Scaillet
   (2009), % see also Genest et al. (2012)
   and given by
   \deqn{\hat{\dot{C}}_{jn}(\bm{u})=\frac{C_n(u_1,..,u_{j-1},min(u_j+b,1),u_{j+1},..,u_d)-C_n(u_1,..,u_{j-1},max(u_j-b,0),u_{j+1},..,u_d)}{2b},}{%

@@ -110,8 +110,7 @@ rK(n, cop, d)
   \bold{20}, 223--256.
 }
 \seealso{
-  \code{\link{gnacopula}}, \code{\link{htrafo}} or \code{\link{emde}}
-  (where \code{\link{K}} is used).
+  \code{\link{htrafo}} or \code{\link{emde}} (where \code{\link{K}} is used).
 }
 \examples{
 tau <- 0.5

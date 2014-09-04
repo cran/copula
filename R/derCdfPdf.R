@@ -338,8 +338,7 @@ derPdfWrtParamsExplicitCopula <- function(cop, u)
     p <- cop@dimension
     alpha <- cop@parameters
     algNm <- paste(class(cop)[1], "pdfDerWrtPar.algr", sep=".")
-    if(exists(algNm)) {
-        der.pdf.alpha <- get(algNm)[p]
+    if(exists(algNm) && is.expression(der.pdf.alpha <- get(algNm)[p])) {
         colnames(u) <- paste0("u", 1:p)
         as.matrix(eval(der.pdf.alpha, data.frame(u)))
     } else {
@@ -351,7 +350,6 @@ derPdfWrtParamsExplicitCopula <- function(cop, u)
 setMethod("derPdfWrtParams", signature("archmCopula"), derPdfWrtParamsExplicitCopula)
 setMethod("derPdfWrtParams", signature("plackettCopula"), derPdfWrtParamsExplicitCopula)
 setMethod("derPdfWrtParams", signature("evCopula"), derPdfWrtParamsExplicitCopula)
-setMethod("derPdfWrtParams", signature("gumbelCopula"), derPdfWrtParamsExplicitCopula)
 
 derPdfWrtParamsEllipCopula <- function(cop, u)
 {

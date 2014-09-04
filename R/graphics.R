@@ -178,8 +178,7 @@ KPlot <- function(x, plot=TRUE, ...) {
 splom2 <- function(data, varnames=NULL, Vname="U", xlab="",
                    col.mat=NULL, bg.col.mat=NULL, ...)
 {
-    stopifnot(require(lattice),
-	      is.numeric(data <- as.matrix(data)),
+    stopifnot(is.numeric(data <- as.matrix(data)),
 	      (d <- ncol(data)) >= 1)
     if(is.null(varnames)) {
 	varnames <- do.call(expression,

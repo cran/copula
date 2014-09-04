@@ -2,7 +2,6 @@ AC-Liouville-demo  Some examples from McNeil, Neslehova (2010)
 copula_garch       A minimal example on the copula--GARCH modeling approach
 fitting-tests      Tests of fitCopula
 estimation.gof	   Estimation and goodness-of-fit capabilities
-QARClayton	   AR(1) Clayton with Student marginals Estimation and Quantile Curves
 gofCopula	   Goodness-of-fit test for copula models
 gof_graph	   Graphical goodness-of-fit based on pairwise Rosenblatt transforms
 gof_radial         Graphical goodness-of-fit based on radial decomposition (elliptical, AC)
@@ -12,6 +11,8 @@ logL-vis	   Log Likelihood Visualizations
 opC-demo	   Outer power copula (Clayton only, for now)
 dnac-demo          Usage of densities of two-level nested Archimedean copulas
 polyGJ		   Investigating precision and run time of polyG and polyJ
+QARClayton	   AR(1) Clayton with Student marginals Estimation and Quantile Curves
+qrng               Quasi-random numbers for copula models
 dDiag-plots	   Plotting dDiag() densities (over range of families, theta, d)
 timings		   Using timing() to measure speed of basic Archimedean families
 retstable	   Computation of exponentially tilted stable random variates

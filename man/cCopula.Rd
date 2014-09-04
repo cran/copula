@@ -1,11 +1,11 @@
-\name{cCopula}
+ \name{cCopula}
 \alias{cCopula}
 \alias{cacopula}
 \title{Conditional Copula Function}
 \description{
   Compute the conditional distribution aka conditional copula function,
-  \eqn{C(u_d\,|\,u_1,\dots,u_{d-1})}{C(u[d]|u[1],...,u[d-1])}
-  of \eqn{u_d}{u[d]} given \eqn{u_1,\dots,u_{d-1}}{u[1],...,u[d-1]}.
+  \eqn{C(u_d\,|\,u_1,\dots, u_{d-1})}{C(u[d] | u[1],..., u[d-1])}
+  of \eqn{u_d}{u[d]} given \eqn{u_1,\dots,u_{d-1}}{u[1],..., u[d-1]}.
 }
 \usage{
 cCopula(u, copula, j.ind=ncol(u), n.MC=0, log=FALSE)
@@ -37,6 +37,10 @@ cacopula(u, cop, n.MC=0, log=FALSE)
   \code{cCopula()} can be seen as a special case of the Rosenblatt
   transform which by default computes all conditional distributions.
   Conseqently, \code{cCopula()} simply calls \code{\link{rtrafo}()}.
+
+  Note that \emph{sampling} aka random number generation from the
+  conditional distribution can be achieved by
+  \code{\link{rtrafo}(*, inverse=TRUE)}.
 }
 \author{Marius Hofert, Yongsheng Wang, and Martin Maechler}
 \note{
@@ -64,6 +68,6 @@ plot(U.[,1],U.[,2])
  stopifnot(all.equal(cacopula(U, cop),# with deprecation warning
                       cCopula(U, cop)))
 }
-## more examples:  -->  ?rtrafo % ./gtrafo.Rd
-}
+## more examples:  -->  ?rtrafo
+} % --> ./gofTrafos.Rd
 \keyword{distribution}

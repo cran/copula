@@ -1,16 +1,15 @@
 \name{Sibuya}
+\title{Sibuya Distribution - Sampling and Probabilities}
 \alias{Sibuya}
 \alias{rSibuya}
 \alias{pSibuya}
 \alias{dSibuya}
 \alias{rSibuyaR}
 \alias{dsumSibuya}
-\title{Sibuya Distribution - Sampling and Probabilities}
 \description{
   The Sibuya distribution \eqn{\mathrm{Sib}(\alpha)}{Sib(alpha)} can be
   defined by its Laplace transform
-  \deqn{1-(1-\exp(-t))^\alpha,\ t\in[0,\infty),}{1-(1-exp(-t))^alpha, t
- in [0,Inf),}
+  \deqn{1-(1-\exp(-t))^\alpha,\ t\in[0,\infty),}{1-(1-exp(-t))^alpha, t in [0,Inf),}
   its distribution function% "R man - FIXME: allow to use \mathbb{N} instead:
   \deqn{F(k)=1-(-1)^k{\alpha-1\choose k}=1-\frac{1}{kB(k,1-\alpha)},\
     k\in\mathbf{N}}{%
@@ -48,7 +47,7 @@ pSibuya(x, alpha, lower.tail=TRUE, log.p=FALSE)
 dsumSibuya(x, n, alpha,
            method=c("log", "direct", "diff", "exp.log",
                     "Rmpfr", "Rmpfr0", "RmpfrM", "Rmpfr0M"),
-           mpfr = list(minPrec = 21, fac = 1.25, verbose=TRUE),
+           mpfr.ctrl = list(minPrec = 21, fac = 1.25, verbose=TRUE),
            log=FALSE)
 }
 \arguments{
@@ -60,11 +59,11 @@ dsumSibuya(x, n, alpha,
   }
   \item{alpha}{parameter in \eqn{(0,1]}.}
   \item{x}{vector of \code{\link{integer}} values (\dQuote{quantiles})
-\eqn{x} at which to compute the probability mass or cumulative probability.}
+    \eqn{x} at which to compute the probability mass or cumulative probability.}
   \item{log, log.p}{\code{\link{logical}}; if TRUE, probabilities p are
-given as log(p).}
+    given as log(p).}
   \item{lower.tail}{\code{\link{logical}}; if TRUE (the default), probabilities
-      are \eqn{P(X \le x)}{P(X <= x)}, otherwise, \eqn{P(X > x)}.}
+    are \eqn{P(X \le x)}{P(X <= x)}, otherwise, \eqn{P(X > x)}.}
   \item{method}{character string specifying which computational method is to be
     applied.  Implemented are:
     \describe{
@@ -92,7 +91,7 @@ given as log(p).}
 	numerically stable evaluation (not recommended, use with care).}
     }
   }
-  \item{mpfr}{for \code{method = "Rmpfr"} or \code{"RmpfrM"} only: a
+  \item{mpfr.ctrl}{for \code{method = "Rmpfr"} or \code{"RmpfrM"} only: a
     list of
     \cr \code{minPrec}: minimal (estimated) precision in bits,
     \cr \code{fac}: factor with which current precision is multiplied if

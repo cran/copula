@@ -70,8 +70,8 @@ margpnames <- function(mv) {
     p <- mv@copula@dimension
     pnms <- unlist(lapply(mv@paramMargins, names)) # maybe NULL
     if (sum(nMar) == 0) character()
-    else if(mv@marginsIdentical)
-	paste(paste("m", pnms[1], sep="."))
+    else if(mv@marginsIdentical) ## all the same ==> names only of *first* margin
+	paste(paste("m", pnms[seq_len(nMar[1])], sep="."))
     else
 	paste(paste0("m", rep.int(1:p, nMar)), pnms, sep=".")
 }

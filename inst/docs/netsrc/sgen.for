@@ -10,32 +10,32 @@ c                   American University
 c                   jpnolan@american.edu
 c
 c     Different parameterizations are used for stable distributions,
-c     the variable iparam is used throughout to denote what 
-c     parameterization to use:         
+c     the variable iparam is used throughout to denote what
+c     parameterization to use:
 c
 c         iparam = 0 for S0 parameterization of Nolan,
-c             a variation of Zolotarev's (M) parameterization  
-c         iparam = 1 for S=S1 parameterization of Samorodnitsky and Taqqu  
+c             a variation of Zolotarev's (M) parameterization
+c         iparam = 1 for S=S1 parameterization of Samorodnitsky and Taqqu
 c             a variation of Zolotarev's (A) parameterization
-c         iparam = 2 for S*=S2 parameterization of Nolan        
+c         iparam = 2 for S*=S2 parameterization of Nolan
 c
-c **********************************************************************  
+c **********************************************************************
 
       subroutine sgen(n,x,alpha,beta,gamma,delta,n2,unif,iparam,ierr)
 cDEC$	ATTRIBUTES DLLEXPORT :: SGEN
 C
 C     Generate stable random variables with the specified parameters.
-C     The method of Chambers, Mallow and Stuck is used for the basic 
+C     The method of Chambers, Mallow and Stuck is used for the basic
 C     work, we just convert to the desired form.
 C
 C     Written by:
 C       John P. Nolan           July 1996
-C       Math/Stat Dept.         
-C       American University     
-C       Washington, DC 20016    
+C       Math/Stat Dept.
+C       American University
+C       Washington, DC 20016
 C       e-mail: jpnolan@american.edu
 C
-C     output: x(1),...,x(n) are realizations of a 
+C     output: x(1),...,x(n) are realizations of a
 C         stable random variable with the given parameters.
 C
 C     input values:
@@ -43,11 +43,11 @@ C       alpha  = index of stability of the distribution (0 < alpha < 2)
 C       beta   = skewness parameter (-1 <= beta <= 1)
 C       delta     = shift parameter
 C       gamma  = scale parameter (gamma > 0)
-C       iparam = parameterization type: 
+C       iparam = parameterization type:
 C                  0 is S0 parameterization Nolan - just a scale multiple
 C                     and a shift of a standardized r.v. in Zolotarev's
 C                     (M) parameterization
-C                  1 is S parameterization of Samorodnitsky and Taqqu 
+C                  1 is S parameterization of Samorodnitsky and Taqqu
 C                  2 is S* parameterization of Nolan
 C       unif   = array of n2 = 2*n uniform random variables on the
 C                interval (0,1).  NOTE: the array must not contain
@@ -59,40 +59,40 @@ C                calling this routine.
 C       ierr   = return code, ierr=0 means ok
 C
       IMPLICIT NONE
-      include 'stable.fd' 
-	     
+      include 'stable.fd'
+
       INTEGER*4 N, N2, IPARAM, ierr
       REAL*8 ALPHA, delta, gamma, BETA, X(N), UNIF(N2)
-      
+
       INTEGER*4 I,J
       REAL*8 gamma0, delta0, U, EXPON,RSTAB
-      
+
 c     scale and shift corrections to S0 parameterization
-c     (RSTAB returns an S0(alpha,beta,1,0) r.v.)  
+c     (RSTAB returns an S0(alpha,beta,1,0) r.v.)
       call scheck( 1,alpha,beta,gamma,delta,iparam,
      1      gamma0,delta0,ierr )
       if ((ierr .ne. noerr).and.(ierr.ne.warnrnd)) goto 100
 
 C     call RSTAB in a loop with a uniform and an exponential r.v.
-      J = 1 
+      J = 1
       DO I = 1,N
-        EXPON = -DLOG(UNIF(J)) 
-        U = UNIF(J+1)       
+        EXPON = -DLOG(UNIF(J))
+        U = UNIF(J+1)
         X(I) = gamma0 * RSTAB( ALPHA, beta, U, EXPON ) + delta0
         J = J + 2
       ENDDO
 
-100	continue      
+100	continue
       RETURN
       END
 
-      
-c **********************************************************************  
+
+c **********************************************************************
 C
 C  rstab  --  random stable standardized form
-C  Adapted from a file supplied by Chambers, et al on 5/18/92.  
+C  Adapted from a file supplied by Chambers, et al on 5/18/92.
 C  John Nolan (jpnolan@american.edu) has:
-C  1. converted original from RATFOR to FORTRAN and all variables 
+C  1. converted original from RATFOR to FORTRAN and all variables
 C     and functions have been explicitly typed (5/18/92)
 C  2. converted rstab to double precision (11/7/97)
 C  3. Prevented division by 0 that sometimes occurs (11/7/97)
@@ -107,9 +107,9 @@ C           w : exponentially distributed variate
      * ,a2,a2p,b2,b2p,alogz,tan2,z,d2,d,denom
 c      double precision da,db
       data piby2/1.570796326794896d0 /
-c      real*8 thr1      
+c      real*8 thr1
 c      data thr1/0.99d0/
-      
+
       eps = 1.0d0-alpha
 C compute some tangents
       phiby2 = piby2*(u-0.5d0)
@@ -118,11 +118,11 @@ C compute some tangents
       b = eps*phiby2*bb
       if (eps.gt.(-0.99d0)) then
         tau = bprime/(tan2(eps*piby2)*piby2)
-      else 
+      else
         tau = bprime*piby2*eps*(1.0d0-eps)*tan2((1.0d0-eps)*piby2)
-      endif 
-      
-C compute some necessary subexpressions  
+      endif
+
+C compute some necessary subexpressions
 c
 c Modification (J. Nolan): comment out redundant double precision code.
 C if phi near pi by 2, use double precision throughout
@@ -134,7 +134,7 @@ c        a2 = 1.d0-da
 c        a2p = 1.d0+da
 c        b2 = 1.d0-db
 c        b2p = 1.d0+db
-c      else 
+c      else
 C single precision
         a2 = a**2
         a2p = 1.0d0+a2
@@ -147,8 +147,8 @@ c      endif
 
 c     Modification (J. Nolan): prevent division by 0
       denom = w*a2*b2p
-      if (denom .eq. 0.0d0) then      
-c       This is a kludge, but will prevent the rare case of division 
+      if (denom .eq. 0.0d0) then
+c       This is a kludge, but will prevent the rare case of division
 c       by zero that occurs if a2=0 (which occurs if u is close to 0
 c       or u is close to 1), or w = 0.  In theory, these possibilities
 c	  have probability 0, but in practice they can occur with random
@@ -166,19 +166,19 @@ C compute stable
         rstab = (1.0d0+eps*d)*2.0d0*((a-b)*(1.0d0+a*b)
      1     -phiby2*tau*bb*(b*a2-2.0d0*a))/(a2*b2p)+tau*d
       endif
-      
+
       return
       end
 
-      
-c **********************************************************************  
+
+c **********************************************************************
 
 C d2         evaluate (exp(x)-1)/x
       real*8 function d2(z)
       real*8 z,p1,p2,q1,q2,q3,pv,zz
 C
 C     corrections made to values of q1 and q2 - J. P. Nolan
-C     See JASA Vol 82, pg. 704, June 1987 (still one error) 
+C     See JASA Vol 82, pg. 704, June 1987 (still one error)
 C     and Hart, et al approximation 1801, pg 213.
 C
 C     corrected following data statement from Chambers, Mallows, Stuck routine
@@ -186,7 +186,7 @@ C     corrected following data statement from Chambers, Mallows, Stuck routine
      *  .20001 11415 89964 569 d2,
      *  .16801 33705 07296 648 d4,
      *  .18001 33704 07390 023 d3,1.d0/
-C the approximation 1801 from hart et al (1968, p. 213) 
+C the approximation 1801 from hart et al (1968, p. 213)
 
       if (dabs(z).gt.0.1) then
         d2 = (dexp(z)-1.0d0)/z
@@ -195,12 +195,12 @@ C the approximation 1801 from hart et al (1968, p. 213)
         pv = p1+zz*p2
         d2 = 2.0d0*pv/(q1+zz*(q2+zz*q3)-z*pv)
       endif
-      
+
       return
       end
 
-      
-c **********************************************************************  
+
+c **********************************************************************
 C mytan        tangent function
       real*8 function mytan(xarg)
       logical neg,inv
@@ -233,12 +233,12 @@ C convert to range of rational
       mytan = x*(p0+xx*(p1+xx*p2))/(q0+xx*(q1+xx*q2))
       if (neg) mytan = -mytan
       if (inv) mytan = 1.0d0/mytan
-      
+
       return
       end
 
-      
-c **********************************************************************  
+
+c **********************************************************************
 C  tan2       compute tan(x)/x
 C     function defined only for abs(xarg).le.pi by 4
 C     for other arguments returns tan(x)/x, computed directly
@@ -257,14 +257,14 @@ C the approximation 4283 from hart et al(1968, p. 251)
 C convert to range of rational approx.
         xx = x*x
         tan2 = (p0+xx*(p1+xx*p2))/(piby4*(q0+xx*(q1+xx*q2)))
-      endif                           
-      
+      endif
+
       return
       end
 
 c **********************************************************************
 
-      subroutine scnvrt( iparam, thetai, jparam, thetaj )                                    
+      subroutine scnvrt( iparam, thetai, jparam, thetaj )
 cDEC$	ATTRIBUTES DLLEXPORT :: SCNVRT
 
 c     Utility routine to convert between parameterizations
@@ -273,7 +273,7 @@ c	This routine does no error checking, it could blow up if parameter
 c	values are invalid (e.g. alpha < 0, etc.)
 c
       implicit none
-      include 'stable.fd'      
+      include 'stable.fd'
       real*8 thetai(4),thetaj(4)
       integer*4 iparam, jparam
       real*8 alpha, beta, gammai, deltai, gamma0, delta0,
@@ -284,7 +284,7 @@ c	unpack parameters from input array
 	alpha  = thetai(1)
 	beta   = thetai(2)
 	gammai = thetai(3)
-	deltai = thetai(4) 
+	deltai = thetai(4)
 
 c	convert from iparam to S0 parameterization
 	if ((iparam .le. 0) .or. (iparam .gt. 3)) then
@@ -294,12 +294,12 @@ c	convert from iparam to S0 parameterization
 	  gamma0 = gammai
         if (alpha .eq. 1.0d0) then
           delta0 = deltai + beta*gammai*dlog(gammai)/piby2
-        else    
+        else
           delta0= deltai+beta*dtan(piby2*alpha)*gammai
         endif
 	elseif (iparam .eq. 2) then
 	  gamma0 = gammai * alpha**(-1.0d0/alpha)
-        call smode0( alpha, beta, xmode )        
+        call smode0( alpha, beta, xmode )
         delta0 = deltai - gamma0*xmode
 	elseif (iparam .eq. 3) then
         gamma0 = gammai*alpha**(-1.0d0/alpha)
@@ -314,15 +314,15 @@ c	convert from the S0 to jparam parameterization
         gammaj = gamma0
         if (alpha .eq. 1.0d0) then
           deltaj = delta0 - beta*gamma0*dlog(gamma0)/piby2
-        else    
+        else
           deltaj = delta0 - beta*gamma0*dtan(piby2*alpha)
         endif
       elseif (jparam .eq. 2) then
-        gammaj = gamma0*(alpha**(1.0d0/alpha))     
+        gammaj = gamma0*(alpha**(1.0d0/alpha))
         call smode0( alpha, beta, xmode )
         deltaj = delta0 + gamma0*xmode
 	elseif (jparam .eq. 3) then
-	  gammaj = gamma0*(alpha**(1.0d0/alpha)) 
+	  gammaj = gamma0*(alpha**(1.0d0/alpha))
 	  deltaj = delta0 + gamma0*beta*galpha(alpha)
 	endif
 
@@ -331,14 +331,14 @@ c	pack converted parameter results into output array
 	thetaj(2) = beta
 	thetaj(3) = gammaj
 	thetaj(4) = deltaj
-            
+
       return
       end
-      
+
 c **********************************************************************
 
       real*8 function galpha( alpha )
-c	compute 
+c	compute
 c g(alpha) = tan(pi*alpha/2)*(gamma(1+(2/alpha))/gamma(3/alpha)-1)  alpha .ne. 1
 c		 = (2*EulerGamma-3)/pi	      alpha=1
 c	This function is used in converting between iparam=3
@@ -347,25 +347,25 @@ c     parameterization.
       implicit none
 	include 'stable.fd'
       real*8 alpha, dgamma, euler, g1
-	
+
 	euler = 0.57721 56649 01532 86060d0
 	g1 = (2.0d0*euler - 3.0d0)/pi
       if (dabs(alpha-1.0d0) .lt. 0.0001d0) then
-        galpha = g1 
-      else                           
-        galpha = dtan( piby2 * alpha) * 
+        galpha = g1
+      else
+        galpha = dtan( piby2 * alpha) *
      1         (dgamma(1.0d0+2.0d0/alpha)/dgamma(3.0d0/alpha) - 1.0d0)
       endif
- 
+
       return
-      end   
+      end
 c **********************************************************************
-      
+
       blockdata stableblkdata
-      implicit none 
+      implicit none
       include 'stable.fd'
 
-c     tolerances/thresholds for computations 
+c     tolerances/thresholds for computations
 c     tol(1) for relative error in pdf numerical integration
 c     tol(2) for relative error in cdf numerical integration
 c     tol(3) for relative error in quantile calculation
@@ -373,22 +373,22 @@ c     tol(4) for comparing values of alpha and beta
 c     tol(5) for testing values of x
 c     tol(6) for exponential evaluation
 c     tol(7) for finding location of the peak of the pdf integrand
-c			   and limiting the strim search 
-c     tol(8) for strim    
+c			   and limiting the strim search
+c     tol(8) for strim
 c	tol(9) for minimum alpha
 c	tol(10) min value of xtol allowed
 c     tol(11) threshold for quantile search
 
-      data tol / 0.12d-13, 0.12d-13, 0.12d-13, 0.01d0, 0.005d0, 
+      data tol / 0.12d-13, 0.12d-13, 0.12d-13, 0.01d0, 0.005d0,
      1  200.0d0, 1.0d-14, 1.0d-51, 0.1d0, 1.0d-13, 1.0d-10  /
-      
+
       data debug/.false./
-      
+
       end
-      
+
 c
 c *********************************************************************
-c                      
+c
       subroutine scheck( n, alpha, beta, gamma, delta, iparam, 
      1  gamma0, delta0, ierr ) 
 c
@@ -420,7 +420,7 @@ c	tolerance for testing closeness of x to zeta
 
 c     check for (alpha,beta) at or near a special case:
 c		(alpha=*, beta=+1 or -1)  totally skewed case
-c		(alpha=2, beta=*)  Gaussian case
+c		(alpha=2, beta=*)  Gauss case
 c		(alpha=.5, beta=+1 or -1) Levy case
 c		(alpha=1, beta= 0) Cauchy case
 c     determine if a one-sided density

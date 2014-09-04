@@ -41,7 +41,7 @@ dsSibMpfr <- function(d, alpha, minPrec = 21, fac.prec = 33/32, log=TRUE, verbos
     ## fac.prec = 33/32 = 1.0..  ==> try to not waste -- only get "minimally needed" precision
     stopifnot(length(d) == 1, d >= 1, is.numeric(alpha))
     r <- dsumSibuya(x=d, n = 1:d, alpha=alpha, method = "RmpfrM", log=log,
-                    mpfr = list(minPrec= minPrec, fac = fac.prec, verbose=verbose))
+                    mpfr.ctrl = list(minPrec= minPrec, fac = fac.prec, verbose=verbose))
     list(dsumSib = as.numeric(r), prec = getPrec(r))
 }
 

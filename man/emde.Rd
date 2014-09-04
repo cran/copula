@@ -78,13 +78,13 @@ emde(u, cop,
     Statistique}
   \bold{154}(1), 25--63.
 
-   Hering, C. and Hofert, M. (2011),
-   Goodness-of-fit tests for Archimedean copulas in large dimensions,
-   submitted.
+  Hering, C. and Hofert, M. (2014),
+  Goodness-of-fit tests for Archimedean copulas in high dimensions,
+  \emph{Innovations in Quantitative Risk Management}.
 }
 \seealso{
   \code{\link{enacopula}} (wrapper for different estimators),
-  \code{\link{gnacopula}} (wrapper for different goodness-of-fit tests),
+  \code{\link{gofCopula}} (wrapper for different goodness-of-fit tests),
   \code{\link{htrafo}} (transformation to a multivariate uniform
    distribution), and
   \code{\link{K}} (Kendall distribution function).

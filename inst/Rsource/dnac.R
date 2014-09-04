@@ -16,7 +16,13 @@
 
 ### Densities of two-level nested Archimedean copulas ##########################
 
-## Note: see http://arxiv.org/abs/1204.2410 for more details
+## Reference {in *.Rd style}:
+##     Marius Hofert and David Pham (2013).
+##     Densities of nested Archimedean copulas.
+##     \emph{Journal of Multivariate Analysis}, \bold{118}, 37--52.
+## doi = http://dx.doi.org/10.1016/j.jmva.2013.03.006
+##
+## --> http://arxiv.org/abs/1204.2410 is the preprint of the above, see for more details
 
 
 ### functions for the likelihood ###############################################
@@ -150,14 +156,18 @@ b.coeff <- function(t, cop)
 nacLL <- function(cop, u)
 {
     if(!is.matrix(u)) u <- rbind(u)
-    stopifnot(is(cop, "outer_nacopula"), nesdepth(cop)<=2,
-              (d <- ncol(u))==dim(cop),
-              cop@copula@theta <= min(unlist(lapply(cop@childCops, function(cc)
-              cc@copula@theta)))) # sufficient nesting condition
-    ## setup
+    stopifnot(is(cop, "outer_nacopula"), nesdepth(cop) <= 2,
+              (d <- ncol(u)) == dim(cop))
     C <- cop
     S <- length(C@childCops) # number of proper child copulas (<= d0)
-    if(nesdepth(C)==1 || S == 0) stop("nacLL: You work with an Archimedean copula, so use the more efficient algorithms implemented for this special case.")
+    if(nesdepth(C) == 1 || S == 0) stop("nacLL: Have non-nested Archimedean copula;
+ use the more efficient algorithms implemented for this special case.")
+    ## FIXME?: rather return +Inf than an error ?
+    if(C@copula@theta > min(unlist(lapply(C@childCops,
+                                          function(cc) cc@copula@theta))))
+	stop("Nested archimedean copula parameters do not fulfill nesting condition")
+    ## setup
+    th0 <- C@copula@theta
     lcomp <- length(C@comp) # if > 0 there is a non-sectorial part
     d0 <- S+lcomp # dim(C_0)
     n <- nrow(u)
@@ -165,34 +175,32 @@ nacLL <- function(cop, u)
     eta0. <- matrix(NA, nrow=n, ncol=d0) # n x d_0 matrix containing C_s(u_s)'s and u_0's (if there is a non-sectorial part)
 
     ## walk over the non-sectorial part (if available)
-    if(lcomp > 0){
+    if(lcomp > 0) {
         u0 <- u[,C@comp, drop=FALSE]
-        liPsiD1.[,S+1] <- rowSums(C@copula@absdiPsi(u0, theta=C@copula@theta,
-                                                         log=TRUE))
+        liPsiD1.[,S+1] <- rowSums(C@copula@absdiPsi(u0, theta=th0, log=TRUE))
         eta0.[,(S+1):d0] <- u0 # just set to the u's of the non-sectorial part
     }
 
     ## now walk over all sectors
     t. <- matrix(NA, nrow=n, ncol=S) # n x S matrix of t's
-    for(s in 1:S){
+    for(s in 1:S) {
         Cs <- C@childCops[[s]] # sector s copula list
         us <- u[, Cs@comp] # col-indices of u that belong to sector s
-        t.[,s] <- rowSums(Cs@copula@iPsi(us, theta=Cs@copula@theta))
-        liPsiD1.[,s] <- rowSums(Cs@copula@absdiPsi(us, theta=Cs@copula@theta,
-                                                        log=TRUE))
-        eta0.[,s] <- Cs@copula@psi(t.[,s], theta=Cs@copula@theta) # C_s(u_s)
+        c.s <- Cs@copula
+        t.[,s] <- rowSums(c.s@iPsi(us, theta=c.s@theta))
+        liPsiD1.[,s] <- rowSums(c.s@absdiPsi(us, theta=c.s@theta, log=TRUE))
+        eta0.[,s] <- c.s@psi(t.[,s], theta=c.s@theta) # C_s(u_s)
     }
 
     ## finish computations
     liPsiD1sum <- rowSums(liPsiD1.) # sum(log(absdiPsi)); vector of length n
-    eta0 <- rowSums(C@copula@iPsi(eta0., theta=C@copula@theta)) # eta0; vector of length n; = C@copula@iPsi(pnacopula(C, u), theta=C@copula@theta)
+    eta0 <- rowSums(C@copula@iPsi(eta0., theta=th0)) # eta0; vector of length n; = C@copula@iPsi(pnacopula(C, u), theta=th0)
 
     ## compute b_k's, k=d0,..,d
     ## note: it suffices to give b.coeff only the sectorial t's
     b.mat <- b.coeff(t., cop=C) # n x (d-d_0+1) matrix
 
     ## compute x_k, k=d0,..,d, a n x (d-d_0+1) matrix
-    th0 <- C@copula@theta
     x <- sapply(d0:d, function(k){
         log((-1)^(d-k) * b.mat[,k-d0+1]) +
             C@copula@absdPsi(eta0, theta=th0, degree=k, log=TRUE)

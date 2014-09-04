@@ -13,7 +13,7 @@ loglikCopula(param, x, copula, hideWarnings)
 fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
           start = NULL, lower = NULL, upper = NULL,
           optim.method = "BFGS", optim.control = list(maxit=1000),
-          estimate.variance = TRUE, hideWarnings = TRUE)
+          estimate.variance = NA, hideWarnings = TRUE)
 }
 \arguments{
   \item{param}{ a vector of parameter values. }
@@ -41,8 +41,8 @@ fitCopula(copula, data, method = c("mpl", "ml", "itau", "irho"),
   \item{optim.control}{a \code{\link{list}} of control parameters to be
     passed to \code{\link{optim}(*, control=optim.control)}.}
   \item{optim.method}{the \code{method} for \code{\link{optim}()}.}
-  \item{estimate.variance}{logical; if TRUE, the asymptotic variance is
-    estimated.}
+  \item{estimate.variance}{logical; if true (as by default, if the
+    optimization converges), the asymptotic variance is estimated.}
 }
 \details{
   There are methods for \code{\link{vcov}()}, \code{\link{coef}()},

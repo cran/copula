@@ -1,3 +1,7 @@
+2014-07-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* inst/NEWS.Rd: newly added ---> this is *THE END" of ChangeLog entries
+
 2012-11-15  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 0.999-4

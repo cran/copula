@@ -139,7 +139,10 @@ export(dev.off.pdf)
 
 ## Now  'Depend'  on  stats4 and bbmle :
 importFrom("stats4", mle)
-importMethodsFrom("stats4", coef,confint, logLik, AIC, BIC, plot, profile)
+importMethodsFrom("stats4", coef, confint, logLik, AIC, BIC, plot, profile)
+
+importFrom("lattice", trellis.par.get,
+	   splom, panel.fill, panel.splom, diag.panel.splom)
 
 importFrom("gsl", debye_1, debye_2, dilog, complex_dilog)
 
@@ -148,7 +151,7 @@ importFrom("ADGofTest", ad.test)# really would want the ad.test.statistic() but 
 importFrom("stabledist", dstable)
 
 if(FALSE) {## currently do not "depend" on Rmpfr's correct installation:
-## As we use it in "bad cases" polyG(), dsumSibuya(),..:
+## As we use it only in "bad cases" polyG(), dsumSibuya(),..:
 importFrom("Rmpfr",
 	   mpfr, chooseMpfr, chooseMpfr.all,
 	   getPrec, roundMpfr, sumBinomMpfr)
@@ -164,6 +167,7 @@ exportClasses("acopula",
 
 ## Generics, functions and acopula - family objects defined in this package
 export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
+       , .ac.shortNames, .ac.longNames, .ac.objNames, .ac.classNames
        ,"getAcop"
        ,"cacopula", "dnacopula", "pnacopula", "rnacopula", "rnchild"
        ## estimation

@@ -156,10 +156,8 @@ gofMB(copula, x, N, method = c("Sn", "Rn"),
   (carelessly).  From a mathematical point of view, this is not correct.
 }
 \seealso{
-  \code{\link{fitCopula}()} for the underlying estimation procedure,
-  \code{\link{gofTstat}()} for the available test statistics,
-  \code{\link{gnacopula}()} for other goodness-of-fit tests for (nested)
-  Archimedean copulas.
+  \code{\link{fitCopula}()} for the underlying estimation procedure and
+  \code{\link{gofTstat}()} for the available test statistics.
 }
 \examples{
 ## the following example is available in batch through

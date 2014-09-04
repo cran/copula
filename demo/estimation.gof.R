@@ -26,8 +26,8 @@ source(system.file("Rsource", "estim-gof-fn.R", package="copula"))
 
 ## Use all available estimation and GoF methods:
 (estMeth <- eval(formals(enacopula)$method))
-(gofTraf <- eval(formals(gnacopula)$trafo))
-(gofMeth <- eval(formals(gnacopula)$method))
+(gofTraf <- eval(formals(gofPB)$trafo.method)[-1])
+(gofMeth <- eval(formals(gofCopula)$method))
 
 set.seed(1) # set seed
 
@@ -49,7 +49,6 @@ cat("\n### data from ",simFamily," (n = ",n,", d = ",d,", theta = ",
 estM.1 <- estMeth[estMeth != "smle"]
 ## Hmm, but actually, we currently only recommend to use GOF for the MLE,
 ## and that saves CPU time, too :
-e <- "mle" ## RR <- sapply(estM.1, simplify="array", function(e) {
 RR <-
       sapply(gofTraf, simplify="array", function(gt) {
 	sapply(gofMeth, simplify="array", function(gm)
@@ -57,10 +56,10 @@ RR <-
 			      n.bootstrap= 16, # <-- as some methods are time consuming,
 			      ## please choose a larger number here, e.g., 1000,
 			      ## for particular methods.
-			      include.K = TRUE, estim.method = e,
+			      include.K = TRUE, estim.method.enacopula="mle",
+                              estim.method.fitCopula="ml",
 			      gof.trafo = gt, gof.method = gm))
     })
-## })
 
 str(RR)
 dimnames(RR)

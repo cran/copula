@@ -72,9 +72,9 @@ useR=FALSE, \dots)
   Remarks on a Multivariate Transformation,
   \emph{The Annals of Mathematical Statistics} \bold{23}, 3, 470--472.
 
-  Hering, C. and Hofert, M. (2011),
-  Goodness-of-fit tests for Archimedean copulas in large dimensions,
-  submitted.
+  Hering, C. and Hofert, M. (2014),
+  Goodness-of-fit tests for Archimedean copulas in high dimensions,
+  \emph{Innovations in Quantitative Risk Management}.
 
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2012).
   Likelihood inference for Archimedean copulas in high dimensions

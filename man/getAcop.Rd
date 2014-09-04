@@ -1,11 +1,24 @@
 \name{getAcop}
-\alias{getAcop}
 \title{Get "acopula" Family Object by Name}
+\alias{getAcop}
+\alias{.ac.shortNames}
+\alias{.ac.longNames}
+\alias{.ac.objNames}
+\alias{.ac.classNames}
 \description{
-  Get one of our "acopula" family objects (see \link{acopula-families} by name.
+  Get one of our "acopula" family objects (see \link{acopula-families}
+  by name.
+
+  Named strings for \dQuote{translation} between different names and
+  forms of Archimedean copulas.
 }
 \usage{
 getAcop(family, check=TRUE)
+
+.ac.shortNames
+.ac.longNames
+.ac.objNames
+.ac.classNames
 }
 \arguments{
   \item{family}{either a \code{\link{character}} string, the short or longer
@@ -16,8 +29,11 @@ getAcop(family, check=TRUE)
   \item{check}{logical indicating whether the class of the return value
     should be checked to be \code{"\linkS4class{acopula}"}.}
 }
-\value{an \code{"\linkS4class{acopula}"} family object, typically one of
-  one of our predefined ones.
+\value{\code{getAcop()} returns an \code{"\linkS4class{acopula}"} family
+  object, typically one of one of our predefined ones.
+
+  \code{.as.longnames} etc are named string constants, useful in
+  programming for all our (five) standard Archimedean families.
 }
 \author{Martin Maechler}
 \seealso{
@@ -27,8 +43,17 @@ getAcop(family, check=TRUE)
 \examples{
 getAcop("Gumbel")
 
-stopifnot(identical(getAcop("J"), getAcop("Joe")),
+## different ways of getting the same "acopula" family object:
+stopifnot(## Joe (three ways):
+          identical(getAcop("J"), getAcop("Joe")),
           identical(getAcop("J"), copJoe),
-          identical(getAcop(frankCopula()), copFrank))
+          ## Frank (yet another two different ways):
+          identical(getAcop(frankCopula()), copFrank),
+          identical(getAcop("frankCopula"), copFrank))
+
+.ac.shortNames
+.ac.longNames
+.ac.objNames
+.ac.classNames
 }
 \keyword{manip}

@@ -42,7 +42,7 @@ qacR(p, family, theta, d, log.p = FALSE, interval,
   McNeil, A. J., G. \enc{Nešlehová}{Neslehova}, J. (2009).
   Multivariate Archimedean copulas, \eqn{d}-monotone functions and
   \eqn{l_1}-norm symmetric distributions. \emph{The Annals of Statistics}
-  \bold{37(5b)}, 3059--3097.
+  \bold{37}(5b), 3059--3097.
 }
 \examples{
 ## setup

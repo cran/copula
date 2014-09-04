@@ -132,7 +132,8 @@ loglikMvdc <- function(param, x, mvdc, hideWarnings) {
 
 fitMvdc <- function(data, mvdc, start,
                     optim.control=list(), method="BFGS",
-                    estimate.variance=TRUE, hideWarnings=TRUE)
+                    lower = -Inf, upper = Inf,
+                    estimate.variance = fit$convergence == 0, hideWarnings=TRUE)
 {
     copula <- mvdc@copula
     if (copula@dimension != ncol(data))
@@ -158,7 +159,7 @@ fitMvdc <- function(data, mvdc, start,
 		 ## loglikMvdc args :
 		 mvdc=mvdc, x=data,
 		 ## optim args:
-		 method = method, control= control)
+		 method=method, control=control, lower=lower, upper=upper)
 
     if (hideWarnings) {
 	options(oop); sink(type="message"); sink()
@@ -179,7 +180,7 @@ fitMvdc <- function(data, mvdc, start,
 			  ## optim args:
 			  method = method, ## one final step, computing Hessian :
 			  control=c(control, maxit = 1), hessian=TRUE)
-
+        fit$counts <- fit$counts + fit.last$counts
 	vcov <- tryCatch(solve(-fit.last$hessian), error = function(e) e)
 	if(is(vcov, "error")) {
 	    warning("Hessian matrix not invertible: ", vcov$message)

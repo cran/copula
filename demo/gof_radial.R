@@ -399,7 +399,7 @@ ggofArch <- function(n, d, tau, doPDF)
     indepRS(RS.g$R, S=RS.g$S, doPDF=doPDF, file=file, pch=if(d>=10) ".")
 
 
-    ## 1.3) Hofert-Hering transform as GoF test ################################
+    ## 1.3) Hering--Hofert transform as GoF test ###############################
 
     ## data: R from Clayton
     file <- paste0("ggof_htrafo_true=C_d=", d, "_tau=", tau, ".pdf")
@@ -437,7 +437,7 @@ ggofExch <- function(n, d, tau, doPDF)
     ## generate data
     set.seed(.seed) # set seed
     rho <- iTau(normalCopula(), tau=tau)
-    ## Gaussian
+    ## Gauss
     U.Ga <- pobs(rCopula(n, ellipCopula("normal", param = rho, dim = d)))
     ## t_4
     U.t4 <- pobs(rCopula(n, ellipCopula("t", param = rho, dim = d, df = 4)))
@@ -488,7 +488,7 @@ ggofNonExch <- function(n, d, tau, doPDF)
     ## generate data
     set.seed(.seed) # set seed
     rho <- iTau(normalCopula(), tau=tau)
-    ## Gaussian
+    ## Gauss
     U.Ga <- pobs(rCopula(n, ellipCopula("normal", param=rho, dim=d, dispstr="ar1"))) # AR(1) (see ?getSigma)
     ## t_4
     U.t4 <- pobs(rCopula(n, ellipCopula("t", param=rho, dim=d, dispstr="ar1", df=4)))

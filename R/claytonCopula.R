@@ -102,6 +102,7 @@ rclaytonCopula <- function(n, copula) {
 }
 
 
+## now only used for dim = d = 2  (for negative tau)
 pclaytonCopula <- function(copula, u) {
   dim <- copula@dimension
   stopifnot(!is.null(d <- ncol(u)), dim == d)
@@ -131,6 +132,7 @@ dclaytonCopula <- function(copula, u, ...) {
   if(log) log(val) else val
 }
 
+## now only used for dim = d = 2  (for negative tau)
 dclaytonCopula.pdf <- function(u, copula, log=FALSE) {
   dim <- copula@dimension
   if (dim > 10) stop("Clayton copula PDF not implemented for dimension > 10.")

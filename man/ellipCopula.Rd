@@ -52,6 +52,8 @@ normalCopula(param, dim = 2, dispstr = "ex")
 norm.cop <- normalCopula(c(0.5, 0.6, 0.7), dim = 3, dispstr = "un")
 t.cop <- tCopula(c(0.5, 0.3), dim = 3, dispstr = "toep",
                  df = 2, df.fixed = TRUE)
+getSigma(t.cop)## the P ("Rho") matrix (with diagonal = 1)
+
 ## from the wrapper
 norm.cop <- ellipCopula("normal", param = c(0.5, 0.6, 0.7),
                         dim = 3, dispstr = "un")

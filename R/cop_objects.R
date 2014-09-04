@@ -1051,8 +1051,9 @@ cNms <- c("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe")
 nmsC <- unlist(lapply(cNms, function(.)get(.)@name))
 sNms <- abbreviate(nmsC, 1)
 ## keep these {hidden, for now}:
-c_shortNames <- structure(sNms, names = nmsC)
-c_longNames  <- structure(nmsC, names = sNms)
-c_objNames   <- structure(cNms, names = nmsC)
+.ac.shortNames <- structure(sNms, names = nmsC)
+.ac.longNames  <- structure(nmsC, names = sNms)
+.ac.objNames   <- structure(cNms, names = nmsC)
+.ac.classNames <- structure(paste0(tolower(nmsC), "Copula"), names = nmsC)
 rm(cNms, nmsC, sNms)
 

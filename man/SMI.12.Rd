@@ -11,7 +11,7 @@
 data(SMI.12)
 }
 \format{
-  \code{SMI.12} is a conceptually a multivariate time series,
+  \code{SMI.12} is conceptually a multivariate time series,
   here simply stored as \code{\link{numeric}} \code{\link{matrix}},
   where the \code{\link{rownames}} are dates (of week days).
 

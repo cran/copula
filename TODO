@@ -47,7 +47,7 @@ doesn't.  Note the 2nd  "clayton", i.e. as arg to archmCopula(.) it _does_ work.
  => essentially, we always want to use the capitalized versions, but it might
     still be a bug that it doesn't work otherwise
 ** DONE largely improve on gofTests.R: should be made more modular, so that users can provide functions for the parametric bootstrap (gofPB) and the multiplier boostrap (gofMB). Furthermore, checking and documentation have to be improved (see already improved gofPB());
-** TODO deprecate gnacopula() [see 'Note' there!!!]
+** DONE deprecate gnacopula() [see 'Note' there!!!]
  MH: already 'prepared' a lot; only difficulty: many calls of gnacopula()
  => ideally, the checks should be done with gofCopula() instead of gnacopula()!!!!
 ** DONE persp(), contour() should work with pCopula / dCopula.
@@ -86,10 +86,10 @@ IK: Me too
 *** TODO nparam() "wrapper" for  length(.@parameters)
 *** no longer TODO: dTau() = tau'(), rho() and dRho() = rho'() -- to get std.err. for  "itau" and "irho"
 **** these are *one* of the things where IJ-archmCopula' are better
-** TODO MM: former nacopula  c_longNames etc  --> rename to .ac_longNames *and* export
-(ac = Archimedean copula)
+** DONE MM: former nacopula  c_longNames etc  --> rename to .ac_longNames *and* export
+  (ac = Archimedean copula)
 ** TODO Exporting/Documenting of "internal" functions:
-*** DONE JY: Ivan, I think we should export an empCopula function. I always
+*** DONE => C.n(). JY: Ivan, I think we should export an empCopula function. I always
 thought it was unnecessary because it can be obtained with R package mecdf.
 But people have asked for it.
 *** Also, look at ./man/copula-internal.Rd :

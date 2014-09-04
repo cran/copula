@@ -16,10 +16,9 @@
 
 ### Densities of two-level nested Archimedean copulas ##########################
 
-## Note: see http://arxiv.org/abs/1204.2410 for more details
-
-
-### Setup ######################################################################
+## Note: see the following file  'dnac.R'  for the arxiv + publication reference
+##                                ------   [src pkg =  ../inst/Rsource/dnac.R ]
+## Setup ===
 
 (srcFn <- system.file("Rsource", "dnac.R", package="copula", mustWork = TRUE))
 source(srcFn)#--> a.coeff(),  b.coeff()  nacLL()
@@ -34,15 +33,19 @@ require(lattice)
 ## setup
 n <- 250
 family <- "Gumbel"
-cop. <- getAcop(family)
 tau <- c(0.2, 0.4, 0.6)
-th <- cop.@iTau(tau)
-cop <- onacopulaL(family, list(th[1], NULL, list(list(th[2], 1:2),
-                                                 list(th[3], 3:5))))
+th <- getAcop(family)@iTau(tau)
+G3 <- onacopula(family, C(th[1], , list(C(th[2], 1:2), C(th[3], 3:5))))
+
+## the same with onacopulaL() :
+stopifnot(identical(G3,
+    onacopulaL(family, list(th[1], NULL, list(list(th[2], 1:2),
+                                              list(th[3], 3:5)))))
+)
 
 ## sample and compute log-likelihood
-U <- rnacopula(n, cop)
-nacLL(cop, u=U) # log-likelihood at correct parameters
+U <- rnacopula(n, G3)
+nacLL(G3, u=U) # log-likelihood at correct parameters
 
 
 ### Example 2: (1, (2,3), 4, (5,6,7)) Gumbel ###################################
@@ -53,8 +56,8 @@ family <- "Gumbel"
 cop. <- getAcop(family)
 tau <- c(0.2, 0.4, 0.6)
 th <- cop.@iTau(tau)
-cop <- onacopulaL(family, list(th[1], c(1,4), list(list(th[2], 2:3), list(th[3],
-                                                                          5:7))))
+cop <- onacopula(family, C(th[1], c(1,4),
+                           list(C(th[2], 2:3), C(th[3], 5:7))))
 
 ## Sample and compute log-likelihood
 U <- rnacopula(n, cop)
@@ -68,13 +71,12 @@ n <- 250
 family <- "Gumbel"
 tau <- c(0.25, 0.5)
 th <- getAcop(family)@iTau(tau)
-copTrue <- onacopulaL(family, list(th[1], 1, list(list(th[2], 2:3))))
+copTrue <- onacopula(family, C(th[1], 1, C(th[2], 2:3)))
 
 ## Sample and compute log-likelihood
 U <- rnacopula(n, copTrue)
 nacLL(copTrue, u=U) # log-likelihood at correct parameters
 
-rm(list = ls(patt="^..?.?$"))# cleanup
 
 ### -log-Likelihood plots ######################################################
 
@@ -93,8 +95,7 @@ n <- 100
 cop. <- getAcop(family)
 tau <- c(0.25, 0.5)
 (thTr <- cop.@iTau(tau))
-cop <- onacopulaL(family, list(thTr[1], compTr,
-                               list(list(thTr[2], scompTr)))) # copula
+cop <- onacopula(family, C(thTr[1], compTr, C(thTr[2], scompTr))) # copula
 U <- rnacopula(n, cop) # sample
 h <- 0.2 # delta{tau} for defining a range of theta's
 (th0 <- cop.@iTau(c(tau[1]-h, tau[1]+h)))
@@ -183,7 +184,7 @@ sTit <- list(c(expression(group("(",list(theta[0],theta[1]),")")^T),
 ### ---------- via optimization instead of grid ----------------------------------
 ## starting not too closely
 ropt <- optim(c(1, 3), nLL2,
-              u=U, family=family, comp=compTr, scomp=scompTr#, control=list(trace=1)
+              u=U, family=family, comp=compTr, scomp=scompTr #, control=list(trace=TRUE)
               )
 ## compare with previous "grid result" -- it is a bit better
 rbind(pts, optim= c(ropt$par, ropt$value))

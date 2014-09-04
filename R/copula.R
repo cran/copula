@@ -101,8 +101,8 @@ setMethod("iRho", signature("copula"), iRhoCopula)
 
 cCopula <-  function(u, copula, j.ind=ncol(u), n.MC=0, log=FALSE) {
     stopifnot(is(copula, "Copula"))
-    drop(rtrafo(u, cop=copula, j.ind=j.ind, n.MC=n.MC, log=log, trafo.only=TRUE))
-}##      ------ -> ./gof.R
+    drop(rtrafo(u, cop=copula, j.ind=j.ind, n.MC=n.MC, log=log))
+}##      ------ -> ./gofTrafos.R
 
 
 ###-- "Copula" methods + glue  former "copula" <--> former "nacopula" ---------

@@ -72,7 +72,7 @@ setMethod("show", signature("fitCopula"),
 fitCopula <- function(copula, data, method = c("mpl","ml","itau","irho"),
                       start = NULL, lower = NULL, upper = NULL,
                       optim.method = "BFGS", optim.control = list(maxit=1000),
-                      estimate.variance = TRUE, hideWarnings = TRUE)
+                      estimate.variance = NA, hideWarnings = TRUE)
 {
   if(!is.matrix(data)) {
     warning("coercing 'data' to a matrix.")
@@ -99,7 +99,7 @@ fitCopStart <- function(copula, data, default = copula@parameters)
 	ccl <- getClass(clc)
 	.par.df <- has.par.df(copula, ccl)
 	start <- fitCopula.itau(if(.par.df) as.df.fixed(copula, ccl) else copula,
-				data, FALSE, FALSE)@estimate
+				data, estimate.variance=FALSE, warn.df=FALSE)@estimate
 	if(.par.df) ## add starting value for 'df'
 	    start <- c(start, copula@df)
 	if(!is.finite(loglikCopula(start, data, copula)))
@@ -110,15 +110,14 @@ fitCopStart <- function(copula, data, default = copula@parameters)
 
 ## fitCopula with maximizing pseudo-likelihood #################################
 
-fitCopula.mpl <- function(copula, u, start=NULL,
-                          lower=NULL, upper=NULL,
-                          optim.method=NULL, optim.control=list(),
-                          estimate.variance = TRUE,
-                          hideWarnings = TRUE)
+fitCopula.mpl <- function(copula, u, start, lower, upper,
+                          optim.method, optim.control, estimate.variance, hideWarnings)
 {
     fit <- fitCopula.ml(copula, u, start=start, lower=lower, upper=upper,
                         method=optim.method, optim.control=optim.control,
                         estimate.variance=FALSE, hideWarnings=hideWarnings)
+    if (is.na(estimate.variance))
+        estimate.variance <- fit@fitting.stats[["convergence"]] == 0
     var.est <- if(estimate.variance)
         varPL(fit@copula, u) / nrow(u) else {
             q <- length(copula@parameters)
@@ -136,7 +135,7 @@ fitCopula.mpl <- function(copula, u, start=NULL,
 
 
 ##' fitCopula using inversion of Kendall's tau
-fitCopula.itau <- function(copula, x, estimate.variance=TRUE, warn.df=TRUE) {
+fitCopula.itau <- function(copula, x, estimate.variance, warn.df=TRUE) {
   ccl <- getClass(class(copula))
   isEll <- extends(ccl, "ellipCopula")
   if(has.par.df(copula, ccl, isEll)) { ## must treat it as "df.fixed=TRUE"
@@ -157,7 +156,7 @@ fitCopula.itau <- function(copula, x, estimate.variance=TRUE, warn.df=TRUE) {
                 exp(lm.fit(X, y=log(itau))$coefficients)
                 else lm.fit(X, y=itau)$coefficients)
   copula@parameters <- estimate
-  var.est <- if (estimate.variance)
+  var.est <- if (is.na(estimate.variance) || estimate.variance)
     varKendall(copula, x) / nrow(x) else matrix(NA, q, q)
   new("fitCopula",
       estimate = estimate,
@@ -172,7 +171,7 @@ fitCopula.itau <- function(copula, x, estimate.variance=TRUE, warn.df=TRUE) {
 
 ## fitCopula using inversion of Spearman's rho #################################
 
-fitCopula.irho <- function(copula, x, estimate.variance=TRUE, warn.df=TRUE) {
+fitCopula.irho <- function(copula, x, estimate.variance, warn.df=TRUE) {
   ccl <- getClass(class(copula))
   isEll <- extends(ccl, "ellipCopula")
   if(has.par.df(copula, ccl, isEll)) { ## must treat it as "df.fixed=TRUE"
@@ -191,7 +190,7 @@ fitCopula.irho <- function(copula, x, estimate.variance=TRUE, warn.df=TRUE) {
                 exp(lm.fit(X, y=log(irho))$coefficients)
                 else lm.fit(X, y=irho)$coefficients)
   copula@parameters <- estimate
-  var.est <- if (estimate.variance)
+  var.est <- if (is.na(estimate.variance) || estimate.variance)
     varSpearman(copula, x)/nrow(x) else matrix(NA, q, q)
   new("fitCopula",
       estimate = estimate,
@@ -225,11 +224,8 @@ loglikCopula <- function(param, x, copula, hideWarnings) {
       sum(dCopula(x, copula, log=TRUE, checkPar=FALSE)) else -Inf # was NaN
 }
 
-fitCopula.ml <- function(copula, u, start=NULL,
-                         lower=NULL, upper=NULL,
-                         method=NULL, optim.control=list(),
-                         estimate.variance=TRUE,
-                         hideWarnings=TRUE,
+fitCopula.ml <- function(copula, u, start, lower, upper,
+                         method, optim.control, estimate.variance, hideWarnings,
                          bound.eps = .Machine$double.eps ^ 0.5)
 {
   if(any(u < 0) || any(u > 1))
@@ -283,19 +279,19 @@ fitCopula.ml <- function(copula, u, start=NULL,
 
   copula@parameters[1:q] <- fit$par
   loglik <- fit$val
-  if(fit$convergence > 0)
+  has.conv <- fit[["convergence"]] == 0
+  if (is.na(estimate.variance))
+      estimate.variance <- has.conv
+  if(!has.conv)
       warning("possible convergence problem: optim() gave code=",
               fit$convergence)
 
   ## MM{FIXME}: This should be done only by 'vcov()' and summary() !
   varNA <- matrix(NA_real_, q, q)
-  var.est <- if(estimate.variance && fit$convergence == 0) {
-    fit.last <- optim(copula@parameters, loglikCopula,
-                      lower=lower, upper=upper,
-                      method=method,
-                      copula=copula, x=u,
+  var.est <- if(estimate.variance) {
+    fit.last <- optim(copula@parameters, loglikCopula, lower=lower, upper=upper,
+                      method=method, copula=copula, x=u,
                       control=c(control, maxit=0), hessian=TRUE)
-
     vcov <- tryCatch(solve(-fit.last$hessian), error = function(e) e)
     if(is(vcov, "error")) {
       warning("Hessian matrix not invertible: ", vcov$message)
@@ -308,9 +304,8 @@ fitCopula.ml <- function(copula, u, start=NULL,
       var.est = var.est,
       method = "maximum likelihood",
       loglik = loglik,
-      ## convergence = as.integer(convergence),
       fitting.stats = c(list(method=method),
-                     fit[c("convergence", "counts", "message")], control),
+          fit[c("convergence", "counts", "message")], control),
       nsample = nrow(u),
       copula = copula)
 }
@@ -320,11 +315,13 @@ fitCopula.ml <- function(copula, u, start=NULL,
 
 ## taken from QRMlib and modified
 ## credit to Alexander McNeil and Scott Ulman
+## FIXME:  sfsmisc::posdefify() is more continuous(!) & faster for large d
+## -----  makePosDef(*, delta = 0.001)  <==>  posdefify(*, eps=0.001 / 2)
 makePosDef <- function (mat, delta = 0.001) {
   decomp <- eigen(mat)
   Lambda <- decomp$values
   if (any(Lambda < 0)) {
-    warning("Estimate is not positive-definite. Correction applied.")
+    warning("Estimate is not positive-definite. Correction applied.", immediate.=TRUE)
     Lambda[Lambda < 0] <- delta
     Gamma <- decomp$vectors
     newmat <- Gamma %*% diag(Lambda) %*% t(Gamma)
@@ -390,25 +387,30 @@ influ.terms <- function(u, influ, q)
   S / n
 }
 
-##' @title variance-covariance (vcov) matrix for Pseudo Likelihood estimat
+##' @title variance-covariance (vcov) matrix for Pseudo Likelihood estimate
 ##' @param cop the *fitted* copula
 ##' @param u the available pseudo-observations
 ##' @return vcov matrix
 varPL <- function(cop,u)
 {
     q <- length(cop@parameters)
+    p <- cop@dimension
     ans <- matrix(NA_real_, q, q)
     ccl <- getClass(clc <- class(cop))
     isEll <- extends(ccl, "ellipCopula")
     ## check if variance can be computed
     msg <- gettext("The variance estimate cannot be computed for this copula.",
-                  "  Rather use  'estimate.variance = FALSE'")
+                   " Rather use 'estimate.variance = FALSE'")
+    if(is(cop, "archmCopula")) {
+	fam <- names(which(.ac.classNames == class(cop)[[1]]))
+	msg <- c(msg, gettext("Or rather  emle(u, oCop)	 instead; where",
+			      sprintf("oCop <- onacopula(%s, C(NA, 1:%d)", fam, p)))
+    }
     if (!isEll && (!hasMethod("dcopwrap", clc) ||
                    !hasMethod("derPdfWrtArgs", clc))) {
 	warning(msg); return(ans)
     }
 
-    p <- cop@dimension
     n <- nrow(u)
 
     ## influence: second part
@@ -503,7 +505,7 @@ getXmat <- function(copula) {
 ##' Auxiliary for varKendall() and varSpearman()
 ##' @param cop an ellipCopula with \code{dispstr = "ar1"}
 ##' @param v influence for tau or rho
-##' @param L 
+##' @param L
 ##' @param der a character string, currently either "tau" or "rho"
 varInfluAr1 <- function(cop, v, L, der) {
   p <- cop@dimension

@@ -51,9 +51,11 @@ copFamily <- function(cop)
 ##' @author Marius Hofert
 copFamilyClass <- function(family)
 {
-    if(family=="normal" || family=="t") "ellipCopula"
-    else if(family %in% c_longNames ||
-            family %in% paste0("opower:", c_longNames)) "outer_nacopula" # note: opower not really supported yet
+    if(family == "normal" || family == "t")
+	"ellipCopula"
+    else if(family %in% .ac.longNames ||
+	    family %in% paste0("opower:", .ac.longNames))
+	"outer_nacopula" # note: opower not really supported yet
     else stop("family ", family, " not yet supported")
 }
 

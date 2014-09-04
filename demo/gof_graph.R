@@ -402,7 +402,7 @@ which(pmatt < 0.05, arr.ind=TRUE) # => none (fine)
 stopifnot(require(mvnormtest))
 mshapiro.test(t(x)) ## => *not* a multivariate normal distribution
 mshapiro.test(t(qnorm(u)))
-## => also not a Gaussian after removing marginal non-Gaussianity
+## => also not a Gauss copula after removing marginal non-Gaussianity
 
 ## Well, look at the 1D margins :
 print(Pm <- apply(x, 2, function(u) shapiro.test(u)$p.value))
@@ -411,9 +411,9 @@ qqplot(Pm, ppoints(length(Pm)),
        main = "QQ plot of p-values of Shapiro( X[,j] ), j=1..20")
 abline(0,1, lty=2, col="gray")
 
-## test for Gaussian copula
+## test for Gauss copula
 title <- list("Pairwise Rosenblatt transformed pseudo-observations",
-              expression(bold("to test")~~italic(H[0]^c:C~~bold("is Gaussian"))))
+              expression(bold("to test")~~italic(H[0]^c:C~~bold("is Gauss"))))
 pairsRosenblatt(cu.uN, pvalueMat=pmatN, method="none", cex.labels=0.7,
                 key.space=1.5, main.centered=TRUE, main=title, line.main=c(3, 0.4))
 

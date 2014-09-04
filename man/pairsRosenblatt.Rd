@@ -12,7 +12,7 @@
 \usage{
 pairsRosenblatt(cu.u, pvalueMat=pviTest(pairwiseIndepTest(cu.u)),
                 method = c("scatter", "QQchisq", "QQgamma",
-                "PPchisq", "PPgamma", "none"),
+                           "PPchisq", "PPgamma", "none"),
                 g1, g2, col = "B&W.contrast",
                 colList = pairsColList(pvalueMat, col=col),
                 main=NULL,
@@ -145,7 +145,8 @@ pairsColList(P, pdiv = c(1e-04, 0.001, 0.01, 0.05, 0.1, 0.5),
 \references{
   Hofert, M. and \enc{Mächler}{Maechler}, M. (2013)
   A graphical goodness-of-fit test for dependence models in higher dimensions;
-  submitted.
+  \emph{Journal of Computational and Graphical Statistics},
+  \bold{23}(3), 700--716.
 }
 \seealso{
   \code{\link{pairwiseCcop}} for the tools behind the scenes.
@@ -217,9 +218,9 @@ pairsRosenblatt(cu.u, pvalueMat=pmat, pch=".", main=pwRoto, sub=NULL)
 title <- list(paste(pwRoto, "to test"),
               substitute(italic(H[0]:C~~bold("is Gumbel with"~~tau==tau.)),
                          list(tau.=tau)))
-main.line <- c(4, 1.4)
+line.main <- c(4, 1.4)
 pairsRosenblatt(cu.u, pvalueMat=pmat, pch=".",
-                main=title, main.line=main.line, main.centered=TRUE)
+                main=title, line.main=line.main, main.centered=TRUE)
 
 ## Q-Q plots -- can, in general, better detect outliers
 pairsRosenblatt(cu.u, pvalueMat=pmat, method="QQchisq", cex=0.2)
