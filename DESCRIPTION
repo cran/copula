@@ -1,7 +1,7 @@
 Package: copula
-Version: 0.999-11
-Date: $Date: 2014-09-04 12:37:17 +0200 (Thu, 04. Sep 2014) $,
-        subversion $Revision: 1138 $
+Version: 0.999-12
+Date: $Date: 2014-09-27 13:57:55 +0200 (Sat, 27. Sep 2014) $,
+        subversion $Revision: 1143 $ <<-- don't forget inst/NEWS.Rd !
 Title: Multivariate Dependence with Copulas
 Author: Marius Hofert <marius.hofert@uwaterloo.ca>,
  Ivan Kojadinovic <ivan.kojadinovic@univ-pau.fr>,
@@ -45,7 +45,7 @@ Collate: AllClass.R Classes.R Copula.R Auxiliaries.R aux-acopula.R
         tawnCopula.R tawnExpr.R tevCopula.R wrapper.R zzz.R
 Encoding: UTF-8
 URL: http://nacopula.r-forge.r-project.org/
-Packaged: 2014-09-05 10:04:09 UTC; maechler
+Packaged: 2014-10-01 10:26:11 UTC; maechler
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2014-09-05 17:54:42
+Date/Publication: 2014-10-02 16:00:17

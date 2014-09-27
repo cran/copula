@@ -123,19 +123,17 @@ gofTstat <- function(u, method=c("Sn", "SnB", "SnC", "AnChisq", "AnGamma"),
 ##' @param N number of bootstrap replications
 ##' @param method goodness-of-fit test statistic to be used; see ?gofTstat
 ##' @param estim.method estimation method for the unknown parameter vector; see ?fitCopula
-##' @param optim.method optim() method used for fitting
-##' @param optim.control see ?optim
 ##' @param trafo.method transformation to U[0,1]^d
 ##' @param verbose logical indicating whether a progress bar is shown
-##' @param ... additional arguments passed to the transformation method
+##' @param trafoArgs a list of optional arguments passed to the transformation method
+##' @param ... additional arguments passed to \code{fitCopula}
 ##' @return an object of class 'htest'
 ##' @author Ivan Kojadinovic, Marius Hofert
 ##' Note: - different '...' should be passed to different *.method
-gofPB <- function(copula, x, N, method=eval(formals(gofTstat)$method),
-                  estim.method=eval(formals(fitCopula)$method),
-                  optim.method="BFGS", optim.control,
-                  trafo.method=c("none", "rtrafo", "htrafo"),
-                  verbose=TRUE, ...)
+gofPB <- function(copula, x, N, method = eval(formals(gofTstat)$method),
+                  estim.method = eval(formals(fitCopula)$method),
+                  trafo.method = c("none", "rtrafo", "htrafo"),
+		  trafoArgs = list(), verbose=TRUE, ...)
 {
     ## checks
     stopifnot(is(copula, "copula"), N >= 1)
@@ -144,7 +142,7 @@ gofPB <- function(copula, x, N, method=eval(formals(gofTstat)$method),
     method <- match.arg(method)
     estim.method <- match.arg(estim.method)
     trafo.method <- match.arg(trafo.method)
-    if(trafo.method=="htrafo"){
+    if(trafo.method=="htrafo") {
 	if(!is(copula, "outer_nacopula"))
 	    stop("trafo.method='htrafo' only implemented for copula objects of type 'outer_nacopula'")
 	if(length(copula@childCops))
@@ -155,40 +153,39 @@ gofPB <- function(copula, x, N, method=eval(formals(gofTstat)$method),
     uhat <- pobs(x)
 
     ## 2) Fit the copula
-    C.th.n <- fitCopula(copula, uhat, method=estim.method, estimate.variance=FALSE,
-                        optim.method=optim.method, optim.control=optim.control)@copula
-
+    C.th.n <- fitCopula(copula, uhat, method=estim.method,
+			estimate.variance=FALSE, ...)@copula
     ## 3) Compute the realized test statistic
-    u <- if(method=="Sn"){
-        switch(trafo.method,
-	       "none"= uhat,
-	       "rtrafo"= rtrafo(uhat, cop=C.th.n, ...),
-	       "htrafo"= htrafo(uhat, cop=C.th.n, ...),
-               stop("wrong transformation method"))
+    doTrafo <- (method == "Sn" && trafo.method != "none")
+    u <- if(doTrafo) {
+	stopifnot(is.list(trafoArgs))
+	if(length(names(trafoArgs)) != length(trafoArgs))
+	    stop("'trafoArgs' must be a fully named list")
+	switch(trafo.method,
+	       "rtrafo"= do.call(rtrafo, c(list(uhat, cop=C.th.n), trafoArgs)),
+	       "htrafo"= do.call(htrafo, c(list(uhat, cop=C.th.n), trafoArgs)),
+	       stop("wrong transformation method"))
     } else uhat
     T <- if(method=="Sn") gofTstat(u, method=method, copula=C.th.n)
          else gofTstat(u, method=method)
 
     ## 4) Simulate the test statistic under H_0
-    if(verbose){
+    if(verbose) {
 	pb <- txtProgressBar(max=N, style=if(isatty(stdout())) 3 else 1) # setup progress bar
 	on.exit(close(pb)) # on exit, close progress bar
     }
-    T0 <- vapply(1:N, function(k){
+    T0 <- vapply(1:N, function(k) {
         ## 4.1) Sample the fitted copula
         Uhat <- pobs( rCopula(n, C.th.n) )
 
         ## 4.2) Fit the copula
-        C.th.n. <- fitCopula(copula, Uhat, method=estim.method, estimate.variance=FALSE,
-			   optim.method=optim.method, optim.control=optim.control)@copula
-
+        C.th.n. <- fitCopula(copula, Uhat, method=estim.method,
+                             estimate.variance=FALSE, ...)@copula
         ## 4.3) Compute the test statistic
-        u. <- if(method=="Sn"){
-            switch(trafo.method,
-		   "none"= Uhat,
-		   "rtrafo"= rtrafo(Uhat, cop=C.th.n., ...),
-		   "htrafo"= htrafo(Uhat, cop=C.th.n., ...),
-                   stop("wrong transformation method"))
+        u. <- if(doTrafo) { # (no checks needed; all done above)
+	    switch(trafo.method,
+		   "rtrafo"= do.call(rtrafo, c(list(Uhat, cop=C.th.n.), trafoArgs)),
+		   "htrafo"= do.call(htrafo, c(list(Uhat, cop=C.th.n.), trafoArgs)))
         } else Uhat
         T0. <- if(method=="Sn") gofTstat(u., method=method, copula=C.th.n.)
                else gofTstat(u., method=method)
@@ -245,7 +242,7 @@ Jscore <- function(copula, u, method)
            d <- ncol(u)
            p <- length(copula@parameters)
            S <- matrix(0, n, p)
-           for(j in 1:d){ # FIXME remove for() and apply()
+           for(j in 1:d) { # FIXME remove for() and apply()
                ij <- order(u[,j], decreasing=TRUE)
                ijb <- vapply(1:n, function(i) sum(t(u[,j]) <= u[i,j]), NA_real_)
                S <- S + rbind(rep.int(0, p),
@@ -290,8 +287,6 @@ Jscore <- function(copula, u, method)
 ##'        "Rn"     : test statistic R_n in Genest, Huang, Dufour (2013)
 ##' @param estim.method estimation method for the unknown parameter vector; see
 ##'        ?fitCopula
-##' @param optim.method optim() method used for fitting
-##' @param optim.control see ?optim
 ##' @param verbose indicating whether verbose output is shown
 ##' @param useR logical indicating whether an R or the C implementation is used
 ##' @param ... additional arguments passed to the different methods
@@ -302,8 +297,7 @@ Jscore <- function(copula, u, method)
 ##'         the realized test statistic and the bootstrapped one are computationally different
 gofMB <- function(copula, x, N, method=c("Sn", "Rn"),
                   estim.method=eval(formals(fitCopula)$method),
-                  optim.method="BFGS", optim.control, verbose=TRUE, useR=FALSE,
-                  m = 1/2, zeta.m = 0, b = 0.05)
+                  verbose=TRUE, useR=FALSE, m = 1/2, zeta.m = 0, b = 0.05, ...)
 {
     ## checks
     stopifnot(is(copula, "copula"), N>=1)
@@ -319,9 +313,8 @@ gofMB <- function(copula, x, N, method=c("Sn", "Rn"),
     u. <- pobs(x)
 
     ## 2) Fit the copula (copula is the H_0 copula; C.th.n = C_{\theta_n}(.))
-    C.th.n <- fitCopula(copula, u., method=estim.method, estimate.variance=FALSE,
-                        optim.method=optim.method, optim.control=optim.control)@copula
-
+    C.th.n <- fitCopula(copula, u., method=estim.method,
+			estimate.variance=FALSE, ...)@copula
     ## big, ugly switch due to C code version (although most likely not required)
     switch(method,
            "Sn"=
@@ -345,14 +338,15 @@ gofMB <- function(copula, x, N, method=c("Sn", "Rn"),
            }
 
            ## 4) Simulate the test statistic under H_0
-           T0 <- .C(multiplier,
-                    as.integer(d),
-                    as.double(u.),
-                    as.integer(n),
-                    as.double(u.),
-                    as.integer(n),
-                    as.double(dCdtheta(C.th.n, u.) %*% Jscore(C.th.n, u=u., method=estim.method)),
-                    as.integer(N),
+           T0 <- .C(multiplier,## -> ../src/gof.c
+                    p = as.integer(d),
+                    U = as.double(u.),
+                    n = as.integer(n),
+                    G = as.double(u.),
+                    g = as.integer(n),
+                    influ = as.double(dCdtheta(C.th.n, u.) %*%
+                                      Jscore(C.th.n, u=u., method=estim.method)),
+                    N = as.integer(N),
                     s0 = double(N))$s0
        },
            "Rn"=
@@ -381,7 +375,7 @@ gofMB <- function(copula, x, N, method=c("Sn", "Rn"),
            ##         I_{\{\hat{\bm{U}}_k <= \bm{u}_i\}}
            ind <- vapply(1:n, function(i) colSums(t(u.) <= u.[i,]) == d, logical(n)) # (n, n)-matrix
            hCnh. <- factor %*% ind # (N, n)-matrix * (n, n)-matrix = (N, n)-matrix
-           for(j in 1:d){ # bivariate only here
+           for(j in 1:d) { # bivariate only here
                ## build a matrix with 1s only, except for the jth column, which contains u.[,j]
                u.j <- matrix(1, nrow=n, ncol=d)
                u.j[,j] <- u.[,j]
@@ -431,28 +425,22 @@ gofMB <- function(copula, x, N, method=c("Sn", "Rn"),
 ##' @param simulation parametric bootstrap ('pb') or multiplier method ('mult')
 ##' @param verbose logical indicating whether a progress bar is shown
 ##' @param print.every deprecated
-##' @param optim.method optim() method used for fitting
-##' @param optim.control see ?optim
 ##' @param ... additional arguments passed to the internal auxiliary functions
 ##'        gofPB() and gofMB()
 ##' @return an object of class 'htest'
 ##' @author Ivan Kojadinovic, Marius Hofert
-gofCopula <- function(copula, x, N=1000,
-                      method=eval(formals(gofTstat)$method),
-                      estim.method=eval(formals(fitCopula)$method),
-                      simulation=c("pb", "mult"),
-		      verbose=TRUE, print.every=NULL,
-                      optim.method="BFGS", optim.control=list(maxit=20), ...)
+gofCopula <- function(copula, x, N=1000, method = "Sn",
+                      estim.method = eval(formals(fitCopula)$method),
+                      simulation = c("pb", "mult"),
+		      verbose=TRUE, print.every=NULL, ...)
 {
     ## checks
     stopifnot(is(copula, "copula"), N>=1)
     if(!is.matrix(x)) x <- rbind(x, deparse.level=0L)
     stopifnot((d <- ncol(x)) > 1, (n <- nrow(x)) > 0, dim(copula) == d)
-    method <- match.arg(method)
+    ## 'method' is checked inside gofPB() / gofMB()
     estim.method <- match.arg(estim.method)
-    optim.method <- match.arg(optim.method)
     simulation <- match.arg(simulation)
-    stopifnot(optim.method %in% eval(formals(optim)$method))
     ## deprecation
     if (!is.null(print.every)) {
         warning("Argument 'print.every' is deprecated. Please use 'verbose' instead.")
@@ -472,12 +460,10 @@ gofCopula <- function(copula, x, N=1000,
     switch(simulation,
            "pb" = { ## parametric bootstrap
                gofPB(copula, x, N=N, method=method, estim.method=estim.method,
-                     verbose=verbose, optim.method=optim.method,
-                     optim.control=optim.control, ...)
+                     verbose=verbose, ...)
            },
            "mult" = { ## multiplier bootstrap
-               gofMB(copula, x=x, N=N, method=method, estim.method=estim.method,
-                     optim.method=optim.method, optim.control=optim.control, ...)
+               gofMB(copula, x=x, N=N, method=method, estim.method=estim.method, ...)
            },
            stop("Invalid simulation method ", simulation))
 }

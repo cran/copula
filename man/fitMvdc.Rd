@@ -9,6 +9,10 @@
   Fitting copula-based multivariate distributions
   (\code{"\linkS4class{mvdc}"}) to multivariate data,
   estimating both the marginal and the copula parameters.
+
+  If you assume {non parametric} margins, in other words, take the
+  empirical distributions for all margins, you can use
+  \code{\link{fitCopula}(*, \link{pobs}(x))} instead.
 }
 \usage{
 loglikMvdc(param, x, mvdc, hideWarnings)
@@ -80,9 +84,11 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
   one can construct the loglikelihood function and feed it to \code{"optim"}
   to estimate all the parameters.
 
-  Finally, note that the fitting functions generate error messages
-  because invalid parameter values are tried during the optimization
-  process (see \code{\link{optim}}).
+  Finally, note that some of the fitting functions generate error
+  messages because invalid parameter values are tried during the
+  optimization process (see \code{\link{optim}}).  This should be rarer
+  since 2013, notably for likelihood based methods (as the likelihood
+  is now rather set to \code{-Inf} than giving an error).
 }
 \seealso{
   \code{\link{mvdc}} and \code{\linkS4class{mvdc}};

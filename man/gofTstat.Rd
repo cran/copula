@@ -2,11 +2,12 @@
 \alias{gofTstat}
 \title{Goodness-of-fit Test Statistics}
 \description{
-  \code{gofTstat()} computes various goodness-of-fit test statistics.
+  \code{gofTstat()} computes various goodness-of-fit test statistics
+  typically used in \code{\link{gofCopula}(*, simulation = "pb")}.
 }
 \usage{
-gofTstat(u, method=c("Sn", "SnB", "SnC", "AnChisq", "AnGamma"),
-useR=FALSE, \dots)
+gofTstat(u, method = c("Sn", "SnB", "SnC", "AnChisq", "AnGamma"),
+         useR = FALSE, \dots)
 }
 \arguments{
   \item{u}{\eqn{n\times d}{n x d}-matrix of values in \eqn{[0,1]},
@@ -54,7 +55,7 @@ useR=FALSE, \dots)
     test statistics.}
 }
 \details{
-  This function should be used with care. The different test statistics
+  This function should be used with care.  The different test statistics
   were implemented (partly) for different purposes and goodness-of-fit
   tests and should be used only with knowledge about such (see the
   references for more details).
@@ -82,7 +83,7 @@ useR=FALSE, \dots)
   \bold{110}, 133--150.
 }
 \seealso{
-  \code{\link{gofCopula}()} for goodness-of-fit tests were (some of)
+  \code{\link{gofCopula}()} for goodness-of-fit tests where (some of)
   these test statistics are used.
 }
 \examples{

@@ -1,8 +1,8 @@
 \name{gofCopula}
+\title{Goodness-of-fit Tests for Copulas}
 \alias{gofCopula}
 \alias{gofMB}
 \alias{gofPB}
-\title{Goodness-of-fit Tests for Copulas}
 \description{
   Goodness-of-fit tests for copulas based on the empirical process
   comparing the empirical copula with a parametric estimate of the
@@ -20,22 +20,20 @@
   \code{simulation} either calls \code{gofPB()} or \code{gofMB()}.
 }
 \usage{
-gofCopula(copula, x, N=1000,
-          method=eval(formals(gofTstat)$method),
-          estim.method=eval(formals(fitCopula)$method),
-          simulation=c("pb", "mult"),
-	  verbose=TRUE, print.every=NULL,
-          optim.method="BFGS", optim.control=list(maxit=20), ...)
+gofCopula(copula, x, N = 1000,
+          method = "Sn",
+          estim.method = eval(formals(fitCopula)$method),
+          simulation = c("pb", "mult"),
+	  verbose = TRUE, print.every = NULL, \dots)
 
 gofPB(copula, x, N, method = eval(formals(gofTstat)$method),
       estim.method = eval(formals(fitCopula)$method),
-      optim.method = "BFGS", optim.control,
-      trafo.method = c("none", "rtrafo", "htrafo"), verbose = TRUE, ...)
+      trafo.method = c("none", "rtrafo", "htrafo"),
+      trafoArgs = list(), verbose = TRUE, \dots)
 
 gofMB(copula, x, N, method = c("Sn", "Rn"),
-      estim.method = eval(formals(fitCopula)$method),
-      optim.method = "BFGS", optim.control, verbose = TRUE, useR = FALSE,
-      m = 1/2, zeta.m = 0, b = 0.05)
+      estim.method = eval(formals(fitCopula)$method), verbose = TRUE,
+      useR = FALSE, m = 1/2, zeta.m = 0, b = 0.05, \dots)
 }
 \arguments{
   \item{copula}{object of class \code{"\linkS4class{copula}"} representing the
@@ -45,8 +43,11 @@ gofMB(copula, x, N, method = c("Sn", "Rn"),
     simulate realizations of the test statistic under the null
     hypothesis.}
   \item{method}{a \code{\link{character}} string specifying the
-    goodness-of-fit test statistic to be used; currently, one of "Sn",
-      "SnB", "SnC", "AnChisq", or "AnGamma", see \code{\link{gofTstat}()}.}
+    goodness-of-fit test statistic to be used.  For \code{simulation = "pb"},
+    one of "Sn", "SnB", "SnC", "AnChisq", or "AnGamma", see
+    \code{\link{gofTstat}()}.  For \code{simulation = "mult"}, one of
+    \code{"Sn"} or \code{"Rn"}, where the latter is \eqn{R_n} from
+    Genest et al. (2013).}
   \item{estim.method}{a character string specifying the estimation method to
     be used to estimate the dependence parameter(s); see \code{\link{fitCopula}()}.}
   \item{simulation}{a string specifying the simulation method for
@@ -56,16 +57,18 @@ gofMB(copula, x, N, method = c("Sn", "Rn"),
   \item{print.every}{is deprecated in favor of \code{verbose}.}
   \item{verbose}{a logical specifying if progress of the bootstrap
     should be displayed via \code{\link[utils]{txtProgressBar}}.}
-  \item{optim.method, optim.control}{the \code{method} and
-    \code{control} arguments for \code{\link{optim}()}, see there.}
   \item{\dots}{for \code{gofCopula}, additional arguments passed to
     \code{gofPB()} or \code{gofMB()};
 
-    for \code{gofPB()}: additional arguments passed to \code{htrafo()}
-    or \code{rtrafo()}.}
+    for \code{gofPB()} and \code{gofMB()}: additional arguments passed
+    to \code{\link{fitCopula}()}.  These may notably contain
+    \code{optim.method}, \code{optim.control}, \code{lower},
+    or \code{upper} depending on the \code{optim.method}.}
   \item{trafo.method}{string specifying the transformation to
     \eqn{U[0,1]^d}; either \code{"none"} or one of \code{"rtrafo"},
     see \code{\link{rtrafo}}, or \code{"htrafo"}, see \code{\link{htrafo}}.}
+  \item{trafoArgs}{a \code{\link{list}} of optional arguments passed
+    to the transformation method (see \code{trafo.method} above).}
   \item{useR}{logical indicating whether an R or the C implementation is used.}
   \item{m, zeta.m, b}{only for method \code{"Rn"} in \dQuote{MB}, the
     multiplier bootstrap. \code{m} is the power, \code{zeta.m} the adjustment
@@ -115,13 +118,18 @@ gofMB(copula, x, N, method = c("Sn", "Rn"),
     copula family.}
 }
 \references{
+  Genest, C., Huang, W., and Dufour, J.-M. (2013).
+  A regularized goodness-of-fit test for copulas.
+  \emph{Journal de la Soci\enc{é}{e}t\enc{é}{e} fran\enc{ç}{c}aise de statistique}
+  \bold{154}, 64--77.
+
   Genest, C. and R\enc{é}{e}millard, B. (2008). Validity of the parametric
   bootstrap for goodness-of-fit testing in semiparametric models.
   \emph{Annales de l'Institut Henri Poincare: Probabilites et Statistiques}
   \bold{44}, 1096--1127.
 
-  Genest, C., R\enc{é}{e}millard, B., and Beaudoin,
-  D. (2009). Goodness-of-fit tests for copulas: A review and a power study.
+  Genest, C., R\enc{é}{e}millard, B., and Beaudoin, D. (2009).
+  Goodness-of-fit tests for copulas: A review and a power study.
   \emph{Insurance: Mathematics and Economics} \bold{44}, 199--214.
 
   Kojadinovic, I., Yan, J., and Holmes M. (2011).

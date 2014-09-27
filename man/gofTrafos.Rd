@@ -1,8 +1,8 @@
 \name{gtrafo}
+\title{GOF Testing Transformations for Archimedean Copulas}
 \alias{gtrafo}
 \alias{rtrafo}
 \alias{htrafo}
-\title{GOF Testing Transformations for Archimedean Copulas}
 \description{
   Compute the following goodness-of-fit (GOF) testing transformations,
   \describe{
@@ -50,7 +50,8 @@ htrafo(u, cop, include.K=TRUE, n.MC=0, inverse=FALSE,
     Kendall distribution function \code{\link{K}}, is used in \code{htrafo}.}
   \item{method}{method to compute \code{qK}.}
   \item{u.grid}{argument of \code{qK} (for \code{method="discrete"}).}
-  \item{\dots}{additional arguments passed to \code{qK}.}
+  \item{\dots}{additional arguments passed to \code{\link{qK}()} if
+    \code{inverse} is true.}
 }
 \details{
   \describe{

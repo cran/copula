@@ -2,7 +2,18 @@
 \title{News for \R Package \pkg{copula}}% MM: look into ../svn-log-from.all
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
-\section{Changes in version 0.999-11 (2014-..-..)}{
+\section{Changes in version 0.999-12 (2014-..-..)}{
+  \itemize{
+    \item fix bug which did not allow to set non-default
+    \code{optim.method} in \code{gofCopula()}.
+
+    \item Not fully back-compatible change: \code{gofCopula()} now
+    passes all extra arguments via \code{...} to \code{fitCopula()}.
+    Before, \code{gofPB()} passed them to the trafo.method.
+  }
+}
+
+\section{Changes in version 0.999-11 (2014-09-05)}{
   \itemize{
     \item The default for the optional \code{estimate.variance} argument
     of \code{fitCopula()} and \code{fitMvcd()} now is \code{TRUE} only if
@@ -68,6 +79,10 @@
 
 \section{Changes in version 0.999-6 (2013-05-14)}{
   \itemize{
+    \item \code{gofCopula()} gets a new \code{trafo.method} argument,
+    now also can use (new) \code{htrafo()} in addition to Rosenblatt's
+    transform \code{rtrafo}.
+
     \item ...
   }
 }

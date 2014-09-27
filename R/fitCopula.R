@@ -403,8 +403,8 @@ varPL <- function(cop,u)
                    " Rather use 'estimate.variance = FALSE'")
     if(is(cop, "archmCopula")) {
 	fam <- names(which(.ac.classNames == class(cop)[[1]]))
-	msg <- c(msg, gettext("Or rather  emle(u, oCop)	 instead; where",
-			      sprintf("oCop <- onacopula(%s, C(NA, 1:%d)", fam, p)))
+	msg <- c(msg, gettext(" Or rather  emle(u, oCop)  instead; where",
+                              sprintf(" oCop <- onacopula(%s, C(NA, 1:%d))", fam, p)))
     }
     if (!isEll && (!hasMethod("dcopwrap", clc) ||
                    !hasMethod("derPdfWrtArgs", clc))) {

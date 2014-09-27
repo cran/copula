@@ -334,18 +334,18 @@ setMethod("derPdfWrtArgs", signature("tCopula"), derPdfWrtArgsTCopula)
 setGeneric("derPdfWrtParams", function(cop, u) standardGeneric("derPdfWrtParams"))
 
 derPdfWrtParamsExplicitCopula <- function(cop, u)
-  {
+{
     p <- cop@dimension
     alpha <- cop@parameters
     algNm <- paste(class(cop)[1], "pdfDerWrtPar.algr", sep=".")
-    if(exists(algNm) && is.expression(der.pdf.alpha <- get(algNm)[p])) {
+    if(exists(algNm) && !is.null((der.pdf.alpha <- get(algNm)[p])[[1]])) {
         colnames(u) <- paste0("u", 1:p)
         as.matrix(eval(der.pdf.alpha, data.frame(u)))
     } else {
         warning("there is no formula for derPdfWrtParam*() for this copula")
         matrix(NA_real_, nrow(u),p)
     }
-  }
+}
 
 setMethod("derPdfWrtParams", signature("archmCopula"), derPdfWrtParamsExplicitCopula)
 setMethod("derPdfWrtParams", signature("plackettCopula"), derPdfWrtParamsExplicitCopula)

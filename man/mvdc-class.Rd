@@ -36,6 +36,6 @@
 }
 \seealso{
   \code{\link{mvdc}}, % ./Mvdc.Rd
-  also for examples.
+  also for examples; for fitting, \code{\link{fitMvdc}}.
 }
 \keyword{classes}
