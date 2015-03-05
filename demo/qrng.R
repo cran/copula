@@ -433,3 +433,63 @@ for(i in 1:(nrow(sq.mid[["u.MO"]])-1)) lines(sq.mid[["u.MO"]][i:(i+1),], col=sq.
 for(i in 1:(nrow(sq.in[["u.MO"]])-1)) lines(sq.in[["u.MO"]][i:(i+1),], col=sq.in[["col"]][i], lwd=2)
 if(doPDF) dev.off.pdf(file=file)
 
+
+### 4) 3d vs 2d projections (for a Clayton copula) #############################
+
+family <- "Clayton"
+tau <- 0.5
+th <- iTau(getAcop(family), tau)
+cop <- onacopulaL(family, nacList=list(th, 1:2))
+
+set.seed(271)
+U <- halton(n, dim=3)
+U.C.CDM <- rtrafo(U, cop=cop, inverse=TRUE) # CDM
+U.C.MO <- cbind(U1=cop@copula@psi(-log(U[,1])/qgamma(U[,3], shape=1/th), theta=th),
+                U2=cop@copula@psi(-log(U[,2])/qgamma(U[,3], shape=1/th), theta=th),
+                U3=U[,3])
+
+## 3d plots
+if(doPDF) pdf(file=(file <- "fig_3d_Halton_U.pdf"), width=6, height=6)
+par(pty="s")
+cloud(U[,3]~U[,1]+U[,2], scales=list(col=1, arrows=FALSE), col=1,
+      xlab=expression(italic(U[1])), ylab=expression(italic(U[2])),
+      zlab=expression(italic(U[3])),
+      par.settings=list(background=list(col="#ffffff00"),
+                axis.line=list(col="transparent"), clip=list(panel="off")))
+if(doPDF) dev.off.pdf(file=file)
+
+if(doPDF) pdf(file=(file <- "fig_3d_CDM_Clayton.pdf"), width=6, height=6)
+par(pty="s")
+cloud(U.C.CDM[,3]~U.C.CDM[,1]+U.C.CDM[,2], scales=list(col=1, arrows=FALSE), col=1,
+      xlab=expression(italic(U[1])), ylab=expression(italic(U[2])),
+      zlab=expression(italic(U[3])),
+      par.settings=list(background=list(col="#ffffff00"),
+                axis.line=list(col="transparent"), clip=list(panel="off")))
+if(doPDF) dev.off.pdf(file=file)
+
+if(doPDF) pdf(file=(file <- "fig_3d_MO_U_Clayton.pdf"), width=6, height=6)
+par(pty="s")
+cloud(U.C.MO[,3]~U.C.MO[,1]+U.C.MO[,2], scales=list(col=1, arrows=FALSE), col=1,
+      xlab=expression(italic(U[1])), ylab=expression(italic(U[2])),
+      zlab=expression(italic(U[3])),
+      par.settings=list(background=list(col="#ffffff00"),
+                axis.line=list(col="transparent"), clip=list(panel="off")))
+if(doPDF) dev.off.pdf(file=file)
+
+
+## 2d plots
+if(doPDF) pdf(file=(file <- "fig_3d_pairs_plot_Halton_U.pdf"), width=6, height=6)
+par(pty="s")
+pairs(U, labels=as.expression( sapply(1:3, function(j) bquote(italic(U[.(j)]))) ), gap=0)
+if(doPDF) dev.off.pdf(file=file)
+
+if(doPDF) pdf(file=(file <- "fig_3d_pairs_plot_CDM_Clayton.pdf"), width=6, height=6)
+par(pty="s")
+pairs(U.C.CDM, labels=as.expression( sapply(1:3, function(j) bquote(italic(U[.(j)]))) ), gap=0)
+if(doPDF) dev.off.pdf(file=file)
+
+if(doPDF) pdf(file=(file <- "fig_3d_pairs_plot_MO_U_Clayton.pdf"), width=6, height=6)
+par(pty="s")
+pairs(U.C.MO, labels=as.expression( sapply(1:3, function(j) bquote(italic(U[.(j)]))) ), gap=0)
+if(doPDF) dev.off.pdf(file=file)
+

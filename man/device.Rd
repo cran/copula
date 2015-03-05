@@ -13,9 +13,9 @@ dev.off.pdf(file="Rplots.pdf", crop=NULL, embedFonts="", ...)
   \item{file}{output file name including extension .pdf.}
   \item{crop}{cropping command, can be one of:
     \describe{
-      \item{\code{\link{NULL}}}{crop with the command \code{"pdfcrop
-      --pdftexcmd pdftex file file 1>/dev/null 2>&1"}. This is suitable
-	for Unix; for non-Unix, no cropping is done.}
+      \item{\code{\link{NULL}}}{crop with the command
+	\code{"pdfcrop --pdftexcmd pdftex file file 1>/dev/null 2>&1"}.
+	This is suitable for Unix; for non-Unix, no cropping is done.}
       \item{\code{\link{character}}}{a string containing the crop
 	command.}
       \item{""}{do not crop.}
@@ -44,12 +44,10 @@ dev.off.pdf(file="Rplots.pdf", crop=NULL, embedFonts="", ...)
   \pkg{sfsmisc}'s \code{\link[sfsmisc]{pdf.end}()} for another approach.
 }
 \examples{
-## example usage
-set.seed(271)
-U <- rCopula(200, tCopula(0.8, df=3))
-doPDF <- dev.interactive(orNone=TRUE)
-if(doPDF) pdf(file=(file <- "myfile.pdf"), width=6, height=6)
-plot(U, xlab=expression(italic(U[1])), ylab=expression(italic(U[2])))
-if(doPDF) dev.off.pdf(file=file)
+## typical usage
+doPDF <- !dev.interactive(orNone=TRUE)
+if(doPDF) pdf(file=(file <- "crop_device.pdf"), width=6, height=6)
+plot(1)
+if(doPDF) dev.off.pdf(file)
 }
 \keyword{utilities}

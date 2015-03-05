@@ -845,7 +845,7 @@ dsumSibuya <- function(x, n, alpha,
 	   "Rmpfr" =,  "Rmpfr0" =,
 	   "RmpfrM" =, "Rmpfr0M" =
        {
-	   stopifnot(require("Rmpfr"))# need package: classes, methods, e.g. as.numeric(), new()
+	   stopifnot(requireNamespace("Rmpfr"))# need package: classes, methods, e.g. as.numeric(), new()
 	   ## as "direct" but using high-precision arithmetic, where
 	   ## the precision should be set via alpha = mpfr(*, precBits= .)
 	   mayRecall <- !grepl("Rmpfr0", method) ## only if not "Rmpfr0(M)"

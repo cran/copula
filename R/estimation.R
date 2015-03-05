@@ -421,6 +421,7 @@ edmle <- function(u, cop, interval=initOpt(cop@copula@name), warn=TRUE, ...)
 ### (Simulated) maximum likelihood estimation ##################################
 
 ##' (Simulated) maximum likelihood estimation for nested Archimedean copulas
+##' -- *Fast* version (based on optimize()) called from enacopula
 ##'
 ##' @title (Simulated) maximum likelihood estimation for nested Archimedean copulas
 ##' @param u matrix of realizations following the copula
@@ -432,7 +433,6 @@ edmle <- function(u, cop, interval=initOpt(cop@copula@name), warn=TRUE, ...)
 ##' @param ... additional parameters for optimize
 ##' @return (simulated) maximum likelihood estimator; return value of optimize
 ##' @author Marius Hofert
-##' note: this is a *fast* version (based on optimize()) called from enacopula
 .emle <- function(u, cop, n.MC=0, interval=initOpt(cop@copula@name), ...)
 {
     stopifnot(is(cop, "outer_nacopula"))
@@ -486,20 +486,19 @@ emle <- function(u, cop, n.MC=0, optimizer="optimize", method,
 
     ## optimization
     if(!(is.null(optimizer) || is.na(optimizer))) {
-        stopifnot(require("bbmle"))
+        ## stopifnot(requireNamespace("bbmle"))
 	if(optimizer == "optimize")
 	    bbmle::mle2(minuslogl = nLL, optimizer = "optimize",
-                        lower = interval[1], upper = interval[2],
-                        ##vvv awkward to be needed, but it is - by mle2():
-                        start=start, ...)
+		 lower = interval[1], upper = interval[2],
+		 ##vvv awkward to be needed, but it is - by mle2():
+		 start=start, ...)
 	else if(optimizer == "optim") {
 	    message(" optimizer = \"optim\" -- using mle2(); consider optimizer=NULL instead")
 	    bbmle::mle2(minuslogl = nLL, optimizer = "optim", method = method,
-                        start=start, ...)
+		 start=start, ...)
 	}
 	else ## "general"
-	    bbmle::mle2(minuslogl = nLL, optimizer = optimizer,
-                        start=start, ...)
+	    bbmle::mle2(minuslogl = nLL, optimizer = optimizer, start=start, ...)
     }
     else
 	## use optim() .. [which uses suboptimal method for 1D, but provides Hessian]

@@ -39,7 +39,7 @@
 ##' @return (n,d) matrix U supposedly U[0,1]^d (if inverse==FALSE) or 'copula'
 ##'         (if inverse=TRUE) realizations (if j.ind==NULL) or
 ##'         C(u_j | u_1,..,u_{j-1}) (if j.ind in {2,..,d}) [or the log of
-##'         the result if log==TRUE]
+##'         the result if log=TRUE]
 ##' @author Marius Hofert and Martin Maechler
 rtrafo <- function(u, cop, j.ind=NULL, n.MC=0, inverse=FALSE, log=FALSE)
 {
@@ -132,7 +132,7 @@ rtrafo <- function(u, cop, j.ind=NULL, n.MC=0, inverse=FALSE, log=FALSE)
 
     } else if(is(cop, "normalCopula")) {
 
-    ## Gauss copula ############################################################
+    ## Gauss copula (see, e.g., Cambou, Hofert, Lemieux) #######################
 
         P <- getSigma(cop)
         stopifnot(dim(P) == c(d,d)) # defensive programming
@@ -140,7 +140,7 @@ rtrafo <- function(u, cop, j.ind=NULL, n.MC=0, inverse=FALSE, log=FALSE)
         ## compute inverse
         if(inverse) {
             U <- u # consider u as U[0,1]^d
-            max.col <- if(is.null(j.ind)) d else j.ind
+            max.col <- if(is.null.j.ind) d else j.ind
             x <- qnorm(u[,1:max.col, drop=FALSE]) # will be updated with previously transformed U's
             for(j in 2:max.col) {
                 P. <- P[j,1:(j-1), drop=FALSE] %*% solve(P[1:(j-1),1:(j-1), drop=FALSE]) # (1,j-1) %*% (j-1,j-1) = (1,j-1)
@@ -154,7 +154,8 @@ rtrafo <- function(u, cop, j.ind=NULL, n.MC=0, inverse=FALSE, log=FALSE)
         }
 
         ## compute conditional probabilities (more efficient due to vapply())
-        x <- qnorm(u[,jj.res, drop=FALSE])
+        max.col.ran <- if(is.null.j.ind) jj.res else 1:j.ind
+        x <- qnorm(u[, max.col.ran, drop=FALSE])
         C.j <- function(j) {
             P. <- P[j,1:(j-1), drop=FALSE] %*% solve(P[1:(j-1),1:(j-1), drop=FALSE]) # (1,j-1) %*% (j-1,j-1) = (1,j-1)
             mu.cond <- as.numeric(P. %*% t(x[,1:(j-1), drop=FALSE])) # (1,j-1) %*% (j-1,n) = (1,n) = n
@@ -166,7 +167,7 @@ rtrafo <- function(u, cop, j.ind=NULL, n.MC=0, inverse=FALSE, log=FALSE)
 
     } else if(is(cop, "tCopula")) {
 
-    ## t Copula ################################################################
+    ## t Copula (see, e.g., Cambou, Hofert, Lemieux) ###########################
 
 	P <- getSigma(cop)
         stopifnot(dim(P) == c(d,d)) # defensive programming
@@ -195,7 +196,8 @@ rtrafo <- function(u, cop, j.ind=NULL, n.MC=0, inverse=FALSE, log=FALSE)
         }
 
         ## compute conditional probabilities (more efficient due to vapply())
-        x <- qt(u[,jj.res, drop=FALSE], df=nu)
+        max.col.ran <- if(is.null.j.ind) jj.res else 1:j.ind
+        x <- qt(u[, max.col.ran, drop=FALSE], df=nu)
         C.j <- function(j) {
             P1.inv <- solve(P[1:(j-1),1:(j-1), drop=FALSE])
             x1 <- x[,1:(j-1), drop=FALSE]

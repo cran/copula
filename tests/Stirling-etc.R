@@ -206,3 +206,31 @@ stopifnot(is.na(c(D1[1],D2[1])), is.nan(c(D1[2],D2[2])),
           !is.na(D2[-(1:2)]), !is.nan(D2[-2]),
           D1[isI] == 0,
           D2[isI] == 0)
+
+### lsum() and lssum() --------------
+ lsum <- copula:::lsum
+lssum <- copula:::lssum
+lsum0 <- function(lx) log(sum(exp(lx)))
+
+lx1 <- 10*(-80:70) # is easy
+lx2 <- 600:750     # lsum0() not ok [could work with rescaling]
+lx3 <- -(750:900)  # lsum0() = -Inf - not good enough
+m3 <- cbind(lx1,lx2,lx3)
+lx6 <- lx5 <- lx4 <- lx3
+lx4[149:151] <- -Inf ## = log(0)
+lx5[150] <- Inf
+lx6[1] <- NA_real_
+m6 <- cbind(m3,lx4,lx5,lx6)
+stopifnot(all.equal(lsum(lx1), lsum0(lx1)),
+          all.equal((ls1 <- lsum(lx1)),  700.000045400960403, tol=8e-16),
+          all.equal((ls2 <- lsum(lx2)),  750.458675145387133, tol=8e-16),
+          all.equal((ls3 <- lsum(lx3)), -749.541324854612867, tol=8e-16),
+          ## identical: matrix-version <==> vector versions
+	  identical(lsum(lx4), ls3),
+	  identical(lsum(lx4), lsum(head(lx4, -3))), # the last three were -Inf
+	  identical(lsum(lx5), Inf),
+	  identical(lsum(lx6), lx6[1]),
+	  identical((lm3 <- lsum(m3)), c(lx1=ls1, lx2=ls2, lx3=ls3)),
+	  identical(lsum(m6), c(lm3, lx4=ls3, lx5=Inf, lx6=lx6[1])),
+          TRUE)
+

@@ -28,7 +28,7 @@ importFrom("methods", ## incl generics for which we export new methods:
 ### Part I: Mainly former copula ###############################################
 
 importFrom("graphics", persp, contour)
-importFrom("stats", coef, nobs, vcov)# logLik? - already import from "stats4" for mle2
+importFrom("stats", nobs, vcov)# 'coef': from "bblme"; 'logLik': from "stats4"
 
 importFrom("mvtnorm",
             dmvnorm, pmvnorm, rmvnorm,
@@ -137,9 +137,10 @@ export(dev.off.pdf)
 
 ### Part II: Mainly former nacopula ############################################
 
-## Now  'Depend'  on  stats4 and bbmle :
 importFrom("stats4", mle)
-importMethodsFrom("stats4", coef, confint, logLik, AIC, BIC, plot, profile)
+importMethodsFrom("stats4",
+		  coef, confint, logLik, AIC, BIC,
+		  plot, profile, summary)
 
 importFrom("lattice", trellis.par.get,
 	   splom, panel.fill, panel.splom, diag.panel.splom)
@@ -149,6 +150,9 @@ importFrom("gsl", debye_1, debye_2, dilog, complex_dilog)
 importFrom("ADGofTest", ad.test)# really would want the ad.test.statistic() but that's hidden
 
 importFrom("stabledist", dstable)
+
+## importFrom("bbmle", mle2)
+
 
 if(FALSE) {## currently do not "depend" on Rmpfr's correct installation:
 ## As we use it only in "bad cases" polyG(), dsumSibuya(),..:
@@ -224,7 +228,10 @@ export(psiDabsMC
        )
 
 exportMethods(## for both own and "other" generics:
-	      "prob",
-	      "%in%", "dim",
-	      "format", "show"
-	      )
+    "prob",
+    "%in%", "dim",
+    "format", "show",
+    ## imported from "stats4" / "bbmle":
+    "coef", "confint", "logLik", #-> hence AIC works [BIC: needs 'nobs' fix in bbmle]
+    "profile", "summary", "plot"
+    )

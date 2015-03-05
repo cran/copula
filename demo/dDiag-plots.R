@@ -162,9 +162,9 @@ if(canGet(filR)) attach(filR) else {
     ##           ------------
     ## Compute for more about 10 minutes --- using
     ## package Rmpfr - we need here
-    stopifnot(require("Rmpfr"))
+    stopifnot(requireNamespace("Rmpfr")) ## or rather need require(.) for dDiagF() to work??
 
-    m.M <- mpfr(m.tu, precBits = 512)# <- takes a few seconds
+    m.M <- Rmpfr::mpfr(m.tu, precBits = 512)# <- takes a few seconds
 
     stopifnot(dim(m.M) == dim(m.tu),
               identical(dimnames(m.M), dimnames(m.tu)))

@@ -9,9 +9,9 @@
 %     in JSS, \url{http://www.jstatsoft.org/v39/i09}.}
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Martin M\"achler} %% comma-separated
-\Shorttitle{Spearman's Rho for AMH --Beautiful}
+\Shorttitle{Spearman's Rho for AMH -- Beautiful}
 %
-%\VignetteIndexEntry{copula}
+%\VignetteIndexEntry{Rho_AMH_beautiful}% <-------- "Name" on CRAN web page
 %\VignetteDepends{MASS}
 %\VignetteDepends{copula}
 %\VignetteDepends{sfsmisc}

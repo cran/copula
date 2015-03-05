@@ -118,6 +118,9 @@ random numbers.
 ** DONE tests/pdf.R should use "all" copulas, similar to tests/moments.R.
 *** DONE Then, test that  exp(dCopula(*, log=TRUE)) "==" dCopula(*)
 {to test the bug, fixed in r954, reported by Benedikt}
+** DONE ~/R/Pkgs/copula : need a version with much shorter tests on CRAN?
+*** can we "not rebuild the PDFs" for the vignettes? to save a bit?
+
 * Mid Term
 ** TODO Ulf Schepsmeier's email to Marius on 2014-04-23: VineCopulas now has wrappers for 'copula' => Ulf suggested to refer to them / their copulas which are not in our package:
 library(copula)

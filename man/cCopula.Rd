@@ -64,10 +64,10 @@ U <- rCopula(n, cop)
 
 U. <- cbind(U[,1], cCopula(U, cop=cop)) # should be ~ U[0,1]^2
 plot(U.[,1],U.[,2])
-\donttest{
- stopifnot(all.equal(cacopula(U, cop),# with deprecation warning
-                      cCopula(U, cop)))
-}
-## more examples:  -->  ?rtrafo
+\donttest{\dontshow{suppressWarnings(}% <- for --run-donttest
+stopifnot(all.equal(cacopula(U, cop),# with deprecation warning
+                    cCopula (U, cop)))
+\dontshow{)}
+}## more examples:  -->  ?rtrafo
 } % --> ./gofTrafos.Rd
 \keyword{distribution}

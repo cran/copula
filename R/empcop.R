@@ -59,8 +59,8 @@ F.n <- function(x, X, offset=0, method=c("C", "R"))
 		   ## == apply(x, 1, function(x.) sum(colSums(t(X)<=x.)==d)/(n+offset) )
 		   ## but vapply is slightly faster (says MH)
 		   tX <- t(X)
-		   vapply(1:nrow(x), function(k) sum(colSums(tX <= x[k,]) == d), NA_real_) /
-		       (n + offset)
+		   vapply(1:nrow(x), function(k) sum(colSums(tX <= x[k,]) == d),
+		       NA_real_) / (n + offset)
 	       },
 	       stop("wrong 'method': ", method))
     }

@@ -482,7 +482,7 @@ pairsColList <- function(P, pdiv=c(1e-4, 1e-3, 1e-2, 0.05, 0.1, 0.5),
 	if(is0bg.col.bottom && is0bg.col.top) { # use default color schemes
 	    bg.col <- match.arg(bg.col)
 	    hex2pLUV <- function(cc) {
-		stopifnot(require(colorspace)) # also for as(.,.) method
+		stopifnot(requireNamespace("colorspace")) # also for as(.,.) method
 		rev(as(colorspace::hex2RGB(cc), "polarLUV")@coords) # default
 	    }
 	    switch(bg.col,

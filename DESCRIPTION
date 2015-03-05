@@ -1,7 +1,7 @@
 Package: copula
-Version: 0.999-12
-Date: $Date: 2014-09-27 13:57:55 +0200 (Sat, 27. Sep 2014) $,
-        subversion $Revision: 1143 $ <<-- don't forget inst/NEWS.Rd !
+Version: 0.999-13
+Date: $Date: 2015-03-05 17:50:12 +0100 (Thu, 05. Mar 2015) $,
+        subversion $Revision: 1156 $ <<-- don't forget inst/NEWS.Rd !
 Title: Multivariate Dependence with Copulas
 Author: Marius Hofert <marius.hofert@uwaterloo.ca>,
  Ivan Kojadinovic <ivan.kojadinovic@univ-pau.fr>,
@@ -11,7 +11,7 @@ Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
 Depends: R (>= 2.15.2)
 Imports: stats, graphics, methods, stats4, Matrix, lattice, gsl,
         ADGofTest, stabledist (>= 0.6-4), mvtnorm, pspline
-Suggests: MASS, KernSmooth, sfsmisc, bbmle, scatterplot3d, Rmpfr,
+Suggests: MASS, KernSmooth, sfsmisc, scatterplot3d, Rmpfr, bbmle,
         partitions, polynom, rugarch, colorspace, mvnormtest, tseries,
         zoo
 SuggestsNote: the last line packages partitions, ..., zoo are only used
@@ -29,6 +29,7 @@ Description: Classes (S4) of commonly used elliptical, Archimedean, extreme
  sampling algorithms, various estimators, goodness-of-fit tests and related
  tools and special functions.
 License: GPL (>= 3) | file LICENCE
+ByteCompile: yes
 Collate: AllClass.R Classes.R Copula.R Auxiliaries.R aux-acopula.R
         special-func.R cop_objects.R nacopula.R derCdfPdf.R amhCopula.R
         amhExpr.R An.R archmCopula.R asymCopula.R asymExplicitCopula.R
@@ -45,7 +46,7 @@ Collate: AllClass.R Classes.R Copula.R Auxiliaries.R aux-acopula.R
         tawnCopula.R tawnExpr.R tevCopula.R wrapper.R zzz.R
 Encoding: UTF-8
 URL: http://nacopula.r-forge.r-project.org/
-Packaged: 2014-10-01 10:26:11 UTC; maechler
+Packaged: 2015-03-05 16:51:24 UTC; maechler
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2014-10-02 16:00:17
+Date/Publication: 2015-03-05 22:13:21

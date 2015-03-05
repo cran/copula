@@ -71,14 +71,15 @@ evTestA(uG, derivatives = "Cn")
 evTestA(uC)
 }
 \dontshow{% test only: very small subset to be fast
+set.seed(34)
 tG   <- evTestA(uG[1:10,])
 tC.A <- evTestA(uC[1:12,])
 tC.C <- evTestA(uC[1:20,], derivatives = "Cn")
 stopifnot(
-all.equal(all.equal(tG  $p.value, 47/2002, tolerance= 1e-15),
-	  all.equal(tC.C$p.value,  1/154 , tolerance= 1e-15),
-	  all.equal(tC.C$p.value, tC.A$p.value, tolerance = 1e-15)
-))
+ all.equal(tG  $p.value, 27/2002,  tolerance= 1e-15),
+ all.equal(tC.C$p.value,   1/182 , tolerance= 1e-15),
+ all.equal(tC.C$p.value, tC.A$p.value, tolerance = 1e-15) # in < 10\% of cases
+)
 }%dont
 }
 \keyword{htest}

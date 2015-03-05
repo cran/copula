@@ -98,7 +98,7 @@ signFF <- function(alpha, j, d) {
 ##' @title Properly compute the logarithm of a sum
 ##' @param lx (n,d)-matrix containing the row vectors log(x_1),..,log(x_n)
 ##'        each of dimension d
-##' @param l.off the offset to substract and re-add; ideally in the order of
+##' @param l.off the offset to subtract and re-add; ideally in the order of
 ##'        the maximum of each column
 ##' @return log(x_1 + .. + x_n) [i.e., OF DIMENSION d!!!] computed via
 ##'         log(sum(x)) = log(sum(exp(log(x))))
@@ -107,11 +107,38 @@ signFF <- function(alpha, j, d) {
 ##'         = lx.max + log(sum(exp(lx-lx.max)))
 ##'         => VECTOR OF DIMENSION d
 ##' @author Marius Hofert, Martin Maechler
-lsum <- function(lx, l.off = apply(lx, 2, max)) {
-    ## do not use cbind or rbind here, since it is not clear if the user specified
-    ## only one vector log(x) or several vectors of dimension 1 !!!
-    ## stopifnot(length(dim(lx)) == 2L) # is.matrix(.) generalized
-    l.off + log(colSums(exp(lx - rep(l.off, each=nrow(lx)))))
+lsum <- function(lx, l.off) {
+    rx <- length(d <- dim(lx))
+    if(mis.off <- missing(l.off)) l.off <- {
+	if(rx <= 1L)
+	    max(lx)
+	else if(rx == 2L)
+	    apply(lx, 2L, max)
+    }
+    if(rx <= 1L) { ## vector
+	if(is.finite(l.off))
+	    l.off + log(sum(exp(lx - l.off)))
+	else if(mis.off || is.na(l.off) || l.off == max(lx))
+	    l.off # NA || NaN or all lx == -Inf, or max(.) == Inf
+	else
+	    stop("'l.off  is infinite but not == max(.)")
+    } else if(rx == 2L) { ## matrix
+	if(any(x.off <- !is.finite(l.off))) {
+	    if(mis.off || isTRUE(all.equal(l.off, apply(lx, 2L, max)))) {
+		## we know l.off = colMax(.)
+		if(all(x.off)) return(l.off)
+		r <- l.off
+		iok <- which(!x.off)
+		l.of <- l.off[iok]
+		r[iok] <- l.of + log(colSums(exp(lx[,iok,drop=FALSE] -
+						     rep(l.of, each=d[1]))))
+		r
+	    } else ## explicitly specified l.off differing from colMax(.)
+		stop("'l.off' has non-finite values but differs from default max(.)")
+	}
+	else
+	    l.off + log(colSums(exp(lx - rep(l.off, each=d[1]))))
+    } else stop("not yet implemented for arrays of rank >= 3")
 }
 
 ##' Properly compute log(x_1 + .. + x_n) for a given matrix of column vectors
@@ -121,7 +148,7 @@ lsum <- function(lx, l.off = apply(lx, 2, max)) {
 ##' @param lxabs (d,n)-matrix containing the column vectors log(|x_1|),..,log(|x_n|)
 ##'        each of dimension d
 ##' @param signs corresponding matrix of signs sign(x_1), .., sign(x_n)
-##' @param l.off the offset to substract and re-add; ideally in the order of max(.)
+##' @param l.off the offset to subtract and re-add; ideally in the order of max(.)
 ##' @param strict logical indicating if it should stop on some negative sums
 ##' @return log(x_1 + .. + x_n) [i.e., of dimension d] computed via
 ##'         log(sum(x)) = log(sum(sign(x)*|x|)) = log(sum(sign(x)*exp(log(|x|))))
@@ -529,7 +556,7 @@ Bernoulli.all <-
     switch(method,
            "A-T" =
        {
-           if(verbose) stopifnot(require("MASS"))
+           if(verbose) stopifnot(requireNamespace("MASS"))
            nn <- seq_len(n1 <- n+1L) ## <- FIXME, make this work with Rmpfr optionally
            if(!is.numeric(precBits) || !is.finite(precBits)) {
                B <- numeric(n1)
