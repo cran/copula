@@ -253,13 +253,13 @@ pairsRosenblatt(cu.u, pvalueMat=pmat, pch=".", main=title)
 if(doPDF) pdf(file=(file <- "gof_graph_fig-nG-scatter.pdf"))
 pairsRosenblatt(cu.u, pvalueMat=pmat, pch=".", main=title,
                 line.main=c(4, 1.4), main.centered=TRUE)
-if(doPDF) copula:::dev.off.pdf(file=file)
+if(doPDF) dev.off()
 
 ## --- JCGS, Fig.4 (right) ---
 if(doPDF) pdf(file=(file <- "gof_graph_fig-nG-QQ.pdf"))
 pairsRosenblatt(cu.u, pvalueMat=pmat, method="QQchisq", cex=0.2, main=title,
                 line.main=c(4, 1.4), main.centered=TRUE)
-if(doPDF) copula:::dev.off.pdf(file=file)
+if(doPDF) dev.off()
 
 
 ### Example 3: 5d t_4 copula (fixed/known d.o.f., estimated P) #################
@@ -426,4 +426,4 @@ pairsRosenblatt(cu.ut, pvalueMat=pmatt, method="none", cex.labels=0.7,
                 key.space=1.5, main.centered=TRUE, main=title, line.main=c(3, 0.4),
                 keyOpt=list(space=1.5, width=1.5, axis=TRUE,
                             rug.at = numeric(), title=NULL, line=5))
-if(doPDF) copula:::dev.off.pdf(file=file)
+if(doPDF) dev.off()

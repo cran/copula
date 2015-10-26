@@ -6,13 +6,12 @@
 }
 \usage{
 pobs(x, na.last = "keep",
-     ties.method = c("average", "first", "random", "max", "min"),
-     lower.tail = TRUE)
+     ties.method = , lower.tail = TRUE)
 }
 \arguments{
   \item{x}{\eqn{n\times d}{n x d}-matrix of random variates to be converted to
     pseudo-observations.}
-  \item{na.last, ties.method}{are passed to \code{\link{rank}}; see
+  \item{na.last, ties.method}{strings, passed to \code{\link{rank}}; see
     there.}
   \item{lower.tail}{\code{\link{logical}} which, if \code{FALSE},
     returns the pseudo-observations when applying the

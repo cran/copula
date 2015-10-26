@@ -69,7 +69,7 @@ F.n <- function(x, X, offset=0, method=c("C", "R"))
 C.n <- function(u, U, offset=0, method=c("C", "R")) {
     if(any(U < 0, 1 < U))
         stop("'U' must be in [0,1].. possibly use 'U=pobs(x)'...")
-    if(any(u < 0, 1 < U))
+    if(any(u < 0, 1 < u))
         stop("'u' must be in [0,1].")
     F.n(u, U, offset=offset, method=method)
 }

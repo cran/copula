@@ -1,21 +1,22 @@
 Package: copula
-Version: 0.999-13
-Date: $Date: 2015-03-05 17:50:12 +0100 (Thu, 05. Mar 2015) $,
-        subversion $Revision: 1156 $ <<-- don't forget inst/NEWS.Rd !
+Version: 0.999-14
+VersionNote: LastCran: 0.999-13 on 2015-03-05
+Date: $Date: 2015-10-26 15:14:37 +0100 (Mon, 26. Oct 2015) $,
+        subversion $Revision: 1198 $ <<-- don't forget inst/NEWS.Rd !
 Title: Multivariate Dependence with Copulas
 Author: Marius Hofert <marius.hofert@uwaterloo.ca>,
  Ivan Kojadinovic <ivan.kojadinovic@univ-pau.fr>,
  Martin Maechler <maechler@stat.math.ethz.ch>, and
  Jun Yan <jun.yan@uconn.edu>
 Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
-Depends: R (>= 2.15.2)
-Imports: stats, graphics, methods, stats4, Matrix, lattice, gsl,
-        ADGofTest, stabledist (>= 0.6-4), mvtnorm, pspline
+Depends: R (>= 3.0.1)
+Imports: stats, graphics, methods, stats4, Matrix, lattice, colorspace,
+        gsl, ADGofTest, stabledist (>= 0.6-4), mvtnorm, pspline
 Suggests: MASS, KernSmooth, sfsmisc, scatterplot3d, Rmpfr, bbmle,
-        partitions, polynom, rugarch, colorspace, mvnormtest, tseries,
-        zoo
-SuggestsNote: the last line packages partitions, ..., zoo are only used
-        in demos
+        knitr, parallel, mvnormtest, partitions, polynom, randtoolbox,
+        rugarch, Runuran, tseries, VGAM, VineCopula, zoo
+SuggestsNote: the last line packages {parallel, ..., zoo} are only used
+        in vignettes and demos.
 Enhances: nor1mix
 Description: Classes (S4) of commonly used elliptical, Archimedean, extreme
  value and some more copula families.  Methods for density, distribution,
@@ -30,6 +31,7 @@ Description: Classes (S4) of commonly used elliptical, Archimedean, extreme
  tools and special functions.
 License: GPL (>= 3) | file LICENCE
 ByteCompile: yes
+VignetteBuilder: knitr
 Collate: AllClass.R Classes.R Copula.R Auxiliaries.R aux-acopula.R
         special-func.R cop_objects.R nacopula.R derCdfPdf.R amhCopula.R
         amhExpr.R An.R archmCopula.R asymCopula.R asymExplicitCopula.R
@@ -37,16 +39,16 @@ Collate: AllClass.R Classes.R Copula.R Auxiliaries.R aux-acopula.R
         acR.R estimation.R evCopula.R evTests.R exchTests.R fgmCopula.R
         fitCopula.R fitMvdc.R frankCopula.R frankExpr.R
         galambosCopula.R galambosExpr-math.R galambosExpr.R
-        ggraph-tools.R pairsRosenblatt.R device.R gofTrafos.R
-        gofEVTests.R gofTests.R graphics.R gumbelCopula.R gumbelExpr.R
+        ggraph-tools.R pairsRosenblatt.R gofTrafos.R gofEVTests.R
+        gofTests.R graphics.R gumbelCopula.R gumbelExpr.R
         huslerReissCopula.R huslerReissExpr.R indepCopula.R
         indepTests.R joeCopula.R K.R logseries.R mvdc.R normalCopula.R
         plackettCopula.R plackettExpr.R rstable1.R safeUroot.R
         schlatherCopula.R stable.R timing.R trafos.R tCopula.R
         tawnCopula.R tawnExpr.R tevCopula.R wrapper.R zzz.R
 Encoding: UTF-8
-URL: http://nacopula.r-forge.r-project.org/
-Packaged: 2015-03-05 16:51:24 UTC; maechler
+URL: http://copula.r-forge.r-project.org/
 NeedsCompilation: yes
+Packaged: 2015-10-26 15:03:01 UTC; maechler
 Repository: CRAN
-Date/Publication: 2015-03-05 22:13:21
+Date/Publication: 2015-10-26 17:07:26

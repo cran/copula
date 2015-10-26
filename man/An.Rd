@@ -75,6 +75,10 @@ curve(An.biv(rCopula(1000, gumbelCopula(2   )), x, estimator="Pickands"),
 curve(An.biv(rCopula(1000, gumbelCopula(1.33)), x, estimator="Pickands"),
       lty=3, add=TRUE, col=3)
 
+legend("bottomleft",  paste0("Gumbel(", format(c(4, 2, 1.33)),")"),
+       lwd=1, col=1:3, bty="n")
+legend("bottomright", c("true", "CFG est.", "Pickands est."), lty=1:3, bty="n")
+
 ## Relationship between An.biv and An
 u <- c(runif(100),0,1) # include 0 and 1
 x <- rCopula(1000, gumbelCopula(4))

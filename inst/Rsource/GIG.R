@@ -14,16 +14,23 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-source(system.file("Rsource", "utils.R", package="copula"))
+source(system.file("Rsource", "utils.R", package = "copula"))## ./utils.R
 ##--> tryCatch.W.E(), canGet()
-stopifnot(require(Runuran), require(optimx))
+stopifnot(requireNamespace("Runuran"))
+## "import" what I need:
+ud    <- Runuran::ud
+ur    <- Runuran::ur
+udgig <- Runuran::udgig
+pinvd.new <- Runuran::pinvd.new
+
+## stopifnot(require(optimx)) -- if needed load the Namespace only
 
 ### GIG generator and related functions ########################################
 
 ## generator (parameters theta_1 in IR, theta_2 in (0,Inf))
-## note: theta_1!=0 and theta_2=0 reduces to copClayton@psi(t, 1/theta_1)
+## note: theta_1 != 0 and theta_2 = 0 reduces to copClayton@psi(t, 1/theta_1)
 psi.GIG <- function(t, theta)
-    (1+t)^(-theta[1]/2)*besselK(theta[2]*sqrt(1+t),nu=theta[1])/
+    (1+t)^(-theta[1]/2) * besselK(theta[2]*sqrt(1+t),nu=theta[1])/
     besselK(theta[2],nu=theta[1])
 
 ## generator inverse
@@ -32,20 +39,20 @@ psi.GIG <- function(t, theta)
 ##       modified Bessel functions of the third kind (besselK) given in
 ##       Paris (1984) ("An inequality for the Bessel function J_v(vx)",
 ##       SIAM J. Math. Anal. 15, 203--205)
-iPsi.GIG <- function(t, theta, upper=NULL, ...){
-    if(is.null(upper)){
+iPsi.GIG <- function(t, theta, upper=NULL, ...) {
+    if(is.null(upper)) {
 	if(theta[1] > -0.5) upper <- function(x) (1-log(x)/theta[2])^2-1 else
         stop("initial interval for iPsi.GIG fails")
     }
     res <- numeric(length(t))
-    is0 <- t==0
-    is1 <- t==1
+    is0 <- t == 0
+    is1 <- t == 1
     n01 <- !(is0 | is1)
     res[is0] <- Inf
     res[is1] <- 0
     t. <- t[n01]
     up <- upper(t.)
-    res[n01] <- unlist(lapply(seq_along(t.), function(i){
+    res[n01] <- unlist(lapply(seq_along(t.), function(i) {
 	uniroot(function(t..) psi.GIG(t.., theta)-t.[i],
                 interval=c(0, up[i]), ...)$root
     }))
@@ -53,16 +60,16 @@ iPsi.GIG <- function(t, theta, upper=NULL, ...){
 }
 
 ## generator derivatives
-absdPsi.GIG <- function(t, theta, degree=1, n.MC=0, log=FALSE){
+absdPsi.GIG <- function(t, theta, degree=1, n.MC=0, log=FALSE) {
     res <- numeric(length(t))
     iInf <- is.infinite(t)
     res[iInf] <- -Inf # log(0)
-    if(any(!iInf)){
+    if(any(!iInf)) {
 	t. <- t[!iInf]
-        if(n.MC>0){
+        if(n.MC > 0) {
             V <- V0.GIG(n.MC, theta)
             res[!iInf] <- copula:::lsum(-V %*% t(t.) + degree*log(V) - log(n.MC))
-        }else{
+        } else {
             res[!iInf] <- degree*log(theta[2]/2)-((theta[1]+degree)/2)*log1p(t.) +
                 log(besselK(theta[2]*sqrt(1+t.), nu=theta[1]+degree, expon.scaled=TRUE)) -
                     log(besselK(theta[2], nu=theta[1], expon.scaled=TRUE)) -
@@ -79,7 +86,7 @@ absdiPsi.GIG <- function(t, theta, log=FALSE) {
 }
 
 ## density of the GIG copula
-dacopula.GIG <- function(u, theta, n.MC=0, log=FALSE){
+dacopula.GIG <- function(u, theta, n.MC=0, log=FALSE) {
     if(!is.matrix(u)) u <- rbind(u)
     if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
     ## f() := NaN outside and on the boundary of the unit hypercube
@@ -91,12 +98,12 @@ dacopula.GIG <- function(u, theta, n.MC=0, log=FALSE){
     psiI <- iPsi.GIG(u., theta=theta) # this is costly if d is large
     psiI.sum <- rowSums(psiI)
     ## main part
-    if(n.MC > 0){ # Monte Carlo
+    if(n.MC > 0) { # Monte Carlo
         res[n01] <- absdPsi.GIG(psiI.sum, theta=theta, degree=d, n.MC=n.MC, log=TRUE) -
             rowSums(absdPsi.GIG(psiI, theta=theta, log=TRUE))
-    }else{ # explicit
+    } else { # explicit
         ## auxiliary function for density evaluation
-        h <- function(t, k, theta, log=FALSE){
+        h <- function(t, k, theta, log=FALSE) {
             s1pt <- sqrt(1+t)
             B <- besselK(theta[2]*s1pt, nu=theta[1]+k)
             if(log) log(B)-(theta[1]+k)*log(s1pt) else B/s1pt^(theta[1]+k)
@@ -110,80 +117,83 @@ dacopula.GIG <- function(u, theta, n.MC=0, log=FALSE){
 }
 
 ## V0 random number generator
-V0.GIG <- function(n, theta){
+V0.GIG <- function(n, theta) {
     dens <- udgig(theta[1], 1, theta[2]^2) # the three args lambda, psi, chi for the GIG density as on page 497 in McNeil, Frey, Embrechts (2005)
     gen <- pinvd.new(dens) # works fast, via approximation of the quantile function by piecewise polynomials
     ur(gen, n)/2
 }
 
 ## density of V0
-dV0.GIG <- function(x, theta, log=FALSE){
+dV0.GIG <- function(x, theta, log=FALSE) {
     dens <- udgig(theta[1], 1, theta[2]^2)
     if(log) log(2*ud(dens, 2*x)) else 2*ud(dens, 2*x)
 }
 
 ## Kendall's tau for fixed theta_1 as a function in theta_2
-## quiet==TRUE means that neither warnings nor errors are returned, just NAs
-tau.GIG. <- function(theta, upper=c(200,200), quiet=TRUE, ...){
-    if(theta[1]<0) stop("tau.GIG.: only implemented for nu >= 0")
-    stopifnot(theta[1]<=upper[1], 0<theta[2], theta[2]<=upper[2])
+## quiet == TRUE means that neither warnings nor errors are returned, just NAs
+tau.GIG. <- function(theta, upper=c(200,200), quiet=TRUE, ...) {
+    if(theta[1] < 0) stop("tau.GIG.: only implemented for nu >= 0")
+    stopifnot(theta[1] <= upper[1], 0 < theta[2], theta[2] <= upper[2])
     ## determine minimal theta such that integration still works (before
     ## asymptotic is used)
-    theta.min <- if(theta[1]<50){
+    theta.min <- if(theta[1] < 50) {
 	1e-4
-    }else{
-	if(theta[1]<100){
+    } else {
+	if(theta[1] < 100) {
             0.1
-        }else{
+        } else {
             l10 <- log(10)
             exp(l10/50*theta[1]-3*l10)
         }
     }
     ## either use heuristic or integration
-    if(theta[2]<theta.min){
+    if(theta[2] < theta.min) {
         1/(1+2*theta[1])
-    }else{
-        tau.integrand <- function(t, theta){
+    } else {
+        tau.integrand <- function(t, theta) {
             st <- sqrt(1+t)
-            t*(theta[2]*besselK(theta[2]*st, nu=theta[1]+1)/(st^(theta[1]+1)*
-                                             besselK(theta[2], nu=theta[1])))^2
+            t*(theta[2]*besselK(theta[2]*st, nu=theta[1]+1)/
+               (st^(theta[1]+1)* besselK(theta[2], nu=theta[1])))^2
         }
         int <- tryCatch.W.E(integrate(tau.integrand, lower=0, upper=Inf, theta=theta,
                                       subdivisions=1000, ...)$value)
-        warn.err <- inherits(int$value, what="simpleError") | inherits(int$value, what="simpleWarning")
+        warn.err <- inherits(int$value, what="simpleError") ||
+            inherits(int$value, what="simpleWarning")
+        ## are cautious: warning already gives NA:
         if(warn.err && quiet) NA else 1-int$value
     }
 }
 
 ## wrapper for tau.GIG. [vectorized]
-tau.GIG <- function(theta, upper=c(200,200), quiet=TRUE, ...){
+tau.GIG <- function(theta, upper=c(200,200), quiet=TRUE, ...) {
     if(!is.matrix(theta)) theta <- matrix(theta, ncol=2)
-    apply(theta, 1, tau.GIG., upper=upper, quiet=quiet, ...)
+    apply(theta, 1L, tau.GIG., upper=upper, quiet=quiet, ...)
 }
 
 ## inverse of Kendall's tau for all parameters fixed except the one given as NA
 ## note: initial interval has to be specified [e.g., c(1e-30,200)] since there
 ##       are no adequate bounds known
-iTau.GIG <- function(tau, theta, upper=c(200,200), quiet=TRUE, iargs=list(), ...){
+iTau.GIG <- function(tau, theta, upper=c(200,200), quiet=TRUE, iargs=list(), ...) {
     stopifnot(length(i <- which(is.na(theta))) == 1)
     tau.min <- tau.GIG(upper, upper=upper, quiet=quiet)
-    if(tau<=tau.min) stop(paste("iTau.GIG: tau must be greater than tau.min=",tau.min,sep=""))
-    if(i==1){ # wanted: nu; given: theta
-        interval <- c(0, upper[1])
-    }else{ # wanted: theta; given: nu
-        if(theta[1]<0) stop("iTau.GIG: only implemented for nu >= 0")
-        tau.max <- 1/(1+2*theta[1])
-        ## make sure we are in the range of attainable Kendall's tau
-        if(tau>=tau.max) stop(paste("iTau.GIG: the supremum of attainable taus is",
-           round(tau.max,8))) # this assumes tau to be falling in theta (numerical experiments show this behavior)
-        interval <- c(1e-100, upper[2])
-    }
-    replace(theta, i, uniroot(function(th) do.call(tau.GIG, c(list(replace(theta,
-                                                                           i, th),
-                                                                   upper=upper,
-                                                                   quiet=quiet),
-                                                              iargs))-tau,
-                              interval=interval, ...)$root)
+    if(tau <= tau.min) stop("iTau.GIG: tau must be greater than tau.min=", tau.min)
+    interval <-
+        if(i == 1) { # wanted: nu; given: theta
+            c(0, upper[1])
+        } else { # wanted: theta; given: nu
+            if(theta[1] < 0) stop("iTau.GIG: only implemented for nu >= 0")
+            tau.max <- 1/(1+2*theta[1])
+            ## make sure we are in the range of attainable Kendall's tau
+            if(tau >= tau.max)
+                ## assumes tau to be falling in theta (numerical experiments show this behavior)
+                stop("iTau.GIG: the supremum of attainable taus is ", round(tau.max, 8))
+            c(1e-100, upper[2])
+        }
+    replace(theta, i, uniroot(function(th) {
+        do.call(tau.GIG, c(list(replace(theta, i, th),
+                                upper = upper,
+                                quiet = quiet), iargs)) - tau },
+        interval=interval, ...)$root)
 }
 
 ## generate vectors of random variates from a GIG copula

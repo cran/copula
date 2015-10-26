@@ -38,7 +38,7 @@ tryCatch.W.E <- function(expr){
 ##' @return logical: TRUE if download succeeded
 ##' @author Martin Maechler (22 Mar 2011)
 canGet <- function(file,
-                   remoteDIR = "http://nacopula.r-forge.r-project.org/resources",
+                   remoteDIR = "http://copula.r-forge.r-project.org/resources",
                    method, mode = "wb", ...)
 {
     if(file.exists(file))

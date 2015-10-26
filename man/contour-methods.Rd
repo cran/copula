@@ -1,13 +1,13 @@
 \name{contour-methods}
+\title{Methods for Contour Plots in Package 'copula'}
 \docType{methods}
 \alias{contour-methods}
 \alias{contour,indepCopula-method}
 \alias{contour,copula-method}
 \alias{contour,mvdc-method}
-\title{Methods for Function 'contour' in Package 'copula'}
 \description{
   Methods for function \code{\link{contour}} to draw contour lines aka a
-  level plot for objectsf from package \pkg{copula}.
+  level plot for objects from package \pkg{copula}.
 }
 \usage{% want \usage{} since we have many "surprising arguments"
 \S4method{contour}{copula}(x, fun,
@@ -17,7 +17,7 @@
       xlim, ylim, nx = 51, ny = 51,
       xis = seq(xlim[1], xlim[2], length = nx),
       yis = seq(ylim[1], ylim[2], length = ny),
-      box01 = TRUE, \dots)
+      box01 = FALSE, \dots)
 }
 \arguments{
   \item{x}{either a \code{"\linkS4class{copula}"} or
@@ -44,7 +44,9 @@
     and \code{ny}) may be specified directly.}
 
   \item{box01}{logical specifying if faint rectangle should be drawn
-    at the \eqn{[0,1]^2} borders.}
+    at the \eqn{[0,1]^2} borders (often useful for copulas, but
+    typically \emph{not} for general multivariate distributions
+    (\code{"mvdc"})).}
   %% contour
   \item{\dots}{further arguments for (the default method of)
     \code{\link{contour}()}, e.g., \code{nlevels}, \code{levels}, etc.}

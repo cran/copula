@@ -121,7 +121,7 @@ if(copula:::doExtras()) { ## these are typically not run with CRAN checking:
   ## a wrong starting value can already be *the* problem:
   f2 <- try(fitMvdc(x, gMvd.I, start = c(1, 1),
 	            optim.control=list(trace= TRUE, REPORT= 2)))
-  ##--> Error in optim( ... : non-finite finite-difference value [2]
+  ##--> Error in optim( ... ) : non-finite finite-difference value [2]
 
   ##==> "Solution" :  Using a more robust (but slower) optim() method:
   fI.2 <- fitMvdc(x, gMvd.I, start = c(1, 1), method = "Nelder",
@@ -136,11 +136,10 @@ if(copula:::doExtras()) { ## these are typically not run with CRAN checking:
 		     coef(summary(fI.2)),    tolerance = 2e-4),
 	   all.equal(coef(fitI), coef(fI.2), tolerance = 1e-4))
 }%dont...
+}% if(..doExtras())
 
 ## Roger Koenker prepared a demo illustrating MLE for a Clayton AR(1)
-## copula model with identical, user-defined Student marginals
-demo("QARClayton")
-}% if(..doExtras())
+## ===>  see vignette("AR_Clayton", package="copula") % ../vignettes/AR_Clayton.Rmd
 }
 \keyword{models}
 \keyword{multivariate}

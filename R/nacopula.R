@@ -129,7 +129,7 @@ pacopula <- function(u, C, theta = C@theta) {
 ##' @param l d-vector of lower "integration" limits
 ##' @param u d-vector of upper "integration" limits
 ##' @return the probability that a random vector following the given copula
-##'  falls in the hypercube with lower and upper corner l and u, respectively.
+##'         falls in the hypercube with lower and upper corner l and u, respectively.
 ##' @author Marius Hofert, Martin Maechler
 setGeneric("prob", function(x, l, u) standardGeneric("prob"))
 

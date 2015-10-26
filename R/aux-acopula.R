@@ -382,8 +382,9 @@ dDiagFrank <- function(u, theta, d, log=FALSE,
 ##' Note: - This function is known to cause numerical problems, e.g., for d=100,
 ##'         alpha=0.8
 ##'       - sign(s(n,k)) = (-1)^{n-k}
-coeffG <- function(d, alpha, method = c("sort", "horner", "direct", "dsumSibuya",
-			     paste("dsSib", eval(formals(dsumSibuya)$method), sep=".")),
+coeffG <- function(d, alpha,
+                   method = c("sort", "horner", "direct", "dsumSibuya",
+                              paste("dsSib", eval(formals(dsumSibuya)$method), sep=".")),
 		   log = FALSE, verbose = FALSE)
 {
     stopifnot(is.numeric(d), length(d) == 1, d >= 1, length(alpha) == 1,

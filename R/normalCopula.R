@@ -35,13 +35,12 @@ rnormalCopula <- function(n, copula)
 
 
 pnormalCopula <- function(u, copula, ...) {
-  chk.s(..., which.call = -2)
   dim <- copula@dimension
+  ## stopifnot(is.matrix(u), ncol(u) == dim) # <- as called from pCopula()
   i.lower <- rep.int(-Inf, dim)
   sigma <- getSigma(copula)
-  ## now happens in pCopula(): u <- matrix(pmax(0, pmin(1, u)), ncol = dim)
   apply(qnorm(u), 1, function(x) if(any(is.na(x))) NA_real_ else
-        pmvnorm(lower = i.lower, upper = x, sigma = sigma))
+        pmvnorm(lower = i.lower, upper = x, sigma = sigma, ...))
 }
 
 dnormalCopula <- function(u, copula, log=FALSE, ...) {

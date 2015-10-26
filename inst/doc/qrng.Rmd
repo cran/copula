@@ -1,0 +1,545 @@
+---
+title: Quasi-Random Numbers for Copula Models
+author: Marius Hofert
+date: '`r Sys.Date()`'
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Quasi-Random Numbers for Copula Models}
+---
+```{r, message=FALSE}
+require(lattice)
+require(copula)
+require(VineCopula)
+require(randtoolbox)
+require(VGAM)
+doPDF <- FALSE
+```
+
+
+## 1) Auxiliary functions
+
+We start by defining some auxiliary functions used below.
+```{r}
+##' @title Inverse of the bivariate conditional Marshall--Olkin copula
+##' @param u (n,2) matrix of U[0,1] random numbers to be transformed to
+##'        (u[,1], C^-(u[,2]|u[,1]))
+##' @param alpha bivariate parameter vector
+##' @return (u[,1], C^-(u[,2]|u[,1])) for C being a MO copula
+##' @author Marius Hofert
+C.inv.MO <- function(u, alpha)
+{
+    stopifnot(is.matrix(u), 0 <= alpha, alpha <= 1)
+    up <- u[,1]^(alpha[1]*(1/alpha[2]-1))
+    low <- (1-alpha[1])*up
+    i1 <- u[,2] <= low
+    i3 <- u[,2] >  up
+    u2 <- u[,1]^(alpha[1]/alpha[2])
+    u2[i1] <- u[i1,1]^alpha[1] * u[i1,2] / (1-alpha[1])
+    u2[i3] <- u[i3,2]^(1/(1-alpha[2]))
+    cbind(u[,1], u2)
+}
+```
+
+```{r}
+##' @title Sampling bivariate Clayton copulas via MO based on transformed U[0,1]^3
+##' @param u (n,3) matrix of U[0,1] random numbers to be transformed
+##' @param theta Clayton parameter
+##' @return (n,2) matrix of transformed random numbers following a bivariate
+##'         Clayton copula
+##' @author Marius Hofert
+MOtrafoC <- function(u, theta)
+    copClayton@psi(-log(u[,1:2]) / qgamma(u[,3], 1/th), theta=th)
+```
+
+```{r}
+##' @title Constructing points on a square for plotting purposes
+##' @param ll lower left endpoint of the square
+##' @param ur upper right endpoint of the square
+##' @param theta Clayton parameter
+##' @param np number of points on the square in each of the four directions
+##' @param col colors for the four sides of the squares
+##' @return a list including
+##'         u:     (4x np) points on the square
+##'         label: a label indicating the side of the square
+##'         col:   colors for the points on the square
+##'         u.CDM: transformed square (via CDM)
+##'         u.VWS: transformed square (via VWS)
+##'         u.MO:  transformed square (via MO)
+##' @author Marius Hofert
+square <- function(ll, ur, theta, np=16,
+                   col=c("darkorange2", "firebrick", "royalblue3", "black"))
+{
+    stopifnot(length(ll) == 2, length(ur) == 2, length(col) == 4,
+              ll[1] < ur[1], ll[2] < ur[2], np > 1)
+    ## build points
+    SW.to.NW <- cbind(u1=rep(ll[1], np), u2=seq(ll[2], ur[2], length.out=np))
+    NW.to.NE <- cbind(u1=seq(ll[1], ur[1], length.out=np), u2=rep(ur[2], np))
+    NE.to.SE <- cbind(u1=rep(ur[1], np), u2=seq(ur[2], ll[2], length.out=np))
+    SE.to.SW <- cbind(u1=seq(ur[1], ll[1], length.out=np), u2=rep(ll[2], np))
+    u <- rbind(SW.to.NW, NW.to.NE, NE.to.SE, SE.to.SW)
+    ## build attributes
+    label <- rep(c("SW.to.NW", "NW.to.NE", "NE.to.SE", "SE.to.SW"), each=np)
+    col <- rep(col, each=np)
+    ## build transformed points
+    cop <- onacopulaL("Clayton", nacList=list(theta, 1:2))
+    u.CDM <- rtrafo(u, cop=cop, inverse=TRUE)
+    u.WVS <- htrafo(u, cop=cop, inverse=TRUE)
+    u.qrn <- halton(4*np) # additional sequence (deterministic!) for MO trafo
+    u.MO  <- MOtrafoC(cbind(u, u.qrn), theta=theta)
+    ## return
+    list(u=u, label=label, col=col, u.CDM=u.CDM, u.WVS=u.WVS, u.MO=u.MO)
+}
+```
+
+
+## 2) PRNG vs QRNG
+
+Set the sample size.
+```{r}
+n <- 1000 # sample size
+```
+
+Now we consider different copulas and compare pseud-random number generators
+with quasi-random number generators.
+
+### Independence copula
+
+#### PRNG
+```{r}
+set.seed(271)
+U <- matrix(runif(n*2), ncol=2)
+if(doPDF) pdf(file=(file <- "fig_prng.pdf"), width=6, height=6)
+par(pty="s")
+plot(U, xlab=expression(italic(U[1])), ylab=expression(italic(U[2])))
+if(doPDF) dev.off()
+```
+
+#### QRNG
+```{r}
+set.seed(271)
+U. <- halton(n, dim=2)
+if(doPDF) pdf(file=(file <- "fig_qrng.pdf"), width=6, height=6)
+par(pty="s")
+plot(U., xlab=expression(italic(U[1])), ylab=expression(italic(U[2])))
+if(doPDF) dev.off()
+```
+
+
+### $t_3$ copula
+
+```{r}
+family <- "t"
+nu <- 3 # degrees of freedom
+tau <- 0.5
+th <- iTau(ellipCopula(family, df=nu), tau)
+cop <- ellipCopula(family, param=th, df=nu)
+```
+
+#### PRNG
+```{r}
+U.t <- rtrafo(U, cop=cop, inverse=TRUE)
+file <- paste0("fig_prng_t", nu, "_", tau, ".pdf")
+if(doPDF) pdf(file=file, width=6, height=6)
+par(pty="s")
+plot(U.t, xlab=expression(italic(U[1])), ylab=expression(italic(U[2])))
+if(doPDF) dev.off()
+```
+
+#### QRNG
+```{r}
+U.t. <- rtrafo(U., cop=cop, inverse=TRUE)
+file <- paste0("fig_qrng_t", nu, "_", tau, ".pdf")
+if(doPDF) pdf(file=file, width=6, height=6)
+par(pty="s")
+plot(U.t., xlab=expression(italic(U[1])), ylab=expression(italic(U[2])))
+if(doPDF) dev.off()
+```
+
+#### QRNG (pairs plot for 3d $t_3$ sample)
+```{r, fig.width=6, fig.height=6}
+set.seed(271)
+U.3d. <- halton(n, dim=3)
+cop3d <- ellipCopula(family, param=th, dim=3, df=nu)
+U.t.3d. <- rtrafo(U.3d., cop=cop3d, inverse=TRUE)
+file <- paste0("fig_qrng_t", nu, "_", tau, "_pairs.pdf")
+if(doPDF) pdf(file=file, width=6, height=6)
+par(pty="s")
+pairs(U.t.3d., gap=0,
+      labels=as.expression(sapply(1:3, function(j) bquote(italic(U[.(j)])))))
+if(doPDF) dev.off()
+```
+Note that projections (here: to pairs) can be deceiving/non-optimal
+but 'quasi-randomness' is not easily visible from a 3d cloud plot either.
+
+
+### Clayton copula
+
+```{r}
+family <- "Clayton"
+tau <- 0.5
+th <- iTau(getAcop(family), tau)
+cop <- onacopulaL(family, nacList=list(th, 1:2))
+```
+
+#### PRNG
+```{r}
+U.C <- rtrafo(U, cop=cop, inverse=TRUE)
+file <- paste0("fig_prng_C_", tau, ".pdf")
+if(doPDF) pdf(file=file, width=6, height=6)
+par(pty="s")
+plot(U.C, xlab=expression(italic(U[1])), ylab=expression(italic(U[2])))
+if(doPDF) dev.off()
+```
+
+#### QRNG
+```{r}
+U.C. <- rtrafo(U., cop=cop, inverse=TRUE)
+file <- paste0("fig_qrng_C_", tau, ".pdf")
+if(doPDF) pdf(file=file, width=6, height=6)
+par(pty="s")
+plot(U.C., xlab=expression(italic(U[1])), ylab=expression(italic(U[2])))
+if(doPDF) dev.off()
+```
+
+
+### Marshall--Olkin copula
+
+```{r}
+alpha <- c(0.25, 0.75)
+tau <- (alpha[1]*alpha[2]) / (alpha[1]+alpha[2]-alpha[1]*alpha[2])
+```
+
+#### PRNG
+```{r}
+U.MO <- C.inv.MO(U, alpha=alpha)
+file <- paste0("fig_prng_MO_", paste0(alpha, collapse="_"), ".pdf")
+if(doPDF) pdf(file=file, width=6, height=6)
+par(pty="s")
+plot(U.MO, xlab=expression(italic(U[1])), ylab=expression(italic(U[2])))
+if(doPDF) dev.off()
+```
+
+#### QRNG
+```{r}
+U.MO. <- C.inv.MO(U., alpha=alpha)
+file <- paste0("fig_qrng_MO_", paste0(alpha, collapse="_"), ".pdf")
+if(doPDF) pdf(file=file, width=6, height=6)
+par(pty="s")
+plot(U.MO., xlab=expression(italic(U[1])), ylab=expression(italic(U[2])))
+if(doPDF) dev.off()
+```
+
+
+### 3d R-Vine copula
+<!-- Note: RVineSim() [in RVineSim.R] -> SimulateRVine() [in rvine.c] -> Hinv1() [in hfunc.c] -> Hinv() -->
+<!--       0: Pi (fine) -->
+<!--       1: Ga (uses pnorm/qnorm -- should be fine, too) -->
+<!--       2: t  (should be fine, too) -->
+<!--       3: C  (fine) -->
+<!--       4: G  (numerical inversion!) -->
+<!--       5: F  (should be fine) -->
+<!--       6: J  (numerical inversion!) -->
+```{r}
+M <- matrix(c(3, 1, 2,
+              0, 2, 1,
+              0, 0, 1), ncol=3) # R-vine tree structure matrix
+family <- matrix(c(0, 3, 3, # C, C
+                   0, 0, 3, #    C
+                   0, 0, 0), ncol=3) # R-vine pair-copula family matrix (0 = Pi)
+param <- matrix(c(0, 1, 1,
+                  0, 0, 1,
+                  0, 0, 0), ncol=3) # R-vine pair-copula parameter matrix
+param. <- matrix(0, nrow=3, ncol=3) # 2nd R-vine pair-copula parameter matrix
+RVM <- RVineMatrix(Matrix=M, family=family, par=param, par2=param.) # RVineMatrix object
+```
+
+#### PRNG
+```{r, fig.width=6, fig.height=6}
+set.seed(271)
+U <- RVineSim(n, RVM)
+if(doPDF) pdf(file=(file <- "fig_R-vine_prng_d=3.pdf"), width=6, height=6)
+par(pty="s")
+pairs(U, labels=as.expression( sapply(1:3, function(j) bquote(italic(U[.(j)]))) ),
+      gap=0, cex=0.3)
+if(doPDF) dev.off()
+```
+
+#### QRNG (Halton)
+```{r, fig.width=6, fig.height=6}
+set.seed(271)
+U. <- halton(n, d=3)
+if(doPDF) pdf(file=(file <- "fig_qrng_d=3_halton.pdf"), width=6, height=6)
+par(pty="s")
+pairs(U., labels=as.expression( sapply(1:3, function(j) bquote(italic(U[.(j)]))) ),
+      gap=0, cex=0.3)
+if(doPDF) dev.off()
+## Transform to copula data
+U. <- RVineSim(n, RVM, U=U.)
+if(doPDF) pdf(file=(file <- "fig_R-vine_qrng_d=3_halton.pdf"), width=6, height=6)
+par(pty="s")
+pairs(U., labels=as.expression( sapply(1:3, function(j) bquote(italic(U[.(j)]))) ),
+      gap=0, cex=0.3)
+if(doPDF) dev.off()
+```
+
+#### QRNG (Sobol)
+```{r, fig.width=6, fig.height=6}
+set.seed(271)
+U. <- sobol(n, d=3)
+if(doPDF) pdf(file=(file <- "fig_qrng_d=3_sobol.pdf"), width=6, height=6)
+par(pty="s")
+pairs(U., labels=as.expression( sapply(1:3, function(j) bquote(italic(U[.(j)]))) ),
+      gap=0, cex=0.3)
+if(doPDF) dev.off()
+## Transform to copula data
+U. <- RVineSim(n, RVM, U=U.)
+if(doPDF) pdf(file=(file <- "fig_R-vine_qrng_d=3_sobol.pdf"), width=6, height=6)
+par(pty="s")
+pairs(U., labels=as.expression( sapply(1:3, function(j) bquote(italic(U[.(j)]))) ),
+      gap=0, cex=0.3)
+if(doPDF) dev.off()
+```
+Similarly to the 3d *t* copula case, by the 'projection to pairs argument'
+not all pairs look 'quasi-random' (note that for some family choices, there
+could be numerical root-finding involved, but not in this case here).
+
+
+### 5d R-Vine copula
+```{r}
+M <- matrix(c(5, 2, 3, 1, 4,
+              0, 2, 3, 4, 1,
+              0, 0, 3, 4, 1,
+              0, 0, 0, 4, 1,
+              0, 0, 0, 0, 1), ncol=5) # R-vine tree structure matrix
+family <- matrix(c(0, 1, 3, 4, 4, # Ga, C, G, G
+                   0, 0, 3, 4, 1, #     C, G, Ga
+                   0, 0, 0, 4, 1, #        G, Ga
+                   0, 0, 0, 0, 3, #           C
+                   0, 0, 0, 0, 0), ncol=5) # R-vine pair-copula family matrix
+param <- matrix(c(0, 0.2, 0.9, 1.5, 3.9,
+                  0,   0, 1.1, 1.6, 0.9,
+                  0,   0,   0, 1.9, 0.5,
+                  0,   0,   0,   0, 4.8,
+                  0,   0,   0,   0,   0), ncol=5) # R-vine pair-copula parameter matrix
+param. <- matrix(0, nrow=5, ncol=5) # 2nd R-vine pair-copula parameter matrix
+RVM <- RVineMatrix(Matrix=M, family=family, par=param, par2=param.) # RVineMatrix object
+```
+
+#### PRNG
+```{r, fig.width=6, fig.height=6}
+set.seed(271)
+U <- RVineSim(n, RVM)
+if(doPDF) pdf(file=(file <- "fig_R-vine_prng_d=5.pdf"), width=6, height=6)
+par(pty="s")
+pairs(U, labels=as.expression( sapply(1:5, function(j) bquote(italic(U[.(j)]))) ),
+      gap=0, cex=0.3)
+if(doPDF) dev.off()
+```
+
+#### QRNG
+```{r, fig.width=6, fig.height=6}
+set.seed(271)
+U. <- RVineSim(n, RVM, U=halton(n, d=5))
+if(doPDF) pdf(file=(file <- "fig_R-vine_qrng_d=5.pdf"), width=6, height=6)
+par(pty="s")
+pairs(U., labels=as.expression( sapply(1:5, function(j) bquote(italic(U[.(j)]))) ),
+      gap=0, cex=0.3)
+if(doPDF) dev.off()
+```
+
+
+## 3) Why non-one-to-one transformations (may) not be optimal
+
+Here we visually show why non-one-to-one transformations for sampling may
+be non-optimal (concering discrepancy). To this end, we consider the following
+setup.
+```{r}
+n <- 1000
+family <- "Clayton"
+tau <- 0.5
+th <- iTau(getAcop(family), tau)
+cop <- onacopulaL(family, nacList=list(th, 1:2))
+```
+
+### 3.1) Colorized scatter plot
+
+```{r}
+## Sample quasi-random numbers for CDM, WVS
+set.seed(271)
+U.. <- halton(n, 3) # 3 due to MO
+U.  <- U..[,1:2] # for CDM, WVS to be as 'close/comparable' to MO as possible
+
+## Assign corresponding colors
+col <- rep("black", n)
+col[U.[,1] <= 0.4 & U.[,2] <= 0.4] <- "firebrick"
+col[U.[,1] >= 0.8 & U.[,2] >= 0.8] <- "royalblue3"
+
+#### Transform into dependent samples
+U_CDM <- rtrafo(U., cop=cop, inverse=TRUE)
+U_WVS <- htrafo(U., cop=cop, inverse=TRUE)
+U_MO  <- MOtrafoC(U.., theta=th)
+```
+
+#### Colorized scatter plot (quasi-random numbers)
+```{r}
+if(doPDF) pdf(file=(file <- "fig_qrng_col.pdf"), width=6, height=6)
+par(pty="s")
+plot(U., xlab=expression(italic(U[1])), ylab=expression(italic(U[2])), col=col)
+if(doPDF) dev.off()
+```
+
+#### Colorized scatter plots (CDM)
+```{r}
+if(doPDF) pdf(file=(file <- "fig_qrng_col_CDM.pdf"), width=6, height=6)
+par(pty="s")
+plot(U_CDM, xlab=expression(italic(U[1])), ylab=expression(italic(U[2])), col=col)
+if(doPDF) dev.off()
+```
+
+#### Colorized scatter plots (WVS)
+```{r}
+if(doPDF) pdf(file=(file <- "fig_qrng_col_WVS.pdf"), width=6, height=6)
+par(pty="s")
+plot(U_WVS, xlab=expression(italic(U[1])), ylab=expression(italic(U[2])), col=col)
+if(doPDF) dev.off()
+```
+
+#### Colorized scatter plots (MO)
+```{r}
+if(doPDF) pdf(file=(file <- "fig_qrng_col_MO.pdf"), width=6, height=6)
+par(pty="s")
+plot(U_MO, xlab=expression(italic(U[1])), ylab=expression(italic(U[2])), col=col)
+if(doPDF) dev.off()
+```
+
+
+### 3.2) Mapping nested squares
+
+How are squares mapped? Let's find out.
+#### Construct squares
+```{r}
+sq.out <- square(ll=c(0.2,0.2), ur=c(0.8,0.8), theta=th)
+sq.mid <- square(ll=c(0.3,0.3), ur=c(0.7,0.7), theta=th)
+sq.in  <- square(ll=c(0.4,0.4), ur=c(0.6,0.6), theta=th)
+```
+
+#### Squares
+```{r}
+if(doPDF) pdf(file=(file <- "fig_squares.pdf"), width=6, height=6)
+par(pty="s")
+plot(NULL, type="l", xlim=0:1, ylim=0:1,
+     xlab=expression(italic(u[1])), ylab=expression(italic(u[2])))
+for(i in 1:(nrow(sq.out[["u"]])-1)) lines(sq.out[["u"]][i:(i+1),], col=sq.out[["col"]][i], lwd=2)
+for(i in 1:(nrow(sq.mid[["u"]])-1)) lines(sq.mid[["u"]][i:(i+1),], col=sq.mid[["col"]][i], lwd=2)
+for(i in 1:(nrow(sq.in[["u"]])-1)) lines(sq.in[["u"]][i:(i+1),], col=sq.in[["col"]][i], lwd=2)
+if(doPDF) dev.off()
+```
+
+#### CDM-transformed squares
+```{r, results="hide"}
+if(doPDF) pdf(file=(file <- "fig_squares_CDM.pdf"), width=6, height=6)
+par(pty="s")
+plot(NULL, type="l", xlim=0:1, ylim=0:1,
+     xlab=expression(italic(u[1])), ylab=expression(italic(u[2])))
+for(i in 1:(nrow(sq.out[["u.CDM"]])-1)) lines(sq.out[["u.CDM"]][i:(i+1),], col=sq.out[["col"]][i], lwd=2)
+for(i in 1:(nrow(sq.mid[["u.CDM"]])-1)) lines(sq.mid[["u.CDM"]][i:(i+1),], col=sq.mid[["col"]][i], lwd=2)
+for(i in 1:(nrow(sq.in[["u.CDM"]])-1)) lines(sq.in[["u.CDM"]][i:(i+1),], col=sq.in[["col"]][i], lwd=2)
+if(doPDF) dev.off()
+```
+
+#### WVS-transformed squares
+```{r, results="hide"}
+if(doPDF) pdf(file=(file <- "fig_squares_WVS.pdf"), width=6, height=6)
+par(pty="s")
+plot(NULL, type="l", xlim=0:1, ylim=0:1,
+     xlab=expression(italic(u[1])), ylab=expression(italic(u[2])))
+for(i in 1:(nrow(sq.out[["u.WVS"]])-1)) lines(sq.out[["u.WVS"]][i:(i+1),], col=sq.out[["col"]][i], lwd=2)
+for(i in 1:(nrow(sq.mid[["u.WVS"]])-1)) lines(sq.mid[["u.WVS"]][i:(i+1),], col=sq.mid[["col"]][i], lwd=2)
+for(i in 1:(nrow(sq.in[["u.WVS"]])-1)) lines(sq.in[["u.WVS"]][i:(i+1),], col=sq.in[["col"]][i], lwd=2)
+if(doPDF) dev.off()
+```
+
+#### MO-transformed squares
+```{r, results="hide"}
+if(doPDF) pdf(file=(file <- "fig_squares_MO.pdf"), width=6, height=6)
+par(pty="s")
+plot(NULL, type="l", xlim=0:1, ylim=0:1,
+     xlab=expression(italic(u[1])), ylab=expression(italic(u[2])))
+for(i in 1:(nrow(sq.out[["u.MO"]])-1)) lines(sq.out[["u.MO"]][i:(i+1),], col=sq.out[["col"]][i], lwd=2)
+for(i in 1:(nrow(sq.mid[["u.MO"]])-1)) lines(sq.mid[["u.MO"]][i:(i+1),], col=sq.mid[["col"]][i], lwd=2)
+for(i in 1:(nrow(sq.in[["u.MO"]])-1)) lines(sq.in[["u.MO"]][i:(i+1),], col=sq.in[["col"]][i], lwd=2)
+if(doPDF) dev.off()
+```
+
+
+## 4) 3d vs 2d projections (for a Clayton copula)
+
+```{r}
+family <- "Clayton"
+tau <- 0.5
+th <- iTau(getAcop(family), tau)
+cop <- onacopulaL(family, nacList=list(th, 1:2))
+
+set.seed(271)
+U <- halton(n, dim=3)
+U.C.CDM <- rtrafo(U, cop=cop, inverse=TRUE) # CDM
+U.C.MO <- cbind(U1=cop@copula@psi(-log(U[,1])/qgamma(U[,3], shape=1/th), theta=th),
+                U2=cop@copula@psi(-log(U[,2])/qgamma(U[,3], shape=1/th), theta=th),
+                U3=U[,3])
+```
+
+### 3d plots
+```{r, results="hide"}
+if(doPDF) pdf(file=(file <- "fig_3d_Halton_U.pdf"), width=6, height=6)
+par(pty="s")
+cloud(U[,3]~U[,1]+U[,2], scales=list(col=1, arrows=FALSE), col=1,
+      xlab=expression(italic(U[1])), ylab=expression(italic(U[2])),
+      zlab=expression(italic(U[3])),
+      par.settings=list(background=list(col="#ffffff00"),
+                axis.line=list(col="transparent"), clip=list(panel="off")))
+if(doPDF) dev.off()
+```
+
+```{r, results="hide"}
+if(doPDF) pdf(file=(file <- "fig_3d_CDM_Clayton.pdf"), width=6, height=6)
+par(pty="s")
+cloud(U.C.CDM[,3]~U.C.CDM[,1]+U.C.CDM[,2], scales=list(col=1, arrows=FALSE), col=1,
+      xlab=expression(italic(U[1])), ylab=expression(italic(U[2])),
+      zlab=expression(italic(U[3])),
+      par.settings=list(background=list(col="#ffffff00"),
+                axis.line=list(col="transparent"), clip=list(panel="off")))
+if(doPDF) dev.off()
+```
+
+```{r, results="hide"}
+if(doPDF) pdf(file=(file <- "fig_3d_MO_U_Clayton.pdf"), width=6, height=6)
+par(pty="s")
+cloud(U.C.MO[,3]~U.C.MO[,1]+U.C.MO[,2], scales=list(col=1, arrows=FALSE), col=1,
+      xlab=expression(italic(U[1])), ylab=expression(italic(U[2])),
+      zlab=expression(italic(U[3])),
+      par.settings=list(background=list(col="#ffffff00"),
+                axis.line=list(col="transparent"), clip=list(panel="off")))
+if(doPDF) dev.off()
+```
+
+### 2d plots
+```{r, results="hide", fig.width=6, fig.height=6}
+if(doPDF) pdf(file=(file <- "fig_3d_pairs_plot_Halton_U.pdf"), width=6, height=6)
+par(pty="s")
+pairs(U, labels=as.expression( sapply(1:3, function(j) bquote(italic(U[.(j)]))) ), gap=0)
+if(doPDF) dev.off()
+```
+
+```{r, results="hide", fig.width=6, fig.height=6}
+if(doPDF) pdf(file=(file <- "fig_3d_pairs_plot_CDM_Clayton.pdf"), width=6, height=6)
+par(pty="s")
+pairs(U.C.CDM, labels=as.expression( sapply(1:3, function(j) bquote(italic(U[.(j)]))) ), gap=0)
+if(doPDF) dev.off()
+```
+
+```{r, results="hide", fig.width=6, fig.height=6}
+if(doPDF) pdf(file=(file <- "fig_3d_pairs_plot_MO_U_Clayton.pdf"), width=6, height=6)
+par(pty="s")
+pairs(U.C.MO, labels=as.expression( sapply(1:3, function(j) bquote(italic(U[.(j)]))) ), gap=0)
+if(doPDF) dev.off()
+```

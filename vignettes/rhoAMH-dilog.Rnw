@@ -11,7 +11,8 @@
 \Plainauthor{Martin M\"achler} %% comma-separated
 \Shorttitle{Spearman's Rho for AMH -- Beautiful}
 %
-%\VignetteIndexEntry{Rho_AMH_beautiful}% <-------- "Name" on CRAN web page
+% The "Name" on CRAN web page:
+%\VignetteIndexEntry{Rho_AMH_beautiful}
 %\VignetteDepends{MASS}
 %\VignetteDepends{copula}
 %\VignetteDepends{sfsmisc}

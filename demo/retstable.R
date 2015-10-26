@@ -18,9 +18,14 @@
 ###  --> Experiments with retstable*() versions
 
 require(copula)
-source(system.file("Rsource", "utils.R", package="copula"))
+## source(system.file("Rsource", "utils.R", package="copula"))
 ##--> tryCatch.W.E(), canGet()
-
+## NB:  Since  Feb.2012 -- the package ../inst/rData/ has the saveFile s
+##        Size  Name
+## ----------------------------------
+##       16205  retstable_CPU2.rda
+##      304463  retstable_Nstat.rda
+##       16415  retstable_st2.rda
 
 ### --- ======      --------------------------#--
 ### --- Part I ---  Experiments with retstableR()
@@ -409,8 +414,8 @@ p.cpu <- function(log = "", do.h.eq.1 = TRUE,
 		  main = expression(t[CPU](MH) / t[CPU](LD) *
 		      " as " * f(h, alpha, V[0])),
 		  data = dCPU, colT = NULL, pchT = NULL,
-		  pal = { if(require(RColorBrewer))
-			      brewer.pal(nalpha, "RdYlGn") # "Spectral"
+		  pal = { if(requireNamespace("RColorBrewer"))
+			      RColorBrewer::brewer.pal(nalpha, "RdYlGn") # "Spectral"
 			  else c("#A50026", "#D73027", "#F46D43", "#FDAE61",
 				 "#FEE08B", "#FFFFBF", "#D9EF8B", "#A6D96A",
 				 "#66BD63", "#1A9850", "#006837")
@@ -428,6 +433,7 @@ p.cpu <- function(log = "", do.h.eq.1 = TRUE,
         a.f <- paste("alpha", levels(a.f), sep="=")
         V.f <- paste("V0", levels(V.f), sep="=")
         h.f <- paste("h", levels(h.f), sep="=")
+        nalpha <-
 	getC <- function(typ)
 	    switch(typ, "V0" = V.c, "alpha" = a.c, "h" = h.c)
 	getL <- function(typ)

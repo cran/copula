@@ -32,7 +32,8 @@
 ##'        in which case C(u_j | u_1,..,u_{j-1}) is computed for all j in
 ##'        {2,...,d} (in which case the non-transformed first column is returned
 ##'        as well)
-##' @param n.MC parameter n.MC for evaluating the derivatives via Monte Carlo
+##' @param n.MC parameter n.MC for evaluating the derivatives via Monte Carlo;
+##'        if 0, the available (theoretical) formula is used.
 ##' @param inverse logical indicating whether the inverse of rtrafo is computed
 ##'        (this is known as 'conditional distribution method' for sampling)
 ##' @param log logical indicating whether the log-transform is computed
@@ -83,9 +84,9 @@ rtrafo <- function(u, cop, j.ind=NULL, n.MC=0, inverse=FALSE, log=FALSE)
                     sum. <- sum. + eUj^(-th)
                     if(!log) U[,j] <- eUj
                 }
-            } else {
+            } else { # non-Clayton
                 ## general case
-                if(!n.MC) stop("the inverse of Rosenblatt's transformation with uniroot() requires n.MC=0")
+                if(n.MC) stop("The inverse of Rosenblatt's transformation with uniroot() requires n.MC=0")
                 U <- u # treat u as U[0,1]^d
                 for(i in 1:n)
                     for(j in j.ind)

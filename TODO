@@ -22,6 +22,29 @@ stopifnot(NULL == 1) is not stopping
 ** DONE matrix(x, ncol=.) is really slower than rbind(x, deparse.level=0L)
 ** DONE implement uscore for MMMH's A, C, F, G, J (note MH: haven't done any testing)
 ** DONE MH: in man/empcop.Rd, document 'method' "C"/"R"
+* Demos -> [ Package functions | Vignettes | Tests | man/ Ex. | Keep Demo ]
+|--------------------------------+-----------+--------------------------------------------------------------------------|
+| File                           | Goal      | Topic                                                                    |
+|--------------------------------+-----------+--------------------------------------------------------------------------|
+| [[file:demo/AC-Liouville-demo.R][AC-Liouville-demo]]              | PKG       | Some examples from McNeil, Neslehova (2010)                              |
+| [[file:demo/GIG-demo.R][GIG-demo]           | PKG       | Generalized Inverse Gaussian Archimedean copulas                         |
+|--------------------------------+-----------+--------------------------------------------------------------------------|
+| [[file:demo/fitting-tests.R][fitting-tests]]      | k         | Tests of fitCopula                                                       |
+| [[file:demo/estimation_via_HAC.R][estimation_via_HAC]] | PKG       | Estimation procedure from the HAC package                                |
+|--------------------------------+-----------+--------------------------------------------------------------------------|
+| [[file:demo/estimation.gof.R][estimation.gof]]     | k         | Estimation and goodness-of-fit capabilities                              |
+| [[file:demo/gofCopula.R][gofCopula]]          | k?        | Goodness-of-fit test for copula models                                   |
+| [[file:demo/gof_graph.R][gof_graph]]          | k?        | Graphical goodness-of-fit based on pairwise Rosenblatt transforms        |
+|--------------------------------+-----------+--------------------------------------------------------------------------|
+| [[file:demo/G_ak.R][G_ak]]               | test /ex  | Coefficients a_k for Gumbel's density derivatives, MLE, etc              |
+| [[file:demo/polyGJ.R][polyGJ]]             |           | Investigating precision and run time of polyG and polyJ                  |
+|--------------------------------+-----------+--------------------------------------------------------------------------|
+| [[file:demo/dDiag-plots.R][dDiag-plots]]        | k          | Plotting dDiag() densities (over range of families, theta, d)            |
+| [[file:demo/opC-demo.R][opC-demo]]           | k         | Outer power copula (Clayton only, for now)                               |
+| [[file:demo/timings.R][timings]]            | k         | Using timing() to measure speed of basic Archimedean families            |
+| [[file:demo/retstable.R][retstable]]          | k         | Computation of exponentially tilted stable random variates               |
+|--------------------------------+-----------+--------------------------------------------------------------------------|
+
 * Short Term: Before 1.0.0
 ** TODO introduce "empiricalCopula" (or "empCopula") as new subclass of "Copula" (not "copula")
    and maybe *additionally* "empiricalDist" / "empMvdc", inheriting from
@@ -183,7 +206,7 @@ Longer term: want to *estimate* those correctly [MLE at least].
 **** DONE implement it,
 **** TODO Extend  rtrafo() to other (d > 2)-copula families
 ** TODO evTestA(), evTestC(), evTestK()  have basically no tests {but improvable code}
- [[file:man/evTestA.Rd][evTestA.Rd]], [[file:man/evTestC.Rd][evTestC.Rd]], [[file:man/evTestK.Rd][evTestK.Rd]]
+ [[file:man/evTestA.Rd][evTestA.Rd]], [[file:man/evTestC.Rd][evTestC.Rd]], [[file:man/evTestK.Rd][evTestK.Rd]
 ** TODO C code
 *** DONE [src/init.c] enable registration for the old 'copula' part
 *** TODO use 'static' "everywhere" +  attribute_hidden "otherwise"/sometimes

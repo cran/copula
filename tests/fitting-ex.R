@@ -151,6 +151,7 @@ plot(u)
 msg <- tryCatch(fitCopula(gumbelCopula(), data = u), error=function(e)e$message)
 ## check error message __FIXME__ want "negative correlation not possible"
 ## or NO ERROR and a best fit to tau=0 [and the same for other Archimedean families!]
+msg
 
 
 

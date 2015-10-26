@@ -1,8 +1,27 @@
+% Check from R:
+%  news(db = tools:::.build_news_db_from_package_NEWS_Rd("~/R/Pkgs/copula/inst/NEWS.Rd"))
 \name{NEWS}
 \title{News for \R Package \pkg{copula}}% MM: look into ../svn-log-from.all
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
-\section{Changes in version 0.999-13 (2015-03-..)}{
+\section{Changes in version 0.999-14 (2015-10-17, svn r1184)}{
+  \itemize{
+    \item New demo "NALC" on nested Archimedean Levy copulas
+    \item Explicitly import from "base packages"
+    \item \code{contour(<mvdc>, ..)} gets new default
+    \code{box01=FALSE}, as a \eqn{[0,1]^2} box does not make sense for
+    general multivariate distributions.
+    \item \code{coeffG()} is exported (though still partly subject to change)
+    \item new (rmarkdown -> knitr) vignette \code{wild_animals} from
+    former demo.% --> ../vignettes/wild_animals.Rmd
+    \item \code{pCopula(*, cop)} for normal- or t- copulas \code{cop}
+    now accepts optional arguments to be passed to the underlying
+    (numerical integration) algorithm from package \pkg{mvtnorm}.%% FIXME: *.Rd, example;
+    \item fixed the (dontrun) 3d example of \code{gofCopula}.
+  }
+}
+
+\section{Changes in version 0.999-13 (2015-03-05, svn r1156)}{
   \itemize{
     \item New demo on tail compatibility
     \item lsum(): also work for vectors and when result is zero,
@@ -12,7 +31,7 @@
 
 \section{Changes in version 0.999-12 (2014-10-01)}{
   \itemize{
-    \item fix bug which did not allow to set non-default
+    \item Fix bug which did not allow to set non-default
     \code{optim.method} in \code{gofCopula()}.
 
     \item Not fully back-compatible change: \code{gofCopula()} now
@@ -36,20 +55,20 @@
 
 \section{Changes in version 0.999-10 (2014-06-18, r1116)}{
   \itemize{
-    \item fixes some border cases, notably \code{psi()} for negative tau
+    \item Fixes some border cases, notably \code{psi()} for negative tau
     Gumbel, Clayton and AMH copulas,
     \item \code{debye[12]()} functions improvements (e.g., \code{Inf})
-    \item new \code{log1pexp()} from \CRANpkg{Rmpfr}'s vignette
+    \item New \code{log1pexp()} from \CRANpkg{Rmpfr}'s vignette
     \file{log1mexp}.
     \item \code{rho(<amhCopula>)} now numerically stable, also works for
     \eqn{\theta \approx 0}{theta ~= 0}, using Martin's beautiful
     formula, as documented in the \emph{new vignette}
     \file{rhoAMH-dilog.Rnw}.
 
-    \item purely numerical \code{.psiFrank()} etc; accuracy improvements for
+    \item Purely numerical \code{.psiFrank()} etc; accuracy improvements for
     \code{psi()}, \code{rho()}, \code{tau()} for small \eqn{|\alpha|}
     for Frank.
-    \item new \code{cospi2()}, \code{tanpi()}; \code{iTau()} and
+    \item New \code{cospi2()}, \code{tanpi()}; \code{iTau()} and
     \code{iRho()} have a smaller tolerance of \code{1e-7} and hence are
     more accurate where they use inversion.
 

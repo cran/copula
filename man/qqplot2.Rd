@@ -17,7 +17,7 @@ qqplot2(x, qF, log = "", qqline.args = if(log=="x" || log=="y")
         main.args = list(text=main, side=3, line=1.1, cex=par("cex.main"),
                          font=par("font.main"), adj=par("adj"), xpd=NA),
         xlab = "Theoretical quantiles", ylab = "Sample quantiles",
-        file="", width=6, height=6, crop=NULL, \dots)
+        file="", width=6, height=6, \dots)
 }
 \arguments{
   \item{x}{\code{\link{numeric}}.}
@@ -47,14 +47,6 @@ qqplot2(x, qF, log = "", qqline.args = if(log=="x" || log=="y")
   \item{file}{file name including the extension \dQuote{.pdf}.}
   \item{width}{width parameter of \code{\link{pdf}()}.}
   \item{height}{height parameter of \code{\link{pdf}()}.}
-    \item{crop}{crop command, can be one of:
-    \describe{
-      \item{\code{\link{NULL}}}{crop with a default command (suitable
-	for Unix).}
-      \item{\code{\link{character}}}{a string containing a crop
-	command.}
-      \item{""}{do not crop.}
-  }}
   \item{\dots}{additional arguments passed to \code{\link{plot}()} based
     for plotting the points.}
 }

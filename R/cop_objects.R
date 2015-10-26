@@ -709,6 +709,7 @@ copGumbel <-
                       ## compute P' at lx; for now, only implemented all coeffG() methods (see polyG())
                       ## as they already cover a wide range of "stable" values
                       ## Note: this code is copied and adjusted from aux-acopula.R
+                      ##     (2), buggy: still using 'lx' (which is a *vector* !)
                       if(missing(P.method)) P.method <- function(d, alpha) { # adjusted meth2012 in polyG()
                           if (d <= 30) "direct"
                           else if (d <= 50) {

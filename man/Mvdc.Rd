@@ -1,4 +1,5 @@
 \name{Mvdc}
+\title{Multivariate Distributions Constructed from Copulas}
 \alias{Mvdc}
 \alias{mvdc}
 \alias{dMvdc}
@@ -7,7 +8,6 @@
 \alias{dmvdc}%deprecated
 \alias{pmvdc}%deprecated
 \alias{rmvdc}%deprecated
-\title{Multivariate Distributions Constructed from Copulas}
 \description{
   Density, distribution function, and random generator for a
   multivariate distribution via copula.

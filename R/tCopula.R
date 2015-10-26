@@ -83,7 +83,6 @@ rtCopula <- function(n, copula) {
 
 
 ptCopula <- function(u, copula, ...) {
-  chk.s(..., which.call = -2)
   dim <- copula@dimension
   i.lower <- rep.int(-Inf, dim)
   sigma <- getSigma(copula)
@@ -92,7 +91,7 @@ ptCopula <- function(u, copula, ...) {
     stop("'df' is not integer (or Inf); therefore, pCopula() cannot be computed yet")
   ## more checks now  pCopula() *generic*
   apply(u, 1, function(x) if(any(is.na(x))) NA_real_ else
-	pmvt(lower = i.lower, upper = qt(x, df = df), sigma = sigma, df = df))
+	pmvt(lower = i.lower, upper = qt(x, df = df), sigma = sigma, df = df, ...))
 }
 
 dtCopula <- function(u, copula, log = FALSE, ...) {

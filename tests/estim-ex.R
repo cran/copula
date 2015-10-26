@@ -1,4 +1,4 @@
-## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
+## Copyright (C) 2012, 2015 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
 ## This program is free software; you can redistribute it and/or modify it under
 ## the terms of the GNU General Public License as published by the Free Software
@@ -209,7 +209,22 @@ round(cbind(rr, bias = rr - theta), 3)
 showProc.time()
 
 ### 2-level nested Archimedean copulas :
-if(doExtras)
-  demo("dnac-demo")
+if(doExtras) {
+    ## was simply (!) :   demo("dnac-demo")
+    v.dnac <- vignette("dNAC", package="copula")
+    R.dnac <-
+	if(nzchar(v.dnac$R))
+	    with(v.dnac, file.path(Dir, "doc", R))
+	else { ## default: knitr::rmarkdown() unfortunately does *not* provide R
+	    stopifnot(file.exists(ff <- with(v.dnac, file.path(Dir, "doc", File))))
+	    oR <- file.path(tempdir(), sub("Rmd$", "R", basename(ff)))
+	    knitr::purl(ff, output = oR)
+	    oR
+	}
+    cat("R file: ", R.dnac, "\n -- now source()ing it :\n")
+    source(R.dnac, echo = TRUE, max.deparse.length = Inf,
+           keep.source = TRUE, encoding = getOption("encoding"))
+}
+
 
 showProc.time()

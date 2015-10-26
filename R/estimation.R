@@ -518,9 +518,11 @@ emle <- function(u, cop, n.MC=0, optimizer="optimize", method,
 ##'        marginal survival functions are returned.
 ##' @return pseudo-observations (matrix of the same dimensions as x)
 ##' @author Marius Hofert
-pobs <- function(x, na.last="keep",
-                 ties.method=c("average", "first", "random", "max", "min"),
-                 lower.tail=TRUE) {
+pobs <- function(x, na.last = "keep",
+		 ## formals(rank) works in pre-2015-10-15 and newer version of rank():
+		 ties.method = eval(formals(rank)$ties.method),
+		 lower.tail = TRUE) {
+    ties.method <- match.arg(ties.method)
     U <- apply(x, 2, rank, na.last=na.last, ties.method=ties.method) / (nrow(x)+1)
     if(lower.tail) U else 1-U
 }

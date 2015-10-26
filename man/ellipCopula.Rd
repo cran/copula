@@ -39,6 +39,19 @@ normalCopula(param, dim = 2, dispstr = "ex")
 \note{
   \code{ellipCopula()} is a wrapper for \code{normalCopula()} and
   \code{tCopula()}.
+
+  The  \code{\link{pCopula}()} methods for the normal- and t-copulas
+  accept optional arguments to be passed to the underlying
+  (numerical integration) algorithms from package \pkg{mvtnorm}'s
+  \code{\link[mvtnorm]{pmvnorm}} and \code{\link[mvtnorm]{pmvt}},
+  respectively, notably \code{algorithm}, see
+  \code{\link[mvtnorm]{GenzBretz}}, or \code{abseps}
+  which defaults to \code{0.001}.
+## For smaller copula dimension 'd', alternatives are available and
+## non-random, see ?GenzBretz from package 'mvtnorm' :
+
+
+
 }
 \seealso{
   \code{\link{p2P}()}, and \code{\link{getSigma}()} for construction and
@@ -57,11 +70,35 @@ getSigma(t.cop)## the P ("Rho") matrix (with diagonal = 1)
 ## from the wrapper
 norm.cop <- ellipCopula("normal", param = c(0.5, 0.6, 0.7),
                         dim = 3, dispstr = "un")
-if(require("scatterplot3d")) {
+if(require("scatterplot3d") && dev.interactive(orNone=TRUE)) {
   ## 3d scatter plot of 1000 random observations
   scatterplot3d(rCopula(1000, norm.cop))
   scatterplot3d(rCopula(1000, t.cop))
 }
+set.seed(12)
+uN <- rCopula(512, norm.cop)
+set.seed(2); pN1 <- pCopula(uN, norm.cop)
+set.seed(3); pN2 <- pCopula(uN, norm.cop)
+stopifnot(all.equal(pN1, pN2, 1e-4))# see 5.711e-5
+(Xtras <- copula:::doExtras())
+if(Xtras) { ## a bit more accurately:
+  set.seed(4); pN1. <- pCopula(uN, norm.cop, abseps = 1e-9)
+  set.seed(5); pN2. <- pCopula(uN, norm.cop, abseps = 1e-9)
+  stopifnot(all.equal(pN1., pN2., 1e-5))# see 3.397e-6
+  ## but increasing the required precision (e.g., abseps=1e-15) does *NOT* help
+}
+
+## For smaller copula dimension 'd', alternatives are available and
+## non-random, see ?GenzBretz from package 'mvtnorm' :
+require("mvtnorm")# -> GenzBretz(), Miva(), and TVPACK() are available
+## Note that Miwa() would become very slow for dimensions 5, 6, ..
+set.seed(4); pN1.M <- pCopula(uN, norm.cop, algorithm = Miwa(steps = 512))
+set.seed(5); pN2.M <- pCopula(uN, norm.cop, algorithm = Miwa(steps = 512))
+stopifnot(all.equal(pN1.M, pN2.M, tol= 1e-15))# *no* randomness
+set.seed(4); pN1.T <- pCopula(uN, norm.cop, algorithm = TVPACK(abseps = 1e-10))
+set.seed(5); pN2.T <- pCopula(uN, norm.cop, algorithm = TVPACK(abseps = 1e-14))
+stopifnot(all.equal(pN1.T, pN2.T, tol= 1e-15))# *no* randomness (but no effect of 'abseps')
+
 
 ## Versions with unspecified parameters:
 tCopula()

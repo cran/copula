@@ -94,8 +94,9 @@ a.coeff <- function(t, cops, th0)
 ##' @author Marius Hofert
 b.coeff <- function(t, cop)
 {
-    stopifnot(require(partitions), # for function blockparts below
-              t>=0, is(cop, "outer_nacopula"), nesdepth(cop)==2,
+    stopifnot(is.function(blockparts <- partitions::blockparts),
+              ## requireNamespace("partitions"),
+              t >= 0, is(cop, "outer_nacopula"), nesdepth(cop) == 2,
               (S <- ncol(t)) == (lchild <- length(cop@childCops)))
     if(!is.matrix(t)) t <- rbind(t) # convert t to a matrix (if necessary)
 
@@ -116,8 +117,8 @@ b.coeff <- function(t, cop)
 
     ## build the list A of length d0 containing n x d_s matrices
     A <- lapply(1:d0, function(s){
-        if(d.[s]==1){ # non-sectorial components
-            matrix(rep(1, n), ncol=1)
+        if(d.[s]==1) { # non-sectorial components
+            matrix(1, n,1L)
         } else { # proper child copulas
             a.coeff(t[,s], cops=C@childCops[[s]], th0=C@copula@theta)
         }

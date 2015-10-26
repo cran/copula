@@ -148,6 +148,8 @@ gofPB <- function(copula, x, N, method = eval(formals(gofTstat)$method),
 	if(length(copula@childCops))
 	    stop("currently, only Archimedean copulas are supported")
     }
+    if(method=="Sn" && is(copula, "tCopula"))
+        stop("The parametric boostrap with method=\"Sn\" is not available for t copulas as pCopula() cannot be computed for non-integer degrees of freedom yet.")
 
     ## 1) Compute the pseudo-observations
     uhat <- pobs(x)
