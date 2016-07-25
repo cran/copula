@@ -65,7 +65,7 @@ setMethod("diPsi", signature("joeCopula"),
 
 setMethod("tau", signature("joeCopula"),
           function(copula) tauJoe(theta=copula@parameters))
-setMethod("tailIndex", signature("joeCopula"),
+setMethod("lambda", signature("joeCopula"),
 	  function(copula) c(lower=0,
 			     upper=copJoe@lambdaU(theta=copula@parameters)))
 

@@ -17,7 +17,7 @@
 \usage{
 ebeta(u, cop, interval = initOpt(cop@copula@name), ...)
 edmle(u, cop, interval = initOpt(cop@copula@name), warn=TRUE, ...)
-etau(u, cop, method = c("tau.mean", "theta.mean"), warn=TRUE, ...)
+ etau(u, cop, method = c("tau.mean", "theta.mean"), warn=TRUE, ...)
 }
 \arguments{
   \item{u}{\eqn{n\times d}{n x d}-matrix of (pseudo-)observations (each
@@ -47,8 +47,9 @@ etau(u, cop, method = c("tau.mean", "theta.mean"), warn=TRUE, ...)
     }
   }
   \item{\dots}{additional arguments passed to
-    \code{\link{cor}} (for \code{etau}), to \code{\link{optimize}}
-    (for \code{edmle}), or to \code{\link{safeUroot}} (for \code{ebeta}).}
+    \code{\link{cor}} (for \code{etau}, but see \sQuote{Details}),
+    to \code{\link{optimize}} (for \code{edmle}), or
+    to \code{\link{safeUroot}} (for \code{ebeta}).}
 }
 \details{
   For \code{ebeta}, the parameter is estimated with a
@@ -61,7 +62,10 @@ etau(u, cop, method = c("tau.mean", "theta.mean"), warn=TRUE, ...)
   \code{edmle}, the parameter is estimated via maximum-likelihood
   estimation based on the diagonal.
 
-  For \code{etau}, the \code{method="tau.mean"} means that the average
+  For \code{etau}, if no additional arguments are provided to
+  \code{\link{cor}(*, method="kendall")} (see \code{\dots}), the much
+  faster \code{\link[pcaPP]{cor.fk}()} from package \CRANpkg{pcaPP} is
+  used.  Furthermore, \code{method="tau.mean"} means that the average
   of sample versions of Kendall's tau are computed first and then the
   parameter is determined such that the population version of Kendall's
   tau matches this average (if possible); the \code{method="theta.mean"}
@@ -87,7 +91,7 @@ etau(u, cop, method = c("tau.mean", "theta.mean"), warn=TRUE, ...)
       Kendall's tau for the chosen method.}
   }
 }
-\author{Marius Hofert}
+%\author{Marius Hofert}
 \references{
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2013).
   Archimedean Copulas in High Dimensions: Estimators and Numerical

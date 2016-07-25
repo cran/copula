@@ -34,6 +34,7 @@
       the content of the "mvdc" \code{object}.}
   }
 }
+%\author{Ivan Kojadinovic and Martin Maechler}
 \seealso{
   \code{\link{mvdc}}, % ./Mvdc.Rd
   also for examples; for fitting, \code{\link{fitMvdc}}.

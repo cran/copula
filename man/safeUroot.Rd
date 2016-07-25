@@ -55,8 +55,7 @@ safeUroot(f, interval, \dots,
   A list with four components, \code{root}, \code{f.root}, \code{iter}
   and \code{estim.prec}; see \code{\link{uniroot}}.
 }
-\author{Martin Maechler (from Martin's \R package \pkg{nor1mix}).
-}
+%\author{Martin Maechler (from Martin's \R package \pkg{nor1mix})}
 \seealso{
   \code{\link{uniroot}}.
 }

@@ -16,93 +16,58 @@
 
 ### Tools for graphical gof tests based on pairwise Rosenblatt trafo ###########
 
-### FIXME  replace by cCopula() in the long run
-
-##' Conditional copula function C(u2|u1) of u2 given u1
-##'
-##' @title Bivariate ("2") Conditional Copula function
-##' @param u2 data vector (numeric(n))
-##' @param u1 data vector (numeric(n))
-##' @param family copula family
-##' @param theta parameter (for ACs; for elliptical copulas, its rho)
-##' @param ... additional args (e.g., df for t copulas)
-##' @return C(u2|u1)
-##' @author Marius Hofert and Martin Maechler
-##' Note: used in Hofert and Maechler (2013)
-ccop2 <- function(u2, u1, family, theta, ...) {
-    stopifnot(length(u1)==length(u2))
-    switch(copFamilyClass(family),
-           "ellipCopula"={
-               switch(family,
-                      "normal"={
-                          pnorm((qnorm(u2)-theta*qnorm(u1))/sqrt(1-theta^2))
-                      },
-                      "t"={
-                          stopifnot(hasArg(df))
-                          df <- list(...)$df
-                          qt.u1 <- qt(u1, df=df)
-                          mu <- theta * qt.u1
-                          sigma <- sqrt((df+qt.u1^2)*(1-theta^2)/(df+1))
-                          pt((qt(u2, df=df)-mu)/sigma, df=df+1)
-                      },
-                      stop("not yet supported family"))
-           },
-           "outer_nacopula"={
-               ## cacopula(u, cop=onacopulaL(family, list(theta, 1:2)))
-               cop <- getAcop(family)
-               u <- cbind(u1, u2)
-               psiI <- cop@iPsi(u, theta=theta)
-	       exp(cop@absdPsi(rowSums(psiI), theta=theta, log=TRUE) -
-		   cop@absdPsi(psiI[,1], theta=theta, log=TRUE))
-           },
-           stop("family ", family, " not yet supported"))
-}
-
 ##' Compute pairwise Rosenblatt-transformed variables C(u[,i]|u[,j])) for the given
 ##' matrix u
 ##'
 ##' @title Compute pairwise Rosenblatt-transformed variables
 ##' @param u (n, d)-matrix (typically pseudo-observations, but also perfectly
 ##'        simulated data)
-##' @param cop copula object used for the Rosenblatt transform (H_0;
+##' @param copula copula object used for the Rosenblatt transform (H_0;
 ##'        either outer_nacopula or ellipCopula)
-##' @param ... additional arguments passed to ccop2
+##' @param ... additional arguments passed to cCopula()
 ##' @return (n,d,d)-array cu.u with cu.u[,i,j] containing C(u[,i]|u[,j]) for i!=j
 ##'         and u[,i] for i=j
 ##' @author Marius Hofert
 ##' Note: used in Hofert and Maechler (2013)
-pairwiseCcop <- function(u, cop, ...)
+pairwiseCcop <- function(u, copula, ...)
 {
     if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-    stopifnot((d <- ncol(u)) >= 2, 0 <= u, u <= 1, d == dim(cop))
+    stopifnot((d <- ncol(u)) >= 2, 0 <= u, u <= 1, d == dim(copula))
 
-    ## 1) determine copula class and compute auxiliary results
-    cls <- copClass(cop)
-    family <- copFamily(cop) # determine copula family
-    switch(cls,
-           "ellipCopula"={
-               ## build correlation matrix from vector of copula parameters
-               P <- diag(1, nrow=d)
-	       rho <- cop@parameters
-	       P[lower.tri(P)] <- if(family == "normal" || cop@df.fixed)
-		   rho else rho[-length(rho)]
-               P <- P + t(P)
-               diag(P) <- rep.int(1, d)
-           },
-           "outer_nacopula"={
-               ## build "matrix" of dependence parameters
-               P <- nacPairthetas(cop)
-           },
-           stop("not yet supported copula object"))
+    ## 1) Determine copula class and compute auxiliary results
+    switch(copClass(copula),
+    "ellipCopula"={
+        ## Build matrix of pairwise parameters
+        P <- diag(1, nrow = d)
+        family <- copFamily(copula)
+        rho <- copula@parameters
+        df <- if(family == "t") tail(rho, n = 1) else NA
+        P[lower.tri(P)] <- if(family == "t") rho[-length(rho)] else rho
+        P <- P + t(P)
+        diag(P) <- rep.int(1, d)
+        ## Define bivariate copula (parameter will be set below)
+        copula <- if(family == "t") ellipCopula(family, df = df, df.fixed = TRUE) else ellipCopula(family)
+    },
+    "outer_nacopula"={
+        ## Build "matrix" of pairwise dependence parameters
+        P <- nacPairthetas(copula)
+        ## Define bivariate copula (parameter will be set below)
+        cop <- copula@copula
+        family <- attributes(cop)$name
+        copula <- onacopulaL(family, nacList = list(NA, 1:2))
+    },
+    stop("Not yet supported copula object"))
 
-    ## 2) compute pairwise C(u_i|u_j)
+    ## 2) Compute pairwise C(u_i|u_j)
     n <- nrow(u)
-    cu.u <- array(NA_real_, dim=c(n,d,d), dimnames=list(C.ui.uj=1:n, ui=1:d, uj=1:d))
+    cu.u <- array(NA_real_, dim = c(n,d,d), dimnames = list(C.ui.uj=1:n, ui=1:d, uj=1:d))
     ## cu.u[,i,j] contains C(u[,i]|u[,j]) for i!=j and u[,i] for i=j
     for(i in 1:d) { # first index C(u[,i]|..)
         for(j in 1:d) { # conditioning index C(..|u[,j])
-	    cu.u[,i,j] <- if(i==j) u[,i] else
-		ccop2(u[,i], u[,j], family, theta=P[i,j], ...)
+	    cu.u[,i,j] <- if(i==j) u[,i] else {
+                cop <- setTheta(copula, value = P[i,j])
+                cCopula(cbind(u[,j], u[,i]), copula = cop, indices = 2, ...)
+            }
         }
     }
     cu.u
@@ -229,17 +194,16 @@ RSpobs <- function(x, do.pobs = TRUE, method = c("ellip", "archm"), ...)
     if(!do.pobs && !all(0 <= u, u <= 1))
         stop("'x' must be in the unit hypercube; consider using 'do.pobs=TRUE'")
     switch(method,
-           "ellip"={
+           "ellip" = {
 
                ## estimate the standardized dispersion matrix with entries
                ## P_{jk} = \Sigma_{jk}/sqrt{\Sigma_{jj}\Sigma_{kk}}
                ## and compute the inverse of the corresponding Cholesky factor
                ## Note: this is *critical* !!
                ## ----  => completely wrong R's if d > n/2 (roughly)
-               P <- as.matrix(nearPD(sin(cor(x, method="kendall")*pi/2),
-                                      corr=TRUE)$mat)
-	       L <- t(chol(P)) # lower triangular L such that LL' = P
-	       ## note: it would be better to stay with 'Matrix' package here and to use LDL
+               P <- nearPD(sinpi(corKendall(x)/2), corr=TRUE)$mat # "dpoMatrix"
+	       L <- t(chol(as.matrix(P))) # lower triangular L such that LL' = P
+	       ## TODO: it would be better to stay with 'Matrix' package here and to use LDL
 
 	       ## compute Ys
 	       Y <- if(hasArg(qQg)) { # if qQg() has been provided

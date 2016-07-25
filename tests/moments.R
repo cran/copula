@@ -83,10 +83,8 @@ showProc.time()
 
 ###-------- rho & and inverse ---------------------------------------------------
 
-## NB:
-##  iRho() method for class "amhCopula" not yet implemented
-
-### give different warnings , but "work" [not using AMH and Joe]:
+## Give different warnings, but "work" (not using AMH, Joe, t copula
+## as iRho() does not work for them)
 rho.s <- c(-.999, -.1, 0, (1:3)/9, .5, .9, .999)
 names(rho.s) <- paste0("rho=", sub("0[.]", ".", formatC(rho.s)))
 tRho <- sapply(rho.s, function(rho)

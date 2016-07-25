@@ -20,38 +20,36 @@
 ## A two-dimensional data example ----------------------------------
 x <- rCopula(200, claytonCopula(3))
 
-(tau. <- cor(x, method="kendall")[1,2]) # around 0.5 -- 0.6
-## Does the Gumbel family seem to be a good choice?
-(thG <- iTau(gumbelCopula(), tau.)) # 3.02
-gofCopula(gumbelCopula(thG), x)
-# SnC: really s..l..o..w.. --- SnB is *EVEN* slower
-gofCopula(gumbelCopula(thG), x, method = "SnC")
+## Does the Gumbel family seem to be a good choice (statistic "Sn")?
+gofCopula(gumbelCopula(), x)
+## With "SnC", really s..l..o..w.. --- with "SnB", *EVEN* slower
+gofCopula(gumbelCopula(), x, method = "SnC", trafo.method = "cCopula")
 ## What about the Clayton family?
-(thC <- iTau(claytonCopula(), tau.)) # 4.05
-gofCopula(claytonCopula(thC), x)
-gofCopula(claytonCopula(thC), x, method = "AnChisq")
+gofCopula(claytonCopula(), x)
 
-## The same with a different estimation method
-gofCopula(gumbelCopula (thG), x, estim.method="itau")
-gofCopula(claytonCopula(thC), x, estim.method="itau")
+## Similar with a different estimation method
+gofCopula(gumbelCopula (), x, estim.method="itau")
+gofCopula(claytonCopula(), x, estim.method="itau")
 
 
 ## A three-dimensional example  ------------------------------------
 x <- rCopula(200, tCopula(c(0.5, 0.6, 0.7), dim = 3, dispstr = "un"))
 
-## Does the Clayton family seem to be a good choice?
-## here starting with the "same" as indepCopula(3) :
-(gCi3 <- gumbelCopula(1, dim = 3, use.indepC="FALSE"))
-gofCopula(gCi3, x)
+## Does the Gumbel family seem to be a good choice?
+g.copula <- gumbelCopula(dim = 3)
+gofCopula(g.copula, x)
 ## What about the t copula?
-t.copula <- tCopula(rep(0, 3), dim = 3, dispstr = "un", df.fixed=TRUE)
-## this is *VERY* slow currently %% FIXME ??
-gofCopula(t.copula, x)
+t.copula <- tCopula(dim = 3, dispstr = "un", df.fixed = TRUE)
+if(FALSE) ## this is *VERY* slow currently
+  gofCopula(t.copula, x)
 
 ## The same with a different estimation method
-gofCopula(gCi3,     x, estim.method="itau")
-gofCopula(t.copula, x, estim.method="itau")
+gofCopula(g.copula, x, estim.method="itau")
+if(FALSE) # still really slow
+  gofCopula(t.copula, x, estim.method="itau")
 
 ## The same using the multiplier approach
-gofCopula(gCi3,     x, simulation="mult")
+gofCopula(g.copula, x, simulation="mult")
 gofCopula(t.copula, x, simulation="mult")
+if(FALSE) # no yet possible
+    gofCopula(t.copula, x, simulation="mult", estim.method="itau")

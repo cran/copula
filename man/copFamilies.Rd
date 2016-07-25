@@ -84,7 +84,7 @@ copJoe
   \code{\link{getAcop}} accesses these families
   \dQuote{programmatically}.
 }
-\author{Marius Hofert}
+%\author{Marius Hofert}
 \references{
   Nelsen, R. B. (2007).
   \emph{An Introduction to Copulas} (2nd ed.).

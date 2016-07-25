@@ -40,7 +40,7 @@ rnchild(x, theta0, V0, ...)
    a child) whose corresponding components of \code{U} are arguments of
    the nested Archimedean copula \code{x}.}
 }
-\author{Marius Hofert, Martin Maechler}
+%\author{Marius Hofert and Martin Maechler}
 \seealso{
   \code{\link{rnacopula}}, also for the references.
   Further, classes \code{"\linkS4class{nacopula}"} and

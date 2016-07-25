@@ -16,7 +16,7 @@
 ##' Generate  stable(alpha, beta=1, gamma = cos(alpha * pi/2)^(1/alpha), pm=1)
 ##'                                 ----------------------------------- "Scaled"
 ##' Note that the gamma factor leads to a *simplified* formula because it cancels mostly.
-##' Only called for rCopula(<Gumbel>, .)
+##' for rCopula(<Gumbel>, .) only if options(copula:rstable1 = "rPosStable")
 ##'
 ##' @title Generate 'Scaled' stable(alpha, beta=1, gamma = **, pm=1)  random numbers
 ##' @param n integer

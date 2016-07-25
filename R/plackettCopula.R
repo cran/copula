@@ -32,7 +32,7 @@ plackettCopula <- function(param = NA_real_) {
 }
 
 pplackettCopula <- function(u, copula) {
-  dim <- copula@dimension
+  ## dim == 2
   u1 <- u[,1]
   u2 <- u[,2]
   alpha <- copula@parameters[1]
@@ -42,7 +42,7 @@ pplackettCopula <- function(u, copula) {
 }
 
 dplackettCopula <- function(u, copula, log = FALSE, ...) {
-  dim <- copula@dimension
+  ## dim == 2
   u1 <- u[,1]
   u2 <- u[,2]
   alpha <- copula@parameters[1]
@@ -147,3 +147,5 @@ setMethod("iRho", signature("plackettCopula"), iRhoCopula)
 
 setMethod("dTau", signature("plackettCopula"), dTauPlackettCopula)
 setMethod("dRho", signature("plackettCopula"), dRhoPlackettCopula)
+
+setMethod("lambda", signature("plackettCopula"), function(copula) c(lower=0, upper=0))

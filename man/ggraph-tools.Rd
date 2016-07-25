@@ -20,7 +20,7 @@
   }
 }
 \usage{
-pairwiseCcop(u, cop, ...)
+pairwiseCcop(u, copula, ...)
 pairwiseIndepTest(cu.u, N=256,
         iTest = indepTestSim(n, p=2, m=2, N=N, verbose = idT.verbose, ...),
         verbose=TRUE, idT.verbose = verbose, ...)
@@ -30,7 +30,7 @@ gpviTest(pvalues, method=p.adjust.methods, globalFun=min)
 }
 \arguments{
   \item{u}{\eqn{(n,d)}-\code{\link{matrix}} of copula data.}
-  \item{cop}{copula object used for the Rosenblatt transform
+  \item{copula}{copula object used for the Rosenblatt transform
     (\eqn{H_0}{H[0]} copula).}
   \item{\dots}{additional arguments passed to the internal function
     which computes the conditional copulas (for \code{pairwiseCcop()}).
@@ -79,7 +79,7 @@ gpviTest(pvalues, method=p.adjust.methods, globalFun=min)
     \item{gpviTest}{global p-values for the specified methods.}
   }
 }
-\author{Marius Hofert, Martin \enc{Mächler}{Maechler}.}
+%\author{Marius Hofert and Martin Maechler}
 \references{
   Hofert and \enc{Mächler}{Maechler} (2013),
   see \code{\link{pairsRosenblatt}}.% -> ./pairsRosenblatt.Rd

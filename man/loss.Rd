@@ -18,6 +18,7 @@ company.
     \item{\code{censored}}{1 means censored (limit reached) and 0 otherwise.}
   }
 }
+%\author{Ivan Kojadinovic and Jun Yan}
 \references{
 Frees, E. and Valdez, E. (1998). Understanding relationships using
 copulas. \emph{North American Actuarial Journal} \bold{2}, 1--25.

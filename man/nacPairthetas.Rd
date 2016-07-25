@@ -19,7 +19,7 @@ nacPairthetas(x)
   \code{T[j,k]} = theta of the bivariate Archimedean copula
   \eqn{C(U_j,U_k)}.
 }
-\author{Martin Maechler}
+%\author{Martin Maechler}
 % \references{
 % }
 \seealso{

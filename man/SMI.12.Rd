@@ -27,6 +27,7 @@ data(SMI.12)
   \code{lSMI} is the list of the original data (\emph{before} \code{NA}
   \dQuote{imputation}).
 }
+%\author{Marius Hofert and Martin Maechler}
 \source{
   The data was drawn from Yahoo! Finance.
 }

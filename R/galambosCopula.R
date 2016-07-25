@@ -17,7 +17,9 @@
 AGalambos <- function(copula, w) {
   alpha <- copula@parameters[1]
   A <- 1 - (w^(-alpha) + (1 - w)^(-alpha))^(-1/alpha)
-  ifelse(w == 0 | w == 1, 1, A)
+  ## ifelse(w == 0 | w == 1, 1, A)
+  A[w == 0 | w == 1] <- 1
+  A
 }
 
 dAduGalambos <- function(copula, w) {
@@ -114,7 +116,7 @@ galambosCopula <- function(param = NA_real_) {
 pgalambosCopula <- function(u, copula) {
   dim <- copula@dimension
   for (i in 1:dim) assign(paste0("u", i), u[,i])
-  alpha <- copula@parameters[1]
+  alpha <- copula@parameters[1] # used in  galambosCopula.algr :
   c(eval(galambosCopula.algr$cdf))
 }
 
@@ -140,7 +142,8 @@ rgalambosCopula <- function(n, copula) {
   myfun <- function(u2, u1, v) {
     deriv1(u1, u2)/deriv1(u1, 1 - eps) - v
   }
-  u2 <- sapply(1:n, function(x) uniroot(myfun, c(eps, 1 - eps), v=v[x], u1=u1[x])$root)
+  u2 <- vapply(1:n, function(i) uniroot(myfun, c(eps, 1 - eps), v=v[i], u1=u1[i])$root,
+               NA_real_)
   cbind(u1, u2)
 }
 
@@ -162,7 +165,7 @@ tauGalambosCopula <- function(copula) {
 }
 
 iTauGalambosCopula <- function(copula, tau) {
-  if (any(tau < 0)) warning("tau is out of the range [0, 1]")
+  if (any(tau < 0)) warning("some tau < 0")
   galambosTauInv <- approxfun(x = .galambosTau$assoMeasFun$fm$ysmth,
                               y = .galambosTau$assoMeasFun$fm$x, rule = 2)
 

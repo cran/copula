@@ -116,7 +116,7 @@ Eulerian numbers; see also \code{\link{Eulerian}}.
 \value{
   numeric/complex vector as \code{z}, or \code{x}, respectively.
 }
-\author{Martin Maechler}
+%\author{Martin Maechler}
 \references{
   Wikipedia (2011) \emph{Polylogarithm},
   \url{http://en.wikipedia.org/wiki/Polylogarithm}.

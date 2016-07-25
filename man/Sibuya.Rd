@@ -125,7 +125,7 @@ dsumSibuya(x, n, alpha,
       that is longer).}
   }
 }
-\author{Marius Hofert, Martin Maechler}
+%\author{Marius Hofert and Martin Maechler}
 \references{
   Hofert, M. (2010).
   \emph{Sampling Nested Archimedean Copulas with Applications to CDO Pricing}.

@@ -12,7 +12,8 @@
   by means of a \emph{multiplier} technique.
 }
 \usage{
-exchEVTest(x, N = 1000,  estimator = "CFG", derivatives = "Cn", m = 100)
+exchEVTest(x, N = 1000,  estimator = c("CFG", "Pickands"),
+           derivatives = c("Cn", "An"), m = 100)
 }
 \arguments{
   \item{x}{a data matrix that will be transformed to pseudo-observations.}
@@ -36,6 +37,7 @@ exchEVTest(x, N = 1000,  estimator = "CFG", derivatives = "Cn", m = 100)
   \item{statistic}{ value of the test statistic. }
   \item{pvalue}{ corresponding approximate p-value. }
 }
+%\author{Ivan Kojadinovic and Jun Yan}
 \references{
   Genest, C. and Segers, J. (2009)
   Rank-based inference for bivariate extreme-value copulas.
@@ -62,20 +64,15 @@ exchEVTest(x, N = 1000,  estimator = "CFG", derivatives = "Cn", m = 100)
 \seealso{ \code{\link{exchTest}}, \code{\link{gofCopula}}.
 }
 \examples{
-## Do these data come from exchangeable copulas?
+## Data from an exchangeable left-tail decreasing copulas
 exchEVTest(rCopula(200,  gumbelCopula(3)))
 \donttest{exchEVTest(rCopula(200, claytonCopula(3)))}
-%% FIXME: Use  asymCopula() + indepCopula() --> Khoudraji
-## Creating asymmetric data
-rKhoudraji <- function(cop,n,a=0.6,b=0.95)
-  {
-    u <- rCopula(n, cop)
-    v <- matrix(runif(2*n),n,2)
-    cbind(pmax(u[,1]^(1/a),v[,1]^(1/(1-a))),
-          pmax(u[,2]^(1/b),v[,2]^(1/(1-b))))
-  }
-exchEVTest(rKhoudraji( gumbelCopula(3),200))
-\donttest{exchEVTest(rKhoudraji(claytonCopula(3),200))}
+
+## An asymmetric Khoudraji-Gumbel-Hougaard copula
+kc <- khoudrajiCopula(copula1 = indepCopula(),
+                      copula2 = gumbelCopula(4),
+                      shapes = c(0.4, 0.95))
+exchEVTest(rCopula(200, kc))
 }
 \keyword{htest}
 \keyword{multivariate}

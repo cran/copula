@@ -1,6 +1,7 @@
 \name{getAcop}
 \title{Get "acopula" Family Object by Name}
 \alias{getAcop}
+\alias{getAname}
 \alias{.ac.shortNames}
 \alias{.ac.longNames}
 \alias{.ac.objNames}
@@ -13,7 +14,8 @@
   forms of Archimedean copulas.
 }
 \usage{
-getAcop(family, check=TRUE)
+getAcop (family, check = TRUE)
+getAname(family, objName = FALSE)
 
 .ac.shortNames
 .ac.longNames
@@ -28,14 +30,20 @@ getAcop(family, check=TRUE)
     from class \code{\linkS4class{archmCopula}}.}
   \item{check}{logical indicating whether the class of the return value
     should be checked to be \code{"\linkS4class{acopula}"}.}
+  \item{objName}{logical indicating that the \emph{name} of the \R
+    object should be returned, instead of the family name, e.g.,
+    \code{"copClayton"} instead of \code{"Clayton"}.}
 }
 \value{\code{getAcop()} returns an \code{"\linkS4class{acopula}"} family
   object, typically one of one of our predefined ones.
 
+  \code{getAname()} returns a \code{\link{character}} string, the name
+  of an \code{"\linkS4class{acopula}"} family object.
+
   \code{.as.longnames} etc are named string constants, useful in
   programming for all our (five) standard Archimedean families.
 }
-\author{Martin Maechler}
+%\author{Martin Maechler}
 \seealso{
   Our predefined \code{\link{acopula-families}};
   the class definition \code{"\linkS4class{acopula}"}.
@@ -50,6 +58,13 @@ stopifnot(## Joe (three ways):
           ## Frank (yet another two different ways):
           identical(getAcop(frankCopula()), copFrank),
           identical(getAcop("frankCopula"), copFrank))
+
+stopifnot(
+  identical(getAname(claytonCopula()), getAname("C")),
+  identical(getAname(copClayton), "Clayton"), identical(getAname("J"), "Joe"),
+  identical(getAname(amhCopula(), TRUE), "copAMH"),
+  identical(getAname(joeCopula(), TRUE), "copJoe")
+)
 
 .ac.shortNames
 .ac.longNames

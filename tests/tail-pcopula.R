@@ -54,10 +54,10 @@ ut20 <- numTailIndexUpper(gumbC20, u.1)
 (ut40 <- numTailIndexUpper(gumbC40, u.1))
 
 stopifnot(
- all.equal(tailIndex(gumbC20)[["upper"]],
+ all.equal(lambda(gumbC20)[["upper"]],
            numTailIndexUpper(gumbC20, 1 - 1e-7), tolerance=1e-8)
  ,
- all.equal(tailIndex(gumbC40)[["upper"]],
+ all.equal(lambda(gumbC40)[["upper"]],
            numTailIndexUpper(gumbC40, 1 - 1e-7), tolerance=1e-8)
 )
 
@@ -88,7 +88,7 @@ signif(numTailIndexLower(gumbC20, 10^-(5*(1:40))),  3)
 
 ###-------------- Frank --------------------------
 Frank2 <- frankCopula(param=2, dim = 2)
-tailIndex(Frank2) # 0 0
+lambda(Frank2) # 0 0
 
 ## Upper and lower tail dependence
 (tl <- numTailIndexLower(Frank2, u.0))
@@ -123,16 +123,16 @@ stopifnot(
  ,
  !is.unsorted(ft)
  ,
- all.equal(tailIndex(t.7.3)[["upper"]],
+ all.equal(lambda(t.7.3)[["upper"]],
            numTailIndexUpper(t.7.3, 1 - 1e-8), tolerance=1e-5)
  ,
- all.equal(tailIndex(t.9.2)[["upper"]],
+ all.equal(lambda(t.9.2)[["upper"]],
            numTailIndexUpper(t.9.2, 1 - 1e-8), tolerance=1e-7)
  ,
- all.equal(tailIndex(t.7.3)[["lower"]],
+ all.equal(lambda(t.7.3)[["lower"]],
            numTailIndexLower(t.7.3, 1e-8), tolerance=1e-5)
  ,
- all.equal(tailIndex(t.9.2)[["lower"]],
+ all.equal(lambda(t.9.2)[["lower"]],
            numTailIndexLower(t.9.2, 1e-8), tolerance=1e-7)
 )
 

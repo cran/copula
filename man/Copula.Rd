@@ -21,8 +21,9 @@
 \alias{dCopula,matrix,plackettCopula-method}
 \alias{dCopula,matrix,fgmCopula-method}
 \alias{dCopula,matrix,indepCopula-method}
-\alias{dCopula,matrix,asymCopula-method}
-\alias{dCopula,matrix,asymExplicitCopula-method}
+\alias{dCopula,matrix,khoudrajiBivCopula-method}
+\alias{dCopula,matrix,khoudrajiExplicitCopula-method}
+\alias{dCopula,matrix,rotCopula-method}
 %\alias{dCopula,matrix,nacopula-method}-> ./dnacopula.Rd
 %
 \alias{dCopula,numeric,claytonCopula-method}
@@ -39,8 +40,9 @@
 \alias{dCopula,numeric,plackettCopula-method}
 \alias{dCopula,numeric,fgmCopula-method}
 \alias{dCopula,numeric,indepCopula-method}
-\alias{dCopula,numeric,asymCopula-method}
-\alias{dCopula,numeric,asymExplicitCopula-method}
+\alias{dCopula,numeric,khoudrajiBivCopula-method}
+\alias{dCopula,numeric,khoudrajiExplicitCopula-method}
+\alias{dCopula,numeric,rotCopula-method}
 %\alias{dCopula,numeric,nacopula-method}-> ./dnacopula.Rd
 % pCopula
 \alias{pCopula,matrix,claytonCopula-method}
@@ -57,8 +59,8 @@
 \alias{pCopula,matrix,plackettCopula-method}
 \alias{pCopula,matrix,fgmCopula-method}
 \alias{pCopula,matrix,indepCopula-method}
-\alias{pCopula,matrix,asymCopula-method}
-\alias{pCopula,matrix,asymExplicitCopula-method}
+\alias{pCopula,matrix,khoudrajiCopula-method}
+\alias{pCopula,matrix,rotCopula-method}
 %\alias{pCopula,matrix,nacopula-method}-> ./pnacopula.Rd
 %
 \alias{pCopula,numeric,claytonCopula-method}
@@ -75,8 +77,8 @@
 \alias{pCopula,numeric,plackettCopula-method}
 \alias{pCopula,numeric,fgmCopula-method}
 \alias{pCopula,numeric,indepCopula-method}
-\alias{pCopula,numeric,asymCopula-method}
-\alias{pCopula,numeric,asymExplicitCopula-method}
+\alias{pCopula,numeric,khoudrajiCopula-method}
+\alias{pCopula,numeric,rotCopula-method}
 %\alias{pCopula,numeric,nacopula-method}-> ./pnacopula.Rd
 % rCopula
 \alias{rCopula,numeric,claytonCopula-method}
@@ -92,8 +94,8 @@
 \alias{rCopula,numeric,fgmCopula-method}
 \alias{rCopula,numeric,evCopula-method}
 \alias{rCopula,numeric,indepCopula-method}
-\alias{rCopula,numeric,asymCopula-method}
-\alias{rCopula,numeric,asymExplicitCopula-method}
+\alias{rCopula,numeric,khoudrajiCopula-method}
+\alias{rCopula,numeric,rotCopula-method}
 \alias{rCopula,numeric,nacopula-method}
 % main
 \title{Density, Evaluation, and Random Number Generation for Copula Functions}
@@ -141,6 +143,7 @@ rCopula(n, copula, \dots)
   \code{dCopula()} gives the density, \code{pCopula()} gives the
   distribution function, and \code{rCopula()} generates random variates.
 }
+%\author{Marius Hofert, Ivan Kojadinovic, Martin Maechler and Jun Yan}
 \references{
   Frees, E. W.  and Valdez, E. A. (1998). Understanding relationships using
   copulas.

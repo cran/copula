@@ -82,8 +82,18 @@ setMethod("%in%", signature(x = "numeric", table = "interval"),
 	      (if(op[2]) `<` else `<=`)(x, table[2])
 	  })
 
-## Not exported, and only used because CRAN checks must be faster
+##' Not exported .. to be used for fast default checks ==> in ../tests/ and ../man/
+##' Now can be numeric via (shell)   export R_copula_check_extra=2.5
 doExtras <- function() {
-    interactive() || nzchar(Sys.getenv("R_copula_check_extra")) ||
-        identical("true", unname(Sys.getenv("R_PKG_CHECKING_doExtras")))
+    nz <- FALSE
+    if(interactive() || (nz <- nzchar(copX <- Sys.getenv("R_copula_check_extra"))) ||
+       identical("true", unname(Sys.getenv("R_PKG_CHECKING_doExtras"))))
+        if(nz) { # ==> cX is  logical or numeric
+            if(!is.na(cX <- as.logical(copX))) cX else as.numeric(copX)
+        } else TRUE
+    else FALSE
+}
+
+corKendall <- function(x, ...) {
+    if(length(list(...))) cor(x, method="kendall", ...) else cor.fk(x)
 }

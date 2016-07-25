@@ -66,15 +66,15 @@
 
   For a list of exported functions, use \code{help(package = "copula")}.
 }
-\author{
-  Marius Hofert, % \email{marius.hofert@math.ethz.ch} FIXME: hide or show?
-  Ivan Kojadinovic, % \email{ivan.kojadinovic@univ-pau.fr}
-  Martin Maechler, and % \email{maechler@stat.math.ethz.ch},
-  Jun Yan.% \email{jun.yan@uconn.edu}.
+%% \author{
+%%   Marius Hofert, % \email{marius.hofert@math.ethz.ch}
+%%   Ivan Kojadinovic, % \email{ivan.kojadinovic@univ-pau.fr}
+%%   Martin Maechler, and % \email{maechler@stat.math.ethz.ch},
+%%   Jun Yan.% \email{jun.yan@uconn.edu}.
 
-  Maintainer: Currently,
-  Martin Maechler \email{maechler@stat.math.ethz.ch}.
-}
+%%   Maintainer: Currently,
+%%   Martin Maechler \email{maechler@stat.math.ethz.ch}.
+%% }
 \references{
   Yan, J. (2007)
   Enjoy the Joy of Copulas: With a Package \pkg{copula}.

@@ -40,7 +40,7 @@ pnacopula(x, u)
   A \code{\link{numeric}} in \eqn{[0,1]} which is the copula evaluated
   at \code{u}. (Currently not parallelized.)
 }
-\author{Marius Hofert, Martin Maechler.}
+%\author{Marius Hofert and Martin Maechler}
 \examples{
 ## Construct a three-dimensional nested Joe copula with parameters
 ## chosen such that the Kendall's tau of the respective bivariate margins

@@ -14,7 +14,7 @@ interval(ch)
 \value{
   an \code{\linkS4class{interval}} object.
 }
-\author{Martin Maechler}
+%\author{Martin Maechler}
 \seealso{
   the \code{\linkS4class{interval}} class documentation,
   notably its reference to more sophisticated interval classes available

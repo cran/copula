@@ -77,7 +77,7 @@ setMethod("A", signature("indepCopula"), AIndep)
 
 setMethod("tau", "indepCopula", function(copula, ...) 0)
 setMethod("rho", "indepCopula", function(copula, ...) 0)
-setMethod("tailIndex", "indepCopula",
+setMethod("lambda", "indepCopula",
           function(copula, ...)  c(lower=0, upper = 0))
 
 # setMethod("iTau", signature("indepCopula"), iTauIndepCopula)

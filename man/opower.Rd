@@ -25,7 +25,7 @@ opower(copbase, thetabase)
   \code{cOP} (which is the outer power copula itself), \code{copbase},
   and \code{thetabase}.
 }
-\author{Marius Hofert}
+%\author{Marius Hofert}
 \references{
   Hofert, M. (2010),
   \emph{Sampling Nested Archimedean Copulas with Applications to CDO Pricing},

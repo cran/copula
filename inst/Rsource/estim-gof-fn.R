@@ -43,9 +43,9 @@ f.tms <- function(x) paste(round(x),"ms") # with a space (sep=" ") !
 ##' @note In a next step, one could include Ga and t as well, not only Archimedean copulas
 estimation.gof <- function(n, d, simFamily, tau,
 			   N = 1, # dummy number of bootstrap replications
-                           estim.method = eval(formals(fitCopula)$method),
+                           estim.method = eval(formals(copula:::fitCopulaCopula)$method), ## CHANGED: fitCopula -> copula:::fitCopulaCopula
                            simulation="pb", verbose=TRUE,
-                           gof.trafo = c("rtrafo", "htrafo"),
+                           gof.trafo = c("cCopula", "htrafo"),
                            gof.method = eval(formals(gofTstat)$method),
 			   checkFamilies = setdiff(.ac.longNames, "AMH")) # as AMH is not available for d > 2
 {
@@ -84,7 +84,7 @@ estimation.gof <- function(n, d, simFamily, tau,
 	}
         cop@parameters <- est[k] # set the parameter of the estimated copula; or use: fit@copula
         ## apply a goodness-of-fit test to the estimated copula
-        ## {{ use rtrafo() or htrafo() if you want the transformed u }}
+        ## {{ use cCopula() or htrafo() if you want the transformed u }}
 	utg[k] <-
 	    utms(gof[k] <-
 		 gofCopula(cop, x=U, N=N, method=gof.method,

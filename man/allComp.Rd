@@ -24,7 +24,7 @@ allComp(x)
   An \code{\link{integer}} vector of indices \eqn{j} of all components
   \eqn{u_j} as described in the description above.
 }
-\author{Martin Maechler}
+%\author{Martin Maechler}
 \examples{
  C3 <- onacopula("AMH", C(0.7135, 1, C(0.943, 2:3)))
  allComp(C3) # components are 1:3

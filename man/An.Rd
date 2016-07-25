@@ -30,9 +30,6 @@ An(x, w)
   \item{corrected}{ TRUE means that the bivariate estimators will be
     corrected to ensure that their value at 0 and 1 is 1.}
 }
-\details{
-  More details can be found in the references.
-}
 \value{
   \code{An.biv()} returns a vector containing the values of the
   estimated Pickands dependence function at the points in \code{w} (and
@@ -45,6 +42,10 @@ An(x, w)
   \item{CFG}{ values of the CFG estimator at the points in \code{w}.}
   \item{HT}{ values of the Hall-Tajvidi estimator at the points in \code{w}.}
 }
+\details{
+  More details can be found in the references.
+}
+%\author{Ivan Kojadinovic and Jun Yan}
 \references{
   C. Genest and J. Segers (2009).
   Rank-based inference for bivariate extreme-value copulas.

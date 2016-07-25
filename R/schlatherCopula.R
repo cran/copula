@@ -16,7 +16,7 @@
 
 ## Schlather copula; does not offer full range of dependence
 setClass("schlatherCopula", contains = "evCopula"
-           # , exprdist = "expression")
+           # , slots = c(exprdist = "expression")
          )
 
 ASchlather <- function(copula, w) { ## one-parameter for now
@@ -27,8 +27,9 @@ ASchlather <- function(copula, w) { ## one-parameter for now
 
 dAduSchlather <- function(copula, w) {
   alpha <- copula@parameters[1]
-  ainv <- 1 / alpha
-  z <- 0.5 * alpha * log(w / (1 - w))
+  ## ainv <- 1 / alpha
+  ## z <- 0.5 * alpha * log(w / (1 - w))
+
   ## deriv(~ 0.5 * (1 + (1 - 2 * (alpha + 1) * w * (1 - w))), "w", hessian=TRUE)
   zder <- eval(expression({
     .expr2 <- 2 * (alpha + 1)
@@ -50,7 +51,7 @@ dAduSchlather <- function(copula, w) {
 }
 
 dAdthetaSchlather <- function(copula, w) {
-  alpha <- copula@parameters[1]
+  ## alpha <- copula@parameters[1]
   ## to be completed
   stop("to be implemented")
 }
@@ -69,7 +70,7 @@ schlatherCopula <- function(param = NA_real_) {
 
 
 pschlatherCopula <- function(u, copula) {
-  dim <- copula@dimension
+  ## dim = 2
   u1 <- u[,1]
   u2 <- u[,2]
   alpha <- copula@parameters[1]
@@ -79,10 +80,10 @@ pschlatherCopula <- function(u, copula) {
 }
 
 dschlatherCopula <- function(u, copula, log=FALSE, ...) {
-  dim <- copula@dimension
-  u1 <- u[,1]
-  u2 <- u[,2]
-  alpha <- copula@parameters[1]
+  ## dim = 2
+  ## u1 <- u[,1]
+  ## u2 <- u[,2]
+  ## alpha <- copula@parameters[1]
   stop("to be implemented")
 }
 

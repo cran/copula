@@ -1,7 +1,7 @@
 
-R version 3.1.0 Patched (2014-05-05 r65522) -- "Spring Dance"
-Copyright (C) 2014 The R Foundation for Statistical Computing
-Platform: x86_64-unknown-linux-gnu (64-bit)
+R version 3.3.0 Patched (2016-06-10 r70759) -- "Supposedly Educational"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -78,10 +78,10 @@ Loading required package: tools
  [8] 0.9825248 0.9825221 0.9825212 0.9825208 0.9825205 0.9825204
 > 
 > stopifnot(
-+  all.equal(tailIndex(gumbC20)[["upper"]],
++  all.equal(lambda(gumbC20)[["upper"]],
 +            numTailIndexUpper(gumbC20, 1 - 1e-7), tolerance=1e-8)
 +  ,
-+  all.equal(tailIndex(gumbC40)[["upper"]],
++  all.equal(lambda(gumbC40)[["upper"]],
 +            numTailIndexUpper(gumbC40, 1 - 1e-7), tolerance=1e-8)
 + )
 > 
@@ -124,7 +124,7 @@ Loading required package: tools
 > 
 > ###-------------- Frank --------------------------
 > Frank2 <- frankCopula(param=2, dim = 2)
-> tailIndex(Frank2) # 0 0
+> lambda(Frank2) # 0 0
 lower upper 
     0     0 
 > 
@@ -155,14 +155,14 @@ lower upper
 t copula family  
 Dimension:  2 
 Parameters:
-   rho.1  =  0.7 
-   df  =  3 
+  rho.1  =  0.7
+  df     =  3.0
 > (t.9.2 <- tCopula(0.9, df=2, dim = 2))
 t copula family  
 Dimension:  2 
 Parameters:
-   rho.1  =  0.9 
-   df  =  2 
+  rho.1  =  0.9
+  df     =  2.0
 > 
 > t.frac <- tCopula(0.9, df=2.5, dim = 2)
 > ## fractional df  currently (must) *fail* for pCopula
@@ -174,16 +174,16 @@ Parameters:
 +  ,
 +  !is.unsorted(ft)
 +  ,
-+  all.equal(tailIndex(t.7.3)[["upper"]],
++  all.equal(lambda(t.7.3)[["upper"]],
 +            numTailIndexUpper(t.7.3, 1 - 1e-8), tolerance=1e-5)
 +  ,
-+  all.equal(tailIndex(t.9.2)[["upper"]],
++  all.equal(lambda(t.9.2)[["upper"]],
 +            numTailIndexUpper(t.9.2, 1 - 1e-8), tolerance=1e-7)
 +  ,
-+  all.equal(tailIndex(t.7.3)[["lower"]],
++  all.equal(lambda(t.7.3)[["lower"]],
 +            numTailIndexLower(t.7.3, 1e-8), tolerance=1e-5)
 +  ,
-+  all.equal(tailIndex(t.9.2)[["lower"]],
++  all.equal(lambda(t.9.2)[["lower"]],
 +            numTailIndexLower(t.9.2, 1e-8), tolerance=1e-7)
 + )
 > 
@@ -203,8 +203,8 @@ Parameters:
 > 
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ''statistical reasons''
-Time elapsed:  1.937 0.048 2.143 0 0 
+Time elapsed:  0.675 0.106 0.777 0 0.002 
 > 
 > proc.time()
    user  system elapsed 
-  1.937   0.048   2.143 
+  0.675   0.108   0.777 

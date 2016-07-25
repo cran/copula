@@ -25,6 +25,7 @@ evTestC(x, N = 1000)
   \item{statistic}{ value of the test statistic. }
   \item{p.value}{ corresponding approximate p-value. }
 }
+%\author{Ivan Kojadinovic and Jun Yan}
 \references{
   R\enc{é}{e}millard, B. and Scaillet, O. (2009). Testing for equality
   between two copulas. \emph{Journal of Multivariate Analysis}, 100(3),

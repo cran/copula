@@ -4,7 +4,74 @@
 \title{News for \R Package \pkg{copula}}% MM: look into ../svn-log-from.all
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
-\section{Changes in version 0.999-14 (2015-10-17, svn r1184)}{
+\section{Changes in version 0.999-15 (2016-05-21, svn r1435)}{
+  \itemize{
+    \item \code{C.n(u, X, *)} now has \code{X} as second argument,
+    calls \code{pobs(X)} and then \code{F.n(*,*)}; previously,
+    \code{C.n} and \code{F.n} were practically equivalent, which has
+    been confusing.
+    \item \code{pobs()} is more flexible, accepting numeric vectors, and
+    e.g., keeping \code{"xts"} and \code{"zoo"} class attributes.
+    \item improved R markdown vignettes.
+
+    \item Internally, notably for \code{etau()} and \code{"itau"} fitting, make
+    use of fast Kendall's tau from package \pkg{pcaPP} (via hidden
+    \code{corKendall()}).
+
+    \item \code{fitCopula()} gets now method \code{"itau.mpl"} for
+    \code{tCopula}s, which implements the robust estimation method of
+    Mashal and Zeevi (2002).
+
+    \item various improvements in \code{gofCopula()} related to the
+    alternative test statistics (\code{method != "Sn"}).
+
+    \item new \code{xvCopula()} function: cross-validated copula fitting
+    for model selection.
+
+    \item Asymmetric copulas are now better implemented; previous
+    \code{asymCopula()} and \code{asymExplicitCopula()} are deprecated
+    and to be replaced by \code{khoudrajiCopula()}.
+
+    \item \dQuote{Rotated} copulas, i.e., generalizations of
+    \dQuote{survival} copulas, are now available via \code{rotCopula()}.
+
+    \item \code{gofEVCopula()}'s default \code{optim.method} has been
+    changed from \code{"Nelder-Mead"} to \code{"BFGS"} in line with
+    \code{fitCopula()} and because Nelder-Mead is warned against in the
+    1-dimensional case.
+
+    \item new \code{getAname()} useful e.g., in \code{htrafo()}.
+
+    \item Parts of a parameter vector can be kept fixed
+    (\dQuote{known}), see \code{\link{fixedPar}}.  The \code{"tCopula"}
+    and \code{"tevCopula"} classes consequently no longer have a
+    \code{df} slot.
+
+    \item Functions deprecated (\code{\link{.Deprecated}}) since 2012, namely,
+    \code{K}, \code{beta.hat}, \code{calibKendallsTau},
+    \code{calibSpearmansRho}, \code{kendallsTau}, \code{spearmansRho},
+    \code{genInv}, \code{genFun}, \code{genFunDer1}, \code{genFunDer2},
+    \code{Afun}, \code{AfunDer},
+    \code{Anfun}, \code{dcopula}, \code{pcopula}, \code{rcopula},
+    \code{dmvdc}, \code{pmvdc}, and \code{rmvdc}
+    are now defunct (the user still sees them and gets a useful
+    error message from \code{\link{.Defunct}()}!).
+
+    \item Function \code{tailindex} is deprecated in favor of new
+    \code{lambda()}; \code{gofMB()} and \code{gofPB()} calls are
+    deprecated and to be replaced by \code{gofCopula(.., simulation = *)}.
+
+    \item Function \code{rtrafo()} has now been deprecated, users
+    should work with \code{cCopula()} instead.
+
+    \item Various improvements in data visualization tools such as
+    \code{pairs2()}, \code{splom2()}, etc.
+
+    \item \code{qK()} gets \code{log.p} option.
+  }
+}
+
+\section{Changes in version 0.999-14 (2015-10-26, svn r1198)}{
   \itemize{
     \item New demo "NALC" on nested Archimedean Levy copulas
     \item Explicitly import from "base packages"

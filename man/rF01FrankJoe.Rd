@@ -59,7 +59,7 @@ rF01Joe(V0, alpha, approx)
   A vector of positive \code{\link{integer}}s of length \code{n}
   containing the generated random variates.
 }
-\author{Marius Hofert, Martin Maechler}
+%\author{Marius Hofert and Martin Maechler}
 \references{
   Hofert, M. (2011).
   Efficiently sampling nested Archimedean copulas.

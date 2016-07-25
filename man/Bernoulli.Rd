@@ -40,7 +40,7 @@ Bernoulli.all(n, method = c("A-T", "sumBin", "sumRamanujan", "asymptotic"),
       containing B(n)}
   }
 }
-\author{Martin Maechler}% started: 25 Jun 2011 (night train Vienna - Zurich).
+%\author{Martin Maechler}% started: 25 Jun 2011 (night train Vienna - Zurich).
 % \details{
 % The usual algorithms use O(n^2) math operations and in addition lose
 % precision rapidly.

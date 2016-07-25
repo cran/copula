@@ -46,7 +46,7 @@ dnacopula(x, u, log=FALSE, \dots)
   A \code{\link{numeric}} vector containing the values of the density of the
   Archimedean copula at \code{u}.
 }
-\author{Marius Hofert, Martin Maechler}
+%\author{Marius Hofert, Martin Maechler}
 \references{
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2012).
   Likelihood inference for Archimedean copulas in high dimensions

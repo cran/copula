@@ -20,29 +20,33 @@
 ### TODO:  {also for "normalCopula"}
 ##  3) validity should check  pos.definiteness for "un"structured (maybe "toeplitz"
 ##
+
+##' @title Constructor of tCopula
+##' @param param numeric vector of dispersion parameters (df excluded)
+##' @param dim integer dimension
+##' @param dispstr dispersion structure ("ex", "ar1", "toep", or "un")
+##' @param df numeric, degrees of freedom
+##' @param df.fixed logical, TRUE = df fixed
+##' @return an object of tCopula
 tCopula <- function(param = NA_real_, dim = 2L, dispstr = "ex",
 		    df = 4, df.fixed = FALSE)
 {
     dim <- as.integer(dim)
-    stopifnot((pdim <- length(param)) >= 1, is.numeric(param))
+    if(!is.numeric(param)) storage.mode(param) <- "double" # for NA, keeping attributes!
+    stopifnot((pdim <- length(param)) >= 1)
     if(pdim == 1 && is.na(param)) ## extend it (rho only!)
 	pdim <- length(param <- rep(param, length.out = npar.ellip(dim, dispstr)))
-    parameters <- param
-    param.names <- paste("rho", seq_len(pdim), sep=".")
-    param.lowbnd <- rep.int(-1, pdim)
-    param.upbnd	 <- rep.int( 1, pdim)
-    if (!df.fixed) { ## df is another parameter __at end__
-	parameters <- c(parameters, df)
-	param.names <- c(param.names, "df")
-	param.lowbnd <- c(param.lowbnd, 1e-6)
-	param.upbnd <- c(param.upbnd, Inf)
-    }
+    parameters <- c(param, df) ## df is another parameter __at end__
+    param.names <- c(paste("rho", seq_len(pdim), sep="."), "df")
+    param.lowbnd <- c(rep.int(-1, pdim), 1e-6)
+    param.upbnd	 <- c(rep.int( 1, pdim), Inf)
+    attr(parameters, "fixed") <- c(isFixedP(param), df.fixed)
 
     new("tCopula",
 	dispstr = dispstr,
 	dimension = dim,
 	parameters = parameters,
-	df = df,
+	## df = df, ## JY: need to deprecate this in the future
 	df.fixed = df.fixed,
 	param.names = param.names,
 	param.lowbnd = param.lowbnd,
@@ -50,31 +54,61 @@ tCopula <- function(param = NA_real_, dim = 2L, dispstr = "ex",
 	fullname = paste("t copula family", if(df.fixed) paste("df fixed at", df)),
 	getRho = function(obj) {
 	    par <- obj@parameters
-	    if (obj@df.fixed) par else par[-length(par)]
+            par[-length(par)]
 	}
 	)
 }
 
-## used for tCopula *and* tevCopula :
-as.df.fixed <- function(cop, classDef = getClass(class(cop))) {
-    stopifnot( ## fast .slotNames()
-	      any(names(classDef@slots) == "df.fixed"))
-    if (!cop@df.fixed) { ## df is another parameter __at end__
-	cop@df.fixed <- TRUE
-	ip <- seq_len(length(cop@parameters) - 1L)
-	cop@parameters	 <- cop@parameters  [ip]
-	cop@param.names	 <- cop@param.names [ip]
-	cop@param.lowbnd <- cop@param.lowbnd[ip]
-	cop@param.upbnd	 <- cop@param.upbnd [ip]
+### Used for tCopula *and* tevCopula
+##' @title Coerce to a Copula with fixed df
+##' @param copula a copula object with a "df.fixed" slot
+##' @param classDef class definition from getClass
+##' @return a copula with df.fixed = TRUE
+##' @author MH/MM?
+as.df.fixed <- function(copula, classDef = getClass(class(copula))) {
+    if (copula@df.fixed) return(copula)
+    stopifnot(extends(classDef, "tCopula") || extends(classDef, "tevCopula"))
+    if (!is.null(fixed <- attr(copula@parameters, "fixed"))) {
+        ## for tCopula with "fixed" attr in @parameters
+        fixed[length(fixed)] <- TRUE
+    } else {
+        fixed <- c(rep(FALSE, length(copula@parameters) - 1L), TRUE)
     }
-    cop
+    attr(copula@parameters, "fixed") <- fixed
+    copula@df.fixed <- TRUE # (to be deprecated)
+    copula
 }
 
-getdf <- function(object) {
-  if (object@df.fixed) object@df
-  else ## the last par. is 'df'
-      object@parameters[length(object@parameters)]
-}
+##' @title Get the df parameter of a t/tev copula
+##' @param object a copula object
+##' @return the df of copula
+##' @author Jun Yan
+getdf <- function(object) object@parameters[[length(object@parameters)]]
+
+## __ NOWHERE USED __
+##
+## ##' @title Set the df parameter of a t/tev copula
+## ##' @param object a copula object
+## ##' @param df the df value to be set
+## ##' @return a copula object with df set
+## ##' @author Jun Yan
+## `setdf<-` <- function(object, value) {
+##     stopifnot(is.numeric(value), length(value) == 1, value > 0, value < Inf)
+##     object@df <- value
+##     if (!is.null(fixed <- attr(object@parameters, "fixed"))) {
+##         object@parameters[length(object@parameters)] <- value
+##     } else { ## old version
+##         fixed <- c(rep(FALSE, length(object@parameters)), object@df.fixed)
+##         if (object@df.fixed) {
+##             object@parameters <- c(object@parameters, value)
+##             object@param.names  <- c(object@param.names, "df")
+##             object@param.lowbnd <- c(object@param.lowbnd, 1e-6)
+##             object@param.upbnd  <- c(object@param.upbnd, Inf)
+##         } else object@parameters[length(object@parameters)] <- value
+##         attr(object@parameters, "fixed") <- fixed
+##     }
+##     object
+## }
 
 rtCopula <- function(n, copula) {
   df <- getdf(copula)
@@ -111,26 +145,21 @@ dtCopula <- function(u, copula, log = FALSE, ...) {
 showTCopula <- function(object) {
   print.copula(object)
   if (object@dimension > 2) cat("dispstr: ", object@dispstr, "\n")
-  if (object@df.fixed) cat("df is fixed at", object@df, "\n")
+  if (object@df.fixed) cat("df is fixed at", getdf(object), "\n")
   invisible(object)
 }
 
-tailIndexTCopula <- function(copula) {
-### McNeil, Frey, Embrechts (2005), p.211
-  df <- getdf(copula)
-  rho <- copula@getRho(copula)
-  upper <- lower <- 2 * pt(- sqrt((df + 1) * (1 - rho) / (1 + rho)), df=df + 1)
-  c(upper=upper, lower=lower)
-}
-
-tauTCopula <- function(copula) {
-  rho <- copula@getRho(copula)
-  2 * asin(rho) /pi
-}
-
-rhoTCopula <- function(copula) {
-  rho <- copula@getRho(copula)
-  asin(rho / 2) * 6 / pi
+lambdaTCopula <- function(copula)
+{
+  ## McNeil, Frey, Embrechts (p. 211, 2005)
+    df <- getdf(copula)
+    rho <- copula@getRho(copula)
+    if(is.infinite(df)) {
+        lambdaNormalCopula(normalCopula(rho))
+    } else {
+        res <- 2 * pt(- sqrt((df + 1) * (1 - rho) / (1 + rho)), df=df + 1)
+        c(lower = res, upper = res)
+    }
 }
 
 setMethod("rCopula", signature("numeric", "tCopula"), rtCopula)
@@ -140,13 +169,11 @@ setMethod("pCopula", signature("numeric", "tCopula"),ptCopula)
 setMethod("dCopula", signature("matrix", "tCopula"), dtCopula)
 setMethod("dCopula", signature("numeric", "tCopula"),dtCopula)
 
-
-
 setMethod("show", signature("tCopula"), showTCopula)
 
-setMethod("tau", signature("tCopula"), tauTCopula)
-setMethod("rho", signature("tCopula"), rhoTCopula)
-setMethod("tailIndex", signature("tCopula"), tailIndexTCopula)
+setMethod("tau", "tCopula",
+          function(copula) 2 * asin(copula@getRho(copula)) / pi)
+setMethod("rho", "tCopula",
+          function(copula) asin(copula@getRho(copula) / 2) * 6 / pi)
 
-setMethod("iTau", signature("tCopula"), iTauEllipCopula)
-setMethod("iRho", signature("tCopula"), iRhoEllipCopula)
+setMethod("lambda", signature("tCopula"), lambdaTCopula)

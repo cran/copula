@@ -29,7 +29,7 @@ binom.sum <- function(n,k) sum(choose(n, 0:k))
 ##' @param print.every is deprecated
 ##' @return an object of class 'indepTestDist'
 ##' @author Ivan Kojadinovic
-indepTestSim <- function(n, p, m=p, N=1000, verbose = TRUE, print.every = NULL)
+indepTestSim <- function(n, p, m=p, N=1000, verbose = interactive(), print.every = NULL)
 {
     if (!is.numeric(n) || (n <- as.integer(n)) < 2)
         stop("n should be an integer greater than 2")
@@ -162,7 +162,7 @@ indepTest <- function(x, d, alpha=0.05)
 ##' @param print.every is deprecated
 ##' @return an object of class 'serialIndepTestDist'
 ##' @author Ivan Kojadinovic
-serialIndepTestSim <- function(n, lag.max, m=lag.max+1, N=1000, verbose = TRUE, print.every = NULL)
+serialIndepTestSim <- function(n, lag.max, m=lag.max+1, N=1000, verbose = interactive(), print.every = NULL)
 {
     if (!is.numeric(n) || (n <- as.integer(n)) < 2)
         stop("n should be an integer greater than 2")
@@ -303,7 +303,7 @@ serialIndepTest <- function(x, d, alpha=0.05)
 ##' @return an object of class 'indepTest'
 ##' @author Ivan Kojadinovic
 multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05,
-                          verbose = TRUE, print.every = NULL)
+                          verbose = interactive(), print.every = NULL)
 {
     if (!is.numeric(x <- as.matrix(x)))
         stop("data should be numerical")
@@ -311,8 +311,8 @@ multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05,
         stop("data cannot contain missing values")
     if ((n <- nrow(x)) < 2)
         stop("data should contain more than 2 rows")
-    if (!is.numeric(d) || any((d <- as.integer(d)) < 1) || sum(d) != (nc <- ncol(x)))
-      stop(paste("wrong vector of dimensions"))
+    if (!is.numeric(d) || any((d <- as.integer(d)) < 1) || sum(d) != ncol(x))
+	stop("wrong vector 'd' of dimensions")
 
     p <- length(d)
 
@@ -401,7 +401,7 @@ multIndepTest <- function(x, d, m=length(d), N=1000, alpha=0.05,
 ##' @return an object of class 'indepTest'
 ##' @author Ivan Kojadinovic
 multSerialIndepTest <- function(x, lag.max, m=lag.max+1, N=1000, alpha=0.05,
-                                verbose = TRUE, print.every = NULL)
+                                verbose = interactive(), print.every = NULL)
 {
     if (!is.numeric(x <- as.matrix(x)))
         stop("data should be numerical")

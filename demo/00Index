@@ -7,5 +7,6 @@ G_ak		    Coefficients a_k for Gumbel's density derivatives, MLE, etc
 opC-demo	    Outer power copula (Clayton only, for now)
 polyGJ		    Investigating precision and run time of polyG and polyJ
 dDiag-plots	    Plotting dDiag() densities (over range of families, theta, d)
+dDiag-plots-part-2  Contiuation of above  'dDiag-plots'
 timings		    Using timing() to measure speed of basic Archimedean families
 retstable	    Computation of exponentially tilted stable random variates

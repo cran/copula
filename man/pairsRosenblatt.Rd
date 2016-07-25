@@ -141,7 +141,7 @@ pairsColList(P, pdiv = c(1e-04, 0.001, 0.01, 0.05, 0.1, 0.5),
   detail in Hofert and \enc{Mächler}{Maechler} (2013).
   See also \code{\link{demo}(gof_graph)}.
 }
-\author{Marius Hofert, Martin \enc{Mächler}{Maechler}.}
+%\author{Marius Hofert and Martin Maechler}
 \references{
   Hofert, M. and \enc{Mächler}{Maechler}, M. (2013)
   A graphical goodness-of-fit test for dependence models in higher dimensions;
@@ -149,7 +149,7 @@ pairsColList(P, pdiv = c(1e-04, 0.001, 0.01, 0.05, 0.1, 0.5),
   \bold{23}(3), 700--716.
 }
 \seealso{
-  \code{\link{pairwiseCcop}} for the tools behind the scenes.
+  \code{\link{pairwiseCcop}()} for the tools behind the scenes.
   \code{\link{demo}(gof_graph)} for examples.
 }
 \examples{
@@ -167,7 +167,7 @@ X <- qexp(rCopula(n = 400, tCop))
 copH0 <- ellipCopula("normal", param=iTau(ellipCopula("normal"), tau = 0.5))
 
 ## create array of pairwise copH0-transformed data columns
-cu.u <- pairwiseCcop(pobs(X), copH0)
+cu.u <- pairwiseCcop(pobs(X), copula = copH0)
 
 ## compute pairwise matrix of p-values and corresponding colors
 pwIT <- pairwiseIndepTest(cu.u, N=200) # (d,d)-matrix of test results
@@ -198,7 +198,7 @@ copH0 <- onacopulaL(family, list(th, 1:d)) # define H0 copula
 U. <- pobs(rCopula(n, cop=copH0))
 
 ## create array of pairwise copH0-transformed data columns
-cu.u <- pairwiseCcop(U., copH0)
+cu.u <- pairwiseCcop(U., copula = copH0)
 
 ## compute pairwise matrix of p-values and corresponding colors
 pwIT <- pairwiseIndepTest(cu.u, N=N, verbose=interactive()) # (d,d)-matrix of test results

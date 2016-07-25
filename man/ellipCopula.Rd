@@ -1,8 +1,8 @@
 \name{ellipCopula}
+\title{Construction of Elliptical Copula Class Objects}
 \alias{ellipCopula}
 \alias{normalCopula}
 \alias{tCopula}
-\title{Construction of Elliptical Copula Class Object}
 \description{
   Constructs an elliptical copula class object with its corresponding
   parameters and dimension.
@@ -13,23 +13,25 @@ normalCopula(param, dim = 2, dispstr = "ex")
     tCopula (param, dim = 2, dispstr = "ex", df = 4, df.fixed = FALSE)
 }
 \arguments{
-  \item{family}{ a character string specifying the family of an
-    elliptical copula. Implemented families are "normal" and "t".  }
-  \item{param}{a numeric vector specifying the parameter values.  The
-    \code{getRho()} method accesses this vector, whereas
+  \item{family}{a character string specifying the family of an
+    elliptical copula.  Must be \code{"normal"} (the default) or \code{"t"}.}
+  \item{param}{a numeric vector specifying the parameter values;
+    \code{P2p()} accesses this vector, whereas
     \code{\link{p2P}()} and \code{\link{getSigma}()} provide
-    the corresponding \dQuote{Rho} matrix, see below.}
+    the corresponding \dQuote{P} matrix, see below.}
   \item{dim}{ the dimension of the copula. }
-  \item{dispstr}{ a character string specifying the type of the symmetric
+  \item{dispstr}{a character string specifying the type of the symmetric
     positive definite matrix characterizing the elliptical
-    copula. Implemented structures are "ex" for exchangeable, "ar1" for
-    AR(1), "toep" for Toeplitz, and "un" for unstructured. }
-  \item{df}{ a integer value specifying the number of degrees of freedom
+    copula.  Currently available structures are \code{"ex"} for
+    \bold{ex}changeable, \code{"ar1"} for \eqn{AR(1)}, \code{"toep"} for
+    Toeplitz (\code{\link{toeplitz}}), and \code{"un"} for
+    \bold{un}structured.}
+  \item{df}{integer value specifying the number of degrees of freedom
     of the multivariate t distribution used to construct the t copulas.}
   \item{df.fixed}{logical specifying if the degrees of freedom \code{df} will be
     considered as a parameter (to be estimated) or not.  The default,
     \code{FALSE}, means that \code{df} is to be estimated if the object is
-    passed as argument to \code{fitCopula}.}
+    passed as argument to \code{\link{fitCopula}}.}
   \item{\dots}{ currently nothing. }
 }
 \value{
@@ -48,14 +50,12 @@ normalCopula(param, dim = 2, dispstr = "ex")
   \code{\link[mvtnorm]{GenzBretz}}, or \code{abseps}
   which defaults to \code{0.001}.
 ## For smaller copula dimension 'd', alternatives are available and
-## non-random, see ?GenzBretz from package 'mvtnorm' :
-
-
-
+## non-random, see ?GenzBretz from package 'mvtnorm'
 }
+%\author{Ivan Kojadinovic and Jun Yan}
 \seealso{
   \code{\link{p2P}()}, and \code{\link{getSigma}()} for construction and
-  extraction of the \dQuote{Rho} (\eqn{P}) or \eqn{Sigma} matrix of
+  extraction of the dispersion matrix \eqn{P} or \eqn{Sigma} matrix of
   (generalized)% for t
   correlations.
 
@@ -65,7 +65,7 @@ normalCopula(param, dim = 2, dispstr = "ex")
 norm.cop <- normalCopula(c(0.5, 0.6, 0.7), dim = 3, dispstr = "un")
 t.cop <- tCopula(c(0.5, 0.3), dim = 3, dispstr = "toep",
                  df = 2, df.fixed = TRUE)
-getSigma(t.cop)## the P ("Rho") matrix (with diagonal = 1)
+getSigma(t.cop) # P matrix (with diagonal = 1)
 
 ## from the wrapper
 norm.cop <- ellipCopula("normal", param = c(0.5, 0.6, 0.7),

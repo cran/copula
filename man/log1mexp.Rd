@@ -30,9 +30,7 @@ log1pexp(x, c0 = -37, c1 = 18, c2 = 33.3)
 
   computed accurately and quickly
 }
-\author{
-  Martin Maechler, May 2002; \code{log1pexp()} in 2012.
-}
+%\author{Martin Maechler, May 2002; \code{log1pexp()} in 2012}
 \references{%  ~/R/Pkgs/Rmpfr/vignettes/log1mexp-note.Rnw
   Martin \enc{Mächler}{Maechler} (2012).
   Accurately Computing \eqn{\log(1-\exp(-|a|))};

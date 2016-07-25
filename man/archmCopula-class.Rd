@@ -50,6 +50,7 @@
 \note{
   \code{"gumbelCopula"} is also of class \code{"\linkS4class{evCopula}"}.
 }
+%\author{Marius Hofert, Ivan Kojadinovic, Martin Maechler and Jun Yan}
 \seealso{
   \code{\link{archmCopula}}, for constructing such copula objects;
   \code{\link{copula-class}}.

@@ -70,7 +70,7 @@ dacopulaG <- function(acop, u, n.MC=0, log = FALSE) {
     if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
     if((d <- ncol(u)) < 2) stop("u should be at least bivariate")
     th <- acop@theta
-    res <- rep(NaN,n <- nrow(u)) # density not defined on the margins
+    res <- rep(NaN, nrow(u)) # density not defined on the margins
     n01 <- apply(u,1,function(x) all(0 < x, x < 1)) # indices for which density has to be evaluated
     if(any(n01)) {
         u. <- u[n01,, drop=FALSE]
@@ -106,7 +106,6 @@ pnacopula <- function(x,u) {
     .pnacopula(u,x)
 }
 
-
 ##' Returns the copula value at u
 ##'
 ##' @title CDF / Evaluation of Archimedean copula
@@ -121,41 +120,6 @@ pacopula <- function(u, C, theta = C@theta) {
     if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
     .pacopula(u,C,theta)
 }
-
-##' Compute the probability P[l < U <= u]  where U ~ copula x
-##'
-##' @title Compute the probability P[l < U <= u]  where U ~ copula x
-##' @param x copula object
-##' @param l d-vector of lower "integration" limits
-##' @param u d-vector of upper "integration" limits
-##' @return the probability that a random vector following the given copula
-##'         falls in the hypercube with lower and upper corner l and u, respectively.
-##' @author Marius Hofert, Martin Maechler
-setGeneric("prob", function(x, l, u) standardGeneric("prob"))
-
-setMethod("prob", signature(x ="Copula"),
-          function(x, l,u) {
-              d <- dim(x)
-              stopifnot(is.numeric(l), is.numeric(u),
-                        length(u) == d, d == length(l),
-                        0 <= l, l <= u, u <= 1)
-              if(d > 30)
-		  stop("prob() for copula dimensions > 30 are not supported (yet)")
-              D <- 2^d
-              m <- 0:(D - 1)
-              ## digitsBase() from package 'sfsmisc' {slightly simplified} :
-              ## Purpose: Use binary representation of 0:N
-              ## Author: Martin Maechler, Date:  Wed Dec  4 14:10:27 1991
-              II <- matrix(0, nrow = D, ncol = d)
-              for (i in d:1L) {
-                  II[,i] <- m %% 2L + 1L
-                  if (i > 1) m <- m %/% 2L
-              }
-              ## Sign: the ("u","u",...,"u") case has +1; = c(2,2,...,2)
-              Sign <- c(1,-1)[1L + (- rowSums(II)) %% 2]
-              U <- array(cbind(l,u)[cbind(c(col(II)), c(II))], dim = dim(II))
-              sum(Sign * pCopula(U, x))
-          })
 
 ##' Returns (n x d)-matrix of random variates
 ##'
@@ -337,7 +301,7 @@ nac2list <- function(x) {
     else list(x@copula@theta, x@comp)
 }
 
-##'*randomly* construct a nested Archimedean copula model
+##' Randomly construct a nested Archimedean copula model
 ##' @title Random nacopula Model
 ##' @param family the Archimedean family
 ##' @param d integer >=2; the dimension
@@ -361,7 +325,7 @@ rnacModel <- function(family, d, pr.comp, rtau0 = function() rbeta(1, 2,4),
     ## Care: theta values must obey family specific nesting constraints
     ##	  we use paraInterval +	 theta1 >= theta0  [ok for the 5 families]
 
-    RR <- if(do.round <- digits.theta < 17)
+    RR <- if(digits.theta < 17)
 	function(t) round(t, digits.theta) else identity
     stopifnot(is.numeric(t0 <- rtau0()), length(t0) == 1, abs(t0) <= 1)
     theta0 <- RR(COP@iTau(t0))
@@ -498,14 +462,14 @@ setMethod("dCopula", signature("numeric", "nacopula"),
 
 setMethod("rCopula", signature("numeric", "nacopula"), rnacopula)
 
-setMethod("tailIndex", "acopula",
+setMethod("lambda", "acopula",
 	  function(copula, ...) {
 	      th <- copula@theta
 	      if(any(is.na(th)))
 		  warning("'theta' is NA -- maybe rather apply to setTheta(.)")
 	      c(copula@lambdaL(th), copula@lambdaU(th))
 	  })
-setMethod("tailIndex", "nacopula", function(copula, ...) tailIndex(copula@copula, ...))
+setMethod("lambda", "nacopula", function(copula, ...) lambda(copula@copula, ...))
 
 setMethod("tau", "acopula", function(copula) copula@tau(copula@theta))
 setMethod("tau", "nacopula", function(copula) tau(copula@copula))

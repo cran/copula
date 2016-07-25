@@ -42,7 +42,7 @@
       Archimedean copula under consideration.}
   }
 }
-\author{Martin Maechler}
+%\author{Martin Maechler}
 \seealso{
   \code{\link{onacopula}} for building (outer) "nacopula" objects.  For the
   class definition of the \code{copula} component, see

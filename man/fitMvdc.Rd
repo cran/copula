@@ -1,10 +1,10 @@
 \name{fitMvdc}
+\title{Estimation of Multivariate Models Defined via Copulas}
 \alias{fitMvdc}
 \alias{coef.fittedMV}
 \alias{logLik.fittedMV}
 \alias{vcov.fittedMV}
 \alias{loglikMvdc}
-\title{Estimation of Multivariate Models Defined via Copulas}
 \description{
   Fitting copula-based multivariate distributions
   (\code{"\linkS4class{mvdc}"}) to multivariate data,
@@ -15,7 +15,7 @@
   \code{\link{fitCopula}(*, \link{pobs}(x))} instead.
 }
 \usage{
-loglikMvdc(param, x, mvdc, hideWarnings)
+loglikMvdc(param, x, mvdc)
 fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
         lower = -Inf, upper = Inf,
         estimate.variance = fit$convergence == 0, hideWarnings = TRUE)
@@ -32,9 +32,9 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
     parameters of one marginal must be specified.}
   \item{x}{a data matrix.}
   \item{mvdc}{a \code{"\linkS4class{mvdc}"} object. }
-  \item{hideWarnings}{\emph{deprecated} and unused for \code{loglikMvdc};
-    logical; if TRUE, warning messages from likelihood maximization
-    (mostly evaluating at invalid parameter values) are suppressed.}
+  \item{hideWarnings}{logical indicating if warning messages from
+    likelihood maximization, e.g., from evaluating at invalid parameter
+    values, should be suppressed (via \code{\link{suppressWarnings}}).}
   \item{data}{a data matrix.}
   \item{start}{a vector of starting value for \code{"param"}.  See
     \code{"param"} above for ordering of this vector.}
@@ -77,8 +77,8 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
 }
 \note{
   User-defined marginal distributions can be used as long as the
-  \code{"{dpq}"} functions are defined.  See \code{demo(QARClayton)}
-  prepared by Roger Koenker \email{rkoenker@uiuc.edu}.
+  \code{"{dpq}"} functions are defined.
+  See \code{vignette("AR_Clayton", package="copula")}.
 
   When covariates are available for marginal distributions or for the copula,
   one can construct the loglikelihood function and feed it to \code{"optim"}
@@ -89,7 +89,12 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
   optimization process (see \code{\link{optim}}).  This should be rarer
   since 2013, notably for likelihood based methods (as the likelihood
   is now rather set to \code{-Inf} than giving an error).
+
+  Previously, \code{loglikMvdc()} had an argument \code{hideWarnings};
+  nowadays, do use \code{\link{suppressWarnings}(..)} if you are sure
+  you do not want to see them.
 }
+%\author{Ivan Kojadinovic and Martin Maechler}
 \seealso{
   \code{\link{mvdc}} and \code{\linkS4class{mvdc}};
   further, \code{\link{Copula}}, \code{\link{fitCopula}},
@@ -137,9 +142,6 @@ if(copula:::doExtras()) { ## these are typically not run with CRAN checking:
 	   all.equal(coef(fitI), coef(fI.2), tolerance = 1e-4))
 }%dont...
 }% if(..doExtras())
-
-## Roger Koenker prepared a demo illustrating MLE for a Clayton AR(1)
-## ===>  see vignette("AR_Clayton", package="copula") % ../vignettes/AR_Clayton.Rmd
 }
 \keyword{models}
 \keyword{multivariate}

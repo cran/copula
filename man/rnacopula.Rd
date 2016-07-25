@@ -33,7 +33,7 @@ rnacopula(n, copula, x, ...)
   \code{\link{numeric}} matrix containing the generated vectors of
   random variates from the nested Archimedean copula object \code{copula}.
 }
-\author{Marius Hofert, Martin Maechler}
+%\author{Marius Hofert and Martin Maechler}
 \references{
   McNeil, A. J. (2008).
   Sampling nested Archimedean copulas.

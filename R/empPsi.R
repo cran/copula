@@ -78,7 +78,7 @@ r.solve <- function(wp, d, interval=c(0,1), r.max=1, ...)
 ##' @return n-vector of pseudo-observations from the radial parts
 ##' @author Marius Hofert
 R.pobs <- function(r, p, n, sample=FALSE) {
-    stopifnot((m <- length(r)) == length(p), n >= 1)
+    stopifnot(length(r) == length(p), n >= 1)
     res <- rep(r, n*p)
     if(sample) sample(res) else res
 }
@@ -91,8 +91,9 @@ R.pobs <- function(r, p, n, sample=FALSE) {
 ##' @return psi_{n,d}(x)
 ##' @author Marius Hofert
 psi.n <- function(x, r, p, d) {
-    stopifnot((m <- length(r)) == length(p), d > 1)
-    vapply(x, function(x.) if(any(ii <- r > x.)) sum((1-x./r[ii])^(d-1) * p[ii]) else 0, NA_real_)
+    stopifnot(length(r) == length(p), d > 1)
+    vapply(x, function(x.) if(any(ii <- r > x.)) sum((1-x./r[ii])^(d-1) * p[ii]) else 0,
+	   NA_real_)
 }
 
 ##' @title Inverse of the Non-parametric Generator Estimator
@@ -109,14 +110,14 @@ psi.n <- function(x, r, p, d) {
 ##'       2) \hat{U}_i are also j/(n+1) as w_k's => if iPsi.n(\hat{U}_i) = w_k for some k
 ##'          one could return the corresponding r
 iPsi.n <- function(u, r, p, d, interval=c(0, max.r), ...) {
-    stopifnot((m <- length(r)) == length(p), d > 1, 0 <= u, u <= 1, (n <- length(u)) >= 1)
+    stopifnot(length(r) == length(p), d > 1, 0 <= u, u <= 1, (n <- length(u)) >= 1)
     max.r <- max(r)
     res <- rep(max.r, n) # => psi_{n,d}^{-1}(u) = max.r for all u <= psi_{n,d}(max.r)
-    f <- function(x, u) psi.n(x, r=r, p=p, d=d) - u
     ii <- u > psi.n(max.r, r=r, p=p, d=d)
     if(any(ii)) {
-        res[ii] <- vapply(u[ii], function(u.)
-                          uniroot(f, interval=interval, u=u., ...)$root, NA_real_)
+	f <- function(x, u) psi.n(x, r=r, p=p, d=d) - u
+	res[ii] <- vapply(u[ii], function(u.)
+			  uniroot(f, interval=interval, u=u., ...)$root, NA_real_)
     }
     res
 }

@@ -65,7 +65,8 @@ aCt2 <- unlist(lapply(taus, function(TAU) {
 (csubc <- Filter(Negate(isVirtualClass), csubc))
 ## schlatherCopula() e.g. has no constructor:
 (cfnms <- intersect(csubc, ls(pkg, pattern = "[A-Za-z]+Copula$")))
-stopList <- c("asymCopula",  "asymExplicitCopula", "indepCopula")
+stopList <- c("khoudrajiCopula", #"khoudrajiBivCopula",  "khoudrajiExplicitCopula",
+              "indepCopula", "rotCopula")
 cfnms <- cfnms[is.na(match(cfnms, stopList))]
 str(cfn <- sapply(cfnms, get, pkg, simplify=FALSE))
 str(th.25 <- lapply(cfn, function(F) iTau(F(), 0.25)))
@@ -78,6 +79,15 @@ length(cops <- c(aCt2, Ct2))
 
 set.seed(17)
 Uc <- lapply(cops, rCopula, n = 1024)
+
+## rPosStable [coverage]
+gC <- cops[[match("gumbelCopula", names(cops))]]
+set.seed(17); Uc <- c(Uc, list(gumbelC.x  = rCopula(gC, n = nrow(Uc[[1]]))))
+options('copula:rstable1' = "rPosStable")
+set.seed(17); Uc <- c(Uc, list(gumbelC.rP = rCopula(gC, n = nrow(Uc[[1]]))))
+options('copula:rstable1' = NULL) # check that things *are* reproducible
+set.seed(17); stopifnot(all.equal(Uc[["gumbelC.x"]], rCopula(gC, n = nrow(Uc[[1]]))))
+
 
 ## 1) Check the tau's
 
@@ -92,7 +102,11 @@ pp <- sapply(Uc, function(U2)
 
 ## The P-values should simply be uniform in [0,1]:
 hh <- hist(c(pp), breaks = (0:20)/20)## should "look" uniform
+summary(hh$counts)
+## Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+## 4.00    5.75    7.00    7.20    9.00   11.00
+
 ## and hence their test should typically *not* be significant
 (ad.pp <- ad.test(c(pp)))
-stopifnot(hh$counts[1] < 15, # for the above seed, it is 13 , "somewhat high"
+stopifnot(hh$counts < 15,
           ad.pp$p.value > 0.10)

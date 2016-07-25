@@ -55,7 +55,7 @@ nac2list(x)
   \code{nac2list}: a \code{\link{list}} exactly like the \code{naclist}
   argument to \code{onacopulaL}.
 }
-\author{Martin Maechler}
+%\author{Martin Maechler}
 \seealso{
   The class definitions \code{"\linkS4class{nacopula}"},
   \code{"\linkS4class{outer_nacopula}"}, and \code{"\linkS4class{acopula}"}.

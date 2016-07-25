@@ -63,9 +63,9 @@ amhCopula <- function(param = NA_real_, dim = 2L,
 
 
 pamhCopula <- function(copula, u) {
-  dim <- copula@dimension
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (apply(u, 1, prod))
+  ## dim = 2
   ## for (i in 1:dim) assign(paste0("u", i), u[,i])
   u1 <- u[,1]
   u2 <- u[,2]
@@ -74,9 +74,9 @@ pamhCopula <- function(copula, u) {
 
 
 damhCopula <- function(u, copula, log = FALSE, ...) {
-  dim <- copula@dimension
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep.int(if(log) 0 else 1, nrow(u)))
+  ## dim <- copula@dimension
   ## for (i in 1:dim) assign(paste0("u", i), u[,i])
   ## bivariate anyway
   u1 <- u[,1]
@@ -197,7 +197,7 @@ setMethod("diPsi", signature("amhCopula"),
 setMethod("tau", signature("amhCopula"), function(copula) tauAMH(copula@parameters[1]))
 
 setMethod("rho", signature("amhCopula"), rhoAmhCopula)
-setMethod("tailIndex", signature("amhCopula"), function(copula) c(lower=0, upper=0))
+setMethod("lambda", signature("amhCopula"), function(copula) c(lower=0, upper=0))
 
 setMethod("iTau", signature("amhCopula"), iTauAmhCopula)
 ## iRho() uses default method:  uniroot(rho(.) - rh)

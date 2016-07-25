@@ -142,9 +142,9 @@ rMvdc <- function(n, mvdc) {
   x
 }
 
-dmvdc <- function(mvdc, x, log=FALSE) { .Deprecated("dMvdc"); dMvdc(x, mvdc, log) }
-pmvdc <- function(mvdc, x) { .Deprecated("pMvdc"); pMvdc(x, mvdc) }
-rmvdc <- function(mvdc, n) { .Deprecated("rMvdc"); rMvdc(n, mvdc) }
+dmvdc <- function(mvdc, x, log=FALSE) { .Defunct("dMvdc"); dMvdc(x, mvdc, log) }
+pmvdc <- function(mvdc, x) { .Defunct("pMvdc"); pMvdc(x, mvdc) }
+rmvdc <- function(mvdc, n) { .Defunct("rMvdc"); rMvdc(n, mvdc) }
 
 print.mvdc <- function(x, digits = getOption("digits"), ...)
 {

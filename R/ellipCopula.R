@@ -32,22 +32,17 @@ npar.ellip <- function(dim, dispstr, df.fixed = TRUE) {
 	   return("'dispstr' not supported (yet)"))
 }
 
-ellipCopula <- function(family, param = NA_real_, dim = 2L, dispstr = "ex",
-                        df = 4, ...)
+ellipCopula <- function(family = c("normal", "t"), param = NA_real_, dim = 2L,
+                        dispstr = "ex", df = 4, ...)
 {
-  familiesImplemented <- c("normal", "t")
-  fam <- pmatch(family, familiesImplemented, -1)
-  if (fam == -1)
-    stop(paste("Valid family names are", paste(familiesImplemented, collapse=", ")))
-  switch(fam,
-	 normalCopula(param, dim = dim, dispstr = dispstr),
-	      tCopula(param, dim = dim, dispstr = dispstr, df = df, ...)
-         )
+  switch(match.arg(family), # error if invalid
+	 "normal" = normalCopula(param, dim = dim, dispstr = dispstr),
+         "t" =           tCopula(param, dim = dim, dispstr = dispstr, df = df, ...))
 }
 
-iTauEllipCopula <- function(copula, tau) sin((tau * pi) / 2)
+iTauEllipCopula <- function(copula, tau) sinpi(tau / 2)
 
-iRhoEllipCopula <- function(copula, rho) sin(pi * rho / 6) * 2
+## iRho --> only for normalCopula
 
 dTauEllipCopula <- function(copula)  {
   2 / (pi * sqrt(1 - copula@getRho(copula)^2))
@@ -66,7 +61,7 @@ dRhoFunEllipCopula <- function(copula) {
 }
 
 setMethod("iTau", signature("ellipCopula"), iTauEllipCopula)
-setMethod("iRho", signature("ellipCopula"), iRhoEllipCopula)
+## iRho: only for --> ./normalCopula.R
 
 setMethod("dTau", signature("ellipCopula"), dTauEllipCopula)
 setMethod("dRho", signature("ellipCopula"), dRhoEllipCopula)

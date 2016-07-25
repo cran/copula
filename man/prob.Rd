@@ -13,8 +13,8 @@
 prob(x, l, u)
 }
 \arguments{
-  \item{x}{copula of dimension, that is, an object
-    of class \code{\linkS4class{Copula}}.}
+  \item{x}{copula of dimension \eqn{d}, that is, an object
+    inheriting from \code{\linkS4class{Copula}}.}
   \item{l, u}{\eqn{d}-dimensional, \code{\link{numeric}}, lower and
     upper hypercube boundaries, respectively, satisfying
     \eqn{0 \le l_i \le u_i \le 1}{0 <= l_i <= u_i <= 1},
@@ -23,7 +23,7 @@ prob(x, l, u)
 \value{A \code{\link{numeric}} in \eqn{[0,1]} which is the probability
   \eqn{P(l_i< U_i \le u_i)}{P(l[i] < U[i] <= u[i])}.
 }
-\author{Marius Hofert, Martin Maechler}
+%\author{Marius Hofert and Martin Maechler}
 \seealso{
   \code{\link{pCopula}(.)}.
 }

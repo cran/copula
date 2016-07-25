@@ -15,7 +15,8 @@
 
 
 normalCopula <- function(param = NA_real_, dim = 2L, dispstr = "ex") {
-    stopifnot((pdim <- length(param)) >= 1, is.numeric(param))
+    if(!is.numeric(param)) storage.mode(param) <- "double" # for NA, keeping attributes!
+    stopifnot((pdim <- length(param)) >= 1)
     if(pdim == 1 && is.na(param)) ## extend it (rho)
 	pdim <- length(param <- rep(param, length.out = npar.ellip(dim, dispstr)))
   new("normalCopula",
@@ -101,21 +102,9 @@ showNormalCopula <- function(object) {
 }
 
 
-tailIndexNormalCopula <- function(copula) {
-  rho <- copula@parameters
-  upper <- lower <- ifelse(rho == 1, 1, 0)
-  c(lower=lower, upper=upper)
-}
-
-
-tauNormalCopula <- function(copula) {
-  rho <- copula@parameters
-  2 * asin(rho) /pi
-}
-
-rhoNormalCopula <- function(copula) {
-  rho <- copula@parameters
-  asin(rho / 2) * 6 / pi
+lambdaNormalCopula <- function(copula) {
+  i01 <- as.numeric(copula@parameters == 1) ## == rho
+  c(lower = i01, upper = i01)
 }
 
 setMethod("rCopula", signature("numeric", "normalCopula"), rnormalCopula)
@@ -127,9 +116,10 @@ setMethod("dCopula", signature("numeric", "normalCopula"),dnormalCopula)
 
 setMethod("show", signature("normalCopula"), showNormalCopula)
 
-setMethod("tau", signature("normalCopula"), tauNormalCopula)
-setMethod("rho", signature("normalCopula"), rhoNormalCopula)
-setMethod("tailIndex", signature("normalCopula"), tailIndexNormalCopula)
+## rho := copula@parameters
+setMethod("tau", "normalCopula", function(copula) 2 * asin(copula@parameters) /pi)
+setMethod("rho", "normalCopula", function(copula) asin(copula@parameters / 2) * 6 / pi)
+setMethod("lambda", signature("normalCopula"), lambdaNormalCopula)
 
-setMethod("iTau", signature("normalCopula"), iTauEllipCopula)
-setMethod("iRho", signature("normalCopula"), iRhoEllipCopula)
+setMethod("iRho", "normalCopula", function(copula, rho) sinpi(rho / 6) * 2)
+

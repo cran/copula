@@ -16,19 +16,6 @@
 source(system.file(package="Matrix", "test-tools-1.R", mustWork=TRUE))
 ##--> showProc.time(), assertError(), relErrV(), ...
 
-## Catch and save both warnings and errors and in the case of
-## a warning, also keep the computed result
-tryCatch.W.E <- function(expr){
-    W <- NULL
-    w.handler <- function(w){ # warning handler
-        W <<- w
-        invokeRestart("muffleWarning")
-    }
-    list(value = withCallingHandlers(tryCatch(expr, error = function(e) e),
-         warning = w.handler), warning = W)
-}
-
-
 ##' @title If needed, get file from internet - but do not "error out"
 ##' @param file
 ##' @param remoteDIR
@@ -72,6 +59,6 @@ nCorrDigits <- function(target, current, zeroDigs = 16) {
 
 setPar <- function(cop, par) {
     if((is(cop, "tCopula") || is(cop, "tevCopula")) && !cop@df.fixed)
-	par <- c(par, df = cop@df)
+	par <- c(par, df = cop@parameters[length(cop@parameters)])
     setTheta(cop, par, noCheck=TRUE)
 }

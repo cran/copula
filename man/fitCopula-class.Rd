@@ -57,6 +57,7 @@
   \code{\link{coef}()}, \code{\link{vcov}()} and \code{\link{logLik}()},
   see \code{\link{fitMvdc}}.
 }
+%\author{Marius Hofert, Ivan Kojadinovic, Martin Maechler and Jun Yan}
 \references{
   Genest, C., Ghoudi, K., and Rivest, L.-P. (1995). A semiparametric
   estimation procedure of dependence parameters in multivariate

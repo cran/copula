@@ -46,6 +46,7 @@
   Objects of class \code{"\linkS4class{gumbelCopula}"} are also of class
   \code{"\linkS4class{archmCopula}"}.
 }
+%\author{Ivan Kojadinovic and Jun Yan}
 \seealso{
   \code{\link{evCopula}},
   \code{\link{evTestC}},

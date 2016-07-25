@@ -34,7 +34,7 @@ printNacopula(x, labelKids=NA, deltaInd=, indent.str="",
 \value{
   invisibly, \code{x}.
 }
-\author{Martin Maechler}
+%\author{Martin Maechler}
 \examples{
 C8 <- onacopula("F", C(1.9, 1,
                        list(K1 = C(5.7, c(2,5)),

@@ -431,7 +431,7 @@ polylog <- function(z, s, method = c("default", "sum", "negI-s-Stirling",
 		    ## for "sum" -- this is more for experiments etc:
 		    n.sum)
 {
-    if((nz <- length(z)) == 0 || (ns <- length(s)) == 0)
+    if(length(z) == 0 || length(s) == 0)
 	return((z+s)[FALSE])# of length 0
     stopifnot(length(s) == 1) # for now
     method <- match.arg(method)
@@ -515,7 +515,7 @@ polylog <- function(z, s, method = c("default", "sum", "negI-s-Stirling",
 		   stop("1-st order asympt: implementation unfinished")
 		   r <- if(logarithm) {
 		       ## main: lgamma(n+1) - (n+1)*log(w) + c1 ^ w^*(2*ceiling((n+1)/2))
-		       trm <-
+                       ## FIXME: TODO   trm <-
 			   if(n %% 2) { ## n odd
 			   } else { ## n even
 			   }

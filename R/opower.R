@@ -14,6 +14,8 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
+### Outer power trafos #############################################################
+
 ##' Outer power transformation of Archimedean copulas
 ##'
 ##' @title Outer power Archimedean copulas
@@ -46,7 +48,7 @@ opower <- function(copbase, thetabase) {
 		 n.MC=n.MC, log=log))	# copbase case
 	      is0 <- t == 0
 	      isInf <- is.infinite(t)
-	      res <- numeric(n <- length(t))
+	      res <- numeric(length(t))
 	      res[is0] <- Inf # Note: absdPsi(0, ...) is correct (even for n.MC > 0)
 	      res[isInf] <- -Inf
 	      n0Inf <- !(is0 | isInf)
@@ -124,7 +126,7 @@ opower <- function(copbase, thetabase) {
               if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
               if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
               ## f() := NaN outside and on the boundary of the unit hypercube
-              res <- rep.int(NaN, n <- nrow(u))
+              res <- rep.int(NaN, nrow(u))
               n01 <- apply(u,1,function(x) all(0 < x, x < 1)) # indices for which density has to be evaluated
               if(!any(n01)) return(res)
               ## auxiliary results
@@ -138,7 +140,7 @@ opower <- function(copbase, thetabase) {
               score = function(u, theta) {
 	          stopifnot(C.@paraConstr(theta))
                   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-                  if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
+                  if(ncol(u) < 2) stop("u should be at least bivariate") # check that d >= 2
                   stop("The score function is currently not implemented for outer power copulas")
               },
               ## V0 and V01

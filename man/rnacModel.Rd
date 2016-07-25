@@ -24,7 +24,7 @@ rnacModel(family, d, pr.comp, rtau0 = function() rbeta(1, 2,4),
 \value{
   an object of \code{\linkS4class{outer_nacopula}}.
 }
-\author{Martin Maechler, 10 Feb 2012}
+%\author{Martin Maechler, 10 Feb 2012}
 \seealso{
   \code{\link{rnacopula}} for generating \eqn{d}-dimensional
   observations from an (outer) \code{\linkS4class{nacopula}}, e.g., from

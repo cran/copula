@@ -34,7 +34,7 @@ A..Z(x, alpha, I.alpha = 1 - alpha)
 
   where \eqn{\alpha\in(0,1]}{alpha in (0,1]} is \code{alpha}.
 }
-\author{Martin Maechler}
+%\author{Martin Maechler}
 \seealso{
   \code{\link{retstable}} internally makes use of these functions.
 }

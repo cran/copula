@@ -30,6 +30,7 @@ evTestA(x, N = 1000, derivatives = c("An","Cn"))
   \item{statistic}{ value of the test statistic. }
   \item{p.value}{ corresponding approximate p-value. }
 }
+%\author{Ivan Kojadinovic and Jun Yan}
 \references{
   Genest, C. and Segers, J. (2009). Rank-based inference for bivariate
   extreme-value copulas. \emph{Annals of Statistics}, 37, pages 2990-3022.

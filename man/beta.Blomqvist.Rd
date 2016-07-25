@@ -39,7 +39,7 @@ betan(u, scaling=FALSE)
   and related measures of tail dependence,
   \emph{Metrika} \bold{66}, 323--354.
 }
-\author{Marius Hofert}
+%\author{Marius Hofert}
 \seealso{
   \code{\linkS4class{acopula}}
 }

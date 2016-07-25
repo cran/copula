@@ -37,7 +37,7 @@ setTheta(x, value, \dots)
   (often called \code{theta}) set to \code{value}.
 %% FIXME: be more explicit about outer_nacopula  case
 }
-\author{Martin Maechler}
+%\author{Martin Maechler}
 \examples{
 myC <- setTheta(copClayton, 0.5)
 myC

@@ -186,11 +186,10 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     print(dV01.i)
 
     ### (5) cCopula {was "cacopula"}
-
-    cat("\n(5) values of cCopula(cbind(v,rev(v)), cop) for v=u01:\n")
+    cat("\n(5) values of cCopula(cbind(v,rev(v)), copula = cop) for v=u01:\n")
     cop. <- onacopulaL(cop@name, list(theta0, 1:2))
-    CT <- c(CT, list(cCopula. = system.time(cac <- cCopula(cbind(u01,rev(u01)),
-                     cop=cop.))))
+    CT <- c(CT, list(cCopula. = system.time(cac <- cCopula(cbind(u01, rev(u01)),
+                     copula = cop., indices = 2))))
     stopifnot(is.vector(cac), length(cac) == length(u01), 0 <= cac, cac <= 1)
     print(cac)
 

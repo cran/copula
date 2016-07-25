@@ -39,7 +39,7 @@ rFJoe(n, alpha)
   \code{\link{rF01Frank}(rep(1,n), theta0, theta1, rej, 1)} and
   \code{rFJoe(n, alpha)} calls \code{\link{rSibuya}(n, alpha)}.
 }
-\author{Marius Hofert}
+%\author{Marius Hofert}
 \seealso{
   \code{\link{rF01Frank}}, \code{\link{rF01Joe}}, also for references.
   \code{\link{rSibuya}}, and \code{\link{rnacopula}}.

@@ -16,7 +16,7 @@ gofBTstat(u)
   An \eqn{(n,d-1)}-\code{\link{matrix}} where the \eqn{(i,k)}th entry is
   \deqn{B_{ik}=\frac{\sum_{j=1}^k u_{ij}^2}{\sum_{j=1}^d u_{ij}^2}.}{B[ik]=(u[i,1]^2+..+u[i,k]^2)/(u[i,1]^2+..+u[i,d]^2).}
 }
-\author{Marius Hofert.}
+%\author{Marius Hofert.}
 \references{
   Li, R.-Z., Fang, K.-T., and Zhu, L.-X. (1997).
   Some Q-Q probability plots to test spherical and elliptical symmetry.

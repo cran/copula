@@ -1,26 +1,24 @@
 \name{multSerialIndepTest}
 \alias{multSerialIndepTest}
-\title{Serial Independence Test for Multivariate Continuous Time Series
-  Based on the Empirical Copula Process}
+\title{Serial Independence Test for Multivariate Time Series via Empirical Copula}
 \description{
   Analog of the serial independence test based on the empirical
   copula process proposed by Christian Genest and Bruno Rémillard (see
   \code{\link{serialIndepTest}}) for \emph{multivariate} time
-  series. The main difference comes from the fact that critical values
-  and p-values are obtainted through the bootstrap/permutation
+  series.  The main difference comes from the fact that critical values
+  and p-values are obtained through the bootstrap/permutation
   methodology, since, here, test statistics are not distribution-free.
 }
 \usage{
-multSerialIndepTest(x, lag.max, m=lag.max+1, N=1000, alpha=0.05,
-                    verbose = TRUE, print.every = NULL)
+multSerialIndepTest(x, lag.max, m = lag.max+1, N = 1000, alpha = 0.05,
+                    verbose = interactive(), print.every = NULL)
 }
 \arguments{
-  \item{x}{ data frame or data matrix containing realizations the
-    multivaraite continuous time series whose serial independence is to
- be tested.}
+  \item{x}{data frame or matrix of multivariate continuous time series
+    whose serial independence is to be tested.}
   \item{lag.max}{ maximum lag.}
   \item{m}{ maximum cardinality of the subsets of 'lags' for
-    which a test statistic is to be computed. It makes sense to consider
+    which a test statistic is to be computed.  It makes sense to consider
     \code{m << lag.max+1} especially when \code{lag.max} is large.}
   \item{N}{ number of bootstrap/permutation samples.}
   \item{alpha}{ significance level used in the computation of the
@@ -46,27 +44,28 @@ multSerialIndepTest(x, lag.max, m=lag.max+1, N=1000, alpha=0.05,
   the independence empirical copula process - see \code{In} in the last
   reference) and \code{global.statistic.pvalue} (corresponding p-value).
 }
+%\author{Ivan Kojadinovic and Jun Yan}
 \references{
-  Deheuvels, P. (1979). La fonction de dépendance empirique et ses
-  propriétés: un test non paramétrique d'indépendance, \emph{Acad. Roy.
-    Belg. Bull. Cl. Sci.}, 5th Ser. \bold{65}, 274--292.
+  Deheuvels, P. (1979)  La fonction de dépendance empirique et ses
+  propriétés: un test non paramétrique d'indépendance.
+  \emph{Acad. Roy. Belg. Bull. Cl. Sci.}, 5th Ser. \bold{65}, 274--292.
 
-  Deheuvels, P. (1981), A non parametric test for independence,
-  \emph{Publ. Inst. Statist. Univ. Paris}. \bold{26}, 29--50.
+  Deheuvels, P. (1981)  A non parametric test for independence.
+  \emph{Publ. Inst. Statist. Univ. Paris} \bold{26}, 29--50.
 
-  Genest, C. and R\enc{é}{e}millard, B. (2004), Tests of independence and
-  randomness based on the empirical copula process. \emph{Test}
-  \bold{13}, 335--369.
+  Genest, C. and R\enc{é}{e}millard, B. (2004)
+  Tests of independence and randomness based on the empirical copula
+  process.
+  \emph{Test} \bold{13}, 335--369.
 
-  Ghoudi, K., Kulperger, R., and R\enc{é}{e}millard, B. (2001), A
-  nonparametric test of serial independence for times series and
-  residuals.
+  Ghoudi, K., Kulperger, R., and R\enc{é}{e}millard, B. (2001)
+  A nonparametric test of serial independence for times series and residuals.
   \emph{Journal of Multivariate Analysis} \bold{79}, 191--218.
 
-  Kojadinovic, I. and Yan, J. (2011), Tests of multivariate serial
-  independence based on a Möbius decomposition of the independence
-  empirical copula process, \emph{Annals of the Institute of Statistical
-  Mathematics} \bold{63}, 347--373.
+  Kojadinovic, I. and Yan, J. (2011)
+  Tests of multivariate serial independence based on a Möbius
+  decomposition of the independence empirical copula process.
+  \emph{Annals of the Institute of Statistical Mathematics} \bold{63}, 347--373.
 }
 \seealso{
   \code{\link{serialIndepTest}},
@@ -75,14 +74,16 @@ multSerialIndepTest(x, lag.max, m=lag.max+1, N=1000, alpha=0.05,
   \code{\link{dependogram}}
 }
 \examples{
-## A multivariate time series
+## A multivariate time series {minimal example for demo purposes}
 d <- 2
-n <- 100
+n <- 100 # sample size *and* "burn-in" size
 param <- 0.25
-ar <- matrix(0,2*n,d)
-ar[1,] <- rnorm(d)
+A <- matrix(param,d,d) # the bivariate AR(1)-matrix
+set.seed(17)
+ar <- matrix(rnorm(2*n * d), 2*n,d) # used as innovations
 for (i in 2:(2*n))
-  ar[i,] <- matrix(param,d,d) \%*\% ar[i-1,] + rnorm(d)
+  ar[i,] <- A \%*\% ar[i-1,] + ar[i,]
+## drop burn-in :
 x <- ar[(n+1):(2*n),]
 
 ## Run the test

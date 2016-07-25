@@ -24,8 +24,7 @@ polynEval(coef, x)
   numeric vector or array, with the same dimensions as \code{x},
   containing the polynomial values \eqn{p(x)}.
 }
-\author{Martin Maechler; the \R version has been in package
-  \pkg{sfsmisc} for ages.}
+%\author{Martin Maechler; the \R version has been in package \pkg{sfsmisc} for ages.}
 \seealso{For a much more sophisticated treatment of polynomials, use the
   \code{polynom} package (for example, evaluation can be done via
 \code{\link[polynom]{predict.polynomial}}).

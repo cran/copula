@@ -41,6 +41,7 @@
   \code{"\linkS4class{archmCopula}"} and
   \code{"\linkS4class{evCopula}"} directly.
 }
+%\author{Ivan Kojadinovic and Jun Yan}
 \seealso{
   \code{\link{indepCopula}},
   \code{\link{copula-class}}.

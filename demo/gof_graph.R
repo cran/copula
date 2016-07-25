@@ -353,7 +353,7 @@ nLLt <- function(nu, P, u){
 
 ## Note:  nLLt() is ~ 30% faster than these  {where  p := P2p(P) } :
 t.20 <- tCopula(dim=d, dispstr="un")
-nLLt2 <- function(nu, P, u) -loglikCopula(c(P, df=nu), x=u, copula=t.20)
+nLLt2 <- function(nu, P, u) -loglikCopula(c(P, df=nu), u=u, copula=t.20)
 nLLt3 <- function(nu, P, u) -sum(dCopula(u, setTheta(t.20, c(P, nu)), log=TRUE))
 
 ## confirm the "equivalence" of nLLt(), nLLt2() and nLLt3()
@@ -385,7 +385,7 @@ cop.t <- ellipCopula("t", df=nuOpt, param=P.., dim=ncol(P.), dispstr="un")
 
 ## create array of pairwise copH0-transformed data columns
 cu.uN <- pairwiseCcop(u, cop.N)
-cu.ut <- pairwiseCcop(u, cop.t, df=nuOpt)
+cu.ut <- pairwiseCcop(u, cop.t)
 
 if(setSeeds) set.seed(8)
 ## compute pairwise matrix (d x d) of p-values and corresponding colors
@@ -424,6 +424,5 @@ title <- list("Pairwise Rosenblatt transformed pseudo-observations",
 if(doPDF) pdf(file=(file <- "gof_graph_fig-SMI-ex.pdf"))
 pairsRosenblatt(cu.ut, pvalueMat=pmatt, method="none", cex.labels=0.7,
                 key.space=1.5, main.centered=TRUE, main=title, line.main=c(3, 0.4),
-                keyOpt=list(space=1.5, width=1.5, axis=TRUE,
-                            rug.at = numeric(), title=NULL, line=5))
+                keyOpt=list(space=1.5, width=1.5, axis=TRUE, title=NULL, line=5))
 if(doPDF) dev.off()

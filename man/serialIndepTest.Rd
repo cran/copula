@@ -1,26 +1,29 @@
 \name{serialIndepTest}
 \alias{serialIndepTest}
 \alias{serialIndepTestSim}
-\title{Serial Independence Test for Continuous Time Series Based
-  on the Empirical Copula Process}
+\title{Serial Independence Test for Continuous Time Series Via Empirical Copula}
 \description{
-  Serial independence test based on the empirical copula process as
-  proposed in Ghoudi et al. (2001) and Genest and Rémillard (2004). The
-  test, which is the serial analog of \code{\link{indepTest}}, can be
-  seen as composed of three steps: (i) a simulation step, which consists
-  in simulating the distribution of the test statistics under serial
-  independence for the sample size under consideration; (ii) the test
-  itself, which consists in computing the approximate p-values of the
-  test statistics with respect to the empirical distributions obtained
-  in step (i); and (iii) the display of a graphic, called a
-  \emph{dependogram}, enabling to understand the type of departure from
-  serial independence, if any. More details can be found in the articles
-  cited in the reference section.
+  Computes the serial independence test based on the empirical copula
+  process as proposed in Ghoudi et al.(2001) and Genest and Rémillard (2004).
+  The test, which is the serial analog of \code{\link{indepTest}}, can be
+  seen as composed of three steps:
+  \describe{
+    \item{(i)}{a simulation step, which consists in simulating the
+      distribution of the test statistics under serial independence for
+      the sample size under consideration;}
+    \item{(ii)}{the test itself, which consists in computing the
+      approximate p-values of the test statistics with respect to the
+      empirical distributions obtained in step (i);}
+    \item{(iii)}{the display of a graphic, called a \emph{dependogram},
+      enabling to understand the type of departure from serial
+      independence, if any.}
+  }
+  More details can be found in the articles cited in the reference section.
 }
 \usage{
-  serialIndepTestSim(n, lag.max, m=lag.max+1, N=1000, verbose = TRUE,
-                     print.every = NULL)
-  serialIndepTest(x, d, alpha=0.05)
+serialIndepTestSim(n, lag.max, m=lag.max+1, N=1000, verbose = interactive(),
+                   print.every = NULL)
+serialIndepTest(x, d, alpha=0.05)
 }
 \arguments{
   \item{n}{ length of the time series when simulating the distribution of
@@ -45,8 +48,8 @@
 }
 \details{See the references below for more details, especially the third
   and fourth ones.}
-\value{The function \code{"serialIndepTestSim"} returns an object of class
-   \code{"serialIndepTestDist"} whose attributes are: \code{sample.size},
+\value{The function \code{serialIndepTestSim()} returns an object of S3 class
+  \code{"serialIndepTestDist"} with list components \code{sample.size},
   \code{lag.max}, \code{max.card.subsets}, \code{number.repetitons},
   \code{subsets} (list of the subsets for which test statistics have
   been computed), \code{subsets.binary} (subsets in binary 'integer'
@@ -57,8 +60,8 @@
   global Cramér-von Mises test statistic for each repetition --- see
   last reference p.175).
 
-  The function \code{"serialIndepTest"} returns an object of class
-  \code{"indepTest"} whose attributes are: \code{subsets},
+  The function \code{serialIndepTest()} returns an object of S3 class
+  \code{"indepTest"} with list components \code{subsets},
   \code{statistics}, \code{critical.values}, \code{pvalues},
   \code{fisher.pvalue} (a p-value resulting from a combination \emph{à la}
   Fisher of the subset statistic p-values), \code{tippett.pvalue} (a
@@ -70,6 +73,7 @@
   empirical copula process --- see last reference p 175) and
   \code{global.statistic.pvalue} (corresponding p-value).
 }
+%\author{Ivan Kojadinovic and Jun Yan}
 \references{
   Deheuvels, P. (1979). La fonction de dépendance empirique et ses
   propriétés: un test non paramétrique d'indépendance, \emph{Acad. Roy.
@@ -78,16 +82,17 @@
   Deheuvels, P. (1981), A non parametric test for independence,
   \emph{Publ. Inst. Statist. Univ. Paris}. 26:29--50.
 
-  Genest, C. and R\enc{é}{e}millard, B. (2004), Tests of independence and
-  randomness based on the empirical copula process. \emph{Test}
-  \bold{13}, 335--369.
+  Genest, C. and R\enc{é}{e}millard, B. (2004)
+  Tests of independence and randomness based on the empirical copula
+  process.
+  \emph{Test} \bold{13}, 335--369.
 
-  Genest, C., Quessy, J.-F., and R\enc{é}{e}millard, B. (2006). Local
-  efficiency of a Cramer-von Mises test of independence,
+  Genest, C., Quessy, J.-F., and R\enc{é}{e}millard, B. (2006)
+  Local efficiency of a Cramer-von Mises test of independence.
   \emph{Journal of Multivariate Analysis} \bold{97}, 274--294.
 
-  Genest, C., Quessy, J.-F., and R\enc{é}{e}millard, B. (2007), Asymptotic
-  local efficiency of Cramér-von Mises tests for multivariate
+  Genest, C., Quessy, J.-F., and R\enc{é}{e}millard, B. (2007)
+  Asymptotic local efficiency of Cramér-von Mises tests for multivariate
   independence. \emph{The Annals of Statistics} \bold{35}, 166--191.
 }
 \seealso{

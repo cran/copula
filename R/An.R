@@ -55,7 +55,7 @@ An.biv <- function(x, w, estimator = c("CFG", "Pickands"), corrected = TRUE) {
 }
 
 Anfun <- function(x, w, estimator = c("CFG", "Pickands"), corrected = TRUE) {
-    .Deprecated("An.biv")
+    .Defunct("An.biv")
     An.biv(x, w, estimator, corrected=corrected)
 }
 

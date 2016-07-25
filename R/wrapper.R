@@ -14,8 +14,7 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-### Wrappers and auxiliary functions for dealing with elliptical (Gauss, t_nu)
-### and Archimedean copulas
+### Wrappers for dealing with elliptical (Gauss, t_nu) and Archimedean copulas
 
 ##' @title Copula class for the given copula object
 ##' @param cop copula object
@@ -59,56 +58,3 @@ copFamilyClass <- function(family)
     else stop("family ", family, " not yet supported")
 }
 
-##' @title Construct a symmetric matrix with 1s on the diagonal from the given
-##'        parameter vector
-##' @param param parameter vector
-##' @param d number of columns (or rows) of the output matrix
-##' @return a symmetric matrix with 1s on the diagonal and the values of param
-##'         filled column-wise below the diagonal (= row-wise above the diagonal)
-##' @author Marius Hofert
-p2P <- function(param, d)
-{
-    P <- diag(1, nrow=d)
-    P[lower.tri(P)] <- param
-    P <- P+t(P)
-    diag(P) <- rep.int(1, d)
-    P
-}
-
-##' @title Extract the vector of column-wise below-diagonal entries from a matrix
-##' @param P matrix (typically a symmetric matrix as used for elliptical copulas)
-##' @return the vector of column-wise below-diagonal entries of P (they are equal
-##'         to the row-wise above-diagonal entries in case of a symmetric matrix)
-##' @author Marius Hofert
-##' Note: This is used "by foot" at several points in the package.
-P2p <- function(P) P[lower.tri(P)]
-
-##' @title Construct matrix Sigma from a given elliptical copula
-##' @param copula copula
-##' @return (d, d) matrix Sigma containing the parameter vector rho
-##' @author Marius Hofert
-getSigma <- function(copula)
-{
-    stopifnot(is(copula, "ellipCopula"))
-    d <- copula@dimension
-    rho <- copula@getRho(copula)
-    switch(copula@dispstr,
-	   "ex" = {
-	       Sigma <- matrix(rho[1], nrow=d, ncol=d)
-	       diag(Sigma) <- rep(1, d)
-	   },
-	   "ar1" = {
-	       Sigma <- rho^abs(outer(1:d, 1:d, FUN="-"))
-	   },
-	   "un" = {
-	       Sigma <- p2P(rho, d)
-	   },
-	   "toep" = {
-	       rho <- c(rho, 1)
-	       ind <- outer(1:d, 1:d, FUN=function(i, j) abs(i-j))
-	       diag(ind) <- length(rho)
-	       Sigma <- matrix(rho[ind], nrow=d, ncol=d)
-	   },
-	   stop("invalid 'dispstr'"))
-    Sigma
-}

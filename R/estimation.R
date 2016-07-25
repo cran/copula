@@ -16,11 +16,31 @@
 
 ### Estimation for nested Archimedean copulas
 
-### initial interval/value for optimization procedures #########################
+### Auxiliaries ################################################################
 
-##' Compute an initial interval or value for optimization/estimation routines
-##' (only a heuristic; if this fails, choose your own interval or value)
-##'
+##' @title Pseudo-observations
+##' @param x matrix of random variates to be converted to pseudo-observations
+##' @param na.last passed to rank()
+##' @param ties.method passed to rank()
+##' @param lower.tail if FALSE, pseudo-observations when apply the empirical
+##'        marginal survival functions are returned.
+##' @return pseudo-observations (of the same dimensions as x)
+##' @author Marius Hofert & Martin Maechler
+pobs <- function(x, na.last = "keep",
+		 ## formals(rank) works in pre-2015-10-15 and newer version of rank():
+		 ties.method = eval(formals(rank)$ties.method),
+		 lower.tail = TRUE)
+{
+    ties.method <- match.arg(ties.method)
+    U <- if(!is.null(dim(x)))
+	     apply(x, 2, rank, na.last=na.last, ties.method=ties.method) / (nrow(x)+1)
+	 else
+	     rank(x, na.last=na.last, ties.method=ties.method) / (length(x)+1)
+    if (inherits(x, "zoo"))
+	attributes(U) <- attributes(x)
+    if(lower.tail) U else 1-U
+}
+
 ##' @title Compute an initial interval or value for estimation procedures
 ##' @param family Archimedean family
 ##' @param tau.range vector containing lower and upper admissible Kendall's tau
@@ -33,6 +53,8 @@
 ##' @param ... further arguments to cor() for method="tau.mean"
 ##' @return initial interval or value which can be used for optimization
 ##' @author Marius Hofert
+##' @note Compute an initial interval or value for optimization/estimation routines
+##' (only a heuristic; if this fails, choose your own interval or value)
 initOpt <- function(family, tau.range=NULL, interval=TRUE, u,
                     method=c("tau.Gumbel", "tau.mean"), warn=TRUE, ...)
 {
@@ -61,7 +83,7 @@ initOpt <- function(family, tau.range=NULL, interval=TRUE, u,
                           copGumbel@tau(theta.hat.G)
                       },
                       "tau.mean" = {
-                          tau.hat.mat <- cor(u, method="kendall", ...) # matrix of pairwise tau()
+                          tau.hat.mat <- corKendall(u, ...) # matrix of pairwise tau()
                           mean(tau.hat.mat[upper.tri(tau.hat.mat)]) # mean of estimated taus
                       },
                       stop("wrong method for initOpt"))
@@ -72,16 +94,15 @@ initOpt <- function(family, tau.range=NULL, interval=TRUE, u,
 
 ### Blomqvist's beta ###########################################################
 
-##' Compute the sample version of Blomqvist's beta,
-##' see, e.g., Schmid and Schmidt (2007) "Nonparametric inference on multivariate
-##' versions of Blomqvist's beta and related measures of tail dependence"
-##'
 ##' @title Sample version of Blomqvist's beta
 ##' @param u matrix of realizations following the copula
 ##' @param scaling if TRUE then the factors 2^(d-1)/(2^(d-1)-1) and
 ##'                2^(1-d) in Blomqvist's beta are omitted
 ##' @return sample version of multivariate Blomqvist beta
 ##' @author Marius Hofert
+##' @note Compute the sample version of Blomqvist's beta,
+##' see, e.g., Schmid and Schmidt (2007) "Nonparametric inference on multivariate
+##' versions of Blomqvist's beta and related measures of tail dependence"
 betan <- function(u, scaling = FALSE) {
     less.u <- u <= 0.5
     prod1 <- apply( less.u, 1, all)
@@ -90,11 +111,8 @@ betan <- function(u, scaling = FALSE) {
     if(scaling) b else {T <- 2^(ncol(u)-1); (T*b - 1)/(T - 1)}
 }
 
-beta.hat <- function(u, scaling = FALSE) { .Deprecated("betan") ; betan(u, scaling) }
+beta.hat <- function(u, scaling = FALSE) { .Defunct("betan") ; betan(u, scaling) }
 
-
-##' Compute the population version of Blomqvist's beta for Archimedean copulas
-##'
 ##' @title Population version of Blomqvist's beta for Archimedean copulas
 ##' @param cop acopula to be estimated
 ##' @param theta copula parameter
@@ -111,9 +129,6 @@ beta. <- function(cop, theta, d, scaling=FALSE) {
     if(scaling) b else { T <- 2^(d-1); (T*b - 1)/(T - 1)}
 }
 
-##' Method-of-moment-like estimation of nested Archimedean copulas based on a
-##' multivariate version of Blomqvist's beta
-##'
 ##' @title Method-of-moment-like parameter estimation of nested Archimedean copulas
 ##'        based on Blomqvist's beta
 ##' @param u matrix of realizations following the copula
@@ -141,8 +156,6 @@ ebeta <- function(u, cop, interval=initOpt(cop@copula@name), ...) {
 
 ### Kendall's tau ##############################################################
 
-##' Sample tau checker
-##'
 ##' @title Check sample versions of Kendall's tau
 ##' @param x vector of sample versions of Kendall's tau to be checked for whether
 ##'        they are in the range of tau of the corresponding family
@@ -185,8 +198,6 @@ tau.checker <- function(x, family, warn=TRUE){
     x.
 }
 
-##' Compute pairwise estimators for nested Archimedean copulas based on Kendall's tau
-##'
 ##' @title Pairwise estimators for nested Archimedean copulas based on Kendall's tau
 ##' @param u matrix of realizations following the copula
 ##' @param cop outer_nacopula to be estimated
@@ -205,7 +216,7 @@ etau <- function(u, cop, method = c("tau.mean", "theta.mean"), warn=TRUE, ...){
               max(cop@comp) == d)
     if(length(cop@childCops))
         stop("currently, only Archimedean copulas are supported")
-    tau.hat.mat <- cor(u, method="kendall",...) # matrix of pairwise tau()
+    tau.hat.mat <- corKendall(u, ...) # matrix of pairwise tau()
     tau.hat <- tau.hat.mat[upper.tri(tau.hat.mat)] # all tau hat's
     ## define tau^{-1}
     tau_inv <- if(cop@copula@name == "AMH")
@@ -229,8 +240,6 @@ etau <- function(u, cop, method = c("tau.mean", "theta.mean"), warn=TRUE, ...){
 
 ### Minimum distance estimation ################################################
 
-##' Distances for minimum distance estimation
-##'
 ##' @title Distances for minimum distance estimation
 ##' @param u matrix of realizations (ideally) following U[0,1]^(d-1) or U[0,1]^d
 ##' @param method distance methods available:
@@ -276,8 +285,6 @@ emde.dist <- function(u, method = c("mde.chisq.CvM", "mde.chisq.KS", "mde.gamma.
            stop("wrong distance method"))
 }
 
-##' Minimum distance estimation for nested Archimedean copulas
-##'
 ##' @title Minimum distance estimation for nested Archimedean copulas
 ##' @param u matrix of realizations following the copula
 ##' @param cop outer_nacopula to be estimated
@@ -302,7 +309,7 @@ emde <- function(u, cop, method = c("mde.chisq.CvM", "mde.chisq.KS", "mde.gamma.
     method <- match.arg(method) # match argument method
     distance <- function(theta) { # distance to be minimized
         cop@copula@theta <- theta
-        u. <- htrafo(u, cop=cop, include.K=include.K, n.MC=0) # transform data [don't use MC here; too slow]
+        u. <- htrafo(u, copula = cop, include.K = include.K, n.MC = 0) # transform data [don't use MC here; too slow]
         emde.dist(u., method)
     }
     if(repara){
@@ -339,8 +346,6 @@ emde <- function(u, cop, method = c("mde.chisq.CvM", "mde.chisq.KS", "mde.gamma.
 
 ### Diagonal maximum likelihood estimation #####################################
 
-##' Density of the diagonal of a nested Archimedean copula
-##'
 ##' @title Diagonal density of a nested Archimedean copula
 ##' @param u evaluation point in [0,1]
 ##' @param cop outer_nacopula
@@ -382,8 +387,6 @@ dDiagA <- function(u, d, cop, log=FALSE) {
     }
 }
 
-##' Maximum likelihood estimation based on the diagonal of a nested Archimedean copula
-##'
 ##' @title Maximum likelihood estimation based on the diagonal of a nested Archimedean copula
 ##' @param u matrix of realizations following a copula
 ##' @param cop outer_nacopula to be estimated
@@ -420,9 +423,6 @@ edmle <- function(u, cop, interval=initOpt(cop@copula@name), warn=TRUE, ...)
 
 ### (Simulated) maximum likelihood estimation ##################################
 
-##' (Simulated) maximum likelihood estimation for nested Archimedean copulas
-##' -- *Fast* version (based on optimize()) called from enacopula
-##'
 ##' @title (Simulated) maximum likelihood estimation for nested Archimedean copulas
 ##' @param u matrix of realizations following the copula
 ##' @param cop outer_nacopula to be estimated
@@ -433,6 +433,8 @@ edmle <- function(u, cop, interval=initOpt(cop@copula@name), warn=TRUE, ...)
 ##' @param ... additional parameters for optimize
 ##' @return (simulated) maximum likelihood estimator; return value of optimize
 ##' @author Marius Hofert
+##' @note (Simulated) maximum likelihood estimation for nested Archimedean copulas
+##' -- *Fast* version (based on optimize()) called from enacopula
 .emle <- function(u, cop, n.MC=0, interval=initOpt(cop@copula@name), ...)
 {
     stopifnot(is(cop, "outer_nacopula"))
@@ -447,9 +449,6 @@ edmle <- function(u, cop, interval=initOpt(cop@copula@name), warn=TRUE, ...)
     optimize(mLogL, interval=interval, ...)
 }
 
-
-##' (Simulated) maximum likelihood estimation for nested Archimedean copulas
-##'
 ##' @title (Simulated) maximum likelihood estimation for nested Archimedean copulas
 ##' @param u matrix of realizations following the copula
 ##' @param cop outer_nacopula to be estimated
@@ -508,27 +507,6 @@ emle <- function(u, cop, n.MC=0, optimizer="optimize", method,
 
 ### Estimation wrapper #########################################################
 
-##' Computes the pseudo-observations for the given data matrix
-##'
-##' @title Pseudo-observations
-##' @param x matrix of random variates to be converted to pseudo-observations
-##' @param na.last passed to rank()
-##' @param ties.method passed to rank()
-##' @param lower.tail if FALSE, pseudo-observations when apply the empirical
-##'        marginal survival functions are returned.
-##' @return pseudo-observations (matrix of the same dimensions as x)
-##' @author Marius Hofert
-pobs <- function(x, na.last = "keep",
-		 ## formals(rank) works in pre-2015-10-15 and newer version of rank():
-		 ties.method = eval(formals(rank)$ties.method),
-		 lower.tail = TRUE) {
-    ties.method <- match.arg(ties.method)
-    U <- apply(x, 2, rank, na.last=na.last, ties.method=ties.method) / (nrow(x)+1)
-    if(lower.tail) U else 1-U
-}
-
-##' Computes different parameter estimates for a nested Archimedean copula
-##'
 ##' @title Estimation procedures for nested Archimedean copulas
 ##' @param u data matrix (of pseudo-observations or from the copula "directly")
 ##' @param cop outer_nacopula to be estimated

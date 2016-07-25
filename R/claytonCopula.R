@@ -14,7 +14,6 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-
 ## NB: For  d = dim = 2,   -1 <= param = theta = alpha < 0 is allowed
 ## --  psi() and iPsi() now ok
 
@@ -194,7 +193,7 @@ dRhoClaytonCopula <- function(copula) {
   claytondRho(alpha)
 }
 
-tailIndexClaytonCopula <- function(copula) {
+lambdaClaytonCopula <- function(copula) {
   alpha <- copula@parameters
   c(lower= if(alpha > 0) 2 ^ (-1/alpha) else 0,
     upper= 0)
@@ -252,7 +251,7 @@ setMethod("diPsi", signature("claytonCopula"),
 setMethod("tau", signature("claytonCopula"),
           function(copula) copClayton@tau(copula@parameters))
 setMethod("rho", signature("claytonCopula"), rhoClaytonCopula)
-setMethod("tailIndex", signature("claytonCopula"), tailIndexClaytonCopula)
+setMethod("lambda", signature("claytonCopula"), lambdaClaytonCopula)
 
 setMethod("iTau", signature("claytonCopula"),
           function(copula, tau) copClayton@iTau(tau))

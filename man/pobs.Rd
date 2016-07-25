@@ -9,15 +9,15 @@ pobs(x, na.last = "keep",
      ties.method = , lower.tail = TRUE)
 }
 \arguments{
-  \item{x}{\eqn{n\times d}{n x d}-matrix of random variates to be converted to
-    pseudo-observations.}
+  \item{x}{\eqn{n\times d}{n x d}-matrix (or \eqn{d}-vector) of random
+    variates to be converted to pseudo-observations.}
   \item{na.last, ties.method}{strings, passed to \code{\link{rank}}; see
     there.}
   \item{lower.tail}{\code{\link{logical}} which, if \code{FALSE},
     returns the pseudo-observations when applying the
     empirical marginal survival functions.}
 }
-\value{matrix of the same dimensions as \code{x} containing the
+\value{matrix (or vector) of the same dimensions as \code{x} containing the
   pseudo-observations.
 }
 \details{
@@ -35,7 +35,7 @@ pobs(x, na.last = "keep",
   avoid problems with density evaluation at the boundaries. Note that
   \code{pobs(, lower.tail=FALSE)} simply returns \code{1-pobs()}.
 }
-\author{Marius Hofert}
+%\author{Marius Hofert}
 \examples{
 ## Simple definition of the function:
 pobs

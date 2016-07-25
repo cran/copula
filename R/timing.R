@@ -50,7 +50,7 @@ nacFrail.time <- function(n, family, taus, digits=3, verbose=FALSE)
         if(verbose) cat("V0:  tau_0 = ",f.taus[i],
                         "; time = ", f(res[i,1]), " ms\n",sep="")
         if(i < l) for(j in (i+1):l) {   # run over all theta1
-            res[i,j] <- mTime(V01 <- cop@V01(V0,thetas[i], thetas[j]))
+            res[i,j] <- mTime(cop@V01(V0,thetas[i], thetas[j]))
             if(verbose) cat("  V01: tau_0 = ",f.taus[i],", tau_1 = ", f.taus[j],
                             "; time = ",f(res[i,j])," ms\n", sep="")
         }

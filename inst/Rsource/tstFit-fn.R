@@ -95,9 +95,11 @@ tstFit1cop <- function(cop, tau.set, n.set, N, verbose=TRUE, ...) {
 reshape.tstFit <- function(res, taunum=FALSE) {
   names(dimnames(res)) <- c("method","stat","n","tau")
   d <- cbind(expand.grid(dimnames(res),KEEP.OUT.ATTRS=FALSE), x=as.vector(res))
-  d[,"n"  ] <- as.numeric(vapply(strsplit(as.character(d[, "n" ]),split="="),`[`,"",2))
+  d[,"n"  ] <- as.numeric(vapply(strsplit(as.character(d[, "n" ]), split="="),
+                                 `[`, "", 2))
   if (taunum)
-    d[,"tau"] <- as.numeric(vapply(strsplit(as.character(d[,"tau"]),split="="),`[`,"",2))
+      d[,"tau"] <- as.numeric(vapply(strsplit(as.character(d[,"tau"]), split="="),
+                                     `[`, "", 2))
   d
 }
 

@@ -1,4 +1,5 @@
 \name{generator}
+\title{Generator Functions for Archimedean and Extreme-Value Copulas}
 \docType{methods}
 %----------------------Archimedean Copulas------------------
 % iPsi
@@ -47,7 +48,7 @@
 \alias{A,huslerReissCopula-method}
 \alias{A,tawnCopula-method}
 \alias{A,tevCopula-method}
-\alias{A,asymCopula-method}
+\alias{A,khoudrajiBivCopula-method}
 \alias{A,indepCopula-method}
 % dAdu
 \alias{AfunDer}%deprecated
@@ -59,7 +60,6 @@
 \alias{dAdu,tawnCopula-method}
 \alias{dAdu,tevCopula-method}
 % main
-\title{Generator Functions for Archimedean and Extreme-Value Copulas}
 \description{
   Methods to evaluate the generator function, the inverse generator
   function, and derivatives of the inverse of the generator function for
@@ -113,6 +113,7 @@ dAdu(copula, w)
   \code{dAdu()} returns a data.frame containing the 1st and 2nd
   derivative of \code{A()}.
 }
+%\author{Marius Hofert, Ivan Kojadinovic, Martin Maechler and Jun Yan}
 \references{
   Gudendorf, G. and Segers, J. (2009)
   {Nonparametric estimation of an extreme-value copula in arbitrary dimensions},

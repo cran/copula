@@ -25,7 +25,8 @@ AGumbel <- function(copula, w) .AGumbel(w, copula@parameters[1])
 
 dAduGumbel <- function(copula, w) {
   alpha <- copula@parameters[1]
-  ## deriv(expression((w^alpha + (1 - w)^alpha)^(1/alpha)), "w", hessian=TRUE)
+
+  ## deriv(expression((w^alpha + (1 - w)^alpha)^(1/alpha)), "w", hessian=TRUE):
   value <- eval(expression({
     .expr2 <- 1 - w
     .expr4 <- w^alpha + .expr2^alpha
@@ -121,21 +122,18 @@ rgumbelCopula <- function(n, copula) {
 pgumbelCopula <- function(copula, u) {
   dim <- copula@dimension
   if(!is.matrix(u)) u <- matrix(u, ncol = dim)
-  cdf <- copula@exprdist$cdf
   for (i in 1:dim) assign(paste0("u", i), u[,i])
-  alpha <- copula@parameters[1]
-  val <- eval(cdf)
-  pmax(val, 0)
+  alpha <- copula@parameters[1] # needed in eval():
+  pmax(0, eval(copula@exprdist$cdf))
 }
 
 dgumbelCopula <- function(u, copula, log=FALSE, ...) {
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-  pdf <- copula@exprdist$pdf
   dim <- copula@dimension
   for (i in 1:dim) assign(paste0("u", i), u[,i])
-  alpha <- copula@parameters[1]
   if(log) stop("'log=TRUE' not yet implemented")
-  eval(pdf)
+  alpha <- copula@parameters[1] # needed in eval():
+  eval(copula@exprdist$pdf)
 }
 
 dgumbelCopula.pdf <- function(u, copula, log=FALSE) {
@@ -155,7 +153,7 @@ tauGumbelCopula <- function(copula) {
   1 - 1/alpha
 }
 
-tailIndexGumbelCopula <- function(copula, ...) {
+lambdaGumbelCopula <- function(copula, ...) {
   alpha <- copula@parameters
   upper <- 2 - 2^(1/alpha)
   c(lower=0, upper=upper)
@@ -163,7 +161,7 @@ tailIndexGumbelCopula <- function(copula, ...) {
 
 
 iTauGumbelCopula <- function(copula, tau) {
-  if (any(tau < 0)) warning("tau is out of the range [0, 1]")
+  if (any(tau < 0)) warning("some tau < 0")
   ifelse(tau <= 0, 1, 1/(1 - tau))
 }
 
@@ -251,7 +249,7 @@ setMethod("diPsi", signature("gumbelCopula"),
 
 setMethod("tau", signature("gumbelCopula"), tauGumbelCopula)
 setMethod("rho", signature("gumbelCopula"), rhoGumbelCopula)
-setMethod("tailIndex", signature("gumbelCopula"), tailIndexGumbelCopula)
+setMethod("lambda", signature("gumbelCopula"), lambdaGumbelCopula)
 
 setMethod("iTau", signature("gumbelCopula"), iTauGumbelCopula)
 setMethod("iRho", signature("gumbelCopula"), iRhoGumbelCopula)

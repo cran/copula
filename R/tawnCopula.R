@@ -16,8 +16,8 @@
 
 ATawn <- function(copula, w) {
   alpha <- copula@parameters[1]
-  A <- alpha * w^2 - alpha * w + 1
-  ifelse(w == 0 | w == 1, 1, A)
+  ## return  A ; ifelse(w == 0 | w == 1, 1, A)
+  alpha * w*(w - 1) + 1 ## == alpha * w^2 - alpha * w + 1
 }
 
 dAduTawn <- function(copula, w) {
@@ -60,7 +60,7 @@ ptawnCopula <- function(u, copula) {
   dim <- copula@dimension
   for (i in 1:dim) assign(paste0("u", i), u[,i])
   has0 <- apply(u, 1, function(x) any(x <= 0)) # an ui = 0 would give NaN
-  alpha <- copula@parameters[1]
+  alpha <- copula@parameters[1] # used in  tawnCopula.cdf.algr :
   r <- c(eval(tawnCopula.cdf.algr[dim]))
   r[has0 & !is.na(has0)] <- 0
   r

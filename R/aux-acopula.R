@@ -14,8 +14,8 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-if(getRversion() < "2.15")
-paste0 <- function(...) paste(..., sep="")
+## if(getRversion() < "2.15")
+## paste0 <- function(...) paste(..., sep="")
 
 #### Functions and Methods for "acopula" objects
 #### class definition in ./AllClass.R
@@ -108,7 +108,7 @@ m.opt.retst <- function(V0) {
 ##' @param alpha parameter in (0,1]
 ##' @return St
 ##' @author Marius Hofert, Martin Maechler
-retstablerej <- function(m,V0,alpha) {
+retstablerej <- function(m, V0, alpha) {
     gamm. <- (cospi2(alpha)*V0/m)^(1/alpha)
     sum(unlist(lapply(integer(m),
 		      function(.) {
@@ -1094,7 +1094,7 @@ circRat <- function(e, d)
 	    r[l1] <- d
 	if(any(l2 <- !l1 & ((d2 <- (d-2)/3)*(e2 <- e*e) < eps)))
 	    r[l2] <- d*(1 - d1*e[l2])
-	if(any(l3 <- !l1 & !l2 & ((d3 <- (d-3)/4)*e*e2 < eps)))
+	if(any(l3 <- !l1 & !l2 & ((d-3)/4 * e*e2 < eps)))
 	    r[l3] <- d*(1 - d1*e[l3]*(1 - d2*e[l3]))
 	## and for the remaining ones, we afford a little precision loss:
 	if(any(lrg <- !l1 & !l2 & !l3)) {
@@ -1171,13 +1171,13 @@ dimU <- function(u) {
 }
 
 
-
 ##' Conditional copula function C(u[,d]|u[,1],...,u[,d-1])
 ##'
 ##' @title Conditional copula function
 ##' @param u (n x d)-matrix of evaluation points (first d-1 columns are conditioned on)
 ##' @param cop an outer_nacopula
 ##' @param n.MC Monte Carlo sample size
+##'        => NOT USED ANYMORE
 ##' @param log if TRUE the logarithm of the conditional copula is returned
 ##' @author Marius Hofert
 cacopula <- function(u, cop, n.MC=0, log=FALSE) {
@@ -1187,8 +1187,9 @@ cacopula <- function(u, cop, n.MC=0, log=FALSE) {
 
     .Deprecated("cCopula")
     d <- ncol(u)
-    drop(rtrafo(u, cop=cop, j.ind = d, n.MC=n.MC, log=log))
+    drop(cCopula(u, copula = cop, indices = d, log = log))
 }
+
 
 ##' Function which computes absdPsi via Monte Carlo
 ##'
@@ -1266,7 +1267,7 @@ psiDabsMC <- function(t, family, theta, degree=1, n.MC,
                       method=c("log", "direct", "pois.direct", "pois"),
                       log = FALSE, is.log.t = FALSE)
 {
-    .Deprecated("absdPsiMC")
+    .Defunct("absdPsiMC")
     absdPsiMC(t, family=family, theta=theta, degree=degree, n.MC=n.MC,
                       method=method, log=log, is.log.t)
 }
@@ -1459,6 +1460,46 @@ printNacopula <-
 
 setMethod(show, "nacopula", function(object) printNacopula(object))
 
+
+##' (hidden) utility for getAname() and getAcop()
+archm2ch <- function(class) {
+    if(extends(class, "indepCopula"))## FIXME? do not want full family object!
+        stop("independence copula not implemented as Archimedean family")
+    if(extends(class, "claytonCopula")) "C" else
+    if(extends(class, "frankCopula"))   "F" else
+    if(extends(class, "amhCopula"))     "A" else
+    if(extends(class, "joeCopula"))     "J" else
+    if(extends(class, "gumbelCopula"))  "G" else
+    stop("invalid archmCopula class: ", class)
+}
+
+
+##' Get the *name* of "acopula" family objects, typically from
+##'
+##' @title Get Name of "acopula" Family Objects
+##' @param family either character string (short or longer form of
+##'	 copula family name), or an "archmCopula" or "acopula" object
+##' @return string: the name one of our "acopula" objects
+##' @author Martin Maechler
+getAname <- function(family, objName=FALSE) {
+    if(is.character(family)) {
+	stopifnot(length(family) == 1)
+	if((nf <- nchar(family)) <= 2) # it's a short name
+	    family <- .ac.longNames[[family]]
+	else if (nf >= 8 && grepl("Copula$", family))
+	    family <- names(which(.ac.classNames == family))
+    } else {
+	cl <- getClass(class(family))# so the extends(.) below are fast
+	family <-
+	    if(extends(cl, "acopula"))
+		family@name
+	    else if(extends(cl, "archmCopula"))
+		.ac.longNames[[archm2ch(cl)]]
+	else stop("'family' must be an \"archmCopula\" or \"acopula\" object or family name")
+    }
+    if(objName) .ac.objNames[[family]] else family
+}
+
 ##' Get one of our "acopula" family objects by name
 ##'
 ##' @title Get one of our "acopula" family objects by name
@@ -1473,7 +1514,7 @@ getAcop <- function(family, check=TRUE) {
     if(is.character(family)) {
 	stopifnot(length(family) == 1)
 	if((nf <- nchar(family)) <= 2) # it's a short name
-	    family <- .ac.longNames[family]
+	    family <- .ac.longNames[[family]]
 	else if (nf >= 8 && grepl("Copula$", family))
 	    family <- names(which(.ac.classNames == family))
 	COP <- get(.ac.objNames[family]) # envir = "package:copula"
@@ -1484,17 +1525,8 @@ getAcop <- function(family, check=TRUE) {
 	cl <- getClass(class(family))# so the extends(.) below are fast
 	if(extends(cl, "acopula"))
 	    family
-	else if(extends(cl, "archmCopula")) {
-	    if(extends(cl, "indepCopula"))## FIXME? do not want full family object!
-		stop("independence copula not implemented as Archimedean family")
-	    ## now use short family names
-	    getAcop(if(extends(cl, "claytonCopula")) "C" else
-		    if(extends(cl, "frankCopula"))   "F" else
-		    if(extends(cl, "amhCopula"))     "A" else
-		    if(extends(cl, "joeCopula"))     "J" else
-		    if(extends(cl, "gumbelCopula"))  "G" else
-		    stop("invalid archmCopula class: ", cl))
-	}
+	else if(extends(cl, "archmCopula"))
+	    getAcop(archm2ch(cl))
 	else stop("'family' must be an \"archmCopula\" or \"acopula\" object or family name")
     }
 }

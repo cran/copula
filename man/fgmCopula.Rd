@@ -24,6 +24,7 @@ fgmCopula(param, dim = 2)
   The random number generation needs to be properly tested, especially
   for dimensions higher than 2.
 }
+%\author{Ivan Kojadinovic and Jun Yan}
 \references{
   Nelsen, R. B. (2006), \emph{An introduction to Copulas}, Springer, New York.
 }

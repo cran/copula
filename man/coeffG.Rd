@@ -44,9 +44,7 @@ coeffG(d, alpha,
     k in 1..d.
   }
 }
-\author{
-  Marius Hofert and Martin Maechler
-}
+%\author{Marius Hofert and Martin Maechler}
 \note{There are still known numerical problems (with non-"Rmpfr" methods; and
   those are slow), e.g., for d=100,
   alpha=0.8 and  \eqn{sign(s(n,k)) = (-1)^{n-k}}{sign(s(n,k)) = (-1)^(n-k)}.

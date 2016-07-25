@@ -8,7 +8,8 @@
 \alias{iRho}
 \alias{calibKendallsTau}
 \alias{calibSpearmansRho}
-\alias{tailIndex}
+\alias{tailIndex}% Deprecated for
+\alias{lambda}
 
 \alias{tau-methods}
 \alias{tau,ANY-method}
@@ -31,6 +32,7 @@
 \alias{tau,evCopula-method}
 \alias{tau,acopula-method}
 \alias{tau,nacopula-method}
+\alias{tau,rotCopula-method}
 
 \alias{rho-methods}
 \alias{rho,ANY-method}
@@ -51,21 +53,24 @@
 \alias{rho,evCopula-method}
 \alias{rho,acopula-method}
 \alias{rho,nacopula-method}
+\alias{rho,rotCopula-method}
 
-\alias{tailIndex-methods}
-\alias{tailIndex,ANY-method}
-\alias{tailIndex,copula-method}
-\alias{tailIndex,evCopula-method}
-\alias{tailIndex,claytonCopula-method}
-\alias{tailIndex,frankCopula-method}
-\alias{tailIndex,gumbelCopula-method}
-\alias{tailIndex,indepCopula-method}
-\alias{tailIndex,amhCopula-method}
-\alias{tailIndex,joeCopula-method}
-\alias{tailIndex,normalCopula-method}
-\alias{tailIndex,tCopula-method}
-\alias{tailIndex,acopula-method}
-\alias{tailIndex,nacopula-method}
+\alias{lambda-methods}
+\alias{lambda,ANY-method}
+\alias{lambda,copula-method}
+\alias{lambda,evCopula-method}
+\alias{lambda,claytonCopula-method}
+\alias{lambda,frankCopula-method}
+\alias{lambda,gumbelCopula-method}
+\alias{lambda,indepCopula-method}
+\alias{lambda,amhCopula-method}
+\alias{lambda,joeCopula-method}
+\alias{lambda,plackettCopula-method}
+\alias{lambda,normalCopula-method}
+\alias{lambda,tCopula-method}
+\alias{lambda,acopula-method}
+\alias{lambda,nacopula-method}
+\alias{lambda,rotCopula-method}
 
 \alias{iTau-methods}
 \alias{iTau,ANY-method}
@@ -86,6 +91,7 @@
 \alias{iTau,tevCopula-method}
 \alias{iTau,nacopula-method}
 \alias{iTau,acopula-method}
+\alias{iTau,rotCopula-method}
 
 \alias{iRho-methods}
 \alias{iRho,ANY-method}
@@ -103,6 +109,9 @@
 \alias{iRho,plackettCopula-method}
 \alias{iRho,fgmCopula-method}
 \alias{iRho,nacopula-method}
+\alias{iRho,rotCopula-method}
+
+
 \title{Dependence Measures for Bivariate Copulas}
 \description{
   These functions compute Kendall's tau, Spearman's rho, and the tail
@@ -114,7 +123,7 @@
 \usage{
 tau (copula, \dots)
 rho (copula, \dots)
-tailIndex(copula, \dots)
+lambda(copula, \dots)
 iTau (copula, tau, \dots)
 iRho (copula, rho, \dots)
 }
@@ -138,6 +147,7 @@ iRho (copula, rho, \dots)
   calibration function based on Spearman's rho uses the corresponding
   expression for the normal copula as an approximation.
 }
+%\author{Marius Hofert, Ivan Kojadinovic, Martin Maechler and Jun Yan}
 \references{
   E.W. Frees and E.A. Valdez (1998)
   Understanding relationships using copulas.
@@ -151,7 +161,7 @@ iRho (copula, rho, \dots)
 \seealso{
   The \code{\linkS4class{acopula}} class objects have slots,
   \code{tau}, \code{lambdaL}, and \code{lambdaU} providing functions for
-  \code{tau()}, and the two tail indices \code{tailIndex()},
+  \code{tau()}, and the two tail indices \code{lambda()},
   and slot \code{iTau} for \code{iTau()}, see the
   examples and \code{\link{copGumbel}}, etc.
 }
@@ -159,12 +169,12 @@ iRho (copula, rho, \dots)
 gumbel.cop <- gumbelCopula(3)
 tau(gumbel.cop)
 rho(gumbel.cop)
-tailIndex(gumbel.cop)
+lambda(gumbel.cop)
 iTau(joeCopula(), 0.5)
 %%--- more "tests" are in ../tests/moments.R
 stopifnot(all.equal(tau(gumbel.cop), copGumbel@tau(3)),
 
-          all.equal(tailIndex(gumbel.cop),
+          all.equal(lambda(gumbel.cop),
                     c(copGumbel@lambdaL(3), copGumbel@lambdaU(3)),
                     check.attributes=FALSE),
 

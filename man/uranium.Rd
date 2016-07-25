@@ -23,6 +23,7 @@
     \item{\code{Ti}}{(numeric) log concentration of Titanium.}
   }
 }
+%\author{Ivan Kojadinovic and Jun Yan}
 \references{
   Cook, R. D.  and  Johnson, M. E. (1986)
   Generalized BurrParetologistic distributions with applications to a

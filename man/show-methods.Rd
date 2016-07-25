@@ -20,8 +20,8 @@
       Using \code{\link{print}()} instead, allows to set \code{digits}, e.g.}
     \item{object = "fitMvdc"}{see \code{\link{fitCopula}}. }
 }}
+%\author{Marius Hofert, Ivan Kojadinovic, Martin Maechler and Jun Yan}
 %\examples{
-
 %}
 \keyword{methods}
 \keyword{print}

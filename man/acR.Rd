@@ -37,7 +37,7 @@ qacR(p, family, theta, d, log.p = FALSE, interval,
 }
 \value{The distribution function of the radial part evaluated at
   \code{x}, or its inverse, the quantile at \code{p}.}
-\author{Marius Hofert}
+%\author{Marius Hofert}
 \references{
   McNeil, A. J., G. \enc{Nešlehová}{Neslehova}, J. (2009).
   Multivariate Archimedean copulas, \eqn{d}-monotone functions and

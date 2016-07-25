@@ -74,7 +74,7 @@
 {
     ## checking
     stopifnot(is.array(gcu.u), is.numeric(gcu.u), length(dc <- dim(gcu.u)) == 3,
-	      dc == c((n <- dc[1]), (d <- dc[2]), d), d>=2)
+	      dc == c(dc[1], (d <- dc[2]), d), d >= 2)
 
     panel <- match.fun(panel)
     if(d * d > 500 - 3 && getRversion() < "3.0.0")

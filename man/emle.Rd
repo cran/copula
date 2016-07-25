@@ -71,7 +71,7 @@ emle(u, cop, n.MC=0, optimizer="optimize", method,
       estimator (does not confidence intervals but is typically faster).}
   }
 }
-\author{Martin Maechler, Marius Hofert.}
+%\author{Martin Maechler and Marius Hofert}
 \references{
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2012).
   Likelihood inference for Archimedean copulas in high dimensions

@@ -14,6 +14,7 @@ indepCopula(dim = 2)
 \value{
   An independence copula object of class \code{"\linkS4class{indepCopula}"}.
 }
+%\author{Ivan Kojadinovic and Jun Yan}
 \seealso{\code{\link{archmCopula}}, \code{\link{ellipCopula}},
   \code{\link{evCopula}}.}
 \examples{

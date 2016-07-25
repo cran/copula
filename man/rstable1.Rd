@@ -44,12 +44,12 @@ rstable1(n, alpha, beta, gamma = 1, delta = 0, pm = 1)
   delta are straightforward scale and shift parameters.  This
   representation is continuous in all 4 parameters.
 }
-\author{
-  Diethelm Wuertz wrote \code{\link[stabledist]{rstable}} (now in
-  package \pkg{stabledist}) for Rmetrics;
-  Martin Maechler vectorized it (also in \code{alpha},\dots), fixed it
-  for \eqn{\alpha=1,\beta\ne 0}{alpha = 1, beta != 0} and sped it up.
-}
+%% \author{
+%%   Diethelm Wuertz wrote \code{\link[stabledist]{rstable}} (now in
+%%   package \pkg{stabledist}) for Rmetrics;
+%%   Martin Maechler vectorized it (also in \code{alpha},\dots), fixed it
+%%   for \eqn{\alpha=1,\beta\ne 0}{alpha = 1, beta != 0} and sped it up.
+%% }
 \seealso{\code{\link[stabledist]{rstable}} which also allows the
   2-parametrization and provides further functionality for
   stable distributions.

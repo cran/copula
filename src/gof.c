@@ -33,6 +33,7 @@
 #include "An.h"
 #include "gof.h"
 #include "empcop.h"
+#include "indepTests.h" // for progress bar
 
 /**
  * Cramer-von Mises test statistic
@@ -84,13 +85,15 @@ void cramer_vonMises_grid(int *p, double *U, int *n, double *V, int *m,
  * @param n sample size
  * @param G grid (g x p)
  * @param g grid size
+ * @param b bandwidth for partial derivative estimation
  * @param influ influence matrix (g x n)
+ * @param denom "denominator" n-vector for Rn approach
  * @param N number of multiplier replications
  * @param s0 N replications of the test statistic
  * @author Ivan Kojadinovic
  */
-void multiplier(int *p, double *U, int *n, double *G, int *g,
-		double *influ, int *N, double *s0)
+void multiplier(int *p, double *U, int *n, double *G, int *g, double *b,
+		double *influ, double *denom, int *N, double *s0, int *verbose)
 {
   int i, j, k, l, ind;
   double invsqrtn = 1.0/sqrt(*n);
@@ -109,11 +112,11 @@ void multiplier(int *p, double *U, int *n, double *G, int *g,
         }
       for (k = 0; k < *p; k++)
         {
-	  v1[k] += invsqrtn;
-	  v2[k] -= invsqrtn;
-	  der[k] = der_multCn(U, *n, *p, v1, v2, 2 * invsqrtn);
-	  v1[k] -= invsqrtn;
-	  v2[k] += invsqrtn;
+	  v1[k] += *b;
+	  v2[k] -= *b;
+	  der[k] = der_multCn(U, *n, *p, v1, v2, 2.0 * (*b));
+	  v1[k] -= *b;
+	  v2[k] += *b;
 	}
 
       for (i = 0; i < *n; i++) /* loop over the data */
@@ -155,11 +158,15 @@ void multiplier(int *p, double *U, int *n, double *G, int *g,
 	{
 	  double process = 0.0;
 	  for (i=0; i<*n; i++)
-	    process += (random[i] - mean) * influ_mat[i + j * (*n)]
-	      - random[i] * influ[j + i * (*g)];
+	      process += ((random[i] - mean) * influ_mat[i + j * (*n)]
+			  - random[i] * influ[j + i * (*g)]) / denom[j];
 	  s0[l] += process * process;
 	}
       s0[l] /= *g;
+
+      /* update progress bar */
+      if (*verbose)
+	  progressBar(l, *N, 70);
     }
 
   PutRNGstate();

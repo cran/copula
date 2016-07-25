@@ -151,7 +151,7 @@ dfrankCopula.pdf <- function(u, copula, log=FALSE) {
   if (dim > 6) stop("Frank copula PDF not implemented for dimension > 6.")
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   for (i in 1:dim) assign(paste0("u", i), u[,i])
-  alpha <- copula@parameters[1]
+  alpha <- copula@parameters[1] # used in 'frankCopula.pdf.algr'
   ## FIXME: improve log-case
   if(log)
     log(c(eval(frankCopula.pdf.algr[dim])))
@@ -240,7 +240,7 @@ setMethod("diPsi", signature("frankCopula"),
 
 setMethod("tau", signature("frankCopula"), tauFrankCopula)
 setMethod("rho", signature("frankCopula"), rhoFrankCopula)
-setMethod("tailIndex", signature("frankCopula"), function(copula) c(lower=0, upper=0))
+setMethod("lambda", signature("frankCopula"), function(copula) c(lower=0, upper=0))
 
 setMethod("iTau", signature("frankCopula"),
 	  function(copula, tau, tol = 1e-7) copFrank@iTau(tau, tol=tol))

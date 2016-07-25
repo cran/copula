@@ -33,15 +33,15 @@ gnacopula(u, cop, n.bootstrap,
     applies to \code{trafo="Hering.Hofert"}.}
   \item{n.MC}{parameter \code{n.MC} for \code{\link{htrafo}()} (and thus
     for \code{\link{K}()}) if \code{trafo="Hering.Hofert"} and for
-    \code{\link{rtrafo}()} if \code{trafo="Rosenblatt"}.}
+    \code{\link{cCopula}()} if \code{trafo="Rosenblatt"}.}
   \item{trafo}{a \code{\link{character}} string specifying the multivariate
     transformation performed for goodness-of-fit testing, which has to be one
     (or a unique abbreviation) of
     \describe{
       \item{\code{"Hering.Hofert"}}{for the multivariate transformation of
 	Hering and Hofert (2011); see \code{\link{htrafo}()}.}
-      \item{\code{"Hering.Hofert"}}{for the multivariate transformation of
-	Rosenblatt (1952); see \code{\link{rtrafo}()}.}
+      \item{\code{"Rosenblatt"}}{for the multivariate transformation of
+	Rosenblatt (1952); see \code{\link{cCopula}()}.}
     }
   }
   \item{method}{a \code{\link{character}} string specifying the
@@ -56,7 +56,7 @@ gnacopula(u, cop, n.bootstrap,
   transformation given by \code{trafo} specifies the multivariate
   transformation which is first applied to the (copula-) data \code{u}
   (typically, the pseudo-observations are used); see
-  \code{\link{htrafo}()} or \code{\link{rtrafo}()} for more details. The
+  \code{\link{htrafo}()} or \code{\link{cCopula}()} for more details. The
   argument \code{method} specifies the particular goodness-of-fit test
   carried out, which is either the Anderson-Darling test for the
   univariate standard uniform distribution (for \code{method="AnChisq"} or
@@ -99,7 +99,7 @@ gnacopula(u, cop, n.bootstrap,
       for each bootstrap replication.}
   }
 }
-\author{Marius Hofert, Martin Maechler.}
+%\author{Marius Hofert and Martin Maechler}
 \references{
   Genest, C., R\enc{é}{e}millard, B., and Beaudoin, D. (2009),
   Goodness-of-fit tests for copulas: A review and a power study
@@ -120,8 +120,7 @@ gnacopula(u, cop, n.bootstrap,
 }
 \seealso{
   \code{\link{gofTstat}()} for the implemented test statistis,
-  \code{\link{gtrafo}()} for the multivariate transformation(s)
-  \code{\link{htrafo}()} and \code{\link{rtrafo}()} involved and
+  \code{\link{htrafo}()} and \code{\link{cCopula}()} involved and
   \code{\link{K}()} for the Kendall distribution function.
 
   \code{\link{gofCopula}()} for other (parametric bootstrap) based

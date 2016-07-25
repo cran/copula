@@ -13,8 +13,8 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
-setClass("fitMvdc", representation(mvdc = "mvdc"),
-	 contains="fittedMV" #-> ./Classes.R
+setClass("fitMvdc", contains = "fittedMV", #-> ./Classes.R
+         slots = c(mvdc = "mvdc")
 	 ## FIXME , validity = function(object) TRUE
 	 )
 
@@ -114,20 +114,13 @@ setMvdcPar <- function(mvdc, param) {
     mvdc
 }
 
-loglikMvdc <- function(param, x, mvdc, hideWarnings) {
-  if(!missing(hideWarnings))
-      warning("'hideWarnings' is deprecated and has no effect here anymore")
-  ##       use suppressMessages() otherwise {and live without  "fitMessages"}
-
+loglikMvdc <- function(param, x, mvdc) {
   mvdc <- setMvdcPar(mvdc, param)
-
   loglik <- tryCatch(sum(log(dMvdc(x, mvdc))), error = function(e) e)
-
   if(is(loglik, "error")) {
       warning("error in loglik computation: ", loglik$message)
-      (-Inf)# was NaN
-  }
-  else loglik
+      (-Inf) # was NaN
+  } else loglik
 }
 
 fitMvdc <- function(data, mvdc, start,
@@ -148,24 +141,13 @@ fitMvdc <- function(data, mvdc, start,
     control <- control[ !vapply(control, is.null, NA)]
 
     ## messageOut may be used for debugging
-    if (hideWarnings) {
-	messageOut <- textConnection("fitMessages", open="w", local=TRUE)
-	sink(messageOut); sink(messageOut, type="message")
-	oop <- options(warn = -1) ## ignore warnings; can be undesirable!
-	on.exit({ options(oop); sink(type="message"); sink(); close(messageOut)})
-    }
-
+    (if(hideWarnings) suppressWarnings else identity)(
     fit <- optim(start, loglikMvdc,
-		 ## loglikMvdc args :
+		 ## loglikMvdc args:
 		 mvdc=mvdc, x=data,
 		 ## optim args:
 		 method=method, control=control, lower=lower, upper=upper)
-
-    if (hideWarnings) {
-	options(oop); sink(type="message"); sink()
-	on.exit()
-        close(messageOut)
-    }
+    )
 
     if (fit$convergence > 0)
 	warning("possible convergence problem: optim gave code=", fit$convergence)

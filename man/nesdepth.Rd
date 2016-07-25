@@ -15,6 +15,7 @@ nesdepth(x)
 \value{an integer, the nesting depth of the nested Archimedean copula.
   An (unnested) Archimedean copula has depth \code{1}.
 }
+%\author{Marius Hofert and Martin Maechler}
 \seealso{
   \code{\link[=nacopula-class]{dim}} of nacopulas.
 }

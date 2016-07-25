@@ -68,6 +68,7 @@ rMvdc(n, mvdc)
 %   Yan (2007). Enjoy the joy of copulas. \emph{Journal of Statistical
 %     Software}, 21(4): 1--21.
 % }
+%\author{Ivan Kojadinovic and Jun Yan}
 \seealso{
   \code{\link{ellipCopula}},
   \code{\link{archmCopula}};
@@ -97,10 +98,10 @@ op <- par(mfcol=c(1,2))
 pp <- persp(mv.NE, pMvdc, xlim = c(-5,5), ylim=c(0,2),
             main = "pMvdc(mv.NE)", ticktype="detail")
 %% FIXME: provide "empiricalCopula" .. with persp() method, see ../TODO !!
-px <- copula:::perspMvdc(x.samp, fun = F.n, xlim = c(-5,5), ylim=c(0,2),
+px <- copula:::perspMvdc(x.samp, FUN = F.n, xlim = c(-5, 5), ylim = c(0, 2),
                          main = "F.n(x.samp)", ticktype="detail")
 par(op)
-all.equal(px, pp)# about 5\% difference 
+all.equal(px, pp)# about 5\% difference
 \dontshow{stopifnot(all.equal(px, pp, tolerance = 0.08))}
 }
 \keyword{distribution}

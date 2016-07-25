@@ -61,7 +61,7 @@ Eulerian.all (n)
 %% for large n, and hence as to *switch* for n >= n.max
 
 }
-\author{Martin Maechler ("direct": May 1992)}
+%\author{Martin Maechler ("direct": May 1992)}
 \references{
   \bold{Eulerians:}
 

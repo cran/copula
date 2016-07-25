@@ -13,9 +13,11 @@
   parametric bootstrap.
 }
 \usage{
-gofEVCopula(copula, x, N = 1000, method = "mpl",
-            estimator = "CFG", m = 1000, verbose = TRUE,
-            print.every = NULL, optim.method = "Nelder-Mead")
+gofEVCopula(copula, x, N = 1000,
+            method = c("mpl", "ml", "itau", "irho"),
+            estimator = c("CFG", "Pickands"), m = 1000,
+            verbose = interactive(),
+            optim.method = "BFGS")
 }
 \arguments{
   \item{copula}{ object of class \code{"\linkS4class{evCopula}"}
@@ -33,13 +35,20 @@ gofEVCopula(copula, x, N = 1000, method = "mpl",
     \code{"CFG"} (Caperaa-Fougeres-Genest) or  \code{"Pickands"}.}
   \item{m}{ number of points of the uniform grid on [0,1] used to
     compute the test statistic numerically.}
-  \item{print.every}{ is deprecated in favor of \code{verbose}.}
   \item{verbose}{a logical specifying if progress of the bootstrap
     should be displayed via \code{\link[utils]{txtProgressBar}}.}
-  \item{optim.method}{ the method for \code{"\link{optim}"}. }
+  \item{optim.method}{a string, the \code{method} for
+    \code{\link{optim}()}.  In \pkg{copula} versions \code{0.999-14} and
+    earlier, the default was \code{"Nelder-Mead"}, but now is set to the
+    same as for \code{\link{fitCopula}()}.}
+%% Notably, that gave tons of warnings
+%%  one-dimensional optimization by Nelder-Mead is unreliable: use "Brent" or optimize() directly
 }
 \details{
   More details can be found in the second reference.
+
+  The former argument \code{print.every} is deprecated and not
+  supported anymore; use \code{verbose} instead.
 }
 \value{
   An object of \code{\link{class}} \code{htest} which is a list,
@@ -50,9 +59,10 @@ gofEVCopula(copula, x, N = 1000, method = "mpl",
     copula family. }
 }
 \note{
-  For a given degree of dependence, the most popular extreme-value
-  copulas are strikingly similar.
+  For a given degree of dependence, the most popular bivariate
+  extreme-value copulas are strikingly similar.
 }
+%\author{Ivan Kojadinovic and Jun Yan}
 \references{
   Genest, C. and Segers, J. (2009). Rank-based inference for bivariate
   extreme-value copulas. \emph{Annals of Statistics} \bold{37}, 2990--3022.
@@ -65,29 +75,33 @@ gofEVCopula(copula, x, N = 1000, method = "mpl",
   \code{\link{evTestK}}, \code{\link{gofCopula}}, \code{\link{An}}.
 }
 \examples{
-\dontrun{% because the bootstraps are slow, particularly for the non-Gumbel ones
-x <- rCopula(100, claytonCopula(3))
+n <- 100; N <- 1000 # realistic (but too large currently for CRAN checks)
+n <-  60; N <-  200 # (for now)
+x <- rCopula(n, claytonCopula(3))
 
+\donttest{% because the bootstraps are slow,..
 ## Does the Gumbel family seem to be a good choice?
-gofEVCopula(gumbelCopula(1), x)
-
-## The same with different estimation methods
-gofEVCopula(gumbelCopula(1), x, method="itau")
-gofEVCopula(gumbelCopula(1), x, method="irho")
-
-## The same with different extreme-value copulas
-gofEVCopula(galambosCopula(1), x)
-gofEVCopula(galambosCopula(1), x, method="itau")
-gofEVCopula(galambosCopula(1), x, method="irho")
-
-gofEVCopula(huslerReissCopula(1), x)
-gofEVCopula(huslerReissCopula(1), x, method="itau")
-gofEVCopula(huslerReissCopula(1), x, method="irho")
-
-gofEVCopula(tevCopula(0, df.fixed=TRUE), x)
-gofEVCopula(tevCopula(0, df.fixed=TRUE), x, method="itau")
-gofEVCopula(tevCopula(0, df.fixed=TRUE), x, method="irho")
+gofEVCopula(gumbelCopula(), x)
 }
+
+## The same with different (and cheaper) estimation methods:
+gofEVCopula(gumbelCopula(), x, N=N, method="itau")
+gofEVCopula(gumbelCopula(), x, N=N, method="irho")
+
+\donttest{% non-gumbel bootstraps are slow
+## The same with different extreme-value copulas
+gofEVCopula(galambosCopula(), x)
+gofEVCopula(galambosCopula(), x, method="itau")
+gofEVCopula(galambosCopula(), x, method="irho")
+
+gofEVCopula(huslerReissCopula(), x)
+gofEVCopula(huslerReissCopula(), x, method="itau")
+gofEVCopula(huslerReissCopula(), x, method="irho")
+
+gofEVCopula(tevCopula(df.fixed=TRUE), x)
+gofEVCopula(tevCopula(df.fixed=TRUE), x, method="itau")
+gofEVCopula(tevCopula(df.fixed=TRUE), x, method="irho")
+}% dont..
 }
 \keyword{htest}
 \keyword{models}

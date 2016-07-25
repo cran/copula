@@ -69,7 +69,7 @@ emde(u, cop,
   \code{\link{list}} as returned by \code{\link{optimize}}, including the
   minimum distance estimator.
 }
-\author{Marius Hofert}
+%\author{Marius Hofert}
 \references{
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2013).
   Archimedean Copulas in High Dimensions: Estimators and Numerical

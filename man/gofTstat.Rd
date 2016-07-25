@@ -29,7 +29,7 @@ gofTstat(u, method = c("Sn", "SnB", "SnC", "AnChisq", "AnGamma"),
       \item{\code{"AnChisq"}}{Anderson-Darling test statistic for
 	computing (supposedly) \eqn{\mathrm{U}[0,1]}{U[0,1]}-distributed
 	(under \eqn{H_0}) random variates via the distribution function
-	of chi-square distribution with \eqn{d}
+	of the chi-square distribution with \eqn{d}
 	degrees of freedom. To be more precise, the Anderson-Darling
 	test statistc of the variates
 	\deqn{\chi_d^2\Bigl(\sum_{j=1}^d(\Phi^{-1}(u_{ij}))^2\Bigr)}{%
@@ -63,7 +63,7 @@ gofTstat(u, method = c("Sn", "SnB", "SnC", "AnChisq", "AnGamma"),
 \value{
   The value of the test statistic, a \code{\link{numeric}}.
 }
-\author{Marius Hofert, Martin Maechler.}
+%\author{Marius Hofert and Martin Maechler}
 \references{
   Genest, C., R\enc{é}{e}millard, B., and Beaudoin, D. (2009),
   Goodness-of-fit tests for copulas: A review and a power study
@@ -94,8 +94,8 @@ U <- rCopula(1000, cop)
 
 ## compute Sn (as is done in a parametric bootstrap, for example)
 Uhat <- pobs(U) # pseudo-observations
-u <- rtrafo(Uhat, cop) # Rosenblatt transformed data (with correct copula)
-gofTstat(u, method="Sn", copula=cop) # compute test statistic Sn; requires copula argument
+u <- cCopula(Uhat, copula = cop) # Rosenblatt transformed data (with correct copula)
+gofTstat(u, method = "Sn", copula = cop) # compute test statistic Sn; requires copula argument
 }
 \keyword{htest}
 \keyword{goodness-of-fit}

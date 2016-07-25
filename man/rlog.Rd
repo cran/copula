@@ -29,7 +29,7 @@
   implementation of \code{rlog}.  However, \code{rlogR} is not as fast as
   \code{rlog} (the latter being implemented in C).
 }
-\author{Marius Hofert, Martin Maechler}
+%\author{Marius Hofert and Martin Maechler}
 \references{
   Kemp, A. W. (1981),
   Efficient Generation of Logarithmically Distributed Pseudo-Random Variables,

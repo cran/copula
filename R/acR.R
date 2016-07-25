@@ -1,4 +1,4 @@
-## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
+## Copyright (C) 2012, 2015 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
 ## This program is free software; you can redistribute it and/or modify it under
 ## the terms of the GNU General Public License as published by the Free Software
@@ -83,7 +83,7 @@ pacR <- function(x, family, theta, d, lower.tail = TRUE, log.p = FALSE, ...)
 qacR <- function(p, family, theta, d, log.p = FALSE, interval,
                  tol=.Machine$double.eps^0.25, maxiter=1000, ...)
 {
-    stopifnot(family %in% .ac.longNames, d >= 1, (n <- length(p)) >= 1, 0 < p,  p < 1)
+    stopifnot(family %in% .ac.longNames, d >= 1, length(p) >= 1, 0 < p,  p < 1)
     if(log.p) p <- exp(p) # not very efficient yet
     y <- log1p(-p) # to be able to work with highest precision with pacR()
     f <- function(x, y) pacR(x, family=family, theta=theta, d=d, lower.tail=FALSE, log.p=TRUE, ...) - y

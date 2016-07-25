@@ -20,7 +20,7 @@ dDiag(u, cop, log=FALSE)
 \value{
   A \code{\link{numeric}} vector containing the values of the density of the
   diagonal of the Archimedean copula at \code{u}.}
-\author{Martin Maechler, Marius Hofert}
+%\author{Marius Hofert, Martin Maechler}
 \references{
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2013).
   Archimedean Copulas in High Dimensions: Estimators and Numerical

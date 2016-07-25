@@ -43,7 +43,7 @@ retstableR(alpha, V0, h = 1)
   A vector of variates from \eqn{\tilde{S}(\alpha, 1, .....)}{%
     tS(alpha, 1, .....)}; see above.
 }
-\author{Marius Hofert, Martin Maechler}
+%\author{Marius Hofert and Martin Maechler}
 \seealso{
  \code{\link{rstable1}} for sampling stable distributions.
 }

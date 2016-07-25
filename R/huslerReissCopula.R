@@ -90,18 +90,17 @@ huslerReissCopula <- function(param = NA_real_) {
 
 
 phuslerReissCopula <- function(u, copula) {
-  dim <- copula@dimension
-  u1 <- u[,1]
-  u2 <- u[,2]
-  alpha <- copula@parameters[1]
+  ## dim = 2 :
   ## Joe (1997, p.142)
-  u1p <- -log(u1); u2p <- -log(u2)
+  u1p <- -log(u[,1])
+  u2p <- -log(u[,2])
+  alpha <- copula@parameters[1]
   exp(- u1p * pnorm(1/alpha + 0.5 * alpha * log(u1p / u2p))
       - u2p * pnorm(1/alpha + 0.5 * alpha * log(u2p / u1p)))
 }
 
 dhuslerReissCopula <- function(u, copula, log=FALSE, ...) {
-  dim <- copula@dimension
+  ## always 2-dim: dim <- copula@dimension
   u1 <- u[,1]
   u2 <- u[,2]
   alpha <- copula@parameters[1]

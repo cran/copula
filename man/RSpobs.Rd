@@ -56,7 +56,7 @@ RSpobs(x, do.pobs = TRUE, method = c("ellip", "archm"), ...)
   uniform distribution on the unit sphere/simplex is described in
   Genest, Hofert, G. \enc{Nešlehová}{Neslehova} (2014).
 }
-\author{Marius Hofert}
+%\author{Marius Hofert}
 \references{
   Genest, C., Hofert, M., G. \enc{Nešlehová}{Neslehova}, J., (2014).
   Is the dependence Archimedean, elliptical, or what?

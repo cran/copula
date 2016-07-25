@@ -32,7 +32,7 @@ evCopula <- function(family, param = NA_real_, dim = 2L, ...) {
 	 stop("family ", fam, "not yet available, at least via evCopula()"))
 }
 
-tailIndexEvCopula <- function(copula) {
+lambdaEvCopula <- function(copula) {
   lower <- 0
   upper <- 2 - 2 * A(copula, 0.5)
   c(lower=lower, upper=upper)
@@ -92,7 +92,7 @@ rhoEvCopula <- function(copula) {
   12 * integrate(integrand, 0, 1)$value - 3
 }
 
-setMethod("tailIndex", signature("evCopula"), tailIndexEvCopula)
+setMethod("lambda", signature("evCopula"), lambdaEvCopula)
 setMethod("rCopula", signature("numeric", "evCopula"), revCopula)
 setMethod("tau", signature("evCopula"), tauEvCopula)
 setMethod("rho", signature("evCopula"), rhoEvCopula)

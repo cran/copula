@@ -54,7 +54,7 @@ absdPsiMC(t, family, theta, degree = 1, n.MC,
   \code{\link{numeric}} vector of the same length as \code{t} containing
   the absolute values of the generator derivatives.
 }
-\author{Marius Hofert (and Martin M.)}
+%\author{Marius Hofert (and Martin M.)}
 \references{
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2013).
   Archimedean Copulas in High Dimensions: Estimators and Numerical

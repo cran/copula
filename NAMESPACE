@@ -20,7 +20,7 @@ useDynLib(copula, .registration=TRUE)
 ## import all we need, but not more..
 
 importFrom("stats", D, approxfun, cor # 'coef': from "bblme"; 'logLik': from "stats4"
-         , deriv, dnorm, dpois, dt, ecdf, integrate, lm.fit, median, model.matrix
+	 , deriv, dnorm, dpois, dt, ecdf, integrate, .lm.fit, median, model.matrix
          , na.omit, nobs
          , optimize, optim, p.adjust.methods, p.adjust
          , pchisq, pgamma, pnorm, ppois, ppoints, printCoefmat, pt
@@ -30,22 +30,24 @@ importFrom("stats", D, approxfun, cor # 'coef': from "bblme"; 'logLik': from "st
          , var, vcov
            )
 
-importFrom("utils", str, setTxtProgressBar, txtProgressBar)
+importFrom("utils", str, setTxtProgressBar, txtProgressBar, modifyList, head, tail)
 
-importFrom("grDevices", col2rgb, dev.flush, dev.hold, dev.off, pdf)
+importFrom("grDevices", col2rgb, dev.flush, dev.hold, dev.off, pdf, extendrange,
+           gray)
 importFrom("graphics", Axis, abline, axis, box, contour, curve
          , layout.show, layout, lcm, lines, mtext
-         , par, persp
+         , par, persp, pairs
          , plot.new, plot.window, points
          , rect, rug, strwidth, text
            )
 
-importFrom("methods", ## incl generics for which we export new methods:
-	   coerce, show, as, is, extends, new
+importMethodsFrom("methods", ## those for which we export new methods:
+		  coerce, show)
+importFrom("methods", as, is, extends, new
          , callGeneric, existsFunction, hasArg, hasMethod, callNextMethod
          , getClass, getClassDef
          , setClass, setClassUnion, setMethod, setOldClass
-         , setValidity, validObject, slot, "slot<-", slotNames
+         , setValidity, validObject, slot, "slot<-", slotNames, .hasSlot
          , signature, representation, prototype)
 
 importFrom("stats4", mle)
@@ -53,8 +55,9 @@ importMethodsFrom("stats4",
 		  coef, confint, logLik, AIC, BIC,
 		  plot, profile, summary)
 
-importFrom("lattice", trellis.par.get,
-	   splom, panel.fill, panel.splom, diag.panel.splom)
+importFrom("lattice", trellis.par.get, trellis.par.set,
+	   splom, wireframe, contourplot, cloud,
+           standard.theme, panel.fill, panel.splom, diag.panel.splom)
 
 importFrom("Matrix", nearPD)
 ## NB: "Dangerous" to not also depend on Matrix; as 'methods' for Matrixclasses are not seen.
@@ -68,7 +71,7 @@ importFrom("stabledist", dstable)
 ## importFrom("bbmle", mle2)
 
 
-if(FALSE) {## currently do not "depend" on Rmpfr's correct installation:
+if(FALSE) {## currently do not want to "depend" on Rmpfr's correct installation:
 ## As we use it only in "numerically hard cases" polyG(), dsumSibuya(),..:
 importFrom("Rmpfr",
 	   mpfr, chooseMpfr, chooseMpfr.all,
@@ -83,6 +86,8 @@ importFrom("mvtnorm",
            ## rather user should require("mvtnorm") for these: GenzBretz, Miva, TVPACK,
            dmvt, pmvt, rmvt)
 
+importFrom("pcaPP", cor.fk)# Fast Kendall's tau
+
 
 ## FIXME: we would only want importS3MethodsFrom("pspline", predict)
 import("pspline")
@@ -91,13 +96,15 @@ import("pspline")
 ## importFrom(sn, dmst)
 ## importFrom(sn, qsn, dsn, psn, dmsn, pmsn)
 
+importFrom("numDeriv", grad, jacobian)
+
 
 ### Part I: Mainly former copula ###############################################
 
 export(dCopula, pCopula, rCopula)
 export(cCopula)
 export(dMvdc, pMvdc, rMvdc)
-export(tau, rho, tailIndex)
+export(tau, rho, lambda)
 export(iTau, iRho)
 
 ## archmCopula methods
@@ -107,13 +114,13 @@ export(psi, iPsi, diPsi)
 export(A, dAdu, An.biv, An)
 
 exportClasses(mvdc)
-exportClasses(Copula, copula, ellipCopula, archmCopula, evCopula)
+exportClasses(Copula, parCopula, xcopula, copula, # virtual classes
+	      ellipCopula, archmCopula, evCopula)
 exportClasses(indepCopula)
 exportClasses(normalCopula, tCopula)
 exportClasses(claytonCopula, frankCopula, gumbelCopula, amhCopula, joeCopula)
 exportClasses(galambosCopula, huslerReissCopula, tawnCopula, tevCopula)
-exportClasses(plackettCopula)
-exportClasses(fgmCopula)
+exportClasses(fgmCopula, plackettCopula)
 
 export(mvdc)
 export(ellipCopula, archmCopula, evCopula)
@@ -123,19 +130,35 @@ export(claytonCopula, frankCopula, gumbelCopula, amhCopula, joeCopula)
 export(galambosCopula, huslerReissCopula, tawnCopula, tevCopula)
 export(plackettCopula)
 export(fgmCopula)
+
+## "transformed" copula classes
+export(rotCopula)
+exportClasses(rotCopula)
+
+export(khoudrajiCopula)
+exportClasses(asymCopula, asym2Copula,
+              khoudrajiCopula, khoudrajiBivCopula, khoudrajiExplicitCopula)
+
 ## auxiliary functions mainly used for working with elliptical copulas:
-export(p2P, P2p, getSigma)
+export(p2P, P2p, getSigma, extremePairs)
 
 exportMethods(show)
-exportMethods(persp, contour)
+exportMethods(persp, contour, plot, contourplot2, wireframe2, cloud2, splom2)
 
 ## empirical copula
-export(F.n, C.n, dCn, Cn)# .Fn
+export(F.n, C.n, dCn)# .Fn
 
 ## fitting copula
 export(loglikCopula, loglikMvdc)
 export(fitCopula, fitMvdc)
 exportClasses(fittedMV, fitCopula, fitMvdc)
+
+## some parameters can be fixed ( ./R/fixedPar.R ) :
+export(fixParam, "fixedParam<-")
+
+
+## estimation of tail dependence
+export(fitLambda)
 
 ## independence tests
 export(indepTestSim, indepTest, multIndepTest,
@@ -145,6 +168,9 @@ export(indepTestSim, indepTest, multIndepTest,
 ## gof tests
 export(gofCopula, gofMB, gofPB, gofEVCopula)
 
+## cross-validation
+export(xvCopula)
+
 ## ggraph utils
 export(pairwiseCcop, pairwiseIndepTest, pviTest, gpviTest, RSpobs, gofBTstat) # R/ggraph-tools.R
 export(pairsColList, pairsRosenblatt, .pairsCond) # R/pairsRosenblatt.R
@@ -153,11 +179,7 @@ export(pairsColList, pairsRosenblatt, .pairsCond) # R/pairsRosenblatt.R
 export(evTestC, evTestA, evTestK)
 export(exchEVTest, exchTest)
 
-## asymmetric copula class testing
-exportClasses(asymCopula)
-export(asymCopula)
-exportClasses(asymExplicitCopula)
-export(asymExplicitCopula)
+
 
 S3method(print, copula)
 S3method(print, mvdc)
@@ -173,7 +195,7 @@ S3method(vcov, fittedMV)
 S3method(logLik, fittedMV)
 
 ##_TESTING_
-## export(dCdtheta, derPdfWrtParams, dTau, dRho)
+## export(dCdtheta, dcdtheta, dTau, dRho)
 ## export(dCdu)
 ## export(ChiPlot, KPlot)
 ##
@@ -191,20 +213,20 @@ exportClasses("acopula",
 ## Generics, functions and acopula - family objects defined in this package
 export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        , .ac.shortNames, .ac.longNames, .ac.objNames, .ac.classNames
-       ,"getAcop"
-       ,"cacopula", "dnacopula", "pnacopula", "rnacopula", "rnchild"
+       ,"getAcop", "getAname"
+       , "dnacopula", "pnacopula", "rnacopula", "rnchild"
        ## estimation
        ,"coeffG" ## , "polyG", "polyJ", "signFF"
        ,"initOpt"
        ,"beta.", "betan", "pobs"
-       , debye1, debye2 # <- since we extend the gsl ones
+       ,"debye1", "debye2" # <- since we extend the gsl ones
        ,"ebeta", "etau", "emde", "dDiag", "edmle", "emle", "enacopula"
        ## goodness-of-fit
-       ,"gofTstat", "rtrafo", "htrafo", "gnacopula"
+       ,"gofTstat", "htrafo"
        ## distribution of the radial part for Archimedean copulas
        ,"pacR", "qacR"
        ## Kendall distribution
-       ,"K", "Kn", "pK", "qK", "dK", "rK"
+       ,"Kn", "pK", "qK", "dK", "rK"
        ## misc
        ,"onacopula", "onacopulaL", "nac2list", "nesdepth", "rnacModel", "nacPairthetas"
        ,"polynEval"
@@ -223,34 +245,54 @@ export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        ,"polylog", "Bernoulli", "Bernoulli.all"
        ,"Eulerian", "Stirling1", "Stirling2"
        ,"Eulerian.all", "Stirling1.all", "Stirling2.all"
-       ,"absdPsiMC"
        ,"setTheta"
        ,"tauAMH", "tauJoe"
        ,"allComp" # <- maybe keep private ?
        ,"safeUroot"
-       ,"splom2", "qqplot2"
+       ,"pairs2", "splom2", "qqplot2"
        )
-## Deprecated old names [2012-07-25]:
-export(psiDabsMC
-       , calibKendallsTau
-       , calibSpearmansRho
-       , kendallsTau
-       , spearmansRho
-       , genInv
-       , genFun, genFunDer1, genFunDer2
-       , Afun
-       , AfunDer
-       , Anfun
-       , beta.hat
-       , pcopula, dcopula, rcopula
-       , dmvdc, pmvdc, rmvdc
-       )
+## Deprecated (old names) --- move to 'Defunct', i.e., replace .Deprecated(.) by .Defunct()
+export(
+    ## 2012-08-27 :
+    cacopula
+    ## 2013-01-08 :
+  , Cn
+    ## 2014-08-03 :
+  , gnacopula
+    ## 2016-04-22 :
+  , gofMB, gofPB
+    ## 2016-06-04 :
+  , rtrafo
+    ## in CRAN's copula 0.999-14 till mid-2016
+  , tailIndex
+  , asymCopula
+  , asymExplicitCopula
+)
+
+## Defunct (from copula 0.999-15,  mid-2016):
+export(
+    K
+  , absdPsiMC
+  , beta.hat
+  , calibKendallsTau
+  , calibSpearmansRho
+  , kendallsTau
+  , spearmansRho
+  , genInv
+  , genFun, genFunDer1, genFunDer2
+  , Afun
+  , AfunDer
+  , Anfun
+  , dcopula, pcopula, rcopula
+  , dmvdc, pmvdc, rmvdc
+)
 
 exportMethods(## for both own and "other" generics:
-    "prob",
-    "%in%", "dim",
-    "format", "show",
+    prob,
+    "%in%", dim, format, show,
+    ## from "graphics"
+    persp, contour,
     ## imported from "stats4" / "bbmle":
-    "coef", "confint", "logLik", #-> hence AIC works [BIC: needs 'nobs' fix in bbmle]
-    "profile", "summary", "plot"
-    )
+    coef, confint, logLik, #-> hence AIC works [BIC: needs 'nobs' fix in bbmle]
+    plot, profile, summary
+)

@@ -66,8 +66,9 @@ static R_NativePrimitiveArgType cramer_vonMises_t[5] = {
     INTSXP, INTSXP, REALSXP,  REALSXP, REALSXP };
 static R_NativePrimitiveArgType cramer_vonMises_grid_t[7] = {
     INTSXP, REALSXP, INTSXP, REALSXP, INTSXP, REALSXP, REALSXP };
-static R_NativePrimitiveArgType multiplier_t[8] = {
-    INTSXP, REALSXP, INTSXP, REALSXP, INTSXP, REALSXP, INTSXP, REALSXP };
+static R_NativePrimitiveArgType multiplier_t[11] = {
+    INTSXP, REALSXP, INTSXP, REALSXP, INTSXP, REALSXP, REALSXP, REALSXP,
+    INTSXP, REALSXP, INTSXP};
 static R_NativePrimitiveArgType cramer_vonMises_Pickands_t[6] = {
     INTSXP, INTSXP, REALSXP, REALSXP, REALSXP, REALSXP };
 static R_NativePrimitiveArgType cramer_vonMises_CFG_t[6] = {

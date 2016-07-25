@@ -25,18 +25,29 @@ copG <- onacopulaL("Gumbel", list(theta[1], NULL, list(list(theta[2], c(2,1)),
                                                        list(theta[3], c(4,3)))))
 ## Sample from copG
 set.seed(271)
-U <- rnacopula(1000, copula=copG)
+U <- pobs(rnacopula(1000, copula=copG))
 
 ## fitCopula(copG, U) does not provide fitting capabilities for HACs/NACs yet
 ## but we can convert copG to a 'hac' object
 hacG <- nacopula2hac(copG)
 plot(hacG) # plot method
 
-## Parameters can either be estimated based on a fixed structure...
+## Parameters of the nested Gumbel copula can either be estimated
+## based on a fixed structure...
 colnames(U) <- paste(1:ncol(U))
-hac.fixed <- estimate.copula(U, hac=hacG)
-## ... or the structure can be estimated as well:
+hac.fixed <- estimate.copula(U, hac=hacG) # defaults: type = 1 (Gumbel), method = 1 (MPLE)
+## ... or the structure of the Gumbel copula can be estimated as well:
 hac.flex <- estimate.copula(U, type=hacG$type)
+## Note:
+## estimate.copula(, hac = ...) calls .QML() internally which proceeds as follows:
+## 1) Compute matrix (tau_{ij}) of pairwise maximum (log-)likelihood estimators (via tau)
+## 2) Determine the pair (i,j) ('pair') with maximal tau_{ij} and convert it to theta_{ij}
+##    (see tau2theta())
+## 3) Replace U[,i] by delta(max{U_i,U_j}) (~ U(0,1)) for delta(u) = phi(2 * phi^{-1}(u))
+##    and remove U[,j] (see .cop.T())
+## 4) Repeat this process until there is an associated estimate of theta for the whole path
+##    of variables. They then determine the estimates for all parameters in the given
+##    nested structure (see .union() and .compare.one() therein)
 
 ## Show the estimates
 plot(hac.fixed)

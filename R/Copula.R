@@ -20,9 +20,16 @@ print.copula <- function(x, digits = getOption("digits"), ...) {
   cat(x@fullname, "\n")
   cat("Dimension: ", x@dimension, "\n")
   if (length(par <- x@parameters) > 0) {
-    cat("Parameters:\n")
+    hasFx <- !is.null(.fixed <- attr(par, "fixed")) && any(.fixed)
+    cat(sprintf("Parameters%s:\n",
+		if(hasFx) " (partly fixed, see ':==')" else ""))
+    ## FIXME:  for the d=400  ellipsCopula with dispstr = "un": do *not* print all!
+    pnms <- format(x@param.names) # padding
+    pars <- format(par, digits=digits)
     for (i in seq_along(par))
-      cat("  ", x@param.names[i], " = ", format(par[i], digits=digits), "\n")
+      cat(sprintf("  %s %3s %s\n",
+		  pnms[i], if(hasFx && .fixed[i]) ":==" else " = ",
+		  pars[i]))
   }
   invisible(x)
 }
@@ -54,18 +61,17 @@ setMethod("show", "copula", function(object) print.copula(object))
 
 
 ### numerical tail index, not accurate
+## lambdaCopula <- function(copula, eps = .Machine$double.eps^0.5) {
+##     u <- eps
+##     v <- 1 - u
+##     lower <- pCopula(c(u, u), copula)/u
+##     upper <- (1 - 2 * v + pCopula(c(v, v), copula))/ u
+##     c(lower=lower, upper=upper)
+## }
 
-tailIndexCopula <- function(copula, eps = .Machine$double.eps^0.5) {
-  u <- eps
-  v <- 1 - u
-  lower <- pCopula(c(u, u), copula)/u
-  upper <- (1 - 2 * v + pCopula(c(v, v), copula))/ u
-  c(lower=lower, upper=upper)
-}
-
-# setMethod("tau", signature("copula"), tauCopula)
-# setMethod("rho", signature("copula"), rhoCopula)
-setMethod("tailIndex", signature("copula"), tailIndexCopula)
+## setMethod("tau", signature("copula"), tauCopula)
+## setMethod("rho", signature("copula"), rhoCopula)
+## setMethod("lambda", signature("copula"), lambdaCopula)
 
 
 ### Numerical "calibration": inverse tau() and rho()
@@ -96,19 +102,15 @@ iRhoCopula <- function(copula, rho, bound.eps = 0, tol = 1e-7, ...) {
   uniroot(myfun, interval=c(lower, upper), tol=tol, ...)$root
 }
 
-setMethod("iTau", signature("copula"), iTauCopula)
-setMethod("iRho", signature("copula"), iRhoCopula)
-
-cCopula <-  function(u, copula, j.ind=ncol(u), n.MC=0, log=FALSE) {
-    stopifnot(is(copula, "Copula"))
-    drop(rtrafo(u, cop=copula, j.ind=j.ind, n.MC=n.MC, log=log))
-}##      ------ -> ./gofTrafos.R
+## From Ivan: do not make these the default methods as some copulas have
+## more than one parameter
+## setMethod("iTau", signature("copula"), iTauCopula)
+## setMethod("iRho", signature("copula"), iRhoCopula)
 
 
 ###-- "Copula" methods + glue  former "copula" <--> former "nacopula" ---------
 
-setMethod("dim", "copula",
-	  function(x) x@dimension)
+setMethod("dim", signature("copula"), function(x) x@dimension)
 
 ## Dummy bail-out methods for all generics --> ./zzz.R
 ##  "nacopula" methods                     --> ./nacopula.R
@@ -119,3 +121,6 @@ setMethod("dPsi", "acopula",
 	      s <- if(log || degree %% 2 == 0) 1. else -1.
 	      s * copula@absdPsi(t, theta, degree=degree, log=log, ...)
        })
+
+## Methods for 'xcopula': extended copulas defined by mainly *one* copula slot
+setMethod("dim", signature("xcopula"), function(x) x@copula@dimension)

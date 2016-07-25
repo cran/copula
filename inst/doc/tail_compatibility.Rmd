@@ -2,6 +2,9 @@
 title: Copula Constructions for Tail-Dependence Matrices
 author: Marius Hofert
 date: '`r Sys.Date()`'
+output:
+  html_vignette:
+    css: style.css
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Copula Constructions for Tail-Dependence Matrices}
@@ -12,7 +15,7 @@ doPDF <- FALSE
 ```
 
 
-## 1) Plot Liebscher copula
+## 1 Plot Liebscher copula
 
 The example we consider is
 \[
@@ -58,7 +61,7 @@ U. <- cbind(pmax(U1[,1], U3[,1]), pmax(U1[,2], U3[,2]))^2 # Liebscher based on C
 (lambda. <- lambda1*lambda3) # 2^(-1/4) * 2^(-3/4) = 1/2
 ```
 
-```{r}
+```{r, fig.align="center", fig.width=7.5, fig.height=6}
 ## Plots
 if(doPDF) pdf(file=(file <- "U_Liebscher_n=2000_U1=C_th=4_U2=t3_th=0.5.pdf"), width=6, height=6)
 par(pty="s")
@@ -71,7 +74,7 @@ if(doPDF) dev.off()
 ```
 
 
-## 2) Sample $\mathbf{Y} = X\mathbf{U} + \mathbf{Z}\circ\mathbf{V}$
+## 2 Sample $\mathbf{Y} = X\mathbf{U} + \mathbf{Z}\circ\mathbf{V}$
 
 Note that the margins are standard uniform by construction.
 
@@ -149,7 +152,7 @@ rY <- function(n, copU, copV, X.method=c("random", "multinomial"), ...)
 ```
 
 
-### 2.1) $\mathbf{U}\sim t_3$, $\mathbf{V}\sim\Pi$ or $\mathbf{V}\sim G$
+### 2.1 $\mathbf{U}\sim t_3$, $\mathbf{V}\sim\Pi$ or $\mathbf{V}\sim G$
 
 ```{r}
 d <- 2
@@ -179,7 +182,7 @@ Y3 <- rY(n, copU=copU, copV=copV2, X.method="random")
 Y4 <- rY(n, copU=copU, copV=copV2, X.method="multinomial", prob=c(0.5, 0.5))
 ```
 
-```{r, fig.width=6, fig.height=6}
+```{r, fig.align="center", fig.width=6, fig.height=6}
 ## Plot (left: X ~ random; right: X ~ multinomial; top: V ~ Pi; bottom: V ~ G)
 opar <- par(no.readonly=TRUE)
 par(pty="s", mar=c(2.6, 2, 1, 1) + 0.1)
@@ -196,7 +199,7 @@ par(opar)
 ```
 
 
-### 2.2) $\mathbf{U}\sim$ survival MO, $\mathbf{V}\sim\Pi$ or $\mathbf{V}\sim G$
+### 2.2 $\mathbf{U}\sim$ survival MO, $\mathbf{V}\sim\Pi$ or $\mathbf{V}\sim G$
 
 ```{r}
 ## Sample U
@@ -218,7 +221,7 @@ Y3. <- rY(n, copU=U, copV=copV3, X.method="random")
 Y4. <- rY(n, copU=U, copV=copV3, X.method="multinomial", prob=c(0.5, 0.5))
 ```
 
-```{r, fig.width=6, fig.height=6}
+```{r, fig.align="center", fig.width=6, fig.height=6}
 ## Plot (left: X ~ random; right: X ~ multinomial; top: V ~ Pi; bottom: V ~ G)
 opar <- par(no.readonly=TRUE)
 par(pty="s", mar=c(2.6, 2, 1, 1) + 0.1)
@@ -249,7 +252,7 @@ if(doPDF) dev.off()
 ```
 
 
-## 3) Example of Federico Degen
+## 3 Example of Federico Degen
 
 ```{r}
 ## Y for the example of Federico Degen (note: m=1)
@@ -310,7 +313,7 @@ Y  <- rY.FD(n, copV=V, alpha=alpha)
 Y. <- rY.FD(n, copV=copV, alpha=alpha)
 ```
 
-```{r, fig.width=6, fig.height=6}
+```{r, fig.align="center", fig.width=6, fig.height=6}
 ## Plots
 if(doPDF) pdf(file=(file <- "Y_n=2000_FD_max_alpha_V=Pi.pdf"), width=6, height=6)
 par(pty="s")
@@ -321,4 +324,4 @@ if(doPDF) pdf(file=(file <- "Y_n=2000_FD_max_alpha_V=Ga_tau=0.8.pdf"), width=6, 
 par(pty="s")
 pairs(Y., labels=as.expression( sapply(1:d, function(j) bquote(italic(Y[.(j)]))) ), gap=0, cex=0.25)
 if(doPDF) dev.off()
-```{r}
+```
