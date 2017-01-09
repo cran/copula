@@ -15,7 +15,7 @@
   R Package 'Rmpfr'}
 \Shorttitle{Numerically Stable Frank via Multiprecision in R}
 %
-%\VignetteIndexEntry{Franknacopula}
+%\VignetteIndexEntry{Numerically stable Frank Copulas via Multiprecision (Rmpfr)}
 %\VignetteDepends{copula}
 %\VignetteDepends{Rmpfr}
 \SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=7,height=5,strip.white=true,keep.source=TRUE}
@@ -467,7 +467,7 @@ Further investigation shows that the culprit is really the use of
 large theta, and hence should be replaced by the generally accurate
 \code{log1mexp()}, see \citet{maechler2012}.
 %%   M\"achler, M. (2012) Accurately Computing $\log(1-\exp(-\lvert a\rvert))$,
-%%  http://cran.r-project.org/web/packages/Rmpfr/vignettes/log1mexp-note.pdf
+%%  https://cran.r-project.org/web/packages/Rmpfr/vignettes/log1mexp-note.pdf
 %% (MM: ~/R/Pkgs/Rmpfr/inst/doc/log1mexp-note.Rnw + ~/R/MM/NUMERICS/log1-exp.R)
 <<log1mexp>>=
 log1mexp <- function(a) # accurately compute log(1-exp(-a))

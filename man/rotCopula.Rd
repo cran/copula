@@ -1,11 +1,16 @@
 \name{rotCopula}
-\title{Construction and Class of "Rotated" Copulas}
+\title{Construction and Class of Rotated aka Reflected Copulas}
+\concept{survival copula}
+\concept{rotated copula}
+\concept{reflected copula}
 \alias{rotCopula}
 \alias{rotCopula-class}
-\concept{survival copula}
+%
+\alias{dim,rotCopula-method}
 \description{
-  Constructs a rotated copula from an initial copula and a vector of
-  logicals indicating which dimension to \dQuote{flip}.
+  Constructs a \dQuote{reflected} or \dQuote{rotated} copula from an
+  initial copula and a vector of logicals indicating which dimension to
+  \dQuote{flip}.
 }
 \usage{
 rotCopula(copula, flip = TRUE)
@@ -15,10 +20,15 @@ rotCopula(copula, flip = TRUE)
   \item{flip}{\code{\link{logical}} vector (of length 1 or
     \code{dim(copula)}) indicating which dimension should be
     \dQuote{flipped}; by default, all the components are flipped,
-    implying that the rotated copula is the \emph{\dQuote{survival copula}}.}
+    implying that the resulting copula is the \emph{\dQuote{survival copula}}.}
 }
 \value{
-  A rotated copula object of class \code{"rotCopula"}.
+  A \dQuote{rotated} or \dQuote{reflected} copula object of class \code{"rotCopula"}.
+}
+\note{When there are an even number of flips, the resulting copula
+  can be seen as a \emph{rotated} version of \code{copula}.  In the
+  other cases, e.g., \code{flip = c(FALSE,TRUE)} in 2d, it is rather a
+  a \emph{reflected} or \dQuote{mirrored} copula.
 }
 \section{Slots}{
   of a \code{"rotCopula"} object
@@ -35,7 +45,7 @@ rotCopula(copula, flip = TRUE)
       (component wise) bounds for each of the parameters.}
     \item{\code{param.names}:}{\code{\link{character}} vector (of same
       length as \code{parameters}) with parameter names.}
-    \item{\code{fullname}:}{a \code{character} string describing the
+    \item{\code{fullname}:}{\bold{deprecated}; a \code{character} string describing the
       rotated copula.}
   }
 }
@@ -51,7 +61,7 @@ rotCopula(copula, flip = TRUE)
 survC <- rotCopula(claytonCopula(3)) # default: flip = 'all TRUE'
 contourplot2(survC, dCopula)
 
-## Now, a "rotated" Clayton copula:
+## Now, a reflected Clayton copula:
 r10C  <- rotCopula(claytonCopula(3), flip = c(TRUE, FALSE))
 
 contourplot2(r10C, dCopula, nlevels = 20, main = "dCopula(<rotCopula>)")
@@ -78,7 +88,7 @@ fitCopula(rc., data = pobs(u), method = "mpl")
 \dontrun{gofCopula(rc., x = u)}
 \donttest{gofCopula(rc., x = u, simulation = "mult")}
 
-## A four-dimensional example: a "rotated" Frank copula
+## A four-dimensional example: a rotated Frank copula
 rf <- rotCopula(frankCopula(10, dim = 4),
                 flip = c(TRUE, FALSE, TRUE, FALSE))
 

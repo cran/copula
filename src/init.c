@@ -43,8 +43,8 @@ static R_NativePrimitiveArgType mult_A_t[8] = {
 };
 
 // ./empcop.c ///////////////////////////////////////////////////////////////////
-static R_NativePrimitiveArgType Cn_C_t[7] = {
-	REALSXP, INTSXP, INTSXP, REALSXP, INTSXP, REALSXP, REALSXP
+static R_NativePrimitiveArgType Cn_C_t[8] = {
+	REALSXP, INTSXP, INTSXP, REALSXP, INTSXP, REALSXP, REALSXP, INTSXP
 };
 
 // ./fgm.c /////////////////////////////////////////////////////////////////////
@@ -116,6 +116,8 @@ static R_NativePrimitiveArgType exchtestCn_t[] = {REALSXP, REALSXP, INTSXP, REAL
 static R_NativePrimitiveArgType exchtestCn_stat_t[] = {REALSXP, REALSXP, INTSXP, REALSXP, REALSXP,
 		     INTSXP, REALSXP};
 
+static R_NativePrimitiveArgType radsymtestCn_stat_t[] = {REALSXP, INTSXP, INTSXP, REALSXP, INTSXP,
+							 REALSXP};
 
 // ./multIndepTest.c ////////////////////////////////////////////////////////////
 
@@ -198,6 +200,7 @@ static const R_CMethodDef CEntries[]  = {
     CDEF(evsymtest_stat),
     CDEF(exchtestCn),
     CDEF(exchtestCn_stat),
+    CDEF(radsymtestCn_stat),
 
     CDEF(bootstrap_MA_I),
     CDEF(empirical_copula_test_rv),

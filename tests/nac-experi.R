@@ -23,7 +23,11 @@ N <- 100 # number of variates used for the Kolmogorov-Smirnov test
 ## "close enough" to population versions; NB: depends on 'n'
 eps.tau <- 0.06
 
-doPlots <- (Sys.getenv("USER") == "maechler")
+(doExtras <- copula:::doExtras())
+doPlots <- doExtras
+if(doPlots && !dev.interactive(orNone=TRUE)) pdf("nac-experi.pdf")
+
+options(warn = 2)# warning not allowed!
 
 
 ### 3d check functions #########################################################
@@ -133,7 +137,7 @@ chiSq_check_cop <- function(n,N,cop,nInt, verbose = interactive()){
                    ## percentage of cubes that fulfill the rule of thumb:
                    percentrot = (sum(E_nobs >= 5)/m)*100
                    ))
-}
+}## end{chiSq_check_cop}
 
 ##' a print method for this class:
 print.chiSqChk_cop <- function(x, ...) {
@@ -188,10 +192,10 @@ stopifnot(max(abs(corCheckAMH[["cor"]]-trCorr)) < eps.tau)
 ## check 2
 AMH3d <-
     new("outer_nacopula", copula = setTheta(copAMH, theta0),
-        comp = as.integer( 1 ),
+        comp = 1L,
         childCops = list(new("nacopula",
-        copula = setTheta(copAMH, theta1),
-        comp = as.integer(c(2,3)))) # no childCops
+                             copula = setTheta(copAMH, theta1),
+                             comp = 2:3)) # no childCops
         )
 
 ## constructor forms of the above:
@@ -331,7 +335,7 @@ stopifnot(is.numeric(rC3), is.matrix(rC3),
 prt.stats(C3,trCorr,rt)
 if(doPlots) {
     stopifnot(require("KernSmooth"))## for smoothScatter()
-    pairs(rC3, panel = function(...) { par(new = TRUE); smoothScatter(...) })
+    pairs2(rC3, panel = function(...) { par(new = TRUE); smoothScatter(...) })
 }
 
 ### 2d Clayton copula example ##################################################
@@ -393,7 +397,7 @@ stopifnot(is.numeric(rC3), is.matrix(rC3),
 prt.stats(C3,trCorr,rt)
 
 if(doPlots)
-    pairs(rC3, panel = function(...) { par(new = TRUE); smoothScatter(...) })
+    pairs2(rC3, panel = function(...) { par(new = TRUE); smoothScatter(...) })
 
 ### 9d Clayton copula example ##################################################
 
@@ -462,9 +466,8 @@ stopifnot(dim(rC9) == c(n, 9),
           max(abs(C9-C9.true)) < eps.tau)
 prt.stats(C9,C9.true,rt)
 if(doPlots && dev.interactive(orNone=TRUE)) # "large"
-    pairs(rC9, gap = .1, pch = 20, cex = 0.2, col = rgb(.2,.1,.7, alpha = .5),
-          main = paste(n," vectors of a ",d,
-          "-dimensional nested Clayton copula",sep = ""))
+    pairs2(rC9, gap = .1, pch = 20, cex = 0.2, col = rgb(.2,.1,.7, alpha = .5),
+	   main = paste0(n," vectors of a ", d,"-dimensional nested Clayton copula"))
 
 ### 25d Clayton ==============================================
 c25 <- onacopula("Clayton", C(0.5, 17,
@@ -475,6 +478,11 @@ c25 <- onacopula("Clayton", C(0.5, 17,
                                     C(3,   c(6:7, 14:13)))))
 stopifnot(identical(sort(allComp(c25)), 1:25))
 c25
+stopifnot(
+    all.equal(pCopula(rep(.01, 25), c25), 0.0001734511294041, tol = 9e-9)# 1.84e-13
+    ,
+    all.equal(pCopula(rep(.99, 25), c25), 0.79506048556858,   tol = 9e-9)# 3.77e-15
+)
 
 ### 125d Clayton copula example ################################################
 
@@ -514,5 +522,58 @@ rt <- system.time(rC125 <- rnacopula(n,c125))
 stopifnot(is.numeric(rC125), is.matrix(rC125), dim(rC125) == c(n, 125))
 cat("Time elapsed for generating ",n," vectors of variates:\n",sep = "")
 rt
+summary(p125 <- pCopula(rC125, c125))
+stopifnot(is.finite(p125),
+          all.equal(range(p125), c(4.13323986e-07, 0.03966520023))# tol=4.9e-11
+          ,
+          all.equal(quantile(p125, (1:3)/4, names=FALSE),
+                    c(0.002422534035, 0.005433890506, 0.009965210908)) # tol=1.5e-11
+          )
+
+
+theta <- c(2,8)
+copG4 <- onacopulaL("Gumbel",
+                   list(theta[1], NULL,
+                        list(list(theta[2], c(1,2)),
+                             list(theta[2], c(3,4)))))
+set.seed(11)
+uG4 <- rCopula(1000, copG4)
+u4. <- rbind(c(1,   0.5, 1,   0.5),
+             c(0.8, 0.4, 0.8, 0.5),
+             c(0.9, 0.5, 0.9, 0.5))
+(pu4 <- pCopula(u4., copula = copG4))
+
+stopifnot(
+    all.equal(
+        pu4, c(0.375214227246, 0.316973265328, 0.375214214144), tol = 9e-9)# 8e-13
+    ,
+    all.equal(print(
+        prob(copG4, l = rep(0.9, 4), u = rep(1, 4))
+    ), 0.056602230621, tol = 1e-9)
+    ,
+    ## and the probability of an empty corner is very small
+    all.equal(print(
+        prob(copG4,
+             l = c(0,   0.7, 0,  0.7),
+             u = c(0.4, 1  , 0.4,1  ))
+      , digits = 15), 8.832425e-10, tol = 1e-5)
+)
+
+## Less "even" example:
+theta <- c(2, 4, 8, 25)
+copG8 <- onacopulaL("Gumbel",
+                   list(theta[1], 5:6,
+                        list(list(theta[2], c(1,2,7)),
+                             list(theta[3], 3, list(list(theta[4], c(8,4)))))))
+uu <- rCopula(500, copG8)
+if(doPlots)
+    splom2(uu, col = adjustcolor("darkseagreen4", 0.5), cex = 0.25)
+summary(puu <- pCopula(uu, copG8))
+stopifnot(is.finite(puu),
+	  all.equal(min(puu), 5.353253447e-06, tol= 9e-9) # 2.33e-12
+	  ,
+	  all.equal(max(puu), 0.99840742713,   tol= 9e-9) # 2.34e-12
+	  )
+
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

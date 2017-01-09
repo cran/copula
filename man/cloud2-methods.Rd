@@ -8,8 +8,9 @@
 \docType{methods}
 \title{Cloud Plot Methods ('cloud2') in Package 'copula'}
 \description{
-  Function and Methods \code{cloud2()} to draw cloud plots of
-  three-dimensional distributions from package \pkg{copula}.
+  Function and Methods \code{cloud2()} to draw (\CRANpkg{lattice})
+  \code{\link{cloud}} plots of two-dimensional distributions from
+  package \pkg{copula}.
 }
 \usage{
 \S4method{cloud2}{matrix}(x,
@@ -28,12 +29,10 @@
       par.settings = standard.theme(color = FALSE), \dots)
 \S4method{cloud2}{Copula}(x, n,
       xlim = 0:1, ylim = 0:1, zlim = 0:1,
-      xlab = expression(U[1]), ylab = expression(U[2]),
-      zlab = expression(U[3]), \dots)
+      xlab = quote(U[1]), ylab = quote(U[2]), zlab = quote(U[3]), \dots)
 \S4method{cloud2}{mvdc}(x, n,
       xlim = NULL, ylim = NULL, zlim = NULL,
-      xlab = expression(X[1]), ylab = expression(X[2]),
-      zlab = expression(X[3]), \dots)
+      xlab = quote(X[1]), ylab = quote(X[2]), zlab = quote(X[3]), \dots)
 }
 \arguments{
   \item{x}{a \code{"\linkS4class{matrix}"},
@@ -57,14 +56,14 @@
 \value{
   An object of class \dQuote{trellis} as returned by \code{\link[lattice]{cloud}()}.
 }
-%\author{Marius Hofert}
+%\author{Marius Hofert; tweaks by MM}
 \examples{
 ## For 'matrix' objects
 cop <- gumbelCopula(2, dim = 3)
 n <- 1000
 set.seed(271)
 U <- rCopula(n, copula = cop)
-cloud2(U, xlab = expression(U[1]), ylab = expression(U[2]), zlab = expression(U[3]))
+cloud2(U, xlab = quote(U[1]), ylab = quote(U[2]), zlab = quote(U[3]))
 
 ## For 'Copula' objects
 set.seed(271)

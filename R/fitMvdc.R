@@ -18,87 +18,96 @@ setClass("fitMvdc", contains = "fittedMV", #-> ./Classes.R
 	 ## FIXME , validity = function(object) TRUE
 	 )
 
-paramNmsMvdc <- function(mv) c(margpnames(mv), mv@copula@param.names)
+paramNmsMvdc <- function(mv) c(margpnames(mv), paramNames(mv@copula))
 ## not exported, but used ..
 setMethod("paramNames", "fitMvdc", function(x) paramNmsMvdc(x@mvdc))
 
+## FIXME: This has much in commong with print.fitCopula [ ./fitCopula.R ]
+## -----  For consistency, use common "helper" functions (instead of now: manually sync'ing)
 print.fitMvdc <- function(x, digits = max(3, getOption("digits") - 3),
-                          signif.stars = getOption("show.signif.stars"), ...)
+                          signif.stars = getOption("show.signif.stars"), ...,
+                          showMore = FALSE)
 {
-    foo <- summary.fitMvdc(x)
-    cat("The Maximum Likelihood estimation is based on", x@nsample, "observations.\n")
-    p <- x@mvdc@copula@dimension
-    marNpar <- vapply(x@mvdc@paramMargins, length, 1L)
+    cat("Call: ", formatCall(x@call, class(x)), "\n", sep = "")
+    cop <- x@mvdc@copula
+    d <- dim(cop) # not slot; e.g. for rotCopula
+    cat(sprintf(
+	"Maximum Likelihood estimation based on %d %d-dimensional observations.\n",
+	x@nsample, d))
+    ## FIXME show more via printCopula() utility; but do *not* show the parameters
+    cat("Copula: ", class(cop), "\n")
+    if(showMore) { ## coefficient *matrix*, incl. std.errs
+        coefs <- coef.fittedMV(x, SE = TRUE)
+        printCf <- function(ind)
+	    printCoefmat(coefs[ ind, , drop=FALSE],
+			 digits = digits, signif.stars = signif.stars,
+			 signif.legend=FALSE, ## in any case
+			 na.print = "NA", ...)
+    } else { # !showMore, default print() etc
+        coefs <- coef.fittedMV(x) # vector of "hat(theta)"
+        printCf <- function(ind) print(coefs[ind], digits=digits, ...)
+    }
+    marNpar <- lengths(x@mvdc@paramMargins)# or  vapply(x@mvdc@paramMargins, nFree, 1L)
     idx2 <- cumsum(marNpar)
     idx1 <- idx2 - marNpar + 1
     margid <- x@mvdc@marginsIdentical
     if (sum(marNpar) > 0) { ## sometimes there is no marginal params
 	if(margid){
 	    cat("Identical margins:\n")
-	    printCoefmat(foo$coefficients[idx1[1]:idx2[1], , drop=FALSE],
-			 digits = digits, signif.stars = signif.stars,
-			 signif.legend=FALSE, ## in any case
-			 na.print = "NA", ...)
+            printCf(idx1[1]:idx2[1])
 	}
-	else {
-	    for (i in 1:p) {
-		cat("Margin", i, ":\n")
-		printCoefmat(foo$coefficients[idx1[i]:idx2[i], 1:2, drop=FALSE],
-			     digits = digits, signif.stars = signif.stars,
-			     signif.legend=FALSE, ## in any case
-			     na.print = "NA", ...)
-
-	    }
-	}
+	else for (i in 1:d) {
+                 cat("Margin", i, ":\n")
+                 printCf(idx1[i]:idx2[i])
+             }
     }
-    cat("Copula:\n")
-    copParIdx <- seq_along(x@mvdc@copula@parameters)
-    printCoefmat(foo$coefficients[copParIdx +
-				  if(margid) marNpar[1] else sum(marNpar),
-				  if(margid) 1:4 else 1:2, drop=FALSE],
-		 digits = digits, signif.stars = signif.stars, na.print = "NA", ...)
-    cat("The maximized loglikelihood is", foo$loglik, "\n")
-    if (!is.na(foo$convergence)) {
-	if(foo$convergence)
-	    cat("Convergence problems: code is", foo$convergence, "see ?optim.\n")
+    cat(if(showMore) describeCop(cop, "short") # as 'parameters' are separate
+        else "Copula:", "\n")
+## or	else paste("Copula:", class(x)), "\n")
+    copParIdx <- seq_len(nFree(cop@parameters))
+    printCf(copParIdx + if(margid) marNpar[1] else sum(marNpar))
+    if (!is.na(ll <- x@loglik))
+	cat("The maximized loglikelihood is", format(ll, digits=digits), "\n")
+    f.stats <- x@fitting.stats
+    if (!is.na(conv <- f.stats[["convergence"]])) {
+	if(conv)
+	    cat("Convergence problems: code is", conv, "see ?optim.\n")
 	else cat("Optimization converged\n")
     }
-    if(!is.null(cnts <- x@fitting.stats$counts) && !all(is.na(cnts))) {
+    if(showMore && !is.null(cnts <- f.stats$counts) && !all(is.na(cnts))) {
 	cat("Number of loglikelihood evaluations:\n"); print(cnts, ...)
     }
     invisible(x)
 }
 
 summary.fitMvdc <- function(object, ...) {
-  estimate <- object@estimate
-  se <- sqrt(diag(object@var.est))
-  ## Hmm, FIXME?  'theta=0' is often *not* the interesting null-hypothesis
-  ## neither for the margins, nor the copula
-  zvalue <- estimate / se
-  pvalue <- 2* pnorm(abs(zvalue), lower.tail=FALSE)
-  ##ans <- object[c("loglik", "convergence")]
-  coef <- cbind(Estimate = estimate, "Std. Error" = se,
-                "z value" = zvalue, "Pr(>|z|)" = pvalue)
-  rownames(coef) <- paramNmsMvdc(object@mvdc)
   structure(class = "summary.fitMvdc",
-	    list(loglik = object@loglik,
+	    list(fitC = object,
+                 method = object@method,
+                 loglik = object@loglik,
 		 convergence = object@fitting.stats[["convergence"]],
-		 coefficients = coef))
+                 coefficients = coef.fittedMV(object, SE = TRUE)))
 }
+
+## NB: print.summary.fitMvdc() via  printSummary.fittedMV() [ ./fitCopula.R ]
 
 setMethod("show", signature("fitMvdc"), function(object) print.fitMvdc(object))
 
 
 ################################################################################
 
-setMvdcPar <- function(mvdc, param) {
-    marNpar <- vapply(mvdc@paramMargins, length, 1L)
+##' @title Set / Update the free (non-fixed) parameters of an MVDC
+##' @param mvdc an \code{mvdc} object
+##' @param param numeric vector of free parameters
+##' @return modified \code{mvdc} object
+setMvdcPar <- function(mvdc, param, noCheck = FALSE) {
+    marNpar <- lengths(mvdc@paramMargins)# or  vapply(mvdc@paramMargins, nFree, 1L)
     idx2 <- cumsum(marNpar)
     idx1 <- idx2 - marNpar + 1
     margid <- mvdc@marginsIdentical
-    p <- mvdc@copula@dimension
+    d <- dim(mvdc@copula)
 
-    for (i in 1:p) {
+    for (i in 1:d) {
         if (marNpar[i] > 0) {
             ## parnames <- mvdc@paramMargins[[i]]
             k <- if(margid) 1 else i
@@ -108,19 +117,24 @@ setMvdcPar <- function(mvdc, param) {
             for (j in 1:marNpar[i]) mvdc@paramMargins[[i]][j] <- par[j]
         }
     }
-    mvdc@copula@parameters <-
-        if (idx2[p] == 0)               # no marginal parameters
-            param else param[- (if(margid) 1:idx2[1] else 1:rev(idx2)[1])]
+    mvdc@copula <-
+        setTheta(mvdc@copula,
+                 value =
+                     if (idx2[d] == 0) param # no marginal parameters
+                     else param[- (if(margid) 1:idx2[1] else 1:rev(idx2)[1])],
+                 noCheck = TRUE)
     mvdc
 }
 
 loglikMvdc <- function(param, x, mvdc) {
-  mvdc <- setMvdcPar(mvdc, param)
-  loglik <- tryCatch(sum(log(dMvdc(x, mvdc))), error = function(e) e)
-  if(is(loglik, "error")) {
-      warning("error in loglik computation: ", loglik$message)
-      (-Inf) # was NaN
-  } else loglik
+  mvdc <- setMvdcPar(mvdc, param, noCheck=TRUE)
+  tryCatch(
+      ## log likelihood :
+      sum(log(dMvdc(x, mvdc))),
+      error = function(e) {
+	  warning("error in loglik computation: ", conditionMessage(e))
+	  (-Inf) # was NaN
+      })
 }
 
 fitMvdc <- function(data, mvdc, start,
@@ -131,10 +145,11 @@ fitMvdc <- function(data, mvdc, start,
     copula <- mvdc@copula
     if (copula@dimension != ncol(data))
         stop("The dimensions of the data and copula do not match.")
-    marNpar <- vapply(mvdc@paramMargins, length, 1L)
+    cl <- match.call()
+    marNpar <- lengths(mvdc@paramMargins)# or  vapply(mvdc@paramMargins, nFree, 1L)
     margid <- mvdc@marginsIdentical
     q <- length(start)
-    if(q != length(copula@parameters) + (if(margid) marNpar[1] else sum(marNpar)))
+    if(q != nParam(copula, freeOnly=TRUE) + (if(margid) marNpar[1] else sum(marNpar)))
 	stop("The lengths of 'start' and mvdc parameters do not match.")
     mvdCheckM(mvdc@margins, "p")
     control <- c(optim.control, fnscale=-1)
@@ -177,6 +192,7 @@ fitMvdc <- function(data, mvdc, start,
 	method = method,
 	fitting.stats = c(fit[c("convergence", "counts", "message")], control),
 	nsample = nrow(data),
+	call = cl,
 	## this contains 'copula':
 	mvdc = setMvdcPar(mvdc, param))
 }

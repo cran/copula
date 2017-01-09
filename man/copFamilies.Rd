@@ -80,6 +80,8 @@ copJoe
 }
 \seealso{
   The class definition, \code{"\linkS4class{acopula}"}.
+  \code{\link{onacopula}} and \code{\link{setTheta}} for such
+  Archimedean copulas with specific parameters.
   \cr
   \code{\link{getAcop}} accesses these families
   \dQuote{programmatically}.
@@ -132,7 +134,7 @@ op <- par(mfrow= c(length(famNms), 2),
 for(nm in famNms) { Cf <- get(nm)
    thet <- Cf@iTau(0.3)
    curve(Cf@psi(x, theta = thet), 0, 5,
-         xlab = expression(x), ylab="", ylim=0:1, col = 2,
+         xlab = quote(x), ylab="", ylim=0:1, col = 2,
          main = substitute(list(NAM ~~~ psi(x, theta == TH), tau == 0.3),
                            list(NAM=Cf@name, TH=thet)))
    I <- Cf@paraInterval

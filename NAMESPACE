@@ -30,10 +30,11 @@ importFrom("stats", D, approxfun, cor # 'coef': from "bblme"; 'logLik': from "st
          , var, vcov
            )
 
-importFrom("utils", str, setTxtProgressBar, txtProgressBar, modifyList, head, tail)
+importFrom("utils", head, tail, capture.output, modifyList,
+	   str, setTxtProgressBar, txtProgressBar)
 
 importFrom("grDevices", col2rgb, dev.flush, dev.hold, dev.off, pdf, extendrange,
-           gray)
+           gray, adjustcolor)
 importFrom("graphics", Axis, abline, axis, box, contour, curve
          , layout.show, layout, lcm, lines, mtext
          , par, persp, pairs
@@ -57,7 +58,8 @@ importMethodsFrom("stats4",
 
 importFrom("lattice", trellis.par.get, trellis.par.set,
 	   splom, wireframe, contourplot, cloud,
-           standard.theme, panel.fill, panel.splom, diag.panel.splom)
+           standard.theme, panel.fill, panel.splom, diag.panel.splom,
+           panel.3dwire, ltransform3dto3d, lsegments)
 
 importFrom("Matrix", nearPD)
 ## NB: "Dangerous" to not also depend on Matrix; as 'methods' for Matrixclasses are not seen.
@@ -99,7 +101,22 @@ import("pspline")
 importFrom("numDeriv", grad, jacobian)
 
 
-### Part I: Mainly former copula ###############################################
+### What we provide --- Exports --- ##########################################
+### -------------------------------
+
+exportMethods(## for "other" (i.e. non copula-package !) generics:
+    ## "base"
+    "%in%", dim, format,
+    ## "methods":
+    show,
+    ## from "graphics"
+    persp, contour, plot,
+    ## imported from "stats4" / "bbmle":
+    coef, confint, logLik, #-> hence AIC works [BIC: needs 'nobs' fix in bbmle]
+    profile, summary
+)
+
+## Part I: Mainly former copula ----------------------------------------
 
 export(dCopula, pCopula, rCopula)
 export(cCopula)
@@ -131,6 +148,9 @@ export(galambosCopula, huslerReissCopula, tawnCopula, tevCopula)
 export(plackettCopula)
 export(fgmCopula)
 
+## generic utilities:
+export(describeCop) # generic & methods
+
 ## "transformed" copula classes
 export(rotCopula)
 exportClasses(rotCopula)
@@ -139,23 +159,22 @@ export(khoudrajiCopula)
 exportClasses(asymCopula, asym2Copula,
               khoudrajiCopula, khoudrajiBivCopula, khoudrajiExplicitCopula)
 
+export(mixCopula)
+exportClasses(mixCopula) # , parClist , mixWeights  (TODO, notably 'parClist' ??)
+
 ## auxiliary functions mainly used for working with elliptical copulas:
 export(p2P, P2p, getSigma, extremePairs)
-
-exportMethods(show)
-exportMethods(persp, contour, plot, contourplot2, wireframe2, cloud2, splom2)
 
 ## empirical copula
 export(F.n, C.n, dCn)# .Fn
 
 ## fitting copula
 export(loglikCopula, loglikMvdc)
-export(fitCopula, fitMvdc)
+export(fitCopula, fitMvdc, optimMeth)
 exportClasses(fittedMV, fitCopula, fitMvdc)
 
 ## some parameters can be fixed ( ./R/fixedPar.R ) :
 export(fixParam, "fixedParam<-")
-
 
 ## estimation of tail dependence
 export(fitLambda)
@@ -171,23 +190,35 @@ export(gofCopula, gofMB, gofPB, gofEVCopula)
 ## cross-validation
 export(xvCopula)
 
+## Graphics -- Copula-enhanced Lattice and traditional graphics:
+export(cloud2, contourplot2, pairs2, qqplot2, splom2, wireframe2)
+
 ## ggraph utils
-export(pairwiseCcop, pairwiseIndepTest, pviTest, gpviTest, RSpobs, gofBTstat) # R/ggraph-tools.R
+export(pairwiseCcop, pairwiseIndepTest, pviTest, gpviTest,
+       RSpobs, gofBTstat) # R/ggraph-tools.R
 export(pairsColList, pairsRosenblatt, .pairsCond) # R/pairsRosenblatt.R
 
 ## other nonparametric tests
 export(evTestC, evTestA, evTestK)
 export(exchEVTest, exchTest)
+export(radSymTest)
 
 
-
-S3method(print, copula)
+## For some, have S3 print() and S4 show() .. MM is not convinced
+S3method(print, parCopula)
+S3method(print, tCopula)
+S3method(print, normalCopula)
+S3method(print, nacopula, printNacopula)
+S3method(print, fitCopula)
+##
 S3method(print, mvdc)
 S3method(print, indepTest)
-S3method(print, fitCopula)
+
 S3method(summary, fitCopula)
 S3method(print, fitMvdc)
 S3method(summary, fitMvdc)
+S3method(print, summary.fitCopula, printSummary.fittedMV)
+S3method(print, summary.fitMvdc,   printSummary.fittedMV)
 ##
 S3method(coef, fittedMV)
 S3method(nobs, fittedMV)
@@ -203,7 +234,7 @@ S3method(logLik, fittedMV)
 ## export(multcomp) ---> R/mult.R
 
 
-### Part II: Mainly former nacopula ############################################
+## Part II: Mainly former nacopula -------------------------------------
 
 exportClasses("acopula",
               "nacopula", "outer_nacopula",
@@ -245,12 +276,15 @@ export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        ,"polylog", "Bernoulli", "Bernoulli.all"
        ,"Eulerian", "Stirling1", "Stirling2"
        ,"Eulerian.all", "Stirling1.all", "Stirling2.all"
-       ,"setTheta"
+       ,"getTheta", "setTheta"
        ,"tauAMH", "tauJoe"
        ,"allComp" # <- maybe keep private ?
        ,"safeUroot"
-       ,"pairs2", "splom2", "qqplot2"
        )
+
+
+
+
 ## Deprecated (old names) --- move to 'Defunct', i.e., replace .Deprecated(.) by .Defunct()
 export(
     ## 2012-08-27 :
@@ -285,14 +319,4 @@ export(
   , Anfun
   , dcopula, pcopula, rcopula
   , dmvdc, pmvdc, rmvdc
-)
-
-exportMethods(## for both own and "other" generics:
-    prob,
-    "%in%", dim, format, show,
-    ## from "graphics"
-    persp, contour,
-    ## imported from "stats4" / "bbmle":
-    coef, confint, logLik, #-> hence AIC works [BIC: needs 'nobs' fix in bbmle]
-    plot, profile, summary
 )

@@ -21,7 +21,7 @@ setClass("rotCopula", contains = "xcopula",
 	 slots = c(flip = "logical"), # plus "copula"
 	 validity =
 	     function(object) {
-		 d <- object@copula@dimension
+		 d <- dim(object@copula)
 		 if((lfl <- length(object@flip)) != 1L && lfl != d)
 		     "'length(flip)' must be one or match the copula dimension"
 		 else if(anyNA(object@flip))
@@ -29,23 +29,157 @@ setClass("rotCopula", contains = "xcopula",
 		 else TRUE
 	     })
 
+
+setClass("rotExplicitCopula", contains = "rotCopula",
+         slots = c(exprdist = "expression")
+         ## validity = function(object) {
+         ##     if (.hasSlot(object@copula, "exprdist") &&
+         ##         is.language(object@copula@exprdist)) TRUE
+         ##     else "The copula is not an explicit copula."
+         ## }
+         )
+
+
+
 ##' @title Rotated Copulas Created from an Existing Copula and a Mask of Logicals
 ##' @param copula The 'base' copula
 ##' @param flip logical (vector); if element i is TRUE,
 ##'        the copula is "rotated" wrt the axis x_i = 0.5;
 ##'        the default value is all TRUE which gives the survival copula
 ##' @return a new "rotCopula" object; see above
-##' @author Ivan Kojadinovic
+##' @author Ivan Kojadinovic (and Martin Maechler)
 rotCopula <- function(copula, flip = TRUE) {
-    new("rotCopula", copula = copula, flip = flip)
+    if (isExplicit(copula))
+        rotExplicitCopula(copula, flip)
+    else {
+        if (inherits(copula, "rotCopula")) {
+            copula@flip <- copula@flip != flip
+            copula
+        } else
+            new("rotCopula", copula = copula, flip = flip)
+    }
 }
+
+##' @title Rotated Explicit Copulas Created from an Existing Copula and a Mask of Logicals
+##' @param copula The 'base' copula
+##' @param flip logical (vector); if element i is TRUE,
+##'        the copula is "rotated" wrt the axis x_i = 0.5;
+##'        the default value is all TRUE which gives the survival copula
+##' @return a new "rotExplicitCopula" object; see above
+##' @author Jun Yan
+
+rotExplicitCopula <- function(copula, flip = TRUE) {
+    stopifnot(isExplicit(copula))
+    d <- dim(copula)
+    ## TODO: if (inherits(copula, "rotExplicitCopula")) then just "flip the flips"
+    if (length(flip) == 1) flip <- rep(flip, d)
+    else if(length(flip) != d) stop("length(flip) must be 1 or d")
+
+    ## preparation for cdf
+    cdf <- copula@exprdist$cdf
+    cdf <- do.call(substitute, list(cdf, list(alpha = quote(param))))
+    unames <- paste0("u", 1L:d)
+    lo <- ifelse(flip, unames, 0L)
+    up <- ifelse(flip, 1L, unames)
+    ## follow prob to construct the cdf expression
+    D <- 2^d
+    m <- 0:(D - 1)
+    ## digitsBase() from package 'sfsmisc' {slightly simplified} :
+    ## Purpose: Use binary representation of 0:N
+    ## Author: Martin Maechler, Date:  Wed Dec  4 14:10:27 1991
+    II <- matrix(0, nrow = D, ncol = d)
+    for (i in d:1L) {
+        II[,i] <- m %% 2L + 1L
+        if (i > 1) m <- m %/% 2L
+    }
+    ## Sign: the ("u","u",...,"u") case has +1; = c(2,2,...,2)
+    Sign <- c(1,-1)[1L + (- rowSums(II)) %% 2]
+    U <- array(cbind(lo, up)[cbind(c(col(II)), c(II))], dim = dim(II))
+    ## sum(Sign * pCopula(U, x))
+    rotCdf <- 0
+    for (i in 1:D) {
+        rep.l <- parse(text = paste0(
+                           "list(",
+                           paste0(unames, " = quote(", U[i, ], ")", collapse = ", "),
+                           ")"))
+        term <- do.call(substitute, list(cdf, eval(rep.l)))
+        rotCdf <- substitute(a + sgn * b, list(a = rotCdf, b = term, sgn = Sign[i]))
+    }
+    oldu <- paste0("u", 1:d)[flip]
+    newu <- paste0("1 - ", oldu)
+    flip.l <- parse(text = paste0(
+                        "list(",
+                        paste0(oldu, " = quote(", newu, ")", collapse = ", "),
+                        ")"))
+    rotCdf <- do.call(substitute, list(rotCdf, eval(flip.l)))
+
+    cdf <- as.expression(rotCdf)
+    cdf.algr <- deriv(cdf, "nothing")
+
+    ## preparation for pdf
+    ## if (inherits(copula, "rotExplicitCopula")) {
+    ##     u <- paste0("u", 1L:d)
+    ##     omu <- paste0("1 - u", 1L:d) ## one minus u
+    ##     oldu <- ifelse( copula@flip, omu, u)[flip]
+    ##     newu <- ifelse(!copula@flip, u, omu)[flip]
+    ## } else {
+    ## }
+    pdf <- copula@exprdist$pdf
+    pdf <- do.call(substitute, list(pdf, list(alpha = quote(param))))
+    pdf <- as.expression(do.call(substitute, list(pdf, eval(flip.l))))
+    pdf.algr <- deriv(pdf, "nothing")
+
+    exprdist <- c(cdf = cdf, pdf = pdf)
+    attr(exprdist, "cdfalgr") <- cdf.algr
+    attr(exprdist, "pdfalgr") <- pdf.algr
+    new("rotExplicitCopula", copula = copula, flip = flip,
+        exprdist = exprdist)
+}
+
+
+##################################################################################
+### Basic methods
+##################################################################################
+
+## dimension setMethod("dim", signature("rotCopula"), ...) : via "xcopula"
+
+
+## parameter names
+setMethod("paramNames", signature("rotCopula"), function(x) paramNames(x@copula))
+
+## get parameters
+setMethod("getTheta", signature("rotCopula"),
+	  function(copula, freeOnly = TRUE, attr = FALSE, named = attr)
+	      getTheta(copula@copula, freeOnly=freeOnly, attr=attr, named=named))
+
+## set free parameters
+setMethod("freeParam<-", signature("rotCopula", "numeric"),
+          function(copula, value) {
+    freeParam(copula@copula) <- value
+    copula
+})
+
+## set or modify "fixedness" of parameters
+setMethod("fixedParam<-", signature("rotCopula", "logical"),
+          function(copula, value) {
+    fixedParam(copula@copula) <- value
+    copula
+})
+
+## describe copula
+setMethod(describeCop, c("rotCopula", "character"), function(x, kind, prefix="", ...)
+    paste0(prefix, "Rotated copula constructed from\n", prefix, describeCop(x@copula, kind, prefix, ...)))
+
+##################################################################################
+### Methods for rotated copulas
+##################################################################################
 
 ## Internal. swicth u[,i] to 1 - u[,i] according to flip
 apply.flip <- function(u, flip) {
     if(identical(flip, TRUE))
-        u
-    else if(identical(flip, FALSE))
         1 - u
+    else if(identical(flip, FALSE))
+        u
     else {
         u[,flip] <- 1 - u[,flip]
         u
@@ -53,23 +187,23 @@ apply.flip <- function(u, flip) {
 }
 
 ## pCopula
-pRotCopula <- function(u, copula) {
+pRotCopula <- function(u, copula, ...) {
     apply(apply.flip(u, copula@flip), 1L, # TODO: vectorize prob ?
           function(x) prob(copula@copula,
                            l = pmin(x, copula@flip),
                            u = pmax(x, copula@flip)))
 }
 
-setMethod("pCopula", signature("numeric", "rotCopula"), pRotCopula)
-setMethod("pCopula", signature("matrix", "rotCopula"), pRotCopula)
-
 ## dCopula
 dRotCopula <- function(u, copula, log = FALSE, ...) {
     dCopula(apply.flip(u, copula@flip), copula@copula, log = log, ...)
 }
 
-setMethod("dCopula", signature("numeric", "rotCopula"), dRotCopula)
-setMethod("dCopula", signature("matrix", "rotCopula"), dRotCopula)
+setMethod("pCopula", signature("matrix",  "rotCopula"), pRotCopula)
+setMethod("dCopula", signature("matrix",  "rotCopula"), dRotCopula)
+setMethod("pCopula", signature("matrix",  "rotExplicitCopula"), pExplicitCopula.algr)
+setMethod("dCopula", signature("matrix",  "rotExplicitCopula"), dExplicitCopula.algr)
+## pCopula() and dCopula() *generic* already deal with non-matrix case!
 
 ## rCopula
 setMethod("rCopula", signature("numeric", "rotCopula"),
@@ -82,7 +216,7 @@ sign.rot2C <- function(flip)
 
 ## rho
 setMethod("rho", signature("rotCopula"), function(copula) {
-    stopifnot(copula@copula@dimension == 2)
+    stopifnot(dim(copula@copula) == 2)
     sign.rot2C(copula@flip) * rho(copula@copula)
 })
 
@@ -102,7 +236,7 @@ setMethod("iTau", signature("rotCopula"), function(copula, tau) {
 
 ## lambda
 setMethod("lambda", signature("rotCopula"), function(copula) {
-    stopifnot(copula@copula@dimension == 2)
+    stopifnot(dim(copula@copula) == 2)
     sm <- sum(rep(copula@flip, length.out = 2))
     if (sm == 1) {
         warning("lambda() method for copula class 'rotCopula' not implemented yet")
@@ -116,6 +250,27 @@ setMethod("lambda", signature("rotCopula"), function(copula) {
         else ## sm == 2
             c(lower = ti[2], upper = ti[1])
     }
+})
+
+## dCdu: Restricted to *bivariate* rotated copulas
+## Needed for Khoudraji copula density evaluation
+setMethod("dCdu", signature("rotCopula"),
+          function(copula, u, ...) {
+    if (dim(copula) > 2)
+        stop("method 'dCdu' not implemented for 'rotCopula' objects in dimension higher than two")
+    if (length(copula@flip) == 1L)
+        apply.flip(dCdu(copula@copula, apply.flip(u, copula@flip)), copula@flip)
+    else
+        apply.flip(dCdu(copula@copula, apply.flip(u, copula@flip)), copula@flip[2:1])
+})
+
+## dCdtheta: Restricted to *bivariate* rotated copulas
+## Needed for Khoudraji copulas
+setMethod("dCdtheta", signature("rotCopula"),
+          function(copula, u, ...) {
+    if (dim(copula) > 2)
+        stop("method 'dCdtheta' not implemented for 'rotCopula' objects in dimension higher than two")
+    sign.rot2C(copula@flip) * dCdtheta(copula@copula, apply.flip(u, copula@flip))
 })
 
 ## fitCopula

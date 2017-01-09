@@ -1,5 +1,5 @@
 
-R version 3.3.0 Patched (2016-06-10 r70759) -- "Supposedly Educational"
+R version 3.3.2 Patched (2016-12-07 r71752) -- "Sincere Pumpkin Patch"
 Copyright (C) 2016 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -152,17 +152,17 @@ lower upper
 > u2 <- cbind(u.0,u.1)
 > 
 > (t.7.3 <- tCopula(0.7, df=3, dim = 2))
-t copula family  
+t-copula, dim. d = 2 
 Dimension:  2 
 Parameters:
-  rho.1  =  0.7
-  df     =  3.0
+  rho.1   = 0.7
+  df      = 3.0
 > (t.9.2 <- tCopula(0.9, df=2, dim = 2))
-t copula family  
+t-copula, dim. d = 2 
 Dimension:  2 
 Parameters:
-  rho.1  =  0.9
-  df     =  2.0
+  rho.1   = 0.9
+  df      = 2.0
 > 
 > t.frac <- tCopula(0.9, df=2.5, dim = 2)
 > ## fractional df  currently (must) *fail* for pCopula
@@ -203,8 +203,8 @@ Parameters:
 > 
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ''statistical reasons''
-Time elapsed:  0.675 0.106 0.777 0 0.002 
+Time elapsed:  0.755 0.13 1.029 0.001 0.002 
 > 
 > proc.time()
    user  system elapsed 
-  0.675   0.108   0.777 
+  0.756   0.132   1.029 

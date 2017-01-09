@@ -47,13 +47,19 @@ Kn <- function(u, x)
 ##'        formula is used
 ##' @param log.p logical indicating whether the logarithm is returned
 ##' @return Kendall distribution function at u
-##' @author Marius Hofert
+##' @author Marius Hofert (and Martin Maechler
 pK <- function(u, copula, d, n.MC = 0, log.p = FALSE)
 {
-    stopifnot(is(copula, "acopula"), 0 <= u, u <= 1)
+    stopifnot(inherits(copula, "acopula"), 0 <= u, u <= 1)
+    .pK(u, copula=copula, d=d, n.MC=n.MC, log.p=log.p)
+}
+
+## not exported :
+.pK <- function(u, copula, d, n.MC = 0, log.p = FALSE)
+{
     ## limiting cases
     n <- length(u)
-    res <- numeric(n)
+    res <- u # hence keeping attributes, even ok for 'mpfr'
     res[is0 <- u == 0] <- if(log.p) -Inf else 0
     res[is1 <- u == 1] <- if(log.p) 0 else 1
     not01 <- seq_len(n)[!(is0 | is1)]
@@ -90,7 +96,7 @@ pK <- function(u, copula, d, n.MC = 0, log.p = FALSE)
             lx <- (if(n==1) lx else t(lx)) + tcrossprod(j, lpsiI.) - lfac.j # (d-1) x n matrix
             ## lsum( < d x n matrix containing the logarithms of the summands of K> ) :
             ls <- lsum(rbind(log(uN01), lx)) # log(K(u))
-            if(log.p) ls else pmin(1, exp(ls)) # ensure we are in [0,1] {numerical inaccuracy}
+            if(log.p) ls else pmin(exp(ls), 1) # ensure we are in [0,1] {numerical inaccuracy}
 
             ## NB: AMH, Clayton, Frank are numerically not quite monotone near one;
             ## --  this does not change that {but maybe slightly *more* accurate}:
@@ -99,10 +105,10 @@ pK <- function(u, copula, d, n.MC = 0, log.p = FALSE)
             ##		       sum(absdPsi.*psInv^j/factorial(j))
         } # else (d >= 3)
     res
-}
+} ## .pK()
 
 ##' @title Quantile function of the Kendall distribution function
-##' @param u evaluation point(s) in [0,1]
+##' @param p vector of probabilities (!)
 ##' @param copula acopula with specified parameter
 ##' @param d dimension
 ##' @param n.MC if > 0 a Monte Carlo approach is applied to evaluate K with
@@ -119,30 +125,29 @@ pK <- function(u, copula, d, n.MC = 0, log.p = FALSE)
 ##'        "monoH.FC"
 ##' @param ... additional arguments passed to uniroot() (for methods "sort",
 ##'        "simple", and "monoH.FC") or findInterval() (for method "discrete")
-##' @return Quantile function of the Kendall distribution function at u
-##' @author Marius Hofert
-##' Note: - K(u) >= u => u gives an upper bound for K^{-1}(u)
-##'       - K for smaller dimensions would also give upper bounds for K^{-1}(u),
-##'         but even for d=2, there is no explicit formula for K^{-1}(u) known.
-qK <- function(u, copula, d, n.MC = 0, log.p = FALSE,
+##' @return Quantile function of the Kendall distribution function at p
+##' Note: - K(u) >= u  <==>  p >= K^{-1}(p)   (since  K(.) is montone)
+##'       - K for smaller dimensions would also give upper bounds for K^{-1}(p),
+##'         but even for d=2, there is no explicit formula for K^{-1}(p) known.
+qK <- function(p, copula, d, n.MC = 0, log.p = FALSE,
                method = c("default", "simple", "sort", "discrete", "monoH.FC"),
                u.grid, ...)
 {
     stopifnot(is(copula, "acopula"))
-    if(log.p) stopifnot(u <= 0) else stopifnot(0 <= u, u <= 1)
+    if(log.p) stopifnot(p <= 0) else stopifnot(0 <= p, p <= 1)
     if(d==1) ## special case : K = identity
-	return(u)
+	return(p)
     ## limiting cases
-    n <- length(u)
+    n <- length(p)
     res <- numeric(n) # all 0
-    u0 <- if(log.p) -Inf else 0
-    u1 <- if(log.p)   0  else 1
-    res[is1 <- u == u1] <- 1
-    is0 <- u == u0 # res[is0 <- u == 0] <- 0
+    p0 <- if(log.p) -Inf else 0
+    p1 <- if(log.p)   0  else 1
+    res[is1 <- p == p1] <- 1
+    is0 <- p == p0 # res[is0 <- p == 0] <- 0
     if(!any(not01 <- !(is0 | is1)))
 	return(res)
     ## usual case:
-    uN01 <- u[not01] # u's for which we have to determine quantiles
+    pN01 <- p[not01] # p's for which we have to determine quantiles
     lnot01 <- sum(not01) # may be < n
     ## computing the quantile function
     method <- match.arg(method)
@@ -152,73 +157,75 @@ qK <- function(u, copula, d, n.MC = 0, log.p = FALSE,
            {
                ## Note: This is the same code as method="monoH.FC" (but with a
                ##       chosen grid)
-               u.grid <- if(log.p) seq(-720, 0, by = 720/128) else 0:128/128 # default grid
-               K.u.grid <- pK(u.grid, copula=copula, d=d, n.MC=n.MC, log.p=log.p)
+               u.grid <- 0:128/128 # default grid
+               K.u.grid <- .pK(u.grid, copula=copula, d=d, n.MC=n.MC, log.p=log.p)
                ## function for root finding
 	       splFn <- splinefun(u.grid, K.u.grid, method = "monoH.FC")
-	       fspl <- function(x, u) splFn(x) - u
+	       fspl <- function(x, p) splFn(x) - p
                ## root finding
-               vapply(uN01, function(u)
-                      uniroot(fspl, u=u, interval=c(u0,u), ...)$root, NA_real_)
+               vapply(pN01, function(p)
+                      uniroot(fspl, p=p, interval=c(p0,p), ...)$root, NA_real_)
 
            },
                "simple" =               # straightforward root finding
            {
                ## function for root finding
-               f <- function(t, u) pK(t, copula=copula, d=d, n.MC=n.MC, log.p=log.p) - u
+               f <- function(t, p) .pK(t, copula=copula, d=d, n.MC=n.MC, log.p=log.p) - p
                ## root finding
-               vapply(uN01, function(u)
-                      uniroot(f, u=u, interval=c(u0,u), ...)$root, NA_real_)
+               vapply(pN01, function(p)
+                      uniroot(f, p=p, interval=c(p0,p), ...)$root, NA_real_)
            },
-               "sort" =                 # root finding with first sorting u's
+               "sort" =                 # root finding with first sorting p's
            {
                ## function for root finding
-               f <- function(t, u) pK(t, copula=copula, d=d, n.MC=n.MC, log.p=log.p) - u
-               ## sort u's
-               ord <- order(uN01, decreasing=TRUE)
-               uN01o <- uN01[ord]       # uN01 ordered in decreasing order
-               ## deal with the first one (largest u) separately
+               f <- function(t, p) .pK(t, copula=copula, d=d, n.MC=n.MC, log.p=log.p) - p
+               ## sort p's
+               i.rev <- lnot01:1L # reverse, as they are typically sorted *increasingly*
+               ord <- order(pN01[i.rev], decreasing=TRUE)
+               pN01o <- pN01[i.rev][ord] # pN01 ordered in decreasing order
+               ## deal with the first one (largest p) separately
                q <- numeric(lnot01)
-               q[1] <- uniroot(f, u=uN01o[1], interval=c(u0, uN01o[1]), ...)$root # last quantile -- used in the following
-               if(lnot01 > 1){
+               q[1] <- uniroot(f, p=pN01o[1], interval=c(p0, pN01o[1]), ...)$root # last quantile -- used in the following
+               if(lnot01 > 1) {
+		   ## FIXME(MM): rather use uniroot()s 'extendInt = "upX" etc ?!
                    eps <- 1e-4 # {FIXME for log.p!} ugly but due to non-monotonicity of K
                    ## otherwise: "Error... f() values at end points not of opposite sign"
                    for(i in 2:lnot01){
-                       lower <- u0
-                       upper <- min(uN01o[i], q[i-1]+eps)
+                       lower <- p0
+                       upper <- min(pN01o[i], q[i-1]+eps)
                        if(FALSE){       # checks for debugging
                            if(lower >= upper) stop("lower=", lower, ", upper=", upper)
-                           f.lower <- f(lower, uN01o[i])
-                           f.upper <- f(upper, uN01o[i])
+                           f.lower <- f(lower, pN01o[i])
+                           f.upper <- f(upper, pN01o[i])
                            if(sign(f.lower*f.upper) >= 0)
-                               stop("uN01o[",i,"]=", uN01o[i], ", f.lower=", f.lower, ", f.upper=", f.upper)
+                               stop("pN01o[",i,"]=", pN01o[i], ", f.lower=", f.lower, ", f.upper=", f.upper)
                        }
-                       q[i] <- uniroot(f, u=uN01o[i], interval=c(lower, upper), ...)$root
+                       q[i] <- uniroot(f, p=pN01o[i], interval=c(lower, upper), ...)$root
                    }
                }
-               ## "return" unordered result
-               quo <- numeric(lnot01)   # unordered vector of quantiles q
-               quo[ord] <- q            # return unordered result
+               ## "return" re-ordered result
+               quo <- numeric(lnot01)   # vector of quantiles q
+               quo[i.rev[ord]] <- q     # return result in original order
                quo
            },
                "discrete" = # evaluate K at a grid and compute approximate quantiles based on this grid
            {
-	       if(log.p) stopifnot(u.grid <= 0) else stopifnot(0 <= u.grid, u.grid <= 1)
-               K.u.grid <- pK(u.grid, copula=copula, d=d, n.MC=n.MC, log.p=log.p)
-               u.grid[findInterval(uN01, vec=K.u.grid,
+	       stopifnot(0 <= u.grid, u.grid <= 1)
+               K.u.grid <- .pK(u.grid, copula=copula, d=d, n.MC=n.MC, log.p=log.p)
+               u.grid[findInterval(pN01, vec=K.u.grid,
                                    rightmost.closed=TRUE, ...)+1] # note: this gives quantiles according to the "typical" definition
            },
                "monoH.FC" = # root finding based on an approximation of K via monotone splines (see ?splinefun)
            {
-	       if(log.p) stopifnot(u.grid <= 0) else stopifnot(0 <= u.grid, u.grid <= 1)
+	       stopifnot(0 <= u.grid, u.grid <= 1)
                ## evaluate K at a grid
-               K.u.grid <- pK(u.grid, copula=copula, d=d, n.MC=n.MC, log.p=log.p)
+               K.u.grid <- .pK(u.grid, copula=copula, d=d, n.MC=n.MC, log.p=log.p)
                ## function for root finding
                splFn <- splinefun(u.grid, K.u.grid, method = "monoH.FC")
-               fspl <- function(x, u) splFn(x) - u
+               fspl <- function(x, p) splFn(x) - p
                ## root finding
-               vapply(uN01, function(u)
-                      uniroot(fspl, u=u, interval=c(u0,u), ...)$root, NA_real_)
+               vapply(pN01, function(p)
+                      uniroot(fspl, p=p, interval=c(p0,p), ...)$root, NA_real_)
            },
                stop("unsupported method ", method))
     res

@@ -10,7 +10,7 @@
 \usage{
 ellipCopula (family, param, dim = 2, dispstr = "ex", df = 4, ...)
 normalCopula(param, dim = 2, dispstr = "ex")
-    tCopula (param, dim = 2, dispstr = "ex", df = 4, df.fixed = FALSE)
+    tCopula (param, dim = 2, dispstr = "ex", df = 4, df.fixed = FALSE, df.min = 0.01)
 }
 \arguments{
   \item{family}{a character string specifying the family of an
@@ -32,6 +32,9 @@ normalCopula(param, dim = 2, dispstr = "ex")
     considered as a parameter (to be estimated) or not.  The default,
     \code{FALSE}, means that \code{df} is to be estimated if the object is
     passed as argument to \code{\link{fitCopula}}.}
+  \item{df.min}{non-negative number; the strict lower bound for
+    \code{df}, mainly during fitting when \code{df.fixed=FALSE}, with
+    \code{\link{fitCopula}}.}
   \item{\dots}{ currently nothing. }
 }
 \value{
@@ -66,6 +69,10 @@ norm.cop <- normalCopula(c(0.5, 0.6, 0.7), dim = 3, dispstr = "un")
 t.cop <- tCopula(c(0.5, 0.3), dim = 3, dispstr = "toep",
                  df = 2, df.fixed = TRUE)
 getSigma(t.cop) # P matrix (with diagonal = 1)
+
+## dispersion "AR1" :
+nC.7 <- normalCopula(0.8, dim = 7, dispstr = "ar1")
+getSigma(nC.7) ##-> toeplitz( (1  0.8  0.8^2  0.8^3  ... 0.8^6) ) matrix
 
 ## from the wrapper
 norm.cop <- ellipCopula("normal", param = c(0.5, 0.6, 0.7),

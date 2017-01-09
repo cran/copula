@@ -14,7 +14,8 @@ gofBTstat(u)
 }
 \value{
   An \eqn{(n,d-1)}-\code{\link{matrix}} where the \eqn{(i,k)}th entry is
-  \deqn{B_{ik}=\frac{\sum_{j=1}^k u_{ij}^2}{\sum_{j=1}^d u_{ij}^2}.}{B[ik]=(u[i,1]^2+..+u[i,k]^2)/(u[i,1]^2+..+u[i,d]^2).}
+  \deqn{B_{ik}=\frac{\sum_{j=1}^k u_{ij}^2}{\sum_{j=1}^d u_{ij}^2}.
+  }{B[ik] = (u[i,1]^2+..+u[i,k]^2) / (u[i,1]^2+..+u[i,d]^2).}
 }
 %\author{Marius Hofert.}
 \references{
@@ -34,10 +35,13 @@ U <- x/sqrt(rowSums(x^2))
 Bmat <- gofBTstat(U)
 
 ## (graphically) check if Bmat[,k] follows a Beta(k/2, (d-k)/2) distribution
-qqp <- function(k, Bmat)
-    qqplot2(Bmat[,k], qF=function(p) qbeta(p, shape1=k/2, shape2=(ncol(Bmat)+1-k)/2),
-            main.args=list(text=as.expression(substitute(plain("Beta")(s1,s2)~~
-                bold("Q-Q Plot"), list(s1=k/2, s2=(d-k)/2))), side=3, cex=1.3, line=1.1, xpd=NA))
+qqp <- function(k, Bmat) {
+    d <- ncol(Bmat)+1L
+    tit <- substitute(plain("Beta")(.A.,.B.)~~ bold("Q-Q Plot"),
+                      list(.A. = k/2, .B. = (d-k)/2))
+    qqplot2(Bmat[,k], qF=function(p) qbeta(p, shape1=k/2, shape2=(d-k)/2),
+            main.args=list(text=tit, side=3, cex=1.3, line=1.1, xpd=NA))
+}
 qqp(1, Bmat=Bmat) # k=1
 qqp(3, Bmat=Bmat) # k=3
 }

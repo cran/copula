@@ -39,7 +39,7 @@ safeUroot <-
 	if(trace)
 	    cat(sprintf("search in [%g,%g]%s", lower, upper,
 			if(trace >= 2)"\n" else " ... "))
-	Delta <- function(u) 0.01* pmax(1e-7, abs(u))
+	Delta <- function(u) 0.01* pmax(abs(u), 1e-7)
 	## Two cases:
 	if(is.null(Sig)) {
 	    ## case 1)	'Sig' unspecified --> extend (lower, upper) at the same time

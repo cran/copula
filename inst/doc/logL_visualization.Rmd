@@ -1,6 +1,6 @@
 ---
 title: Log-Likelihood Visualization for Archimedean Copulas
-author: Marius Hofert and Martin M&auml;chler
+author: Marius Hofert and Martin Mächler
 date: '`r Sys.Date()`'
 output:
   html_vignette:
@@ -8,6 +8,7 @@ output:
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Log-Likelihood Visualization for Archimedean Copulas}
+  %\VignetteEncoding{UTF-8}
 ---
 ```{r, message=FALSE}
 require(copula)
@@ -327,4 +328,10 @@ stopifnot( is.finite( r.$y ),
 	  ## and is convex (everywhere):
 	  diff(r.$y, d=2) > 0)
 options(op) # revert to previous state
+```
+
+### Session information
+
+```{r, echo=FALSE}
+print(sessionInfo(), locale=FALSE)
 ```

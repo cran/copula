@@ -65,7 +65,7 @@ xctTau <- matrix(tau.s, nrow = nrow(tautau), ncol=length(tau.s),
                  byrow=TRUE)
 ## The absolute errors
 errTau <- tautau-xctTau
-round(10000*errTau)
+print.table(round(10000*errTau), zero.print=".", na.print="_NA_")
 ## has two NaN .. ok, for now:
 errTau["tawnCopula", 1:2] <- 0
 ## These families do not support tau < 0
@@ -77,6 +77,13 @@ errTau["tevCopula", 2] <- 0
 ## "fgmCopula" has tau in [-2/9, 2/9] :
 errTau["fgmCopula", "tau=.3"] <- 0
 stopifnot(max(abs(errTau)) <= 0.00052)# ok for IJ-taus
+## show the blown up deviations:
+print.table(round(1e7*errTau, 4), zero.print=".", na.print="_NA_")
+
+## now remove the current worst:
+errT <- errTau; errT["plackettCopula", "tau=0"] <- 0
+10e6 * head(sort(abs(errT), decreasing=TRUE))
+stopifnot(max(abs(errT)) <= 5e6)
 
 showProc.time()
 

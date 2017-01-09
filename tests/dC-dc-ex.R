@@ -14,59 +14,41 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 require(copula)
+source(system.file("Rsource", "utils.R",     package="copula", mustWork=TRUE))
+##-> assertError(), assert.EQ(), ... showProc.time()  +  comparederiv()
+showProc.time()
 
 (doExtras <- copula:::doExtras())
 
+
+m <- 10 # number of random points
+tau <- 0.5
+
+## bivariate comparisons
+d <- 2
+u <- pobs(matrix(runif(d * m), m, d))
+
+## each with  4  warnings  "... numerical differentiation used":
+comparederiv(claytonCopula (iTau(claytonCopula(), tau)), u)
+comparederiv(gumbelCopula  (iTau(gumbelCopula(),  tau)), u)
+comparederiv(frankCopula   (iTau(frankCopula(),   tau)), u)
+comparederiv(plackettCopula(iTau(plackettCopula(),tau)), u)
+comparederiv(normalCopula  (iTau(normalCopula(),  tau)), u)
+comparederiv(tCopula(iTau(tCopula(), tau), df.fixed = TRUE), u)
+
+showProc.time()
+
 if (doExtras)
 {
-    m <- 10 # number of random points
-    tau <- 0.5
-
-    ## Returns max error
-    comparederiv <- function(cop, u) {
-
-        c(dCdu = max(abs((copula:::dCdu(cop, u) -
-                          copula:::dCduCopulaNum(cop, u)))),
-          dCdtheta = max(abs(copula:::dCdtheta(cop, u) -
-                             copula:::dCdthetaCopulaNum(cop, u))),
-          dlogcdu = max(abs(copula:::dlogcdu(cop, u) -
-                            copula:::dlogcduCopulaNum(cop, u))),
-          dlogcdtheta = max(abs(copula:::dlogcdtheta(cop, u) -
-                                copula:::dlogcdthetaCopulaNum(cop, u))))
-    }
-
-
-
-    ## bivariate comparisons
-    d <- 2
-    u <- pobs(matrix(runif(d * m), m, d))
-
-    cop  <- claytonCopula(iTau(claytonCopula(), tau))
-    comparederiv(cop, u)
-
-    cop  <- gumbelCopula(iTau(gumbelCopula(), tau))
-    comparederiv(cop, u)
-
-    cop  <- frankCopula(iTau(frankCopula(), tau))
-    comparederiv(cop, u)
-
-    cop  <- plackettCopula(iTau(plackettCopula(), tau))
-    comparederiv(cop, u)
-
-    cop  <- normalCopula(iTau(normalCopula(), tau))
-    comparederiv(cop, u)
-
-    cop  <- tCopula(iTau(tCopula(), tau), df.fixed = TRUE)
-    comparederiv(cop, u)
-
     ## d-dimensional
     d <- 4
     u <- pobs(matrix(runif(d * m), m, d))
 
-    cop <- normalCopula(rep(iTau(normalCopula(), tau), d * (d-1)/2), dim=d, dispstr = "un")
-    comparederiv(cop, u)
+    nC4 <- normalCopula(rep(iTau(normalCopula(), tau), d * (d-1)/2), dim=d, dispstr = "un")
+    comparederiv(nC4, u)
 
-    cop <- tCopula(rep(iTau(tCopula(), tau), d * (d-1)/2), dim=d, dispstr = "un", df.fixed = TRUE)
-    comparederiv(cop, u)
+    tC4 <- tCopula(rep(iTau(tCopula(), tau), d * (d-1)/2), dim=d, dispstr = "un", df.fixed = TRUE)
+    comparederiv(tC4, u)
+    showProc.time()
 }
 

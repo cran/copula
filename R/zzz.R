@@ -1,5 +1,11 @@
 ### --- At the end, when "everything" is defined  ---
 
+fitCopula_methods <- eval(formals(fitCopula_dflt)$method)
+
+.copulaEnv <- new.env(parent = emptyenv(), hash = FALSE)#  e.g., for  once-per-session warnings
+
+
+if(FALSE) { ## <<--- 2016-07-28 --- The following kills  hasMethod(<genfun>, <signature>)
 
 ## the generics for which we may want to have "bail out" methods:
 .thisEnv <- environment()# == asNamespace("copula")  but not yet
@@ -28,3 +34,4 @@ for(gname in gg) { # possibly more than one arg -- use correct argument list
 }
 rm(gg, .thisEnv)
 
+}## no longer (2016-07-28)

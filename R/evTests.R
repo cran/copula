@@ -248,12 +248,24 @@ Sn <- function(X) {
     -1 + (8*w)/(n*(n-1)) - (9*w.sq)/(n*(n-1)*(n-2))
 }
 
-## Jackknife variance estimator THIS CODE CAN BE IMPROVED!!!!!!!
+## Jackknife variance estimator
+## IK: modified version does not work; reverting to original one below
+## GKRJack <- function(X) {
+##     stopifnot(is.numeric(n <- nrow(X)))
+##     Sn <- Sn(X)
+##     VSn <- vapply(1:n, function(i) Sn(X[-i, ,drop=FALSE]), 1.)
+##     list(Sn=Sn, var = (n-1)/n * sum(VSn - Sn)^2)
+## }
 GKRJack <- function(X) {
-    stopifnot(is.numeric(n <- nrow(X)))
+    n <- nrow(X)
     Sn <- Sn(X)
-    VSn <- vapply(1:n, function(i) Sn(X[-i, ,drop=FALSE]), 1.)
-    list(Sn=Sn, var = (n-1)/n * sum(VSn - Sn)^2)
+    VSn <- numeric()
+    for(i in 1:n){
+        cond <- !(1:n == i)
+        VSn[i] <- Sn(X[cond,])
+    }
+    var <- ((n - 1)/n) * (sum((VSn - rep(Sn, n))^2))
+    return(list(Sn = Sn, var = var))
 }
 
 ## Calculation of Sn and its finite sample and asymptotic variance;
@@ -314,8 +326,9 @@ GKRstatistic <- function(X, variance=c("fsample","asymptotic","all")) {
 ##' @param x the data
 ##' @param method one of "fsample","asymptotic","jackknife"
 ##' @return an object of class 'htest'
-##' @author Johanna Neslehova
-evTestK <- function(x, method = c("fsample","asymptotic","jackknife")) {
+##' @author Johanna Neslehova and Ivan Kojadinovic
+evTestK <- function(x, method = c("fsample","asymptotic","jackknife"),
+                    ties = NA, N = 100) {
 
     ## checks
     if(!is.matrix(x)) {
@@ -324,33 +337,64 @@ evTestK <- function(x, method = c("fsample","asymptotic","jackknife")) {
     }
     method <- match.arg(method)
     n <- nrow(x)
-    ## negvar <- FALSE
-    tmp <- switch(method,
-                  "fsample"= GKRstatistic(x,variance="fsample"),
-                  "asymptotic"=GKRstatistic(x,variance="asymptotic"),
-                  "jackknife"=GKRJack(x)
+
+    fun <- switch(method,
+                  "fsample" = GKRstatistic(x,variance = "fsample"),
+                  "asymptotic" = GKRstatistic(x, variance = "asymptotic"),
+                  "jackknife" = GKRJack(x)
                   )
     var <- switch(method,
-                  "fsample"=tmp$var,
-                  "asymptotic"=tmp$var,
-                  "jackknife"=n*tmp$var
+                  "fsample" = fun$var,
+                  "asymptotic" = fun$var,
+                  "jackknife" = n * fun$var
                   )
+
     if(var < 0){
-        message("Variance estimator less then zero, using jackknife instead")## <- MM: reactivated 2012-02-22
-        ## negvar <- TRUE
-        var <- n*GKRJack(x)$var
+        message("Variance estimator less then zero, using jackknife instead")
+        var <- n * GKRJack(x)$var
         method <- "jackknife"
     }
 
-    Tn <- sqrt(n)*tmp$Sn/sqrt(var)
-    ##calpha <- qnorm((1-alpha/2))
-    ##reject <- (abs(Tn)>calpha)
-    p.value <- pnorm(-abs(Tn))+pnorm(abs(Tn),lower.tail=FALSE)
+    ## Ties: by default, if at least one column has at least one duplicated entry
+    if (is.na(ties <- as.logical(ties))) {
+	ties <- any(apply(x, 2, anyDuplicated))
+        if (ties)
+            warning("argument 'ties' set to TRUE")
+    }
+
+    ## Compute bias if ties
+    bias <- if (ties) {
+                ## Get ties structure from initial sample
+                ir <- apply(x, 2, function(y) sort(rank(y, ties.method = "max")))
+                ## Estimate the arameter of the Gumbel--Hougaard
+                tau <- cor(x[,1], x[,2], method="kendall")
+                theta <- iTau(gumbelCopula(), max(tau, 0))
+
+                do1 <- function() {
+                    ## From the Gumbel--Hougaard copula for the moment
+                    x.b <- rCopula(n, gumbelCopula(theta, use.indepC = "TRUE"))
+                    ## Apply tie structure
+                    for (i in 1:2) {
+                        x.b <- x.b[order(x.b[,i]),]
+                        x.b[,i] <- x.b[ir[,i], i]
+                    }
+                    ## Test statistic
+                    Sn(x.b)
+                }
+                mean(replicate(N, do1()))
+            }
+            else 0
+
+
+    Tn <- sqrt(n) * (fun$Sn - bias) / sqrt(var)
+    p.value <- 2 * pnorm(-abs(Tn))
 
     structure(class = "htest",
-              list(method = sprintf("Test of bivariate extreme-value dependence based on Kendall's process with argument 'method' set to %s",
+              list(method = sprintf("Test of bivariate extreme-value dependence based on Kendall's distribution with argument 'method' set to %s",
                                     dQuote(method)),
                    statistic = c(statistic = Tn),
                    p.value = p.value,
+                   bias = bias,
+                   variance = var,
                    data.name = deparse(substitute(x))))
 }

@@ -34,7 +34,7 @@ log1pexp(x, c0 = -37, c1 = 18, c2 = 33.3)
 \references{%  ~/R/Pkgs/Rmpfr/vignettes/log1mexp-note.Rnw
   Martin \enc{Mächler}{Maechler} (2012).
   Accurately Computing \eqn{\log(1-\exp(-|a|))};
-  \url{http://cran.r-project.org/web/packages/Rmpfr/vignettes/log1mexp-note.pdf}.
+  \url{https://CRAN.R-project.org/package=Rmpfr/vignettes/log1mexp-note.pdf}.
   %  see also <<log1mexp>> in ../inst/doc/Frank-Rmpfr.Rnw
 }
 \examples{

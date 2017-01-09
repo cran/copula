@@ -10,9 +10,9 @@
 }
 \usage{
 \S4method{plot}{Copula,ANY}(x, n, xlim = 0:1, ylim = 0:1,
-      xlab = expression(U[1]), ylab = expression(U[2]), \dots)
+      xlab = quote(U[1]), ylab = quote(U[2]), \dots)
 \S4method{plot}{mvdc,ANY}(x, n, xlim = NULL, ylim = NULL,
-      xlab = expression(X[1]), ylab = expression(X[2]), \dots)
+      xlab = quote(X[1]), ylab = quote(X[2]), \dots)
 }
 \arguments{
   \item{x}{a \emph{bivariate} \code{"\linkS4class{matrix}"},

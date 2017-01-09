@@ -1,6 +1,6 @@
 ---
 title: MLE and Quantile Evaluation for a Clayton AR(1) Model with Student Marginals
-author: Original demo from Roeger Koenker; by Marius Hofert, Ivan Kojadinovic, Martin M&auml;chler, Jun Yan
+author: Original demo from Roeger Koenker; by Marius Hofert, Ivan Kojadinovic, Martin Mächler, Jun Yan
 date: '`r Sys.Date()`'
 output:
   html_vignette:
@@ -8,6 +8,7 @@ output:
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{MLE and Quantile Evaluation for a Clayton AR(1) Model with Student Marginals}
+  %\VignetteEncoding{UTF-8}
 ---
 ```{r, message=FALSE}
 require(copula)

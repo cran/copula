@@ -6,52 +6,54 @@
   bivariate copula based on the empirical copula.
   The test statistics are defined in the first two references.
   Approximate p-values for the test statistics are obtained
-  by means of a \emph{multiplier} technique.
+  by means of a \emph{multiplier} technique if there are no ties in the
+  component series of the bivariate data, or by means of an appropriate
+  bootstrap otherwise.
 }
 \usage{
-exchTest(x, N = 1000, m = 0)
+exchTest(x, N = 1000, ties = NA, m = 0)
 }
 \arguments{
   \item{x}{ a data matrix that will be transformed to pseudo-observations.}
-  \item{N}{ number of multiplier iterations to be used to
+  \item{N}{ number of multiplier or boostrap iterations to be used to
     simulate realizations of the test statistic under the null
     hypothesis.}
+  \item{ties}{ logical; if \code{FALSE}, approximate p-values are computed by
+    means of multiplier bootstrap; if \code{TRUE}, a boostrap adapted to the
+    presence of ties in any of the coordinate samples of \code{x}
+    is used; the default value of \code{NA} indicates that the
+    presence/absence of ties will be checked for automatically.}
   \item{m}{ if \code{m=0}, integration in the Cramér--von Mises
     statistic is carried out with respect to the empirical copula; if
   \code{m > 0}, integration is carried out with respect to the Lebesgue
   measure and \code{m} specifies the size of the integration grid.}
 }
 \details{
-  More details are available in the two first references.
+  More details are available in the references.
 }
 \value{
-  Returns a list whose attributes are:
+  An object of \code{\link{class}} \code{htest} which is a list,
+  some of the components of which are
   \item{statistic}{ value of the test statistic. }
   \item{p.value}{ corresponding approximate p-value. }
 }
 %\author{Ivan Kojadinovic and Jun Yan}
 \references{
-  Genest, C., G. \enc{Nešlehová}{Neslehova}, J. and Quessy, J.-F. (2012). Tests of symmetry for
+  Genest, C., G. \enc{Nešlehová}{Neslehova}, J. and Quessy,
+  J.-F. (2012).
+  Tests of symmetry for
   bivariate copulas. \emph{Annals of the Institute of Statistical
-  Mathematics}. In press.
+  Mathematics} \bold{64}, 811--834.
 
   Kojadinovic, I. and Yan, J. (2012). A nonparametric test of
   exchangeability for extreme-value and left-tail
   decreasing bivariate copulas. \emph{The Scandinavian Journal of
-    Statistics}. In press.
+    Statistics} \bold{39:3}, 480--496.
 
-  Kojadinovic, I. and Yan, J. (2010). Modeling Multivariate Distributions
-  with Continuous Margins Using the copula R Package. \emph{Journal of
-  Statistical Software}, 34(9), pages 1-20.
+  Kojadinovic, I. (2016). Some copula inference procedures adapted to
+  the presence of ties. \url{http://arxiv.org/abs/1609.05519}.
 }
-\note{
-  This test was derived under the assumption of continuous margins,
-  which implies that ties occur with probability zero. The
-  presence of ties in the data might substantially affect the
-  approximate p-value. One way of dealing with ties was suggested in the
-  last reference.
-}
-\seealso{ \code{\link{exchEVTest}}, \code{\link{gofCopula}}. }
+\seealso{ \code{\link{radSymTest}}, \code{\link{exchEVTest}}, \code{\link{gofCopula}}. }
 \examples{
 ## Data from an exchangeable copulas
 exchTest(rCopula(200,  gumbelCopula(3)))

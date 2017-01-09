@@ -1,18 +1,18 @@
 \name{show-methods}
+\title{Methods for 'show()' in Package 'copula'}
 \docType{methods}
 \alias{show-methods}
 \alias{show,normalCopula-method}
 \alias{show,tCopula-method}
-\alias{show,copula-method}
+\alias{show,parCopula-method}
 \alias{show,fitCopula-method}
 \alias{show,fitMvdc-method}
-\title{Methods for `show' in Package `copula'}
 \description{
   Methods for function \code{\link{show}} in package \pkg{copula}.
 }
 \section{Methods}{
   \describe{
-    \item{object = "copula"}{see \code{\link{Copula}}. }
+    \item{object = "parCopula"}{see \code{\link{Copula}}. }
 
     \item{object = "fitMvdc"}{(see \code{\link{fitMvdc}}): and}
     \item{object = "fitCopula"}{(see \code{\link{fitCopula}}): these call the

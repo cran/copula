@@ -97,3 +97,86 @@ doExtras <- function() {
 corKendall <- function(x, ...) {
     if(length(list(...))) cor(x, method="kendall", ...) else cor.fk(x)
 }
+
+##' format() a 'call' -- used for print(<fitCopula>) and print(<fitMvdc>):
+formatCall <- function(cal, className, sep = "\n", collapse = "\n") {
+    if(cal[[1L]] == as.symbol(".local"))
+	cal[[1L]] <- as.symbol(className)
+    if(names(cal[2L]) == "copula")
+	names(cal)[2L] <- ""
+    paste(deparse(cal), sep=sep, collapse=collapse)
+}
+
+## describeCop() -- generic in ./AllGeneric.R
+## =============
+
+setMethod("describeCop", c("Copula", "missing"), # -> default kind = "short"
+	  function(x, kind, prefix="", ...) describeCop(x, "short", prefix, ...))
+
+## FIXME: This table can be extended to cover more atomic copulas
+.copulaNameTab <- matrix(c("galambosCopula",     "Galambos",
+                           "gumbelCopula",       "Gumbel",
+                           "huslerReissCopula",  "Husler-Reiss",
+                           "tawnCopula",         "Tawn",
+                           "tevCopula",          "t-ev"), byrow = TRUE, ncol = 2)
+
+
+setMethod("describeCop", c("copula", "character"),
+          function(x, kind = c("short", "very short", "long"), prefix = "", ...) {
+    kind <- match.arg(kind)
+    cl <- class(x)
+    if(!is.na(idx <- match(cl, .copulaNameTab[,1]))) cl <- .copulaNameTab[idx, 2]
+    if(kind == "very short") # e.g. for show() which has more parts
+        return(paste0(prefix, cl, " copula"))
+    ## else
+    d <- dim(x)
+    ch <- paste0(prefix, cl, " copula, dim. d = ", d)
+    switch(kind <- match.arg(kind),
+           short = ch,
+           long = paste0(ch, "\n", prefix, " param.: ",
+                         capture.output(str(x@parameters,
+                                            give.head=FALSE))),
+           stop("invalid 'kind': ", kind))
+})
+
+setMethod("describeCop", "xcopula", # "ANY"
+	  function(x, kind, prefix = "", ...) {
+	      paste(class(x), "copula: ", describeCop(x@copula, kind=kind, prefix=prefix, ...))
+	  })
+
+## *Specific* describeCop() methods in the class  ./<copClass>.R  files
+
+## FIXME: dput(*, control = "namedVector")  could do this
+dputNamed <- function(x, add.c=FALSE, ...) {
+    x <- format(x, ...)
+    stopifnot(is.character(x), is.vector(x))
+    if(!is.null(nx <- names(x)))
+        x <- paste(nx, x, sep = " = ")
+    paste0(if(add.c) "c", "(", paste(x, collapse=", "), ")")
+  }
+
+##' @title Get c(.) (expression) by differentiating C(.) wrt to u1, u2, .., u<d>
+##' @param cdf expression of cdf C(.)
+##' @param d dimension
+##' @return Expression of pdf c(.)
+cdfExpr2pdfExpr <- function(cdf, d) {
+    if (is.null(cdf)) return(NULL)
+    for (i in seq_len(d))
+      cdf <- D(cdf, paste0("u", i))
+    cdf
+}
+
+## This function uses the algorithmic expressions stored in the class object
+## It is used by khoudrajiExplicitCopula, joeCopula, etc.
+.ExplicitCopula.algr <- function(u, copula, log=FALSE, algoNm, ...) {
+    stopifnot((!is.null(copula@exprdist$cdf)))
+    dim <- dim(copula)
+    stopifnot(!is.null(d <- ncol(u)), dim == d)
+
+    colnames(u) <- paste0("u", 1:dim)
+    u.df <- data.frame(u)
+    params <- getTheta(copula, freeOnly = FALSE, named = TRUE)
+
+    target <- c(eval(attr(copula@exprdist, algoNm), c(u.df, params)))
+    if(log) log(target) else target
+}

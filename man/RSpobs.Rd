@@ -90,26 +90,26 @@ stopifnot(length(RS.norm$R) == n, length(RS.t$R) == n,
 
 ## 1a) Q-Q plot of R against the correct quantiles
 qqplot2(RS.t$R, qF=function(p) sqrt(d*qf(p, df1=d, df2=nu)),
-        main.args=list(text=as.expression(substitute(bold(italic(
-                       F[list(d.,nu.)](r^2/d.))~~"Q-Q Plot"),
-                       list(d.=d, nu.=nu))),
-                       side=3, cex=1.3, line=1.1, xpd=NA))
+        main.args=list(text= substitute(bold(italic(F[list(d.,nu.)](r^2/d.))~~"Q-Q Plot"),
+                                        list(d.=d, nu.=nu)),
+		       side=3, cex=1.3, line=1.1, xpd=NA))
 
 ## 1b) Q-Q plot of R against the quantiles of F_R for a multivariate normal
 ##     distribution
-tit <- as.expression(substitute(bold(italic(chi[d.]) ~~ "Q-Q Plot"), list(d.=d)))
 qqplot2(RS.norm$R, qF=function(p) sqrt(qchisq(p, df=d)),
-        main.args=list(text=tit, side=3, cex=1.3, line=1.1, xpd=NA))
+        main.args=list(text= substitute(bold(italic(chi[D_]) ~~ "Q-Q Plot"), list(D_=d)),
+               side=3, cex=1.3, line=1.1, xpd=NA))
 
 ## 2) Graphically testing the angular distribution
 
 ## auxiliary function
 qqp <- function(k, Bmat) {
-    tit <- as.expression(substitute(plain("Beta")(s1,s2) ~~ bold("Q-Q Plot"),
-                                    list(s1 = k/2, s2 = (ncol(Bmat)+1-k)/2)))
+    d <- ncol(Bmat) + 1
     qqplot2(Bmat[,k],
-            qF=function(p) qbeta(p, shape1=k/2, shape2=(ncol(Bmat)+1-k)/2),
-            main.args=list(text=tit, side=3, cex=1.3, line=1.1, xpd=NA))
+            qF = function(p) qbeta(p, shape1=k/2, shape2=(d-k)/2),
+            main.args=list(text= substitute(plain("Beta")(s1,s2) ~~ bold("Q-Q Plot"),
+                                            list(s1 = k/2, s2 = (d-k)/2)),
+  	                   side=3, cex=1.3, line=1.1, xpd=NA))
 }
 
 ## 2a) Q-Q plot of the 'correct' angular distribution

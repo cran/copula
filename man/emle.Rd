@@ -115,7 +115,7 @@ plot(pfm, absVal=FALSE, #  z  against theta
      show.points=TRUE) # showing how it's interpolated
 ## and show the true theta:
 abline(v=theta, col="lightgray", lwd=2, lty=2)
-axis(1, pos = 0, at=theta, label=expression(theta[0]))
+axis(1, pos = 0, at=theta, label=quote(theta[0]))
 
 ## Plot of the log-likelihood, MLE  and  conf.int.:
 logL <- function(x) -efm@minuslogl(x)

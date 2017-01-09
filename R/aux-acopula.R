@@ -14,8 +14,19 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-## if(getRversion() < "2.15")
-## paste0 <- function(...) paste(..., sep="")
+if((Rv <- getRversion()) < "3.2.1") {
+    lengths <- function (x, use.names = TRUE) vapply(x, length, 1L, USE.NAMES = use.names)
+    ## now have  Depends: R (>= 3.1.0)
+    ## if(Rv < "3.1.0") {
+    ##     anyNA <- function(x) any(is.na(x))
+    ##     if(Rv < "3.0.0") {
+    ##         rep_len <- function(x, length.out) rep(x, length.out=length.out)
+    ##         if(Rv < "2.15")
+    ##             paste0 <- function(...) paste(..., sep = '')
+    ##     }
+    ## }
+} ## R < 3.2.1
+
 
 #### Functions and Methods for "acopula" objects
 #### class definition in ./AllClass.R
@@ -504,7 +515,7 @@ polyG <- function(lx, alpha, d, method= c("default", "default2012", "default2011
                   verboseUsingRmpfr = isTRUE(getOption("copula:verboseUsingRmpfr")),
                   log=FALSE)
 {
-    stopifnot(length(alpha)==1, 0 < alpha, alpha <= 1,
+    stopifnot(length(alpha) == 1L, 0 < alpha, alpha <= 1,
               d == as.integer(d), d >= 1)
     k <- 1:d
     allMeths <- eval(formals()[["method"]])
@@ -552,11 +563,15 @@ polyG <- function(lx, alpha, d, method= c("default", "default2012", "default2011
 	       }
 	       else "dsSib.Rmpfr"
 	   }
+           ix <- seq_along(lx)
 	   ## Each lx can -- in principle -- ask for another method ... --> split() by method
-	   meth.lx <- vapply(lx, function(lx) meth2012(d, alpha, lx), "")
+	   meth.lx <- tryCatch(## when lx is "mpfr", vapply() currently (2016-08) fails
+               vapply(lx, function(lx) meth2012(d, alpha, lx), ""),
+               error = { ch <- character(length(lx))
+                   for (i in ix) ch[i] <- meth2012(d, alpha, lx[[i]]); ch })
 	   if(verboseUsingRmpfr && (lg <- length(grep("Rmpfr$", meth.lx))))
 	       message("Default method chose 'Rmpfr' ", if(lg > 1) paste(lg,"times") else "once")
-	   i.m <- split(seq_along(lx), factor(meth.lx))
+	   i.m <- split(ix, factor(meth.lx))
 	   r <- lapply(names(i.m), function(meth)
 		       polyG(lx[i.m[[meth]]], alpha = alpha, d = d, method = meth, log = log))
 	   lx[unlist(i.m, use.names=FALSE)] <- unlist(r, use.names=FALSE)
@@ -971,7 +986,7 @@ dsumSibuya <- function(x, n, alpha,
         -0.0115467115092516 * ldk + -0.236630339094924 * la + 6.84638655885601 * sa +
             -7.59637383430576 * alpha + -0.529181206860549 * ldk * sa +
                 0.579077302168194 * ldk * alpha + 4.07566657020875 * la * alpha
-    pmax(64, exp(yhat + 0.18))
+    pmax(exp(yhat + 0.18), 64)
 }
 
 .dsSib.mpfr.prec <- function(d, k, alpha)
@@ -1274,18 +1289,15 @@ psiDabsMC <- function(t, family, theta, degree=1, n.MC,
 
 ### Non-numerics ###############################################################
 
+setMethod("getTheta", "acopula",
+	  function(copula, freeOnly = TRUE, attr = FALSE, named = attr)
+              ## FIXME fixedPar not yet implemented for 'acopula'
+	      copula@theta)
 
-setGeneric("setTheta", function(x, value, ...) standardGeneric("setTheta"))
-
-##' @title Setting the parameter in a copula
-##' @param x acopula
-##' @param value parameter value
-##' @param na.ok logical indicating if NA values are ok for theta
-##' @param noCheck logical indicating if parameter constraints should be checked
-##' @return acopula with theta set to value
-##' @author Martin Maechler
+### setTheta() --- "standard" and "acopula" related methods here ---------
+### ----------
 setMethod("setTheta", "acopula",
-	  function(x, value, na.ok = TRUE, noCheck = FALSE, ...)
+	  function(x, value, na.ok = TRUE, noCheck = FALSE, freeOnly = TRUE, ...)
       {
 	  stopifnot(is.numeric(value) | (ina <- is.na(value)))
 	  if(ina) {
@@ -1299,8 +1311,8 @@ setMethod("setTheta", "acopula",
 	  x
       })
 setMethod("setTheta", signature(x="outer_nacopula", value="numeric"),
-	  function(x, value, na.ok = TRUE, noCheck = FALSE, ...) {
-	      x@copula <- setTheta(x@copula, value, na.ok=na.ok, noCheck=noCheck)
+	  function(x, value, na.ok = TRUE, noCheck = FALSE, freeOnly = TRUE, ...) {
+	      x@copula <- setTheta(x@copula, value, na.ok=na.ok, noCheck=noCheck, freeOnly=freeOnly)
 	      x
 	  })
 
@@ -1311,7 +1323,7 @@ setMethod("setTheta", signature(x="outer_nacopula", value="numeric"),
 ##           })
 
 setMethod("setTheta", "copula",
-	  function(x, value, na.ok = TRUE, noCheck = FALSE, ...)
+	  function(x, value, na.ok = TRUE, noCheck = FALSE, freeOnly = TRUE, ...)
       {
 	  stopifnot(is.numeric(value) | (ina <- is.na(value)))
 	  if(any(ina)) {
@@ -1340,7 +1352,7 @@ setMethod("setTheta", "copula",
 
 ## NB:  for tCopula(df.fixed = FALSE), value now is (rho,df)
 setMethod("setTheta", "ellipCopula",
-	  function(x, value, na.ok = TRUE, noCheck = FALSE, ...)
+	  function(x, value, na.ok = TRUE, noCheck = FALSE, freeOnly = TRUE, ...)
       {
 	  stopifnot(is.numeric(value) | (ina <- is.na(value)))
 	  if(any(ina)) {
@@ -1350,6 +1362,14 @@ setMethod("setTheta", "ellipCopula",
 	  }
           df.f <- if(is(x, "tCopula")) x@df.fixed else TRUE
           p <- npar.ellip(x@dimension, dispstr = x@dispstr, df.fixed = df.f)
+          fixed <- attr(x@parameters, "fixed")
+          if(freeOnly && !is.null(fixed) && any(fixed) &&
+	     ## fixed par.s apart from possibly 'df' via 'df.fixed':
+	     !(sum(fixed) == 1L && which(fixed) == length(fixed))) {
+### FIXME; not really hard (see 'fixedPar<-' in ./fixedPar.R )
+      stop("setTheta(<ellipCop>, freeOnly=TRUE) not yet implemented for partially fixed par")
+
+          }
           if(length(value) != p)
               stop(gettextf("'length(value)' must be %d for this elliptical copula (dim=%d, dispstr=\"%s\")",
                             p, x@dimension, x@dispstr), domain=NA)
@@ -1372,16 +1392,16 @@ setMethod("setTheta", "ellipCopula",
 ##' @author Martin Maechler
 mkParaConstr <- function(int) {
     stopifnot(is(int, "interval")) # for now
+    eL <- substitute(LL <= theta, list(LL = int[1]))
+    eR <- substitute(theta <= RR, list(RR = int[2]))
     is.o <- int@open
-    eL <- substitute(LL <= theta, list(LL = int[1])); if(is.o[1]) eL[[1]] <-
-        as.symbol("<")
-    eR <- substitute(theta <= RR, list(RR = int[2])); if(is.o[2]) eR[[1]] <-
-        as.symbol("<")
+    if(is.o[1]) eL[[1]] <- quote(`<`) # instead of '<='
+    if(is.o[2]) eR[[1]] <- quote(`<`)
     bod <- substitute(length(theta) == 1 && LEFT && RIGHT,
                       list(LEFT = eL, RIGHT= eR))
-    as.function(c(alist(theta=), bod), parent.env(environment()))
+    as.function(c(alist(theta=, dim=), bod), parent.env(environment()))
     ## which is a fast version of
-    ## r <- function(theta) {}
+    ## r <- function(theta, dim) {}
     ## environment(r) <- parent.env(environment())
     ## body(r) <- bod
     ## r
@@ -1459,6 +1479,7 @@ printNacopula <-
 }
 
 setMethod(show, "nacopula", function(object) printNacopula(object))
+## and S3method(print, nacopula, printNacopula)  ---> in ../NAMESPACE
 
 
 ##' (hidden) utility for getAname() and getAcop()

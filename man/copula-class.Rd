@@ -7,6 +7,7 @@
 \alias{xcopula-class}
 %
 \alias{plackettCopula-class}% the only "actual" class also on this help page
+% methods
 \alias{dim,copula-method}
 \alias{dim,xcopula-method}
 \description{
@@ -49,7 +50,7 @@
       class \code{"numeric"}.}
     \item{\code{param.upbnd}:}{upper bounds for the parameters, of class
       \code{"numeric"}.}
-    \item{\code{fullname}:}{Object of class \code{"character"}, family names
+    \item{\code{fullname}:}{\bold{deprecated}; object of class \code{"character"}, family names
       of the copula.}
   }
 }

@@ -26,7 +26,8 @@ evTestA(x, N = 1000, derivatives = c("An","Cn"))
   See also Genest and Segers (2009) and Remillard and Scaillet (2009).
 }
 \value{
-  Returns a list whose attributes are:
+  An object of \code{\link{class}} \code{htest} which is a list,
+  some of the components of which are
   \item{statistic}{ value of the test statistic. }
   \item{p.value}{ corresponding approximate p-value. }
 }
@@ -42,19 +43,12 @@ evTestA(x, N = 1000, derivatives = c("An","Cn"))
   Kojadinovic, I. and Yan, J. (2010).
   Nonparametric rank-based tests of bivariate extreme-value dependence.
   \emph{Journal of Multivariate Analysis} \bold{101}, 2234--2249.
-
-  Kojadinovic, I. and Yan, J. (2010).
-  Modeling Multivariate Distributions with Continuous Margins Using the
-  copula R Package.
-  \emph{Journal of Statistical Software} \bold{34}(9), 1--20.
-  \url{http://www.jstatsoft.org/v34/i09/}.
 }
 \note{
   This test was derived under the assumption of continuous margins,
   which implies that ties occur with probability zero.  The
   presence of ties in the data might substantially affect the
-  approximate p-value.  One way of dealing with ties was suggested in
-  the last reference.
+  approximate p-value.
 }
 \seealso{ \code{\link{evTestK}}, \code{\link{evTestC}},
   \code{\link{evCopula}},

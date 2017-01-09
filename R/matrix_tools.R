@@ -91,7 +91,7 @@ extremePairs <- function(x, n = 6, method = c("largest", "smallest", "both"),
     stopifnot(n >= 1, d >= 2, nrow(x) == d, is.logical(use.names))
 
     ## Build (row, col)-matrix
-    ind <- as.matrix(expand.grid(1:d, 1:d)[,2:1])
+    ind <- as.matrix(expand.grid(1:d, 1:d, KEEP.OUT.ATTRS = FALSE)[,2:1])
     ind <- ind[ind[,1]<ind[,2],] # pick out indices as they appear in the upper triangular matrix
     colnms <- colnames(x)
     if(use.names && !is.null(colnms))

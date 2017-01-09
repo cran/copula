@@ -19,14 +19,14 @@ normalCopula <- function(param = NA_real_, dim = 2L, dispstr = "ex") {
     stopifnot((pdim <- length(param)) >= 1)
     if(pdim == 1 && is.na(param)) ## extend it (rho)
 	pdim <- length(param <- rep(param, length.out = npar.ellip(dim, dispstr)))
-  new("normalCopula",
+  new("normalCopula", # validRho() in ./Classes.R checks 'dispstr' and more:
       dispstr = dispstr,
       dimension = as.integer(dim),
       parameters = param,
       param.names = paste("rho", 1:pdim, sep="."),
-      param.lowbnd = rep(-1, pdim),
+      param.lowbnd = lowbnd.rho.ellip(dim, dispstr, pdim),
       param.upbnd = rep(1, pdim),
-      fullname = "Normal copula family",
+      fullname = "<deprecated slot>", # "Normal copula family"
       getRho = function(obj) obj@parameters)
 }
 
@@ -40,7 +40,7 @@ pnormalCopula <- function(u, copula, ...) {
   ## stopifnot(is.matrix(u), ncol(u) == dim) # <- as called from pCopula()
   i.lower <- rep.int(-Inf, dim)
   sigma <- getSigma(copula)
-  apply(qnorm(u), 1, function(x) if(any(is.na(x))) NA_real_ else
+  apply(qnorm(u), 1, function(x) if(anyNA(x)) NA_real_ else
         pmvnorm(lower = i.lower, upper = x, sigma = sigma, ...))
 }
 
@@ -49,7 +49,7 @@ dnormalCopula <- function(u, copula, log=FALSE, ...) {
   sigma <- getSigma(copula)
   if(!is.matrix(u)) u <- matrix(u, ncol = dim)
   r <- numeric(nrow(u)) # i.e. 0  by default (i.e. "outside")
-  ok <- !apply(u, 1, function(x) any(is.na(x)))
+  ok <- !apply(u, 1, anyNA)
   x <- qnorm(u[ok, , drop=FALSE])
   ## work in log-scale [less over-/under-flow, then (maybe) transform:
   r[ok] <- dmvnorm(x, sigma = sigma, log=TRUE) - rowSums(dnorm(x, log=TRUE))
@@ -95,11 +95,15 @@ dmvnorm <- function (x, mean, sigma, log=FALSE)
 
 
 
-showNormalCopula <- function(object) {
-  print.copula(object)
-  if (object@dimension > 2) cat("dispstr: ", object@dispstr, "\n")
-  invisible(object)
+printNormalCopula <- function(x, ...) {
+  printCopula(x, ...)
+  if (x@dimension > 2) cat("dispstr: ", x@dispstr, "\n")
+  invisible(x)
 }
+
+## as long we think we need print.copula(), we also need this:
+print.normalCopula <- printNormalCopula
+setMethod("show", signature("normalCopula"), function(object) printNormalCopula(object))
 
 
 lambdaNormalCopula <- function(copula) {
@@ -110,11 +114,10 @@ lambdaNormalCopula <- function(copula) {
 setMethod("rCopula", signature("numeric", "normalCopula"), rnormalCopula)
 
 setMethod("pCopula", signature("matrix", "normalCopula"), pnormalCopula)
-setMethod("pCopula", signature("numeric", "normalCopula"),pnormalCopula)
 setMethod("dCopula", signature("matrix", "normalCopula"), dnormalCopula)
-setMethod("dCopula", signature("numeric", "normalCopula"),dnormalCopula)
-
-setMethod("show", signature("normalCopula"), showNormalCopula)
+## pCopula() and dCopula() *generic* already deal with non-matrix case!
+## setMethod("pCopula", signature("numeric", "normalCopula"),pnormalCopula)
+## setMethod("dCopula", signature("numeric", "normalCopula"),dnormalCopula)
 
 ## rho := copula@parameters
 setMethod("tau", "normalCopula", function(copula) 2 * asin(copula@parameters) /pi)

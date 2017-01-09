@@ -39,49 +39,41 @@ indepCopula <- function(dim = 2L) {
              param.names = character(0),
              param.lowbnd = double(0),
              param.upbnd = double(0),
-             fullname = "Independence copula")
+             fullname = "<deprecated slot>")# "Independence copula"
 }
 
-AIndep <- function(copula, w) rep.int(1, length(w))
+setMethod("A", signature("indepCopula"), function(copula, w) rep.int(1, length(w)))
 
-rindepCopula <- function(n, copula) matrix(runif(n * copula@dimension), nrow = n)
+setMethod("rCopula", signature("numeric", "indepCopula"),
+          function(n, copula) matrix(runif(n * copula@dimension), nrow = n))
 
-pindepCopula <- function(u, copula, log.p=FALSE) {
-  stopifnot(ncol(u) == copula@dimension)
-  if(log.p) rowSums(log(u)) else apply(u, 1, prod)
-}
-
-dindepCopula <- function(u, copula, log=FALSE, ...) {
-  stopifnot(ncol(u) == copula@dimension)
-  rep.int(if(log) 0 else 1, nrow(u))
-}
-
-## iTauIndepCopula <- function(copula, tau) {
-##   cat("No need to calibrate an independent copula.\n")
-## }
-
-## iRhoIndepCopula <- function(copula, rho) {
-##   cat("No need to calibrate an independent copula.\n")
-## }
-
-
-setMethod("rCopula", signature("numeric", "indepCopula"), rindepCopula)
-
-setMethod("pCopula", signature("numeric", "indepCopula"),pindepCopula)
-setMethod("pCopula", signature("matrix", "indepCopula"), pindepCopula)
-setMethod("dCopula", signature("numeric", "indepCopula"),dindepCopula)
-setMethod("dCopula", signature("matrix", "indepCopula"), dindepCopula)
-
-
-setMethod("A", signature("indepCopula"), AIndep)
+setMethod("pCopula", signature("matrix", "indepCopula"),
+	  function(u, copula, log.p=FALSE) {
+	      stopifnot(ncol(u) == copula@dimension)
+	      if(log.p) rowSums(log(u)) else apply(u, 1, prod)
+	  })
+setMethod("dCopula", signature("matrix", "indepCopula"),
+	  function(u, copula, log=FALSE, ...) {
+	      stopifnot(ncol(u) == copula@dimension)
+	      rep.int(if(log) 0 else 1, nrow(u))
+	  })
 
 setMethod("tau", "indepCopula", function(copula, ...) 0)
 setMethod("rho", "indepCopula", function(copula, ...) 0)
 setMethod("lambda", "indepCopula",
           function(copula, ...)  c(lower=0, upper = 0))
 
-# setMethod("iTau", signature("indepCopula"), iTauIndepCopula)
-# setMethod("iRho", signature("indepCopula"), iRhoIndepCopula)
-
-# setMethod("dTau", signature("indepCopula"), dTauIndepCopula)
-# setMethod("dRho", signature("indepCopula"), dRhoIndepCopula)
+## GETR
+setMethod("describeCop", c("indepCopula", "character"),
+          function(x, kind = c("short", "very short", "long"), prefix = "", ...) {
+    kind <- match.arg(kind)
+    if(kind == "very short") # e.g. for show() which has more parts
+        return(paste0(prefix, "Independence copula"))
+    ## else
+    d <- dim(x)
+    ch <- paste0(prefix, "Independence copula, dim. d = ", d)
+    switch(kind <- match.arg(kind),
+           short = ch,
+           long = ch,
+           stop("invalid 'kind': ", kind))
+})

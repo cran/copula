@@ -44,10 +44,10 @@ rnacopula(n, copula, x, ...)
   Efficiently sampling nested Archimedean copulas.
   \emph{Computational Statistics & Data Analysis} \bold{55}, 57--70.
 
-  Hofert, M. (2011a).
-  A stochastic representation and sampling algorithm for nested
-  Archimedean copulas.
-  \emph{Journal of Statistical Computation and Simulation}, in press.
+  Hofert, M. (2012), A stochastic representation and sampling algorithm
+  for nested Archimedean copulas.
+  \emph{Journal of Statistical Computation and Simulation}, \bold{82},
+  9, 1239--1255.
 
   Hofert, M. (2012).
   Sampling exponentially tilted stable distributions.

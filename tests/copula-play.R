@@ -84,8 +84,8 @@ checkifnot <- function(expr, prefix = "check if", true = "[Ok]")
 ##' @return list of measurements
 ##' @author Marius Hofert, Martin Maechler
 tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
-                   nRnd = 50, u01 = (1:63)/64, # exact binary fractions
-                   lambdaLvec = NA_real_, lambdaUvec = NA_real_)
+		   nRnd = 50, u01 = (1:63)/64, # exact binary fractions
+		   lambdaLvec = NA_real_, lambdaUvec = NA_real_)
 {
     stopifnot(is(cop, "acopula"))
     cat0 <- function(...) cat(..., "\n", sep = "")
@@ -95,25 +95,26 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     ### (1) cop name
 
     cat0(sprintf("(1) copula family: %10s, theta0 = %g",
-                 cop@name, theta0))
+		 cop@name, theta0))
 
     ### (2) generator
 
     ### (2.1) psi and iPsi
 
     cat("\n(2) values of psi at i10:\n")
-    CT <- c(CT, list(psi = system.time(p.i <- cop@psi(i10,theta = theta0))))
+    CT <- c(CT, list(psi = system.time(
+			 p.i <- cop@psi(i10,theta = theta0))))
     print(p.i)
     checkifnot(identical(numeric(0), cop@iPsi(numeric(0), theta = theta0)))
     checkifnot(cop@iPsi(0, theta = theta0) == Inf)
     cat0("\nvalues of iPsi at u01:")
-    CT <- c(CT, list(psiI = system.time(pi.t <-
-                     cop@iPsi(u01, theta = theta0))))
+    CT <- c(CT, list(psiI = system.time(
+			 pi.t <- cop@iPsi(u01, theta = theta0))))
     print(pi.t)
     CT[["psiI"]] <- CT[["psiI"]] +
-        system.time(pi.pi <- cop@iPsi(p.i,theta = theta0))
+	system.time(pi.pi <- cop@iPsi(p.i,theta = theta0))
     CT[["psi" ]] <- CT[["psi" ]] +
-        system.time(p.pit <- cop@psi(pi.t, theta = theta0))
+	system.time(p.pit <- cop@psi(pi.t, theta = theta0))
     cat0("check if iPsi(psi(i10))==i10: ", all.equal(pi.pi, i10))
     cat0("check if psi(iPsi(u01))==u01: ", all.equal(p.pit, u01))
 
@@ -121,34 +122,34 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
 
     ## absdPsi with degree = 10
     cat0("\nvalues of absdPsi with degree=10 at i10:")
-    CT <- c(CT, list(absdPsi = system.time(p.D <- cop@absdPsi(i10,theta = theta0,
-                     degree = 10))))
+    CT <- c(CT, list(absdPsi = system.time(
+			 p.D <- cop@absdPsi(i10,theta = theta0, degree = 10))))
     print(p.D)
     cat0("check if all values are nonnegative")
     stopifnot(is.vector(p.D), all(p.D >= 0))
     cat("check absdPsi(Inf,theta,degree=10) = 0 and the class of absdPsi(0,theta,degree=10): ")
     at.0 <- cop@absdPsi(0, theta = theta0, degree = 10)
     stopifnot(cop@absdPsi(Inf, theta = theta0, degree = 10) == 0,
-              is.numeric(at.0), !is.nan(at.0))
+	      is.numeric(at.0), !is.nan(at.0))
     cat0("[Ok]")
     ## absdPsi with degree = 10 and MC
     cat("\nvalues of absdPsi with degree=10 and MC at i10:\n")
-    CT <- c(CT, list(absdPsi = system.time(p.D <- cop@absdPsi(i10,theta = theta0,
-                     degree = 10, n.MC = 1000))))
+    CT <- c(CT, list(absdPsi = system.time(
+			 p.D <- cop@absdPsi(i10,theta = theta0, degree = 10, n.MC = 1000))))
     print(p.D)
     cat0("check if all values are nonnegative")
     stopifnot(all(p.D >= 0))
     cat("check absdPsi(Inf,theta,degree=10,n.MC=1000) = 0 and the class of absdPsi(0,theta,degree=10,n.MC=1000): ")
     at.0 <- cop@absdPsi(0, theta = theta0, degree = 10, n.MC = 1000)
     stopifnot(cop@absdPsi(Inf, theta = theta0, degree = 10, n.MC = 1000)==0,
-              is.numeric(at.0), !is.nan(at.0))
+	      is.numeric(at.0), !is.nan(at.0))
     cat0("[Ok]")
 
     ### (2.3) absdiPsi
 
     cat0("\nvalues of absdiPsi at u01:")
-    CT <- c(CT, list(absdiPsi. = system.time(absdiPsi. <-
-                     cop@absdiPsi(u01, theta = theta0))))
+    CT <- c(CT, list(absdiPsi. = system.time(
+			 absdiPsi. <- cop@absdiPsi(u01, theta = theta0))))
     print(absdiPsi.)
     stopifnot(all(absdiPsi. >= 0, is.numeric(absdiPsi.), !is.nan(absdiPsi.)))
     cat("check the class of absdiPsi(0,theta): ")
@@ -162,7 +163,7 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     print(cop@paraInterval)
     cat0("theta1=",theta1)
     cat0("nesting condition for theta0 and theta1 fulfilled: ",
-         cop@nestConstr(theta0,theta1))
+	 cop@nestConstr(theta0,theta1))
 
     ### (4) V0, dV0, V01, dV01
 
@@ -181,17 +182,17 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     nt <- length(thetavec)
     ## dV01
     cat("\nvalues of dV01 at i10:\n")
-    CT <- c(CT, list(dV01 = system.time(dV01.i <- cop@dV01(i10,V0=1,theta0=theta0,
-                     theta1=theta1))))
+    CT <- c(CT, list(dV01 = system.time(
+			 dV01.i <- cop@dV01(i10,V0=1,theta0=theta0, theta1=theta1))))
     print(dV01.i)
 
     ### (5) cCopula {was "cacopula"}
     cat("\n(5) values of cCopula(cbind(v,rev(v)), copula = cop) for v=u01:\n")
     cop. <- onacopulaL(cop@name, list(theta0, 1:2))
-    CT <- c(CT, list(cCopula. = system.time(cac <- cCopula(cbind(u01, rev(u01)),
-                     copula = cop., indices = 2))))
-    stopifnot(is.vector(cac), length(cac) == length(u01), 0 <= cac, cac <= 1)
-    print(cac)
+    CT <- c(CT, list(cCopula. = system.time(
+			 cac <- cCopula(cbind(u01, rev(u01)), copula = cop., indices = 2))))
+    stopifnot(identical(dim(cac), c(length(u01),1L)), 0 <= cac, cac <= 1)
+    print(c(cac))
 
     ### (6) dCopula (log = TRUE) {was dnacopula()}
 
@@ -202,7 +203,7 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     ## d = 2
     cat("\n(6) check dCopula(*, log = TRUE) for u being a random (20x2)-matrix:\n")
     CT <- c(CT, list(dCopula. =
-                     system.time(lD <- dCopula(u[,1:2], ocop.2d, log = TRUE))))
+		     system.time(lD <- dCopula(u[,1:2], ocop.2d, log = TRUE))))
     print(lD); stopifnot(is.numeric(lD), is.finite(lD)); cat0("[Ok]")
     cat("check at (0,0.5) and (1,0.5):\n")
     stopifnot(dCopula(cbind(0:1,0.5), ocop.2d, log = FALSE) == 0,
@@ -212,13 +213,13 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     ## d = 20, n.MC = 0
     cat("\n check dCopula(*, log = TRUE) for u being a random (20x20)-matrix:\n")
     CT <- c(CT, list(dCopula. =
-                     system.time(lD. <- dCopula(u, ocop.20d, log = TRUE))))
+		     system.time(lD. <- dCopula(u, ocop.20d, log = TRUE))))
     print(lD.); stopifnot(is.numeric(lD.), is.finite(lD.)); cat0("[Ok]")
 
     ## d = 20, n.MC > 0
     cat("\n check dCopula(*, log = TRUE) and MC for u being a random (20x20)-matrix:\n")
     CT <- c(CT, list(dCopula. =
-                     system.time(lD.. <- dCopula(u, ocop.20d, n.MC = 1000, log = TRUE))))
+		     system.time(lD.. <- dCopula(u, ocop.20d, n.MC = 1000, log = TRUE))))
     print(lD..); stopifnot(is.numeric(lD..), is.finite(lD..)); cat0("[Ok]")
 
     ## d = 20, check if n.MC > 0 is close to n.MC = 0
@@ -229,11 +230,11 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     check.K.u01 <- function(K){
 	d.K <- diff(K)
 	if(any(neg <- d.K < 0)){ # happens for AMH, Clayton, and Frank (near 1)
-            if(any(Neg <- abs(d.K[neg]) > 1e-15* abs(K[-1][neg]))) {
-                warning("K(.) is 'substantially' non-monotone for K() / diff(K) =",
-                        immediate.=TRUE)
-                print(cbind(K = K[-1][Neg], diff.K = d.K[Neg]))
-            }
+	    if(any(Neg <- abs(d.K[neg]) > 1e-15* abs(K[-1][neg]))) {
+		warning("K(.) is 'substantially' non-monotone for K() / diff(K) =",
+			immediate.=TRUE)
+		print(cbind(K = K[-1][Neg], diff.K = d.K[Neg]))
+	    }
 	}
 	stopifnot(is.numeric(K), length(K) == length(u01), 0 <= K, K <= 1)
     }
@@ -244,7 +245,7 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     check.K.u01( print(K.) )
     cat("check if K(0) = 0 and K(1) = 1: ")
     stopifnot(pK(0, cop, d = 2)==0,
-              pK(1, cop, d = 2)==1)
+	      pK(1, cop, d = 2)==1)
     cat0("[Ok]")
     ## K for d = 10
     cat("\nvalues of K for d = 10 at u01:\n")
@@ -252,7 +253,7 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     check.K.u01( print(K.) )
     cat("check if K(0) = 0 and K(1) = 1: ")
     stopifnot(pK(0, cop, d = 10)==0,
-              pK(1, cop, d = 10)==1)
+	      pK(1, cop, d = 10)==1)
     cat0("[Ok]")
     ## K for d = 10 and MC
     cat("\nvalues of K for d = 10 and MC at u01:\n")
@@ -260,7 +261,7 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     check.K.u01( print(K.) )
     cat("check if K(0)=0 and K(1)=1: ")
     stopifnot(pK(0, cop, d = 10, n.MC = 1000)==0,
-              pK(1, cop, d = 10, n.MC = 1000)==1)
+	      pK(1, cop, d = 10, n.MC = 1000)==1)
     cat0("[Ok]")
 
     ### (8) tau, iTau
@@ -270,7 +271,7 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     print(ta)
     CT <- c(CT, list(tauI = system.time(ta.I <- cop@iTau(ta))))
     cat0("check if iTau(tau(thetavec))==thetavec: ",
-         all.equal(ta.I, thetavec))
+	 all.equal(ta.I, thetavec))
     lambdaLvec <- rep(as.double(lambdaLvec), length.out= nt)
     lambdaUvec <- rep(as.double(lambdaUvec), length.out= nt)
 
@@ -281,7 +282,7 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     CT <- c(CT, list(lT.I = system.time(lT.I <- cop@lambdaLInv(lT))))
     print(lT)
     cat0("check if lambdaLInv(lambdaL(thetavec))==lambdaLvec: ",
-         all.equal(lT.I, lambdaLvec))
+	 all.equal(lT.I, lambdaLvec))
 
     ### (10) lambdaU, lambdaUInv
 
@@ -290,13 +291,13 @@ tstCop <- function(cop, theta1 = cop@theta, thetavec = cop@theta, i10 = 1:10,
     CT <- c(CT, list(uT.I = system.time(uT.I <- cop@lambdaUInv(uT))))
     print(uT)
     cat0("check if lambdaUInv(lambdaU(thetavec))==lambdaUvec: ",
-         all.equal(uT.I, lambdaUvec))
+	 all.equal(uT.I, lambdaUvec))
 
     ### (11) dDiag
 
     cat("\n(11) dDiag at u01 for d=10:\n")
-    CT <- c(CT, list(dDiag = system.time(dDiag. <- cop@dDiag(u01, theta=theta0,
-                     d=10))))
+    CT <- c(CT, list(dDiag = system.time(
+			 dDiag. <- cop@dDiag(u01, theta=theta0, d=10))))
     print(dDiag.)
     stopifnot(is.numeric(dDiag.), all(dDiag. > 0))
     cat0("[Ok]")
@@ -426,5 +427,33 @@ chkPsi(claytonCopula(-1/8))
 chkPsi(claytonCopula(-2^-10))
 
 ## AMH:
+tAMH <- c((5 - 8*log(2))/ 3, -1/8, 0, 1/8, 1/3)
+(th.t <- vapply(tAMH, function(tau) iTau(amhCopula(), tau), 1.))
+stopifnot(-1 <= th.t, th.t <= 1,
+          all.equal(th.t[c(1,3,5)], c(-1,0,1)))
+## rho: --> ../vignettes/rhoAMH-dilog.Rnw
 
-## --> ../vignettes/rhoAMH-dilog.Rnw
+## cCopula() for all three "negative" tau families:
+## --------                 --------------
+cCneg <- function(tau, u1 = (1:8)/8) {
+    stopifnot(length(tau) == 1, is.finite(tau), -1 <= tau, tau <= 1)
+    u <- cbind(u1, .5)
+    rbind(A = cCopula(u,     amhCopula(iTau(    amhCopula(), tau)))[,2],
+          C = cCopula(u, claytonCopula(iTau(claytonCopula(), tau)))[,2],
+          F = cCopula(u,   frankCopula(iTau(  frankCopula(), tau)))[,2])
+}
+
+## AMH and Frank "failed" because cop(AMH|Frank) @ absdPsi(*, log=TRUE) gave NaN
+(cACF <- cCneg(tau = -0.18))
+stopifnot(is.finite(cACF), !apply(cACF, 1, is.unsorted),
+	  0.348 <= cACF, cACF <= 0.748,
+          ## *are* somewhat similar as they have same tau:
+	  all.equal(cACF["A",], cACF["F",], tol = 0.035)
+         ,
+	  all.equal(cACF["C",], cACF["F",], tol = 0.079)
+          )
+
+## FIXME: u1 = 0 still gives NaN, and for Clayton even others
+u1. <- c(0, 1e-100, 1e-20, 1e-10, 1e-5, 1e-4, 1e-3, .01)
+cCneg(-0.18, u1 = u1.)
+

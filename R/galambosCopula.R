@@ -110,7 +110,7 @@ galambosCopula <- function(param = NA_real_) {
              param.names = "param",
              param.lowbnd = 0,
              param.upbnd = Inf,
-             fullname = "Galambos copula family; Extreme value copula")
+             fullname = "<deprecated slot>")# "Galambos copula family; Extreme value copula"
 }
 
 pgalambosCopula <- function(u, copula) {
@@ -231,10 +231,10 @@ dRhoGalambosCopula <- function(copula) {
 
 ################################################################################
 
-setMethod("pCopula", signature("numeric", "galambosCopula"),pgalambosCopula)
 setMethod("pCopula", signature("matrix", "galambosCopula"), pgalambosCopula)
-setMethod("dCopula", signature("numeric", "galambosCopula"),dgalambosCopula)
 setMethod("dCopula", signature("matrix", "galambosCopula"), dgalambosCopula)
+## pCopula() and dCopula() *generic* already deal with non-matrix case!
+
 
 ## revCopula is much faster
 ## setMethod("rCopula", signature("galambosCopula"), rgalambosCopula)

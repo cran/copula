@@ -48,7 +48,8 @@
 \alias{A,huslerReissCopula-method}
 \alias{A,tawnCopula-method}
 \alias{A,tevCopula-method}
-\alias{A,khoudrajiBivCopula-method}
+% \alias{A,khoudrajiBivCopula-method}
+\alias{A,khoudrajiCopula-method} % TODO: need to have higher dim A function
 \alias{A,indepCopula-method}
 % dAdu
 \alias{AfunDer}%deprecated
@@ -115,9 +116,11 @@ dAdu(copula, w)
 }
 %\author{Marius Hofert, Ivan Kojadinovic, Martin Maechler and Jun Yan}
 \references{
-  Gudendorf, G. and Segers, J. (2009)
-  {Nonparametric estimation of an extreme-value copula in arbitrary dimensions},
-  {ArXiv}, \url{http://arxiv.org/abs/0911.1015}.
+  Gudendorf, G. and Segers, J. (2010).
+  {Extreme-value copulas}. In \emph{Copula theory and its applications},
+  {Jaworski, P., Durante, F., H\enc{ä}{a}rdle, W. and Rychlik, W., Eds}.
+  {Springer-Verlag}, {Lecture Notes in Statistics}, {127--146},
+  \url{http://arxiv.org/abs/0911.1015}.
 }
 \seealso{
   Nonparametric estimators for \eqn{A()} are available, see

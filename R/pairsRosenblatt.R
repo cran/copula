@@ -186,7 +186,7 @@
 	    mfg <- par("mfg") # for checking afterwards
 
 	    ## everything ok for plotting (especially if method="none" in pairsRosenblatt())?
-	    ok <- !any(is.na(xls[,j]), is.na(yls[,i]))
+	    ok <- !(anyNA(xls[,j]) || anyNA(yls[,i]))
 	    if(ok) { ## set up coordinate system
 		if(i!=j) {
 		    plot.window(xlim=xls[,j], ylim=yls[,i])

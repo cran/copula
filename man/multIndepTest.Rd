@@ -12,7 +12,7 @@
 }
 \usage{
 multIndepTest(x, d, m = length(d), N = 1000, alpha = 0.05,
-              verbose = interactive(), print.every = NULL)
+              verbose = interactive())
 }
 \arguments{
   \item{x}{ data frame (\code{\link{data.frame}}) or  matrix containing
@@ -26,7 +26,6 @@ multIndepTest(x, d, m = length(d), N = 1000, alpha = 0.05,
   \item{N}{ number of bootstrap/permutation samples.}
   \item{alpha}{ significance level used in the computation of the
     critical values for the test statistics.}
-  \item{print.every}{ is deprecated in favor of \code{verbose}.}
   \item{verbose}{ a logical specifying if progress
     should be displayed via \code{\link[utils]{txtProgressBar}}.}
 }
@@ -46,6 +45,9 @@ multIndepTest(x, d, m = length(d), N = 1000, alpha = 0.05,
   Mises statistic derived directly from the independence empirical
   copula process - see \code{In} in the last reference) and
   \code{global.statistic.pvalue} (corresponding p-value).
+
+  The former argument \code{print.every} is deprecated and not
+  supported anymore; use \code{verbose} instead.
 }
 %\author{Ivan Kojadinovic and Jun Yan}
 \references{

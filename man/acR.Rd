@@ -57,8 +57,8 @@ y <- vapply(1:dmax, function(d)
             pacR(x, family=family, theta=iTau(archmCopula(family), tau), d=d),
             rep(NA_real_, m))
 plot(x, y[,1], type="l", ylim=c(0,1),
-     xlab = expression(italic(x)),
-     ylab = substitute(italic(F[R](x))~~"for d=1:"*dm, list(dm=dmax)))
+     xlab = quote(italic(x)), ylab = quote(F[R](x)),
+     main = substitute(italic(F[R](x))~~ "for" ~ d==1:.D, list(.D = dmax)))
 for(k in 2:dmax) lines(x, y[,k])
 }
 \keyword{distribution}

@@ -31,15 +31,15 @@ copClass <- function(cop)
 ##' @title Copula family for the given copula object
 ##' @param cop copula object (either elliptical or (nested) Archimedean)
 ##' @return family string
-##' @author Marius Hofert
+##' @author Marius Hofert and Martin Maechler
 copFamily <- function(cop)
 {
-    cls <- class(cop)
-    if(is(cop, "copula")){
-        if(cls=="normalCopula") "normal"
-        else if(cls=="tCopula") "t"
+    cls <- getClass(class(cop)) # so extends( . , "..")  is efficient
+    if(extends(cls, "copula")) {
+        if(extends(cls, "normalCopula")) "normal"
+        else if(extends(cls, "tCopula")) "t"
         else stop("unsupported copula family")
-    } else if(cls=="outer_nacopula"){
+    } else if(extends(cls, "outer_nacopula")) {
         cop@copula@name # could be nested or not
     } else stop("not yet supported copula object")
 }

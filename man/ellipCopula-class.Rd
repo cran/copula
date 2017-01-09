@@ -29,7 +29,7 @@
       bounds for the \code{parameters} slot, of the same length.}
     \item{\code{param.upbnd}:}{upper bounds for \code{parameters},
       analogous to \code{parm.lowbnd}.}
-    \item{\code{fullname}:}{Object of class \code{"character"}, family names
+    \item{\code{fullname}:}{\bold{deprecated}; object of class \code{"character"}, family names
       of the copula.}
   }
 }

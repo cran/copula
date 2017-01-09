@@ -21,8 +21,7 @@
   More details can be found in the articles cited in the reference section.
 }
 \usage{
-serialIndepTestSim(n, lag.max, m=lag.max+1, N=1000, verbose = interactive(),
-                   print.every = NULL)
+serialIndepTestSim(n, lag.max, m=lag.max+1, N=1000, verbose = interactive())
 serialIndepTest(x, d, alpha=0.05)
 }
 \arguments{
@@ -34,7 +33,6 @@ serialIndepTest(x, d, alpha=0.05)
       lag.max+1} especially when \code{lag.max} is large.}
   \item{N}{ number of repetitions when simulating under serial
     independence.}
-   \item{print.every}{ is deprecated in favor of \code{verbose}.}
    \item{verbose}{ a logical specifying if progress
     should be displayed via \code{\link[utils]{txtProgressBar}}.}
   \item{x}{ numeric vector containing the time series whose serial
@@ -72,6 +70,9 @@ serialIndepTest(x, d, alpha=0.05)
   Mises statistic derived directly from the serial independence
   empirical copula process --- see last reference p 175) and
   \code{global.statistic.pvalue} (corresponding p-value).
+
+  The former argument \code{print.every} is deprecated and not
+  supported anymore; use \code{verbose} instead.
 }
 %\author{Ivan Kojadinovic and Jun Yan}
 \references{
@@ -131,6 +132,6 @@ test
 
 dependogram(test,print=TRUE)
 
-## NB: In order to save d for future use, the save function can be used.
+## NB: In order to save d for future use, the saveRDS() function can be used.
 }
 \keyword{htest}

@@ -4,7 +4,7 @@
 \alias{huslerReissCopula}
 \alias{tawnCopula}
 \alias{tevCopula}
-\title{Construction of Extreme-Value Copula Class Objects}
+\title{Construction of Extreme-Value Copula Objects}
 \description{
   Constructs an extreme-value copula class object with its corresponding
   parameter.
@@ -40,44 +40,49 @@ tevCopula(param, df = 4, df.fixed = FALSE)
   \code{"\linkS4class{tawnCopula}"}, or \code{"\linkS4class{tevCopula}"}.
 }
 \note{
-  The Gumbel copula is both an Archimedean and an extreme-value copula.
+  The Gumbel copula is both an Archimedean and an extreme-value copula,
+  with principal documentation on \code{\link{gumbelCopula}} (or
+  \code{\link{archmCopula}}).
 }
 %\author{Ivan Kojadinovic and Jun Yan}
 \seealso{ \code{\link{ellipCopula}}, \code{\link{archmCopula}},
   \code{\link{gofEVCopula}}, \code{\link{An}}. }
 \examples{
-## Notice that, for a given degree of dependence,
-## these copulas are strikingly similar.
+## Gumbel is both
+stopifnot(identical(   evCopula("gumbel"), gumbelCopula()),
+          identical(archmCopula("gumbel"), gumbelCopula()))
 
-tau <- 0.33
+## For a given degree of dependence these copulas are strikingly similar :
 
-gumbel.cop <- evCopula("gumbel")
-stopifnot(identical(gumbel.cop, gumbelCopula()))
-gumbel.cop@parameters <- iTau(gumbel.cop, tau)
+tau <- 1/3
 
-galambos.cop <- galambosCopula()
-galambos.cop@parameters <- iTau(galambos.cop, tau)
+gumbel.cop      <- gumbelCopula     (iTau(gumbelCopula(),      tau))
+galambos.cop    <- galambosCopula   (iTau(galambosCopula(),    tau))
+huslerReiss.cop <- huslerReissCopula(iTau(huslerReissCopula(), tau))
+tawn.cop        <- tawnCopula       (iTau(tawnCopula(),        tau))
+tev.cop         <- tevCopula        (iTau(tevCopula(),         tau))
 
-huslerReiss.cop <- huslerReissCopula()
-huslerReiss.cop@parameters <- iTau(huslerReiss.cop, tau)
-
-tawn.cop <- tawnCopula()
-tawn.cop@parameters <- iTau(tawn.cop, tau)
-
-tev.cop <- tevCopula()
-tev.cop@parameters[1] <- iTau(tev.cop, tau)
-
-curve(A(gumbel.cop, x), 0, 1,
-      main = "A(x) for five Extreme Value cop. w/  tau = 1/3")
+curve(A(gumbel.cop, x), 0, 1, ylab = "A(<cop>( iTau(<cop>(), tau)), x)",
+      main = paste("A(x) for five Extreme Value cop. w/  tau =", format(tau)))
 curve(A(galambos.cop, x), lty=2, add=TRUE)
 curve(A(huslerReiss.cop, x), lty=3, add=TRUE)
 curve(A(tawn.cop, x), lty=4, add=TRUE)
-curve(A(tev.cop, x), lty=5, add=TRUE)
+curve(A(tev.cop, x), lty=5, col=2, add=TRUE)# very close to Gumbel
+
+## And look at the differences
+curve(A(gumbel.cop, x) - A(tawn.cop, x), ylim = c(-1,1)*0.005,
+      ylab = '', main = "A(<Gumbel>, x) - A(<EV-Cop.>, x)")
+abline(h=0, lty=2)
+curve(A(gumbel.cop, x) - A(galambos.cop, x), add=TRUE, col=2)
+curve(A(gumbel.cop, x) - A(huslerReiss.cop, x), add=TRUE, col=3)
+curve(A(gumbel.cop, x) - A(tev.cop, x), add=TRUE, col=4, lwd=2)
+
 
 ## the t-EV-copula has always positive tau :
 curve(vapply(x, function(x) tau(tevCopula(x)), 0.), -1, 1,
-      col=2, n=257, ylim=0:1, ylab=bquote(tau), xlab=bquote(rho),
-      main= expression(tau( tevCopula(rho) )))
+      n=257, ylim=0:1, xlab=quote(rho),ylab=quote(tau),
+      main= quote(tau( tevCopula(rho) )), col = 2, lwd = 2)
+rect(-1,0,1,1, lty = 2, border = adjustcolor("black", 0.5))
 }
 \keyword{distribution}
 \keyword{multivariate}

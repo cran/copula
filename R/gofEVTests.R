@@ -24,14 +24,13 @@
 ##' @param estimator nonparametric estimator of the Pickands dependence function
 ##' @param m grid size
 ##' @param verbose display progress bar if TRUE
-##' @param optim.method for fitCopula
+##' @param ... : all passed to fitCopula
 ##' @return an object of class 'htest'
 ##' @author Ivan Kojadinovic
 gofEVCopula <- function(copula, x, N = 1000,
                         method = c("mpl", "ml", "itau", "irho"),
                         estimator = c("CFG", "Pickands"), m = 1000,
-                        verbose = interactive(),
-                        optim.method = "BFGS")
+                        verbose = interactive(), ...)
 {
     ## Checks
     stopifnot(is(copula, "copula"), N >= 1L, m>= 100L)
@@ -50,8 +49,7 @@ gofEVCopula <- function(copula, x, N = 1000,
     u <- pobs(x)
 
     ## fit the copula
-    fcop <- fitCopula(copula, u, method, estimate.variance=FALSE,
-                      optim.method=optim.method)@copula
+    fcop <- fitCopula(copula, u, method, estimate.variance=FALSE, ...)@copula
 
     ## where to compute A
     g <- seq(0,1-1/m,by=1/m)
@@ -76,8 +74,7 @@ gofEVCopula <- function(copula, x, N = 1000,
         u0 <- pobs(rCopula(n, fcop))
 
         ## fit the copula
-        fcop0 <-  fitCopula(copula, u0, method, estimate.variance=FALSE,
-                            optim.method=optim.method)@copula
+        fcop0 <-  fitCopula(copula, u0, method, estimate.variance=FALSE, ...)@copula
 
         s0[i,] <- .C(cramer_vonMises_Afun,
                      as.integer(n),

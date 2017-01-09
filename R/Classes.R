@@ -23,7 +23,7 @@ setClass("copula", contains = c("parCopula", "VIRTUAL"),
                    param.lowbnd = "numeric",
                    param.upbnd = "numeric",
                    ## TODO: "a vector" of intervals" paraInterval = "maybeInterval", # [.,.]  (.,.], etc ..
-                   fullname = "character"), ## <- to be replaced (by .. methods, see ../TODO)
+                   fullname = "character"), ## <- DEPRECATED for describeCop(): see ../TODO
          prototype = prototype(dimension = 2L, parameters = NA_real_),
          validity = ##' Check validity of "copula"
          function(object) {
@@ -49,6 +49,7 @@ setClass("copula", contains = c("parCopula", "VIRTUAL"),
 	     ## want to allow (all) NA parameters:
 	     TRUE
          })
+
 
 ## general methods for copula
 setGeneric("dCopula", function(u, copula, log=FALSE, ...) {
@@ -173,6 +174,11 @@ setClass("amhCopula", contains = "archmCopula")
 ## Joe copula
 setClass("joeCopula", contains = "archmCopula")
 
+## These can have negative tau for d=2 only:
+## setClassUnion(..) # <- over kill?; should be enough:
+archm.neg.tau <- c("amhCopula", "claytonCopula", "frankCopula")
+
+
 ## methods for archmCopulas
 setGeneric("psi", function(copula, s) standardGeneric("psi"))
 ##FIXME 'log' compulsory:
@@ -282,8 +288,8 @@ validMvdc <- function(object) {
     TRUE
 }## validMvdc()
 
-setClass("mvdc",
-	 slots = c(copula = "copula",
+setClass("mvdc", contains = "xcopula", #-> slot "copula"; additionally :
+	 slots = c(
                    margins = "character",
                    paramMargins = "list",
                    marginsIdentical = "logical"),
@@ -299,29 +305,36 @@ setClass("fittedMV",
                    loglik = "numeric",
                    nsample = "integer",
                    method = "character",
+                   call = "call",
                    ## convergence = "integer",
                    fitting.stats = "list"))
 
-setMethod("paramNames", "copula", function(x) x@param.names[isFree(x@parameters)])
-## paramNames() methods: further provided separately for "fitCopula", "fitMvdc"
-
-
-coef.fittedMV <- function(object, ...)
-    setNames(object@estimate, paramNames(object))
+coef.fittedMV <- function(object, SE = FALSE, ...) {
+    pNms <- paramNames(object)
+    if(SE)
+	structure(cbind(object@estimate,
+			if(length(V <- object@var.est)) sqrt(diag(V))
+			else rep(NA_real_, length(pNms)),
+			deparse.level=0L),
+		  dimnames = list(pNms, c("Estimate", "Std. Error")))
+    else
+	setNames(object@estimate, pNms)
+}
 
 nobs.fittedMV <- function(object, ...) object@nsample
 
 vcov.fittedMV <- function(object, ...) {
     pNms <- paramNames(object)
-    structure(object@var.est, dimnames = list(pNms, pNms))
+    structure(if(length(V <- object@var.est)) V
+              else matrix(NA, length(pNms), length(pNms)),
+              dimnames = list(pNms, pNms))
 }
 
 logLik.fittedMV <- function(object, ...) {
-    val <- object@loglik
-    attr(val, "nobs") <- object@nsample
-    attr(val, "df") <- length(object@estimate)
-    class(val) <- "logLik"
-    val
+    structure(object@loglik,
+	      nobs = object@nsample,
+	      df = length(object@estimate), # == #{free param.}
+	      class = "logLik")
 }
 
 

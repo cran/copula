@@ -13,7 +13,7 @@ qqplot2(x, qF, log = "", qqline.args = if(log=="x" || log=="y")
         CI.mtext = list(text=paste0("Pointwise asymptotic ", 100*(1-alpha),
                         "\% confidence intervals"), side=4,
                         cex=0.6*par("cex.main"), adj=0, col="gray40"),
-        main = expression(bold(italic(F)~~"Q-Q plot")),
+        main = quote(bold(italic(F)~~"Q-Q plot")),
         main.args = list(text=main, side=3, line=1.1, cex=par("cex.main"),
                          font=par("font.main"), adj=par("adj"), xpd=NA),
         xlab = "Theoretical quantiles", ylab = "Sample quantiles",
@@ -73,17 +73,14 @@ set.seed(1)
 x <- rchisq(n, df=df)
 
 ## Q-Q plot against the true quantiles (of a chi^2_3 distribution)
-qqplot2(x, qF=function(p) qchisq(p, df=df),
-        main=as.expression(substitute(bold(italic(chi[nu])~~"Q-Q Plot"),
-                                      list(nu=df))))
+qqplot2(x, qF = function(p) qchisq(p, df=df),
+        main = substitute(bold(italic(chi[NU])~~"Q-Q Plot"), list(NU=df)))
 
 ## in log-log scale
-qqplot2(x, qF=function(p) qchisq(p, df=df), log="xy",
-        main=as.expression(substitute(bold(italic(chi[nu])~~"Q-Q Plot"),
-                                      list(nu=df))))
+qqplot2(x, qF = function(p) qchisq(p, df=df), log="xy",
+        main = substitute(bold(italic(chi[NU])~~"Q-Q Plot"), list(NU=df)))
 
 ## Q-Q plot against wrong quantiles (of an Exp(1) distribution)
-qqplot2(x, qF=qexp,
-        main=expression(bold(Exp(1)~~"Q-Q Plot")))
+qqplot2(x, qF=qexp, main = quote(bold(Exp(1)~~"Q-Q Plot")))
 }
-\keyword{hplot}% from doc/KEYWORDS
+\keyword{hplot}

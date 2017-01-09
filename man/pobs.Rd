@@ -51,10 +51,11 @@ x <- MASS::mvrnorm(n, mu = rep(0, d), Sigma = P)
 ## Compute pseudo-observations (should roughly follow a Gauss
 ## copula with correlation matrix P)
 u <- pobs(x)
-plot(u[,5],u[,10], xlab=expression(italic(U)[1]), ylab=expression(italic(U)[2]))
+plot(u[,5],u[,10], xlab=quote(italic(U)[1]), ylab=quote(italic(U)[2]))
 
 ## All components: pairwise plot
-pairs(u, gap=0, pch=".", labels=as.expression( sapply(1:d, function(j) bquote(italic(U[.(j)]))) ))
+pairs(u, gap=0, pch=".", labels =
+      as.expression( lapply(1:d, function(j) bquote(italic(U[.(j)]))) ))
 }
 
 

@@ -29,10 +29,11 @@
       scales = list(alternating = c(1,1), tck = c(1,0)),
       region = TRUE, \dots,
       col.regions = gray(seq(0.4, 1, length.out = 100)))
-\S4method{contourplot2}{Copula}(x, FUN, n.grid = 26, xlim = 0:1, ylim = 0:1,
-      xlab = expression(u[1]), ylab = expression(u[2]), \dots)
+\S4method{contourplot2}{Copula}(x, FUN, n.grid = 26, delta = 0,
+      xlim = 0:1, ylim = 0:1,
+      xlab = quote(u[1]), ylab = quote(u[2]), \dots)
 \S4method{contourplot2}{mvdc}(x, FUN, n.grid = 26, xlim, ylim,
-      xlab = expression(x[1]), ylab = expression(x[2]), \dots)
+      xlab = quote(x[1]), ylab = quote(x[2]), \dots)
 }
 \arguments{
   \item{x}{a \code{"\linkS4class{matrix}"},
@@ -59,6 +60,9 @@
     can be a vector of length two, giving the number of grid points used
     in x- and y-direction, respectively; the function \code{FUN} will be
     evaluated on the corresponding (x,y)-grid.}
+  \item{delta}{a small number in \eqn{[0, \frac 1 2)}{[0, 1/2)}
+    influencing the evaluation boundaries. The x- and y- vectors will
+    have the range \code{[0+delta, 1-delta]}, the default being \code{[0,1]}.}
   \item{\dots}{additional arguments passed to the underlying
     \code{\link{contourplot}()}.}
 }

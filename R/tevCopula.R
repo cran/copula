@@ -84,7 +84,7 @@ tevCopula <- function(param = NA_real_, df = 4, df.fixed = FALSE) {
   ##       df.fixed)
 
   ## IK: new version
-  attr(parameters, "fixed") <- c(isFixedP(param), df.fixed)
+  attr(parameters, "fixed") <- c(!isFreeP(param), df.fixed)
 
   new("tevCopula",
              dimension = dim,
@@ -93,8 +93,7 @@ tevCopula <- function(param = NA_real_, df = 4, df.fixed = FALSE) {
              param.names = param.names,
              param.lowbnd = param.lowbnd,
              param.upbnd = param.upbnd,
-             fullname = paste("t-EV copula family",
-               if(df.fixed) paste("df fixed at", df)))
+             fullname = "<deprecated slot>")# paste("t-EV copula family", if(df.fixed) paste("df fixed at", df))
 }
 
 ##' @title Evaluation of distribution function of a tevCopula at u
@@ -240,9 +239,7 @@ dRhoTevCopula <- function(copula) {
 
 ################################################################################
 
-setMethod("pCopula", signature("numeric", "tevCopula"),ptevCopula)
 setMethod("pCopula", signature("matrix", "tevCopula"), ptevCopula)
-setMethod("dCopula", signature("numeric", "tevCopula"),dtevCopula)
 setMethod("dCopula", signature("matrix", "tevCopula"), dtevCopula)
 
 

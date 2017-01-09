@@ -16,6 +16,9 @@
 
 ### Computing probabilities of falling in hyperrectangles
 
+### prob() --- Generic and all Methods here
+### ======
+
 ##' @title Compute the probability P[l < U <= u]  where U ~ copula x
 ##' @param x copula object
 ##' @param l d-vector of lower "integration" limits

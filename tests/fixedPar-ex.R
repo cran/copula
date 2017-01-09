@@ -14,16 +14,12 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 require(copula)
+source(system.file("Rsource", "utils.R",     package="copula", mustWork=TRUE))
+##-> assertError(), assert.EQ(), ... showProc.time()  +  comparederiv()
+showProc.time()
 
 (doExtras <- copula:::doExtras())
 
-showProc.time <- local({
-    pct <- proc.time()
-    function() { ## CPU elapsed __since last called__
-	ot <- pct ; pct <<- proc.time()
-	cat('Time elapsed: ', (pct - ot)[1:3],'\n')
-    }
-})
 
 ### TEST FITTING ##########################################################
 
@@ -168,19 +164,7 @@ showProc.time()
 
 showProc.time()
 
-    ## Compare true and numerical derivatives
-    comparederiv <- function(cop, u) {
-
-        c(dCdu = max(abs((copula:::dCdu(cop, u) -
-                          copula:::dCduCopulaNum(cop, u)))),
-          dCdtheta = max(abs(copula:::dCdtheta(cop, u) -
-                             copula:::dCdthetaCopulaNum(cop, u))),
-          dlogcdu = max(abs(copula:::dlogcdu(cop, u) -
-                            copula:::dlogcduCopulaNum(cop, u))),
-          dlogcdtheta = max(abs(copula:::dlogcdtheta(cop, u) -
-                                copula:::dlogcdthetaCopulaNum(cop, u))))
-    }
-    comparederiv(nc2, v)
+    comparederiv(nc2, v) ## from  ../inst/Rsource/utils.R
     comparederiv(nc1, v)
     comparederiv(tc2, v)
     comparederiv(tc1, v)

@@ -16,8 +16,7 @@
 gofEVCopula(copula, x, N = 1000,
             method = c("mpl", "ml", "itau", "irho"),
             estimator = c("CFG", "Pickands"), m = 1000,
-            verbose = interactive(),
-            optim.method = "BFGS")
+            verbose = interactive(), \dots)
 }
 \arguments{
   \item{copula}{ object of class \code{"\linkS4class{evCopula}"}
@@ -37,11 +36,12 @@ gofEVCopula(copula, x, N = 1000,
     compute the test statistic numerically.}
   \item{verbose}{a logical specifying if progress of the bootstrap
     should be displayed via \code{\link[utils]{txtProgressBar}}.}
-  \item{optim.method}{a string, the \code{method} for
-    \code{\link{optim}()}.  In \pkg{copula} versions \code{0.999-14} and
-    earlier, the default was \code{"Nelder-Mead"}, but now is set to the
-    same as for \code{\link{fitCopula}()}.}
-%% Notably, that gave tons of warnings
+  \item{\dots}{further optional arguments, passed to
+    \code{\link{fitCopula}()}, notably \code{optim.method}, the
+    \code{method} for \code{\link{optim}()}.  In \pkg{copula} versions
+    \code{0.999-14} and earlier, the default for that was
+    \code{"Nelder-Mead"}, but now is the same as for \code{fitCopula()}.}
+%% Notably, "Nelder-Mead" gave tons of warnings
 %%  one-dimensional optimization by Nelder-Mead is unreliable: use "Brent" or optimize() directly
 }
 \details{
@@ -76,12 +76,12 @@ gofEVCopula(copula, x, N = 1000,
 }
 \examples{
 n <- 100; N <- 1000 # realistic (but too large currently for CRAN checks)
-n <-  60; N <-  200 # (for now)
+n <-  60; N <-  200 # (time (and tree !) saving ...)
 x <- rCopula(n, claytonCopula(3))
 
 \donttest{% because the bootstraps are slow,..
 ## Does the Gumbel family seem to be a good choice?
-gofEVCopula(gumbelCopula(), x)
+gofEVCopula(gumbelCopula(), x, N=N)
 }
 
 ## The same with different (and cheaper) estimation methods:
@@ -90,17 +90,17 @@ gofEVCopula(gumbelCopula(), x, N=N, method="irho")
 
 \donttest{% non-gumbel bootstraps are slow
 ## The same with different extreme-value copulas
-gofEVCopula(galambosCopula(), x)
-gofEVCopula(galambosCopula(), x, method="itau")
-gofEVCopula(galambosCopula(), x, method="irho")
+gofEVCopula(galambosCopula(), x, N=N)
+gofEVCopula(galambosCopula(), x, N=N, method="itau")
+gofEVCopula(galambosCopula(), x, N=N, method="irho")
 
-gofEVCopula(huslerReissCopula(), x)
-gofEVCopula(huslerReissCopula(), x, method="itau")
-gofEVCopula(huslerReissCopula(), x, method="irho")
+gofEVCopula(huslerReissCopula(), x, N=N)
+gofEVCopula(huslerReissCopula(), x, N=N, method="itau")
+gofEVCopula(huslerReissCopula(), x, N=N, method="irho")
 
-gofEVCopula(tevCopula(df.fixed=TRUE), x)
-gofEVCopula(tevCopula(df.fixed=TRUE), x, method="itau")
-gofEVCopula(tevCopula(df.fixed=TRUE), x, method="irho")
+gofEVCopula(tevCopula(df.fixed=TRUE), x, N=N)
+gofEVCopula(tevCopula(df.fixed=TRUE), x, N=N, method="itau")
+gofEVCopula(tevCopula(df.fixed=TRUE), x, N=N, method="irho")
 }% dont..
 }
 \keyword{htest}

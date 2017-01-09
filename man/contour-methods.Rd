@@ -12,10 +12,10 @@
 \usage{% want \usage{} since we have many "surprising arguments"
 \S4method{contour}{Copula}(x, FUN,
                    n.grid = 26, delta = 0,
-                   xlab = expression(u[1]), ylab = expression(u[2]),
+                   xlab = quote(u[1]), ylab = quote(u[2]),
                    box01 = TRUE, \dots)
 \S4method{contour}{mvdc}(x, FUN, xlim, ylim, n.grid = 26,
-                   xlab = expression(x[1]), ylab = expression(x[2]),
+                   xlab = quote(x[1]), ylab = quote(x[2]),
 		   box01 = FALSE, \dots)
 }
 \arguments{

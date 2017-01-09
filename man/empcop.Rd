@@ -7,19 +7,23 @@
 \alias{dCn}
 \description{
   Given pseudo-observations from a distribution with continuous margins and
-  copula C, the empirical copula is the empirical distribution function
+  copula C, the \emph{empirical copula} is the empirical distribution function
   of these pseudo-observations.  It is thus a natural nonparametric estimator of
-  C.  The function \code{C.n()} computes the empirical copula.
+  C. The function \code{C.n()} computes the empirical copula or two
+  alternative smoothed versions of the latter: the \emph{empirical beta copula} or the
+  \emph{empirical checkerboard copula}; see Eqs. (2.1) and (4.1) in
+  Segers, Sibuya and Tsukahara (2016), and the references therein.
 
   The function \code{dCn()} approximates first-order partial derivatives
-  of the unknown copula.
+  of the unknown copula using the empirical copula.
 
   The function \code{F.n()} computes the empirical distribution function
-  of a multivariate sample.  Note that \code{C.n(u, X, *)} simply calls
-  \code{F.n(u, pobs(X), *)} after checking \code{u}.
+  of a multivariate sample.  Note that \code{C.n(u, X, smoothing="none",
+  *)} simply calls \code{F.n(u, pobs(X), *)} after checking \code{u}.
 }
 \usage{
-C.n(u, X, offset=0, method=c("C", "R"))
+C.n(u, X, smoothing=c("none", "beta", "checkerboard"),
+    offset=0, method=c("C", "R"))
 dCn(u, U, j.ind=1:d, b=1/sqrt(nrow(U)), ...)
 
 F.n(x, X, offset=0, method=c("C", "R"))
@@ -40,6 +44,10 @@ Cn(x, w) ## <-- deprecated!  use  C.n(w, x) instead!
       d)}-\code{\link{matrix}} with the same number \eqn{d} of columns as
     \code{x}.  Recall that a multivariate random sample \code{X} can be
     transformed to an appropriate \code{U} via \code{\link{pobs}()}.}
+  \item{smoothing}{\code{\link{character}} string specifying whether
+    the empirical copula (\code{smoothing="none"}), the empirical beta
+    copula (\code{smoothing="beta"}) or the empirical checkerboard
+    copula (\code{smoothing="checkerboard"}) is computed.}
   \item{j.ind}{\code{\link{integer}} vector of indices \eqn{j} between 1
     and \eqn{d} indicating the dimensions with respect to which
     first-order partial derivatives are approximated.}
@@ -55,11 +63,15 @@ Cn(x, w) ## <-- deprecated!  use  C.n(w, x) instead!
   \item{\dots}{additional arguments passed to \code{dCn()}.}
 }
 \value{
-  \code{C.n()} returns the empirical copula at \code{u} (that is, the
-  empirical distribution function of the observations \code{U}
-  evaluated at \code{u}).  The \emph{name} \dQuote{U} is a slight
-  misnomer here, for back compatibility reasons, as \code{U} typically
-  contains the original observations \code{X} here.  \code{F.n()}
+  \code{C.n()} returns the empirical copula at \code{u} or a smoothed version of
+  the latter.
+  %(that is, the
+  %empirical distribution function of the observations \code{U}
+  %evaluated at \code{u})
+  %The \emph{name} \dQuote{U} is a slight
+  %misnomer here, for back compatibility reasons, as \code{U} typically
+  %contains the original observations \code{X} here.
+  \code{F.n()}
   returns the empirical distribution function of \code{X} evaluated at
   \code{x}.
   %% The result is slightly wrapped as \code{"mvFn"} (S3) class object,
@@ -78,17 +90,20 @@ Cn(x, w) ## <-- deprecated!  use  C.n(w, x) instead!
   had its two arguments \emph{reversed} compared to \code{C.n()}, and is
   deprecated now.  You \bold{must} swap its arguments to transform to
   new code.
+
+  The use of the two smoothed versions assumes implicitly no
+  ties in the component samples of the data.
 }
 \details{
   There are several asymptotically equivalent definitions of the
   empirical copula. As mentioned above, the empirical copula
-  \code{C.n()} is simply defined as the empirical distribution function
+  \code{C.n(, smoothing = "none")} is simply defined as the empirical distribution function
   computed from the pseudo-observations, that is,
   \deqn{C_n(\bm{u})=\frac{1}{n}\sum_{i=1}^n\mathbf{1}_{\{\hat{\bm{U}}_i\le\bm{u}\}},}{(1/n)
   sum(I_{U_i<=u}, i=1, .., n),}
   where \eqn{\hat{\bm{U}}_i}{U_i}, \eqn{i\in\{1,\dots,n\}}{i=1,..,n},
   denote the pseudo-observations (rows in \code{U}) and \eqn{n} the
-  sample size. Internally, \code{C.n()} is just a wrapper for
+  sample size. Internally, \code{C.n(,smoothing = "none")} is just a wrapper for
   \code{F.n()} and is expected to be fed with the pseudo-observations.
 
   The approximation for the \eqn{j}th partial derivative of the unknown
@@ -117,6 +132,9 @@ Cn(x, w) ## <-- deprecated!  use  C.n(w, x) instead!
   between two copulas. \emph{Journal of Multivariate Analysis}, 100(3),
   pages 377-386.
 
+  Segers, J., Sibuya, M. and Tsukahara, H. (2016). The Empirical Beta
+  Copula. \emph{Journal of Multivariate Analysis}, in press, arXiv:1607.04430.
+
   %% Genest, C., G. \enc{Nešlehová}{Neslehova}, J., and Quessy, J.-F. (2012).
   %% Tests of symmetry for bivariate copulas,
   %% \emph{Ann. Inst. Stat. Math.} \bold{64}, 811--834.
@@ -139,7 +157,14 @@ u <- matrix(runif(n*d), n, d)
 ec <- C.n(u, X)
 
 ## Compare the empirical copula with the true copula
-mean(abs(pCopula(u, copula=cop)-ec)) # ~= 0.012 -- increase n to decrease this error
+pc <- pCopula(u, copula=cop)
+mean(abs(pc - ec)) # ~= 0.012 -- increase n to decrease this error
+
+## The same for the two smoothed versions
+beta <- C.n(u, X, smoothing = "beta")
+mean(abs(pc - beta))
+check <- C.n(u, X, smoothing = "checkerboard")
+mean(abs(pc - check))
 
 ## Compare the empirical copula with F.n(pobs())
 U <- pobs(X) # pseudo-observations
@@ -154,10 +179,10 @@ C.n.diag <- function(u) C.n(do.call(cbind, rep(list(u), d)), X=X) # diagonal of 
 C.diag <- function(u) pCopula(do.call(cbind, rep(list(u), d)), cop) # diagonal of C
 curve(C.n.diag, from=0, to=1, # empirical copula diagonal
       main=paste("True vs empirical diagonal of a", family, "copula"),
-      xlab="u", ylab=expression("True C(u,..,u) and empirical"~C[n](u,..,u)))
+      xlab="u", ylab=quote("True C(u,..,u) and empirical"~C[n](u,..,u)))
 curve(C.diag, lty=2, add=TRUE) # add true copula diagonal
 legend("bottomright", lty=2:1, bty="n", inset=0.02,
-       legend=c("C", expression(C[n])))
+       legend = expression(C, C[n]))
 
 ## Approximate partial derivatives w.r.t. the 2nd and 3rd component
 j.ind <- 2:3 # indices w.r.t. which the partial derivatives are computed

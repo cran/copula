@@ -81,27 +81,63 @@ double der2bivCn(const double U[], const double V[], int n, double u, double v) 
 }
 
 /**
- * Multivariate empirical copula
+ * Wrapper of the beta df for the empirical beta copula
+ * See Segers, Sibuya, Tsukahara, JMVA 2016+
+ * u assumed to be rank/(n+1)
+ **/
+double emp_beta_cop(double u, double v, int n) {
+    return pbeta(v, u * (n + 1), (n + 1) * (1.0 - u), TRUE, FALSE);
+}
+
+/**
+ * For the empirical checkerboard (multilinear extension) copula
+ * See Segers, Sibuya, Tsukahara, JMVA 2016+
+ * u assumed to be rank/(n+1)
+ **/
+double emp_mult_lin_cop(double u, double v, int n) {
+    return fmin2(fmax2(n * v - (n + 1) * u + 1.0 , 0.0), 1.0);
+}
+
+/* For the classical empirical copula */
+double emp_cop(double u, double v, int n) {
+    if (u <= v)
+	return 1.0;
+    else
+	return 0.0;
+}
+
+/**
+ * Multivariate empirical copula, empirical beta copula or
+ * empirical checkerboard copula
+ * See Segers, Sibuya, Tsukahara, JMVA 2016+
  *
- * @param U pseudo-observations
+ * @param U pseudo-observations (rank/(n+1))
  * @param n sample size
  * @param p dimension of the pseudo-observations
  * @param V is vector representing a matrix of dimension m x p
  * @param m "number of lines" of V
- * @param k "line" of V at which to compute the empirical copula
+ * @param k "line" of V at which to compute the empirical ... copula
  * @param o offset (usually 0.0)
+ * @param f function determing which version is computed
  * @return the value of the empirical copula at V[k + m * j], j=1...p
  * @author Ivan Kojadinovic
  */
-double multCn(const double U[], int n, int p, const double V[], int m, int k, double offset) {
-    double sumind = 0.0;
+double Cn_f(const double U[], int n, int p, const double V[], int m, int k,
+	      double offset, double (*f)(double, double, int)) {
+    double sumprod = 0.0;
     for (int i = 0; i < n; i++) {
-	int ind = 1;
+	double prod = 1.0;
 	for (int j = 0; j < p; j++)
-	    ind *= (U[i + n * j] <= V[k + m * j]);
-	sumind += (double)ind;
+	    prod *= f(U[i + n * j], V[k + m * j], n);
+	sumprod += prod;
     }
-    return sumind / (n + offset);
+    return sumprod / (n + offset);
+}
+
+/* The classical multivariate empirical copula */
+double multCn(const double U[], int n, int p, const double V[], int m, int k,
+	      double offset) {
+    return Cn_f(U, n, p, V, m, k, offset, emp_cop);
 }
 
 /**
@@ -122,6 +158,7 @@ double der_multCn(const double U[], int n, int p,
     return (multCn(U, n, p, u, 1, 0, 0.0) - multCn(U, n, p, v, 1, 0, 0.0)) / denom;
 }
 
+
 /**
  * Computes the empirical copula at all the lines of V
  * Called in R by .C
@@ -133,9 +170,25 @@ double der_multCn(const double U[], int n, int p,
  * @param m "number of lines" of V
  * @param ec values of the empirical copula at the lines of V
  * @param offset offset to be used for scaling
+ * @param type: 1 = empirical, 2 = beta, 3 = checkerboard
  * @author Ivan Kojadinovic
  */
-void Cn_C(double *U, int *n, int *p, double *V, int *m, double *ec, double *offset) {
-   for (int i = 0; i < *m; i++)
-     ec[i] = multCn(U, *n, *p, V, *m, i, *offset);
+void Cn_C(double *U, int *n, int *p, double *V, int *m, double *ec, double *offset,
+	  int *type) {
+    switch(*type) {
+
+    case 2 : /* empirical beta copula */
+	for (int i = 0; i < *m; i++)
+	    ec[i] = Cn_f(U, *n, *p, V, *m, i, *offset, emp_beta_cop);
+	return;
+
+    case 3 : /* empirical checkerboard copula */
+	for (int i = 0; i < *m; i++)
+	    ec[i] = Cn_f(U, *n, *p, V, *m, i, *offset, emp_mult_lin_cop);
+	return;
+
+    default : /* classical empirical copula */
+	for (int i = 0; i < *m; i++)
+	    ec[i] = multCn(U, *n, *p, V, *m, i, *offset);
+    }
 }

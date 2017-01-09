@@ -53,8 +53,8 @@ cols <- adjustcolor(colorRampPalette(c("red", "orange", "blue"),
 for(i in seq_along(d.set))
    curve(Vectorize(beta.,"theta")(copAMH, x, d = d.set[i]), 0, .999999,
          main = "Blomqvist's beta(.) for  AMH",
-         xlab = expression(theta), ylab = expression(beta(theta, AMH)),
-         add=(i > 1), lwd=2, col=cols[i])
+         xlab = quote(theta), ylab = quote(beta(theta, AMH)),
+         add = (i > 1), lwd=2, col=cols[i])
 mtext("NB:  d=2 and d=3 are the same")
 legend("topleft", paste("d =",d.set), bty="n", lwd=2, col=cols)
 
@@ -62,7 +62,7 @@ legend("topleft", paste("d =",d.set), bty="n", lwd=2, col=cols)
 for(i in seq_along(d.set))
    curve(Vectorize(beta.,"theta")(copGumbel, x, d = d.set[i]), 1, 10,
          main = "Blomqvist's beta(.) for  Gumbel",
-         xlab = expression(theta), ylab = expression(beta(theta, Gumbel)),
+         xlab = quote(theta), ylab = quote(beta(theta, Gumbel)),
          add=(i > 1), lwd=2, col=cols[i])
 legend("bottomright", paste("d =",d.set), bty="n", lwd=2, col=cols)
 
@@ -70,7 +70,7 @@ legend("bottomright", paste("d =",d.set), bty="n", lwd=2, col=cols)
 for(i in seq_along(d.set))
    curve(Vectorize(beta.,"theta")(copClayton, x, d = d.set[i]), 1e-5, 10,
          main = "Blomqvist's beta(.) for  Clayton",
-         xlab = expression(theta), ylab = expression(beta(theta, Gumbel)),
+         xlab = quote(theta), ylab = quote(beta(theta, Gumbel)),
          add=(i > 1), lwd=2, col=cols[i])
 legend("bottomright", paste("d =",d.set), bty="n", lwd=2, col=cols)
 
@@ -78,7 +78,7 @@ legend("bottomright", paste("d =",d.set), bty="n", lwd=2, col=cols)
 for(i in seq_along(d.set))
    curve(Vectorize(beta.,"theta")(copJoe, x, d = d.set[i]), 1, 10,
          main = "Blomqvist's beta(.) for  Joe",
-         xlab = expression(theta), ylab = expression(beta(theta, Gumbel)),
+         xlab = quote(theta), ylab = quote(beta(theta, Gumbel)),
          add=(i > 1), lwd=2, col=cols[i])
 legend("bottomright", paste("d =",d.set), bty="n", lwd=2, col=cols)
 
@@ -86,7 +86,7 @@ legend("bottomright", paste("d =",d.set), bty="n", lwd=2, col=cols)
 for(i in seq_along(d.set))
    curve(Vectorize(beta.,"theta")(copFrank, x, d = d.set[i]), 1e-5, 50,
          main = "Blomqvist's beta(.) for  Frank",
-         xlab = expression(theta), ylab = expression(beta(theta, Gumbel)),
+         xlab = quote(theta), ylab = quote(beta(theta, Gumbel)),
          add=(i > 1), lwd=2, col=cols[i])
 legend("bottomright", paste("d =",d.set), bty="n", lwd=2, col=cols)
 

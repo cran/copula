@@ -10,7 +10,10 @@
 \alias{rmvdc}%deprecated
 \description{
   Density, distribution function, and random generator for a
-  multivariate distribution via copula.
+  multivariate distribution via copula and \emph{parametric} margins.
+
+  For likelihood and fitting these distributions to data, see
+  \code{\link{fitMvdc}}.
 }
 \usage{
 mvdc(copula, margins, paramMargins, marginsIdentical = FALSE,
@@ -20,9 +23,9 @@ pMvdc(x, mvdc)
 rMvdc(n, mvdc)
 }
 \arguments{
-  \item{copula}{ an object of \code{"\linkS4class{copula}"}. }
-  \item{margins}{ a character vector specifying all the marginal
-    distributions.  See details below.}
+  \item{copula}{an object of \code{"\linkS4class{copula}"}. }
+  \item{margins}{a \code{\link{character}} vector specifying all the
+    parametric marginal distributions.  See details below.}
   \item{paramMargins}{a \code{\link{list}} whose each component is a
     list (or numeric vectors) of named components, giving the parameter
     values of the marginal distributions.  See details below.}
@@ -33,29 +36,39 @@ rMvdc(n, mvdc)
   \item{fixupNames}{logical indicating if the parameters of the margins
     should get automatic names (from \code{\link{formals}(p<mar_i>)}).}
   \item{mvdc}{a \code{"\linkS4class{mvdc}"} object. }
-  \item{x}{ a vector of the copula dimension or a matrix with number of
-    columns being the copula dimension, giving the coordinates of the
-    points where the density or distribution function needs to be
-    evaluated.}
+  \item{x}{a numeric vector of length the copula dimension, say \eqn{d},
+    or a matrix with the number of columns being \eqn{d}, giving the
+    coordinates of the points where the density or distribution function
+    needs to be evaluated.}
   \item{log}{logical indicating if the \code{\link{log}} density should
     be returned.}
-  \item{n}{ number of observations to be generated. }
+  \item{n}{number of observations to be generated.}
+}
+\note{
+  \code{mvdc()}, \code{\link{fitMvdc}}, etc, are only for
+  \emph{parametric} margins.
+  If you do not want to model all margins parametrically, use the
+  standard copula approach, transforming the data by their
+  empirical margins via \code{\link{pobs}} and modelling the copula
+  alone, e.g., using \code{\link{fitCopula}}, i.e., conceptually,
+  using \preformatted{     fitCopula(.., pobs(x))}
+  %% TODO(future): Allow partly parametric, partly empirical margins.
 }
 \details{
   The characters in argument \code{margins} are used to construct
-  density, distribution, and quantile function names. For
+  density, distribution, and quantile function names.  For
   example, \code{norm} can be used to specify marginal distribution,
-  because \code{dnorm}, \code{pnorm}, and \code{qnorm} are all
+  because \code{\link{dnorm}}, \code{pnorm}, and \code{qnorm} are all
   available.
 
   A user-defined distribution, for example, \code{fancy}, can be used as
-  margin provided that \code{dfancy}, \code{pfancy}, and \code{qfancy} are
-  available.
+  margin \emph{\bold{provided}} that \code{dfancy}, \code{pfancy}, and
+  \code{qfancy} are available.
 
-  Each component list in argument \code{paramMargins} is a list with
-  named components which are used to specify the parameters of the
-  marginal distributions. For example, the list
-  \deqn{\code{paramMargins = list(list(mean = 0, sd = 2), list(rate = 2))}}
+  Each component list in argument \code{paramMargins} is a
+  \code{\link{list}} with named components which are used to specify the
+  parameters of the marginal distributions.  For example, the list
+  \preformatted{    paramMargins = list(list(mean = 0, sd = 2), list(rate = 2))}
   can be used to specify that the first margin is normal with mean 0 and
   standard deviation 2, and the second margin is exponential with rate 2.
 }

@@ -11,7 +11,7 @@
 }
 \usage{
 multSerialIndepTest(x, lag.max, m = lag.max+1, N = 1000, alpha = 0.05,
-                    verbose = interactive(), print.every = NULL)
+                    verbose = interactive())
 }
 \arguments{
   \item{x}{data frame or matrix of multivariate continuous time series
@@ -23,12 +23,14 @@ multSerialIndepTest(x, lag.max, m = lag.max+1, N = 1000, alpha = 0.05,
   \item{N}{ number of bootstrap/permutation samples.}
   \item{alpha}{ significance level used in the computation of the
     critical values for the test statistics.}
-  \item{print.every}{ is deprecated in favor of \code{verbose}.}
   \item{verbose}{ a logical specifying if progress
     should be displayed via \code{\link[utils]{txtProgressBar}}.}
 }
 \details{See the references below for more details, especially the last
   one.
+
+  The former argument \code{print.every} is deprecated and not
+  supported anymore; use \code{verbose} instead.
 }
 \value{
   The function \code{"multSerialIndepTest"} returns an object of class

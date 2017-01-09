@@ -29,8 +29,7 @@
 ##' @author Ivan Kojadinovic, Martin Maechler
 xvCopula <- function(copula, x, k=NULL, verbose = interactive(), ...)
 {
-    ## checks
-    stopifnot(is(copula, "copula"))
+    ## checks -- not too many! -- fitCopula() does check [and is generic!]
     if(!is.matrix(x))
     {
         warning("coercing 'x' to a matrix.")

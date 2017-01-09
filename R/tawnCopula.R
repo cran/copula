@@ -53,7 +53,7 @@ tawnCopula <- function(param = NA_real_) {
              param.names = "param",
              param.lowbnd = 0,
              param.upbnd = 1,
-             fullname = "Tawn copula family; Extreme value copula")
+             fullname = "<deprecated slot>")# "Tawn copula family; Extreme value copula"
 }
 
 ptawnCopula <- function(u, copula) {
@@ -115,17 +115,25 @@ rhoTawnCopula <- function(copula) {
   alpha <- copula@parameters[1]
   ## from Mathematica
   ## the range of rho is [0, 0.58743682]
-  integ <- ( (8 - alpha) * alpha + 8 * sqrt( (8 - alpha) * alpha ) * atan(sqrt(alpha) / sqrt(8 - alpha)) ) / ( (8 - alpha)^2 * alpha )
+  integ <- ( (8 - alpha) * alpha + 8 * sqrt( (8 - alpha) * alpha ) *
+             atan(sqrt(alpha) / sqrt(8 - alpha)) ) / ( (8 - alpha)^2 * alpha )
   if(alpha == 0) 0 else 12 * integ - 3
 }
 
 iRhoTawnCopula <- function(copula, rho) {
   alpha <- 1
-  rhomax <- 12 * ( (8 - alpha) * alpha + 8 * sqrt( (8 - alpha) * alpha ) * atan(sqrt(alpha) / sqrt(8 - alpha)) ) / ( (8 - alpha)^2 * alpha ) - 3
-  bad <- (rho < 0 | rho >= rhomax)
+  rhomax <- 12 * ( (8 - alpha) * alpha + 8 * sqrt( (8 - alpha) * alpha ) *
+                   atan(sqrt(alpha) / sqrt(8 - alpha)) ) / ( (8 - alpha)^2 * alpha ) - 3
+  n.na <- !is.na(rho)
+  bad <- ((neg <- n.na & rho < 0) |
+          (Lrg <- n.na & rho > rhomax))
   if (any(bad)) warning("rho is out of the range [0, 0.58743682]")
-  ifelse(rho <= 0, 0,
-         ifelse(rho >= rhomax, 1, iRhoCopula(copula, rho)))
+  r <- rho
+  r[neg | rho == 0     ] <- 0
+  r[Lrg | rho == rhomax] <- 1
+  if(any(ok <- !bad  &  rho != 0  & rho != rhomax))
+    r[ok] <- iRhoCopula(copula, rho[ok])
+  r
 }
 
 dRhoTawnCopula <- function(copula) {
@@ -158,10 +166,7 @@ dRhoTawnCopula <- function(copula) {
 ################################################################################
 
 setMethod("pCopula", signature("matrix", "tawnCopula"), ptawnCopula)
-setMethod("pCopula", signature("numeric", "tawnCopula"),ptawnCopula)
 setMethod("dCopula", signature("matrix", "tawnCopula"), dtawnCopula)
-setMethod("dCopula", signature("numeric", "tawnCopula"),dtawnCopula)
-
 
 setMethod("A", signature("tawnCopula"), ATawn)
 setMethod("dAdu", signature("tawnCopula"), dAduTawn)

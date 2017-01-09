@@ -58,15 +58,14 @@ mvdc <- function(copula, margins, paramMargins, marginsIdentical = FALSE,
 	marginsIdentical = marginsIdentical)
 }
 
-setMethod("dim", "mvdc", function(x) x@copula@dimension)
-
+## "dim": via "xcopula" method
 
 ##' @title Parameter names of the margins of an "mvdc" object
 ##' @param mv
 ##' @return character vector of "the correct" length
 ##' @author Martin Maechler
 margpnames <- function(mv) {
-    nMar <- vapply(mv@paramMargins, length, 1L)
+    nMar <- lengths(mv@paramMargins) # or vapply(mv@paramMargins, nFree, 1L)
     p <- mv@copula@dimension
     pnms <- unlist(lapply(mv@paramMargins, names)) # maybe NULL
     if (sum(nMar) == 0) character()

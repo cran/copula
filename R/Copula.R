@@ -14,27 +14,34 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-##' show method
-print.copula <- function(x, digits = getOption("digits"), ...) {
+##' print() / show() method, _or_ ("tCopula", e.g.) an auxiliary for that :
+printCopula <- function(x, digits = getOption("digits"),
+                        descr.kind = c("short", "very short", "long"), ...) {
   validObject(x)
-  cat(x@fullname, "\n")
-  cat("Dimension: ", x@dimension, "\n")
-  if (length(par <- x@parameters) > 0) {
-    hasFx <- !is.null(.fixed <- attr(par, "fixed")) && any(.fixed)
+  descr.kind <- match.arg(descr.kind)
+  cat(describeCop(x, kind = descr.kind), "\n")
+  cat("Dimension: ", (d <- dim(x)), "\n")
+  if (length(par <- getTheta(x, freeOnly=FALSE, attr = TRUE)) > 0) {
+    ## hasFx <- !is.null(.fixed <- attr(par, "fixed")) && any(.fixed)
+    ## JY: no attribute "fixed" is available from getTheta
+    .fixed <- !isFree(x); hasFx <- any(.fixed)
+    hasFx <- any(!isFree(x))
     cat(sprintf("Parameters%s:\n",
-		if(hasFx) " (partly fixed, see ':==')" else ""))
+		if(hasFx) " (partly fixed, see ':=')" else ""))
     ## FIXME:  for the d=400  ellipsCopula with dispstr = "un": do *not* print all!
-    pnms <- format(x@param.names) # padding
-    pars <- format(par, digits=digits)
+    pnms <- format(names(par)) # padding
+    pars <- format(as.vector(par), digits=digits)
     for (i in seq_along(par))
       cat(sprintf("  %s %3s %s\n",
-		  pnms[i], if(hasFx && .fixed[i]) ":==" else " = ",
+		  pnms[i], if(hasFx && .fixed[i]) ":=" else " =",
 		  pars[i]))
   }
   invisible(x)
 }
 
-setMethod("show", "copula", function(object) print.copula(object))
+## default print() and show() method for copulas:
+print.parCopula <- printCopula
+setMethod("show", "parCopula", function(object) printCopula(object))
 
 
 ### numerical computation of association measures
@@ -93,19 +100,19 @@ iTauCopula <- function(copula, tau, bound.eps = .Machine$double.eps^.5, tol = 1e
 iRhoCopula <- function(copula, rho, bound.eps = 0, tol = 1e-7, ...) {
   stopifnot(length(bound.eps) == 1, is.finite(bound.eps), 0 <= bound.eps,
 	    2*bound.eps < copula@param.upbnd - copula@param.lowbnd)
-  myfun <- function(theta) {
+  d_rho <- function(theta) {
     copula@parameters <- theta
     rho(copula) - rho
   }
   lower <- pmax(-sqrt(.Machine$double.xmax), copula@param.lowbnd + bound.eps)
   upper <- pmin( sqrt(.Machine$double.xmax), copula@param.upbnd  - bound.eps)
-  uniroot(myfun, interval=c(lower, upper), tol=tol, ...)$root
+  uniroot(d_rho, interval = c(lower, upper), tol=tol, ...)$root
 }
 
-## From Ivan: do not make these the default methods as some copulas have
-## more than one parameter
-## setMethod("iTau", signature("copula"), iTauCopula)
-## setMethod("iRho", signature("copula"), iRhoCopula)
+## From Ivan: do not make these the default methods for *all* copulas, as
+## some have more than one parameter
+setMethod("iTau", signature("archmCopula"), iTauCopula)
+setMethod("iRho", signature("archmCopula"), iRhoCopula)
 
 
 ###-- "Copula" methods + glue  former "copula" <--> former "nacopula" ---------
@@ -123,4 +130,16 @@ setMethod("dPsi", "acopula",
        })
 
 ## Methods for 'xcopula': extended copulas defined by mainly *one* copula slot
-setMethod("dim", signature("xcopula"), function(x) x@copula@dimension)
+setMethod("dim", signature("xcopula"), function(x) dim(x@copula))
+
+## logical indicating which parameters are free
+setMethod("isFree", signature("rotCopula"), function(copula) isFree(copula@copula))
+
+## number of (free / all) parameters :
+setMethod("nParam", signature("rotCopula"), function(copula, freeOnly=FALSE)
+    nParam(copula@copula, freeOnly=freeOnly))
+
+## paramNames() methods: further provided separately for "fitCopula", "fitMvdc"
+setMethod("paramNames", signature("copula"), function(x) x@param.names[isFreeP(x@parameters)])
+
+

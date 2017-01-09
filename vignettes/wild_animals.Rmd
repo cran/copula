@@ -1,6 +1,6 @@
 ---
 title: Examples of Nonstandard Copulas -- "Wild Animals"
-author: Marius Hofert and Martin M&auml;chler
+author: Marius Hofert and Martin Mächler
 date: '`r Sys.Date()`'
 output:
   html_vignette:
@@ -8,6 +8,7 @@ output:
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Wild Animals: Examples of Nonstandard Copulas}
+  %\VignetteEncoding{UTF-8}
 ---
 ## 1 Example from Marius Hofert and Frederik Vrins
 
@@ -295,4 +296,9 @@ whereas `U`, the copula sample, indeed is peculiar and contains the word
 par(pty="s")
 plot(U, pch=".", xlab = quote(italic(U[1]) %~% ~ "U[0,1]"),
      asp = 1,    ylab = quote(italic(U[2]) %~% ~ "U[0,1]"))
+```
+
+### Session information
+```{r, echo=FALSE}
+print(sessionInfo(), locale=FALSE)
 ```

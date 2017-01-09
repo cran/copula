@@ -671,3 +671,51 @@ void exchtestCn_stat(double *U, double *V, int *n, double *u, double *v,
 
   *stat = s * (*n) / *m;
 }
+
+/**
+ * Difference between the multivariate empirical copula and
+ * the multivariate survival empirical copula
+ * for the radial symmetry test
+ *
+ * @param U pseudo-observations
+ * @param n sample size
+ * @param p dimension of the pseudo-observations
+ * @param V is vector representing a matrix of dimension m x p
+ * @param m "number of lines" of V
+ * @param k "line" of V at which to compute the difference
+ * @return the value of the difference at V[k + m * j], j=1...p
+ * @author Ivan Kojadinovic
+ */
+double diffCn(const double U[], int n, int p, const double V[], int m, int k) {
+    double sumind = 0.0;
+    for (int i = 0; i < n; i++) {
+	int ind1 = 1;
+	int ind2 = 1;
+	for (int j = 0; j < p; j++) {
+	    ind1 *= (U[i + n * j] <= V[k + m * j]);
+	    ind2 *= (1.0 - U[i + n * j] <= V[k + m * j]);
+	}
+	sumind += (double)ind1 - (double)ind2;
+    }
+    return sumind / n;
+}
+
+
+/**
+ * Statistic for the radial symmetry test based on the empirical copula
+ *
+ * @param U pseudo-obs
+ * @param n sample size
+ * @param u grid
+ * @param m grid size
+ * @param s value of the test statistic
+ * @author Ivan Kojadinovic
+ */
+void radsymtestCn_stat(double *U, int *n, int *p, double *V, int *m, double *stat) {
+    double s = 0.;
+    for (int j = 0; j < *m; j++) {
+	double diff = diffCn(U, *n, *p, V, *m, j);
+	s += diff * diff;
+    }
+    *stat = s * (*n) / *m;
+}

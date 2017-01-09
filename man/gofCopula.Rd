@@ -3,6 +3,7 @@
 \alias{gofCopula}
 \alias{gofCopula-methods}
 \alias{gofCopula,copula-method}
+\alias{gofCopula,parCopula-method}
 \alias{gofCopula,rotCopula-method}
 \alias{gofMB}
 \alias{gofPB}
@@ -27,17 +28,19 @@
   \code{simulation} either calls \code{gofPB()} or \code{gofMB()}.
 }
 \usage{
-## Generic [and "rotCopula" method] :
+## Generic [and "rotCopula" method] ------ Main function ------
 gofCopula(copula, x, \dots)
 \S4method{gofCopula}{copula}(copula, x, N = 1000,
           method = c("Sn", "SnB", "SnC", "Rn"),
           estim.method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
           simulation = c("pb", "mult"), verbose = interactive(), \dots)
 
+## Internal 'helper' functions : --- % keep on help page, even if hidden !
 gofPB(copula, x, N, method = c("Sn", "SnB", "SnC"),
       estim.method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
-      trafo.method = c("none", "cCopula", "htrafo"),
-      trafoArgs = list(), verbose = interactive(), useR = FALSE, \dots)
+      trafo.method = if(method == "Sn") "none" else c("cCopula", "htrafo"),
+      trafoArgs = list(), verbose = interactive(),
+      useR = FALSE, ties = NA, \dots)
 
 gofMB(copula, x, N, method = c("Sn", "Rn"),
       estim.method = c("mpl", "ml", "itau", "irho"),
@@ -74,23 +77,29 @@ gofMB(copula, x, N, method = c("Sn", "Rn"),
     \code{hideWarnings}, and
     \code{optim.method}, \code{optim.control}, \code{lower},
     or \code{upper} depending on the \code{optim.method}.}
-  \item{trafo.method}{only for the parametric bootstrap.
+  \item{trafo.method}{only for the parametric bootstrap (\code{"pb"}):
     String specifying the transformation to
     \eqn{U[0,1]^d}; either \code{"none"} or one of \code{"cCopula"},
     see \code{\link{cCopula}()}, or \code{"htrafo"}, see
-      \code{\link{htrafo}()}. If \code{method != "Sn"}, one needs to set
-      \code{trafo.method != "none"}.}
-  \item{trafoArgs}{only for the parametric bootstrap.
-    A \code{\link{list}} of optional arguments passed
-    to the transformation method (see \code{trafo.method} above).}
-  \item{useR}{logical indicating whether an \R or C implementation is used.}
+    \code{\link{htrafo}()}.  If \code{method != "Sn"}, one needs to set
+    \code{trafo.method != "none"}.}
+  \item{trafoArgs}{only for the parametric bootstrap.  A
+    \code{\link{list}} of optional arguments passed to the
+    transformation method (see \code{trafo.method} above).}
+  \item{useR}{logical indicating whether an \R or C implementation is
+    used.}
+  \item{ties}{only for the parametric bootstrap.  Logical indicating
+    whether a version of the parametric boostrap adapted to the
+    presence of ties in any of the coordinate samples of \code{x}
+    should be used; the default value of \code{NA} indicates that the
+    presence/absence of ties will be checked for automatically.}
   \item{m, zeta.m}{only for the multiplier with \code{method = "Rn"}.
     \code{m} is the power and \code{zeta.m} is the adjustment
     parameter \eqn{\zeta_m}{zeta.m} for the denominator of the test
     statistic.}
-  \item{b}{only for the multiplier. \code{b} is the
-    bandwidth required for the estimation
-    of the first-order partial derivatives based on the empirical copula.}
+  \item{b}{only for the multiplier.  \code{b} is the bandwidth required
+    for the estimation of the first-order partial derivatives based on
+    the empirical copula.}
 }
 \details{
   If the parametric bootstrap is used, the dependence parameters of
@@ -174,16 +183,21 @@ gofMB(copula, x, N, method = c("Sn", "Rn"),
   \emph{Journal of Statistical Software} \bold{34}(9), 1--20.
   \url{http://www.jstatsoft.org/v34/i09/}.
 
+  Kojadinovic, I. (2016). Some copula inference procedures adapted to
+  the presence of ties. \url{http://arxiv.org/abs/1609.05519}.
+
   Pesarin, F. (2001).
   \emph{Multivariate Permutation Tests: With Applications in Biostatistics}.
   Wiley.
 }
 \note{
-  These tests were derived under the assumption of continuous margins,
-  which implies that ties occur with probability zero. The
-  presence of ties in the data might substantially affect the
-  approximate p-values. One way of dealing with ties was suggested in the
-  Journal of Statistical Software reference.
+  These tests were theoretically studied and implemented under the
+  assumption of continuous margins, which implies that ties in the
+  component samples occur with probability zero. The presence of ties in
+  the data might substantially affect the approximate p-values. Through
+  argument \code{ties}, the user can however select a version of the
+  parametric bootstrap adapted to the presence of ties. No such adaption
+  exists for the multiplier for the moment.
 
   %% Since \R is widely used by practitioners, a word of warning concerning
   %% goodness-of-fit tests \emph{in general} is also advisable.
@@ -205,42 +219,45 @@ gofMB(copula, x, N, method = c("Sn", "Rn"),
 ## The following example is available in batch through
 ## demo(gofCopula)
 \donttest{
+n <- 200; N <- 1000 # realistic (but too large for interactive use)
+n <-  60; N <-  200 # (time (and tree !) saving ...)
+
 ## A two-dimensional data example ----------------------------------
-x <- rCopula(200, claytonCopula(3))
+x <- rCopula(n, claytonCopula(3))
 
 ## Does the Gumbel family seem to be a good choice (statistic "Sn")?
-gofCopula(gumbelCopula(), x)
+gofCopula(gumbelCopula(), x, N=N)
 ## With "SnC", really s..l..o..w.. --- with "SnB", *EVEN* slower
-gofCopula(gumbelCopula(), x, method = "SnC", trafo.method = "cCopula")
+gofCopula(gumbelCopula(), x, N=N, method = "SnC", trafo.method = "cCopula")
 ## What about the Clayton family?
-gofCopula(claytonCopula(), x)
+gofCopula(claytonCopula(), x, N=N)
 
 ## Similar with a different estimation method
-gofCopula(gumbelCopula (), x, estim.method="itau")
-gofCopula(claytonCopula(), x, estim.method="itau")
+gofCopula(gumbelCopula (), x, N=N, estim.method="itau")
+gofCopula(claytonCopula(), x, N=N, estim.method="itau")
 
 
 ## A three-dimensional example  ------------------------------------
-x <- rCopula(200, tCopula(c(0.5, 0.6, 0.7), dim = 3, dispstr = "un"))
+x <- rCopula(n, tCopula(c(0.5, 0.6, 0.7), dim = 3, dispstr = "un"))
 
 ## Does the Gumbel family seem to be a good choice?
 g.copula <- gumbelCopula(dim = 3)
-gofCopula(g.copula, x)
+gofCopula(g.copula, x, N=N)
 ## What about the t copula?
 t.copula <- tCopula(dim = 3, dispstr = "un", df.fixed = TRUE)
 if(FALSE) ## this is *VERY* slow currently
-  gofCopula(t.copula, x)
+  gofCopula(t.copula, x, N=N)
 
 ## The same with a different estimation method
-gofCopula(g.copula, x, estim.method="itau")
+gofCopula(g.copula, x, N=N, estim.method="itau")
 if(FALSE) # still really slow
-  gofCopula(t.copula, x, estim.method="itau")
+  gofCopula(t.copula, x, N=N, estim.method="itau")
 
 ## The same using the multiplier approach
-gofCopula(g.copula, x, simulation="mult")
-gofCopula(t.copula, x, simulation="mult")
+gofCopula(g.copula, x, N=N, simulation="mult")
+gofCopula(t.copula, x, N=N, simulation="mult")
 if(FALSE) # no yet possible
-    gofCopula(t.copula, x, simulation="mult", estim.method="itau")
+    gofCopula(t.copula, x, N=N, simulation="mult", estim.method="itau")
 }% dont..
 }
 \keyword{htest}

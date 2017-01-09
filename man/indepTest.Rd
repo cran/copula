@@ -17,7 +17,7 @@
   details can be found in the articles cited in the reference section.
 }
 \usage{
-indepTestSim(n, p, m = p, N = 1000, verbose = interactive(), print.every = NULL)
+indepTestSim(n, p, m = p, N = 1000, verbose = interactive())
 indepTest(x, d, alpha=0.05)
 dependogram(test, pvalues = FALSE, print = FALSE)
 }
@@ -31,7 +31,6 @@ dependogram(test, pvalues = FALSE, print = FALSE)
     test statistic is to be computed.  It makes sense to consider \eqn{m
       \ll p}{m << p} especially when \code{p} is large.}
   \item{N}{number of repetitions when simulating under independence.}
-  \item{print.every}{ is deprecated in favor of \code{verbose}.}
   \item{verbose}{a logical specifying if progress
     should be displayed via \code{\link[utils]{txtProgressBar}}.}
 %% indepTest():
@@ -57,6 +56,9 @@ dependogram(test, pvalues = FALSE, print = FALSE)
 
   See the references below for more details, especially Genest
   and R\enc{é}{e}millard (2004).
+
+  The former argument \code{print.every} is deprecated and not
+  supported anymore; use \code{verbose} instead.
 }
 \value{The function \code{indepTestSim()} returns an object of class
   \code{"indepTestDist"} whose attributes are: \code{sample.size},

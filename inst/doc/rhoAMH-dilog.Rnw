@@ -3,16 +3,17 @@
 %%%%%%%%%%%%
 %
 \author{Martin M\"achler \\ ETH Zurich%
-  \\ June 2014 {\tiny (\LaTeX'ed \today)}}%---- for now
+  \\ June 2014}% {\tiny (\LaTeX'ed \today)}}%---- for now
 \title{Spearman's Rho for the AMH Copula: \\ a Beautiful Formula}
-% \def\mythanks{a version of this paper, for \pkg{nacopula} 0.4\_4, has been published
-%     in JSS, \url{http://www.jstatsoft.org/v39/i09}.}
+%
+%
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Martin M\"achler} %% comma-separated
 \Shorttitle{Spearman's Rho for AMH -- Beautiful}
 %
-% The "Name" on CRAN web page:
-%\VignetteIndexEntry{Rho_AMH_beautiful}
+% The "Name"/Title on CRAN web page:
+%\VignetteIndexEntry{Beautiful Spearman's Rho for AMH Copula}
+%
 %\VignetteDepends{MASS}
 %\VignetteDepends{copula}
 %\VignetteDepends{sfsmisc}

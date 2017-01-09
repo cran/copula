@@ -29,36 +29,48 @@ u3 <- cbind(uu, round(runif(10),2))
 
 ### t-copula instead of normal -- minimal set for testing here:
 ## d = 2
+## fit1() here catches the error: "irho" not available for "tCopula":
 (f1 <- fit1(tCopula(df.fixed=TRUE), x = uu))
 stopifnot(identical(f1, fit1(tCopula(df.fixed=TRUE),
 			     x = data.frame(uu))))# *WITH* a warning
 ## did not work with data.frame before 2012-08-12
 
 ## for df.fixed=FALSE, have 2 parameters ==> cannot use "fit1":
-(f2.t <- fitCopula(tCopula(), uu, method="itau"))#
-if(FALSE) ## 14.Jan.2016: irho(<tCopula>) has been "non-sense" -> now erronous:
-    f2.r <- fitCopula(tCopula(), uu, method="irho")
-if(doExtras) {
-    print(f2.m <- fitCopula(tCopula(), uu, method=  "ml"))# gives SE for 'df' {from optim()}
-    print(f2.M <- fitCopula(tCopula(), uu, method= "mpl"))# no SE for 'df' (for now ..)
-}
+(f2.t <- fitCopula(tCopula(), uu, method="itau"))# (+ warning: ... 'df.fixed=TRUE' )
+tools::assertError( ## 14.Jan.2016: irho(<tCopula>) has been "non-sense" -> now erronous:
+    fitCopula(tCopula(), uu, method="irho"))
 showProc.time()
+if(doExtras) {
+    print(f2.m <- fitCopula(tCopula(), uu, method=  "ml"))
+    print(f2.M <- fitCopula(tCopula(), uu, method= "mpl"))
+    print(summary(f2.m)) # gives SE for 'df' {from optim()}
+    print(summary(f2.M)) # no SE for 'df' (for now ..)
+    stopifnot(all.equal(coef(f2.m), coef(f2.M)))
+    showProc.time()
+}
 
 ## d = 3 : -------------
 ## ok with df.fixed
-tC3f <- tCopula(c(.2,.7, .8), dim=3, dispstr="un", df.fixed=TRUE)
-tC3  <- tCopula(c(.2,.7, .8), dim=3, dispstr="un")
-print(f3 <- fitCopula(tC3f, u3, method="itau"))
-(f3.t <- fitCopula(tC3, u3, method="itau"))# warning: coercing to df.fixed=TRUE
-if(FALSE) ## irho(<tCopula>) now an error:
+tC3f <- tCopula(dim=3, dispstr="un", df.fixed=TRUE)
+tC3  <- tCopula(dim=3, dispstr="un")
+f3   <- fitCopula(tC3f, u3, method="itau")
+f3.t <- fitCopula(tC3 , u3, method="itau") # warning: coercing to df.fixed=TRUE
+summary(f3.t)
+cf3 <- coef(f3, SE = TRUE)
+stopifnot(all.equal(unname(cf3), cbind(c(0.374607, 0.309017, 0.374607),
+                                       c(0.386705, 0.325995, 0.405493)),
+                    tol = 5e-5), # seen 6e-7
+          all.equal(coef(f3), coef(f3.t)))
+if(FALSE) ## Error: iRho() method for class "tCopula" not yet implemented
 (f3.r  <- fitCopula(tC3, u3, method="irho"))
+showProc.time()
 
 if(doExtras) {
-    print(f3.m <- fitCopula(tC3, u3, method=  "ml"))
-    print(f3.M <- fitCopula(tC3, u3, method= "mpl"))
+    print(f3.m <- fitCopula(tC3, u3, method=  "ml")); c.m <- coef(f3.m, SE=TRUE)
+    print(f3.M <- fitCopula(tC3, u3, method= "mpl")); c.M <- coef(f3.M, SE=TRUE)
+    showProc.time()
+    stopifnot(all.equal(c.m[,1], c.M[,1])) # the estimates don't differ; the SE's do
 }
-
-showProc.time()
 
 set.seed(17)
 d <- 5 # dimension
@@ -71,6 +83,8 @@ P <- c(r[2], r[1], r[1], r[1], # upper triangle (w/o diagonal) of corr.matrix
                    r[3], r[3],
                          r[3])
 assertError( setTheta(ec4, value = P) )
+validObject(ex4. <- setTheta(ec4, value = 0.8)) # set the only (non-fixed) parameter
+## TODO "check" getTheta(ex4., ...)
 ## rather need "un" dispersion: Now with smarter tCopula():
 (uc4 <- tCopula(dim=d, df=nu, disp = "un", df.fixed=FALSE))
 validObject(uc4p <- setTheta(uc4, value = c(P, df=nu)))
@@ -81,16 +95,17 @@ stopifnot(cor(P, cU[lower.tri(cU)]) > 0.99)
 
 ## Fitting a t-copula with "itau.mpl" with disp="un"
 (fm4u <- fitCopula(uc4, U., method="itau.mpl", traceOpt = TRUE))
+## Fitting  t-copulas  .............  with disp = "ex" and "ar" :
+uc4.ex <- tCopula(dim=d, df=nu, disp = "ex", df.fixed=FALSE)
+uc4.ar <- tCopula(dim=d, df=nu, disp = "ar1", df.fixed=FALSE)
+validObject(uc4p.ex <- setTheta(uc4.ex, value = c(0.75, df=nu)))
+validObject(uc4p.ar <- setTheta(uc4.ar, value = c(0.75, df=nu)))
+U.ex <- pobs(rCopula(n=1000, copula=uc4p.ex))
+U.ar <- pobs(rCopula(n=1000, copula=uc4p.ar))
 if(FALSE) { # The following are not available (yet); see ~/R/fitCopula.R
     ## Fitting a t-copula with "itau.mpl" with disp="ex"
-    uc4.ex <- tCopula(dim=d, df=nu, disp = "ex", df.fixed=FALSE)
-    validObject(uc4p.ex <- setTheta(uc4.ex, value = c(0.75, df=nu)))
-    U.ex <- pobs(rCopula(n=1000, copula=uc4p.ex))
     (fm4e <- fitCopula(uc4.ex, U.ex, method="itau.mpl"))
     ## Fitting a t-copula with "itau.mpl" with disp="ar"
-    uc4.ar <- tCopula(dim=d, df=nu, disp = "ar1", df.fixed=FALSE)
-    validObject(uc4p.ar <- setTheta(uc4.ar, value = c(0.75, df=nu)))
-    U.ar <- pobs(rCopula(n=1000, copula=uc4p.ar))
     (fm4e <- fitCopula(uc4.ar, U.ar, method="itau.mpl"))
 }
 
@@ -100,10 +115,11 @@ tCop <- tCopula(c(0.2,0.4,0.6), dim=3, dispstr="un", df=5)
 set.seed(101)
 x <- rCopula(n=200, tCop) # "true" observations (simulated)
 ## Maximum likelihood (start = (rho[1:3], df))
-print(tc.ml  <- fitCopula(tCopula(dim=3, dispstr="un"), x, method="ml",
-                          start=c(0,0,0, 10)))
-print(tc.ml. <- fitCopula(tCopula(dim=3, dispstr="un"),
-                          x, method="ml")) # without 'start'
+print(summary(tc.ml <-
+                  fitCopula(tCopula(dim=3, dispstr="un"), x, method="ml",
+                            start=c(0,0,0, 10))))
+print(summary(tc.ml. <-
+                  fitCopula(tCopula(dim=3, dispstr="un"), x, method="ml")))# w/o 'start'
 ## Maximum pseudo-likelihood (the asymptotic variance cannot be estimated)
 u <- pobs(x)
 print(tc.mpl <- fitCopula(tCopula(dim=3, dispstr="un"),
@@ -112,10 +128,10 @@ print(tc.mpl <- fitCopula(tCopula(dim=3, dispstr="un"),
 ## Without 'start'
 tc.mp. <- fitCopula(tCopula(dim=3, dispstr="un"), x, estimate.variance=FALSE)
 print(tc.mp.)
-noC <- function(x) { x@fitting.stats$counts <- NULL ; x }
+noC <- function(x) { x@fitting.stats$counts <- NULL; x@call <- quote(dummy()); x }
 
-assert.EQ(noC(tc.ml) , noC(tc.ml.), tol= .005)
-assert.EQ(noC(tc.mpl), noC(tc.mp.), tol= .100, giveRE=TRUE)
+assert.EQ(noC(tc.ml) , noC(tc.ml.), tol= .005) # nothing
+assert.EQ(noC(tc.mpl), noC(tc.mp.), tol= .100, giveRE=TRUE) # shows diff
 
 ## The same t copula but with df.fixed=TRUE (=> use the same data!)
 tC3u5 <- tCopula(dim=3, dispstr="un", df=5, df.fixed=TRUE)
@@ -132,6 +148,31 @@ print(tcF.mp. <- fitCopula(tC3u5, u, method="mpl", estimate.variance=FALSE))
 assert.EQ(noC(tcF.mpl), noC(tcF.mp.), tol = 1e-5)
 } # end Xtras
 
+## fitMvdc() -- first 2 D -- from Yiyun Shou's bug report: ---------------------
+
+ct.2 <- tCopula(param=0.2, dim=2, dispstr = "ex", df.fixed=TRUE)
+mvt.2.ne <- mvdc(copula = ct.2, margins = c("norm", "exp"),
+                 paramMargins = list(list(mean = 0, sd = 2), list(rate = 2)))
+mvt.2.ne ## --> four free parameters in total: rho, mean, sd, and rate:
+
+if(FALSE) ## FIXME
+copula:::getTheta(mvt.2.ne, attr = TRUE)
+
+## simulate data and fit:
+set.seed(17); x.samp <- rMvdc(250, mvt.2.ne)
+fit2ne <- fitMvdc(x.samp, mvt.2.ne, start= c(1,1,1, rho = 0.5),
+                  optim.control = list(trace = TRUE, maxit = 2000), hideWarnings=FALSE)
+summary(fit2ne)
+(confint(fit2ne) -> ci.2ne)
+stopifnot(
+    all.equal(coef(fit2ne),
+              c(m1.mean=0.061359521, m1.sd=2.0769423,
+                m2.rate=2.0437937, rho.1 = 0.15074002), tol=1e-7)# seen 1.48e-8
+   ,
+    all.equal(c(ci.2ne),
+              c(-0.18309, 1.9064, 1.8019, 0.012286,
+                 0.30581, 2.2474, 2.2857, 0.28919), tol = 4e-4) # seen 1.65e-5
+)
 
 
 
@@ -152,8 +193,13 @@ persp  (gMvGam, dMvdc, xlim = c(0,4), ylim=c(0,8)) ## almost discrete ????
 contour(gMvGam, dMvdc, xlim = c(0,2), ylim=c(0,8))
 points(X, pch = ".", cex = 2, col=adjustcolor("blue", 0.5))
 
-if(FALSE)# unfinished --- TODO maybe move below ('doExtras')!
-fMv <- fitMvdc(X, gMvGam) # needs 'start' ...
+if(doExtras) {
+    st <- system.time(
+        fMv <- fitMvdc(X, gMvGam, start = c(1,1,1,1, 1.3),# method="BFGS",
+                       optim.control= list(trace=TRUE)))
+    print(st) # ~ 59 sec. (lynne 2015)
+    print(summary(fMv))
+}
 
 pFoo <- function(x, lower.tail=TRUE, log.p=FALSE)
      pnorm((x - 5)/20, lower.tail=lower.tail, log.p=log.p)
@@ -222,6 +268,7 @@ msg <- tryCatch(fitCopula(gumbelCopula(), data = u), error=function(e)e$message)
 ## check error message __FIXME__ want "negative correlation not possible"
 ## or NO ERROR and a best fit to tau=0 [and the same for other Archimedean families!]
 msg
+showProc.time()
 
 
 ## Date: Sat, 14 Nov 2015 20:21:27 -0500
@@ -252,6 +299,7 @@ system.time(fit <- fitCopula(ellipCopula("t", dim=d, dispstr="un"),
 ## ... so R crashes (this also happens if the data is much 'closer' to a
 ## t-copula than my data above, so that's not the problem). I'm wondering
 ## about the following.
+showProc.time()
 
 ## 4) Implement: first estimating (via pairwise inversion of
 ## Kendall's tau) the dispersion matrix and then estimating the d.o.f.
@@ -274,6 +322,46 @@ fG <- fitCopula(gumbelCopula(), x)
 	xv.5   = xvCopula(gumbelCopula(), x, k = 5)))# 5-fold CV
 stopifnot(all.equal(unname(v), c(32.783677, 32.835744, 32.247463),
 		    tolerance = 1e-7))
+# now also with rotCopula:
+xvR <- xvCopula(rotCopula(claytonCopula()), x, k = 8)
+stopifnot(all.equal(xvR, 21.050569, tolerance = 1e-6))
+## Now 'copula2 = indepCopula(..) gets 'dim = 3' from the first:
+kh.C <- khoudrajiCopula(claytonCopula(2.5, dim=3), shapes = (1:3)/4)
+kh.C
+copula:::getTheta(kh.C, attr=TRUE) # bounds look good
+x3 <- cbind(x, x[,1]^2 + runif(nrow(x)))
+u3 <- pobs(x3)
+if(FALSE) # Error:  "non-finite finite-difference [3]"
+xvK <- xvCopula(kh.C, u3, k = 8)
+if(FALSE) # fails (same Error)
+fK <- fitCopula(kh.C, u3)
+## "works" :
+p1 <- (1:20)/2
+l1 <- sapply(p1, function(th1) loglikCopula(c(th1, (1:3)/4), u3, kh.C))
+plot(p1, l1, type = "b") # nice maximum at around 6.xx
+
+## works two:
+fixedParam(kh.C) <- c(FALSE, FALSE, TRUE,TRUE)
+summary(fK12 <- fitCopula(kh.C, u3))
+fixedParam(kh.C) <- FALSE # all free now
+fK4 <- fitCopula(kh.C, u3, start = c(coef(fK12), 0.3, 0.5),
+                 optim.method = "L-BFGS-B")
+summary(fK4)
+## -> shape1 ~= shape2 ~= 0
+
+if(FALSE) ## FIXME !! --
+kh.r.C <- khoudrajiCopula(rotCopula(claytonCopula()), shapes = c(1,3)/4)
+## xvK.R <- xvCopula(
+
+##                   )
+
+## From: Ivan, 27 Jul 2016 08:58
+u <- pobs(rCopula(300, joeCopula(4)))
+fjc <- fitCopula(joeCopula(), data = u, method = "itau")
+## Now a warning.  Previously gave 'Error in dCor(cop) :'
+##   dTau() method for class "joeCopula" not yet implemented
+summary(fjc)
+
 
 
 if(!doExtras) q(save="no") ## so the following auto prints
@@ -322,6 +410,8 @@ showProc.time()
 
 data(rdj)
 rdj <- rdj[,2:4]
+splom2(rdj, cex=0.4, ## this gave an error for a day or so:
+       col.mat = matrix(adjustcolor("black", 0.5), nrow(rdj), 3))
 dim(u <- pobs(rdj))# 1262 3
 fc <- frankCopula(dim=3)
 ffc <- fitCopula(fc, u) ## (failed in 0.999-4 {param constraints})

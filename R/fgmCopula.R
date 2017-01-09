@@ -82,9 +82,15 @@ fgmCopula <- function(param = NA_real_, dim = 2L) {
         param.names = paste0("param",subsets.char[(dim+2):2^dim]),
         param.lowbnd = rep(-1, 2^dim - dim - 1),
         param.upbnd = rep(1, 2^dim - dim - 1),
-        fullname = "Farlie-Gumbel-Morgenstern copula family")
+        fullname = "<deprecated slot>") # "Farlie-Gumbel-Morgenstern copula family"
 }
 
+setMethod(describeCop, c("fgmCopula", "character"), function(x, kind, prefix="", ...) {
+    d <- x@dimension
+    paste0(prefix,
+          "Farlie-Gumbel-Morgenstern (FGM) copula, dim. d = ", d, "\n", prefix, " param.: ",
+          capture.output(str(x@parameters, give.head=FALSE)))
+})
 
 ### random number generation ###################################################
 
@@ -177,7 +183,7 @@ rhoFgmCopula <- function(copula) {
 iTauFgmCopula <- function(copula, tau) {
   if (any(tau < -2/9 | tau > 2/9))
     warning("tau is out of the range [-2/9, 2/9]")
-  pmax(-1, pmin(1, 9 * tau / 2))
+  pmax(pmin(9 * tau / 2, 1), -1)
 }
 
 ## calibration via rho
@@ -185,7 +191,7 @@ iTauFgmCopula <- function(copula, tau) {
 iRhoFgmCopula <- function(copula, rho) {
   if (any(rho < -1/3 | rho > 1/3))
     warning("rho is out of the range [-1/3, 1/3]")
-  pmax(-1, pmin(1, 3 * rho))
+  pmax(pmin(3 * rho, 1), -1)
 }
 
 
@@ -193,10 +199,9 @@ iRhoFgmCopula <- function(copula, rho) {
 
 setMethod("rCopula", signature("numeric", "fgmCopula"), rfgmCopula)
 
-setMethod("pCopula", signature("numeric", "fgmCopula"),pfgmCopula)
 setMethod("pCopula", signature("matrix", "fgmCopula"), pfgmCopula)
-setMethod("dCopula", signature("numeric", "fgmCopula"),dfgmCopula)
 setMethod("dCopula", signature("matrix", "fgmCopula"), dfgmCopula)
+## pCopula() and dCopula() *generic* already deal with non-matrix case!
 
 setMethod("tau", signature("fgmCopula"), tauFgmCopula)
 setMethod("rho", signature("fgmCopula"), rhoFgmCopula)

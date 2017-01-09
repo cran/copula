@@ -14,7 +14,7 @@
 \Plaintitle{Nested Archimedean Copulas Meet R---The nacopula Package} %% without formatting
 % \Shorttitle{}
 %
-%\VignetteIndexEntry{copula}
+%\VignetteIndexEntry{Nested Archimedean Copulas Meet R}% << shown on CRAN page!
 %\VignetteDepends{copula}
 %\VignetteDepends{lattice}
 \SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=7,height=4,strip.white=true,keep.source=TRUE}
@@ -274,7 +274,7 @@ particular focus is put on nested Archimedean copulas. The \R\ package
 \pkg{nacopula} had been the first \R\ package dealing with these functions,
 and is now part of the \R\ package \pkg{copula}.
 It is available from the Comprehensive R Archive Network at
-\url{http://CRAN.R-project.org/package=copula}.
+\url{https://CRAN.R-project.org/package=copula}.
 
 \section{Archimedean copulas}
 \subsection{Archimedean copulas and their properties}

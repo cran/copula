@@ -88,7 +88,7 @@ initOpt <- function(family, tau.range=NULL, interval=TRUE, u,
                       },
                       stop("wrong method for initOpt"))
     ## truncate to range if required
-    cop@iTau(pmax(tau.range[1], pmin(tau.range[2], tau.hat)))
+    cop@iTau(pmax(pmin(tau.hat, tau.range[2]), tau.range[1]))
 }
 
 

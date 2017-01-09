@@ -93,6 +93,12 @@ stopifnot(identical(param, P2p(P)),
 (rhoP <- tCt@getRho(tCt))
 stopifnot(identical(getSigma (tCt),
 		    toeplitz (c(1, rhoP))))
+
+## "AR1" case:
+nC.7 <- normalCopula(0.8, dim = 7, dispstr = "ar1")
+(Sar1.7 <- getSigma(nC.7))
+0.8^(0:(7-1)) #  1  0.8  0.64  0.512 ..
+stopifnot(all.equal(Sar1.7, toeplitz(0.8^(0:(7-1)))))
 }
 \keyword{array}
 \keyword{manip}

@@ -17,15 +17,12 @@
 ## NB: For  d = dim = 2,   -1 <= param = theta = alpha < 0 is allowed
 ## --  psi() and iPsi() now ok
 
-iPsiClayton <- function(copula, u) .iPsiClayton(u, copula@parameters[1])
-.iPsiClayton <- function(u, alpha)   sign(alpha) * (u^(-alpha) - 1)
-## (u^(-alpha) - 1) / alpha ## <<- Nelson Table 4.1:  alpha in denom is wrong
+.iPsiClayton <- function(u, theta)   sign(theta) * (u^(-theta) - 1)
+## (u^(-theta) - 1) / theta ## <<- Nelson Table 4.1:  theta in denom is wrong
 
-psiClayton <- function(copula, s) .psiClayton(s, copula@parameters[1])
-.psiClayton <- function(s, alpha) {
-  ## formally, from iPsi(.):  (1 - sign(alpha)*s) ^ (-1/a)
-  (if(alpha < 0) pmax(0, 1-s) else 1+s)^(-1/alpha)
-}
+.psiClayton <- function(t, theta) pmax(1 + sign(theta)*t, 0)^(-1/theta)
+## formally, from iPsi(.), psi(t) = (1 + sign(theta)*t) ^ (-1/a)
+## NB:  pmax(*, 0) keeps attributes of '*'
 
 
 claytonCopula <- function(param = NA_real_, dim = 2L,
@@ -42,9 +39,9 @@ claytonCopula <- function(param = NA_real_, dim = 2L,
       }
   }
   ## get expressions of cdf and pdf
-  cdfExpr <- function(n) {
+  cdfExpr <- function(d) {
     expr <- "u1^(-alpha) - 1"
-    for (i in 2:n) {
+    for (i in 2:d) {
       cur <- paste0("u", i, "^(-alpha) - 1")
       expr <- paste(expr, cur, sep=" + ")
     }
@@ -52,16 +49,8 @@ claytonCopula <- function(param = NA_real_, dim = 2L,
     parse(text = expr)
   }
 
-  pdfExpr <- function(cdf, n) {
-    val <- cdf
-    for (i in 1:n) {
-      val <- D(val, paste0("u", i))
-    }
-    val
-  }
-
   cdf <- cdfExpr(dim)
-  pdf <- if (dim <= 6) pdfExpr(cdf, dim) # else NULL
+  pdf <- if (dim <= 6) cdfExpr2pdfExpr(cdf, dim) # else NULL
   new("claytonCopula",
       dimension = dim,
       parameters = param,
@@ -69,7 +58,7 @@ claytonCopula <- function(param = NA_real_, dim = 2L,
       param.names = "param",
       param.lowbnd = if(dim == 2) -1 else 0,
       param.upbnd = Inf,
-      fullname = "Clayton copula family; Archimedean copula")
+      fullname = "<deprecated slot>") # "Clayton (Archimedean) copula"
 }
 
 rclaytonBivCopula <- function(n, alpha) {
@@ -101,7 +90,8 @@ rclaytonCopula <- function(n, copula) {
 }
 
 
-## now only used for dim = d = 2  (for negative tau)
+## unused now: it is *CLEARLY WRONG* for negative tau, since pmax(*, 0) is "in the wrong place"
+if(FALSE)
 pclaytonCopula <- function(copula, u) {
   dim <- copula@dimension
   stopifnot(!is.null(d <- ncol(u)), dim == d)
@@ -131,7 +121,8 @@ dclaytonCopula <- function(copula, u, ...) {
   if(log) log(val) else val
 }
 
-## now only used for dim = d = 2  (for negative tau)
+## now only used for dim = d = 2  (for negative tau <=> negative alpha | theta)
+## --- but it is *wrong* there "almost surely" exactly for the negative alpha | theta
 dclaytonCopula.pdf <- function(u, copula, log=FALSE) {
   dim <- copula@dimension
   if (dim > 10) stop("Clayton copula PDF not implemented for dimension > 10.")
@@ -203,41 +194,47 @@ dTauClaytonCopula <- function(copula) {
   return( 2 / (copula@parameters+2)^2 )
 }
 
+if(FALSE) # unused
 pMatClayton <- function (u, copula, ...) {
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
     th <- copula@parameters
-    if(d == 2 && !copClayton@paraConstr(th)) # for now, .. to support negative tau
-        pclaytonCopula(copula, u=u)
-    else
-        pacopula(u, copClayton, theta=copula@parameters, ...)
+    ## if(d == 2 && th < 0) # for now, .. to support negative tau
+    ##     pclaytonCopula(copula, u=u)
+    ## else
+    pacopula(u, copClayton, theta=th, ...)
 }
 
 dMatClayton <- function (u, copula, log = FALSE, checkPar=TRUE, ...) {
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
     th <- copula@parameters
-    if(d == 2 && !copClayton@paraConstr(th)) # for now, .. to support negative tau
-        dclaytonCopula.pdf(u, copula, log=log)
-    else
+    if(d == 2 && th < 0) { # for now, to support negative tau-- TODO/FIXME: put into copClayton
+        ## wrong(!): dclaytonCopula.pdf(u, copula, log=log)
+        u_th <- u^-th
+        pt <- rowSums(u_th) - 1 # p-term pt = u1^-th + u2^-th - 1
+        r <- if(log) rep_len(-Inf, length(pt)) else numeric(length(pt))# = value for pt <= 0
+        pos <- pt > 0
+        u <- u[pos, , drop=FALSE]
+        pt <- pt[pos]
+        r[pos] <-
+	    if(log)
+		log1p(th) -(th+1)*rowSums(log(u)) - (1/th + 2) * log(pt)
+            else
+                (1+th) * (u[,1]*u[,2])^-(th+1)  * pt^(-1/th - 2)
+        r
+    } else
         copClayton@dacopula(u, theta=copula@parameters, log=log, checkPar=checkPar, ...)
 }
 
 setMethod("rCopula", signature("numeric", "claytonCopula"), rclaytonCopula)
-
-setMethod("pCopula", signature("numeric", "claytonCopula"),
-	  function (u, copula, ...)
-	  ## was  pclaytonCopula
-          pMatClayton(matrix(u, ncol = dim(copula)), copula, ...))
-setMethod("pCopula", signature("matrix", "claytonCopula"), pMatClayton)
-
-setMethod("dCopula", signature("numeric", "claytonCopula"),
-	  function (u, copula, log=FALSE, ...)
-	  dMatClayton(matrix(u, ncol = dim(copula)), copula, log=log, ...))
+setMethod("pCopula", signature("matrix", "claytonCopula"),
+          function(u, copula, ...) pacopula(u, copClayton, theta=copula@parameters))
 setMethod("dCopula", signature("matrix", "claytonCopula"), dMatClayton)
+## pCopula() and dCopula() *generic* already deal with non-matrix case!
 
-
-setMethod("iPsi", signature("claytonCopula"), iPsiClayton)
-setMethod("psi",  signature("claytonCopula"), psiClayton)
-
+setMethod("iPsi", signature("claytonCopula"),
+          function(copula, u) .iPsiClayton(u, copula@parameters[1]))
+setMethod("psi",  signature("claytonCopula"),
+          function(copula, s) .psiClayton(s, copula@parameters[1]))
 
 setMethod("diPsi", signature("claytonCopula"),
 	  function(copula, u, degree=1, log=FALSE, ...)

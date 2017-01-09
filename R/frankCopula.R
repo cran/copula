@@ -16,26 +16,63 @@
 ### Parameter  'a', also called 'alpha' or 'theta'
 ### must be in (0, Inf)   for completely monotone psi ( <==> tau >= 0 )
 ### a = 0  <==> independence copula
-
-iPsiFrank <- function(copula, u) .iPsiFrank(u, copula@parameters[1])
-.iPsiFrank <- function(u, a) { ## FIXME: copFrank@iPsi() is clearly better for |a| << 1
-  - log(expm1(- a * u) / expm1(-a))
-}
+### a < 0  <==> tau(.) < 0  ... allowed for  d=2 only
 
 psiFrank <- function(copula, s) .psiFrank(s, copula@parameters[1])
-.psiFrank <- function(s, a) {
-  ## -1/a * log(1 + exp(-s) * (exp(-a) - 1))
-  stopifnot(length(a) == 1)
-  if(a > 0)
-    copFrank@psi(s, a) # using log1mexp(.)
-  else if(a == 0)
-    exp(-s)
-  else if(a <= log(.Machine$double.eps))# -36.04
-    ## exp(-a) -1  ~= exp(-a)
-    -log1pexp(-(s+a))/a
-  else ## -36.04 < a < 0 :
-    -log1p(exp(-s) * expm1(-a))/a
+.psiFrank <- function(t, theta) {
+  ## -1/theta * log(1 + exp(-t) * (exp(-theta) - 1))
+  ## = -log(1-(1-exp(-theta))*exp(-t))/theta
+  ## = -log1p(expm1(-theta)*exp(0-t))/theta  # fails really small t, theta > 38
+  stopifnot(length(theta) == 1)
+  if(theta > 0)
+    -log1mexp(t-log1mexp(theta))/theta
+  else if(theta == 0)
+    exp(-t)
+  else if(theta <= log(.Machine$double.eps))# -36.04
+    ## exp(-theta) -1  ~= exp(-theta)
+    -log1pexp(-(t+theta))/theta
+  else ## -36.04 < theta < 0 :
+    -log1p(exp(-t) * expm1(-theta))/theta
 }
+
+iPsiFrank <- function(copula, u, log=FALSE)
+    .iPsiFrank(u, copula@parameters[1], log=log)
+.iPsiFrank <- function(u, theta, log=FALSE) {
+    ## == -log( (exp(-theta*u)-1) / (exp(-theta)-1) )
+    uth <- u*theta # (-> recycling args)
+    if(!length(uth)) return(uth) # {just for numeric(0) ..hmm}
+    et1 <- expm1(-theta) # e^{-theta} - 1 < 0
+    ## FIXME ifelse() is not quite efficient
+    ## FIXME(2): the "> c* theta" is pi*Handgelenk
+    ## FIXME: use  delta = exp(-uth)*(1 - exp(uth-theta)/ (-et1) =
+    ##                   = exp(-uth)* expm1(uth-theta)/et1              (4)
+    ##
+    ## do small Rmpfr-study to find the best form -- (4) above and the three forms below
+    ## Compare with ../vignettes/Frank-Rmpfr.Rnw
+    ##              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ sub ("theta", "theta", .):
+    ## iPsi.0 <- function(u,theta) -log( (exp(-theta*u)-1) / (exp(-theta)-1) ) # = Def.; "naive" form
+    ## iPsi.1 <- function(u,theta) -log(expm1(-u*theta) / expm1(-theta))
+    ## iPsi.2 <- function(u,theta) -log1p((exp(-u*theta)-exp(-theta)) / expm1(-theta))
+    ## and (not yet in the above vignette):
+    ## iPsi.3 <- function(u,theta) -log1p(exp(-theta) * expm1(theta - u*theta)/ expm1(-theta))
+    r <- uth
+    ok <- if(anyNA(r)) !is.na(r) else TRUE
+    et1 <- rep(et1, length.out = length(uth))
+    if(any(sml.u <- ok & abs(uth) <= .01*abs(theta)))
+        r[sml.u] <- ## for small u (u <= 0.01)
+            -log(expm1(-uth[sml.u])/et1[sml.u])  # == iPsi.1(u,theta)
+    ## else:  uth = u*theta > .01*theta <==> u > 0.01
+    e.t <- rep(exp(-theta), length.out = length(uth))
+    notS <- ok & !sml.u
+    if(any(i.th <- notS & (med.th <- e.t > 0 & abs(theta - uth) < 1/2))) # theta - theta*u = theta(1-u) < 1/2
+        r[i.th] <- -log1p(e.t[i.th] * expm1((theta - uth)[i.th])/et1[i.th])
+    if(any(i.th <- notS & !med.th))
+        r[i.th] <- -log1p((exp(-uth[i.th])- e.t[i.th]) / et1[i.th]) # == iPsi.2(u,theta)
+
+    if(log) log(r) else r
+}
+
+
 
 ## psiDerFrank <- function(copula, s, n) {
 ##   eval(psiDerFrank.expr[n + 1], list(s=s, alpha=copula@parameters[1]))
@@ -57,9 +94,9 @@ frankCopula <- function(param = NA_real_, dim = 2L,
   }
 
   ## get expressions of cdf and pdf
-  cdfExpr <- function(n) {
+  cdfExpr <- function(d) {
     expr <-   "- log( (exp(- alpha * u1) - 1) / (exp(- alpha) - 1) )"
-    for (i in 2:n) {
+    for (i in 2:d) {
       cur <- paste0("- log( (exp(- alpha * u", i, ") - 1) / (exp(- alpha) - 1))")
       expr <- paste(expr, cur, sep=" + ")
     }
@@ -67,9 +104,9 @@ frankCopula <- function(param = NA_real_, dim = 2L,
     parse(text = expr)
   }
 
-  pdfExpr <- function(cdf, n) {
+  pdfExpr <- function(cdf, d) {
     val <- cdf
-    for (i in 1:n) {
+    for (i in 1:d) {
       val <- D(val, paste0("u", i))
     }
     val
@@ -84,7 +121,7 @@ frankCopula <- function(param = NA_real_, dim = 2L,
       param.names = "param",
       param.lowbnd = if(dim == 2) -Inf else 0,
       param.upbnd = Inf,
-      fullname = "Frank copula family; Archimedean copula")
+      fullname = "<deprecated slot>")# "Frank copula family; Archimedean copula"
 }
 
 rfrankBivCopula <- function(n, alpha) {
@@ -146,6 +183,7 @@ dfrankCopula <- function(u, copula, log=FALSE, ...) {
 ##   pdf
 ## }
 
+## Only used for  dim == 2  and  theta = alpha < 0:
 dfrankCopula.pdf <- function(u, copula, log=FALSE) {
   dim <- copula@dimension
   if (dim > 6) stop("Frank copula PDF not implemented for dimension > 6.")
@@ -198,7 +236,7 @@ pMatFrank <- function (u, copula, ...) {
     ## was  pfrankCopula
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
     th <- copula@parameters
-    if(d == 2 && !copFrank@paraConstr(th)) # for now, .. to support negative tau
+    if(d == 2 && th < 0) # for now, .. to support negative tau
         pfrankCopula(copula, u=u)
     else
         pacopula(u, copFrank, theta=copula@parameters, ...)
@@ -215,15 +253,17 @@ dMatFrank <- function (u, copula, log = FALSE, checkPar=TRUE, ...) {
 }
 setMethod("rCopula", signature("numeric", "frankCopula"), rfrankCopula)
 
-setMethod("pCopula", signature("numeric", "frankCopula"),
-	  function (u, copula, ...)
-	  pMatFrank(matrix(u, ncol = dim(copula)), copula, ...))
 setMethod("pCopula", signature("matrix", "frankCopula"), pMatFrank)
-
-setMethod("dCopula", signature("numeric", "frankCopula"),
-	  function (u, copula, log=FALSE, ...)
-	  dMatFrank(matrix(u, ncol = dim(copula)), copula, log=log, ...))
 setMethod("dCopula", signature("matrix", "frankCopula"), dMatFrank)
+
+
+## pCopula() and dCopula() *generic* already deal with non-matrix case!
+## setMethod("pCopula", signature("numeric", "frankCopula"),
+## 	  function (u, copula, ...)
+## 	  pMatFrank(matrix(u, ncol = dim(copula)), copula, ...))
+## setMethod("dCopula", signature("numeric", "frankCopula"),
+## 	  function (u, copula, log=FALSE, ...)
+## 	  dMatFrank(matrix(u, ncol = dim(copula)), copula, log=log, ...))
 
 setMethod("iPsi", signature("frankCopula"), iPsiFrank)
 setMethod("psi",  signature("frankCopula"),  psiFrank)
@@ -244,7 +284,6 @@ setMethod("lambda", signature("frankCopula"), function(copula) c(lower=0, upper=
 
 setMethod("iTau", signature("frankCopula"),
 	  function(copula, tau, tol = 1e-7) copFrank@iTau(tau, tol=tol))
-setMethod("iRho", signature("frankCopula"), iRhoCopula)
 
 setMethod("dRho", signature("frankCopula"), dRhoFrankCopula)
 setMethod("dTau", signature("frankCopula"), dTauFrankCopula)

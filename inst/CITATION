@@ -11,7 +11,7 @@ if(!grepl("20", mDate)) mDate <- sub(".* 20", "20", meta$Built)
 year <- sub("-.*", "", mDate)
 note <- sprintf("R package version %s", meta$Version)
 if(getRversion() < "2.15") paste0 <- function(...) paste(..., sep="")
-url <- paste0("http://CRAN.R-project.org/package=", PKG)
+url <- paste0("https://CRAN.R-project.org/package=", PKG)
 
 bibentry(bibtype = "Manual",
          title = "copula: Multivariate Dependence with Copulas",

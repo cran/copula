@@ -1,4 +1,5 @@
 \name{assocMeasures}
+\title{Dependence Measures for Bivariate Copulas}
 % \docType{methods}
 \alias{tau}
 \alias{rho}
@@ -78,6 +79,7 @@
 \alias{iTau,ellipCopula-method}
 \alias{iTau,normalCopula-method}
 \alias{iTau,tCopula-method}
+\alias{iTau,archmCopula-method}
 \alias{iTau,amhCopula-method}
 \alias{iTau,claytonCopula-method}
 \alias{iTau,frankCopula-method}
@@ -99,6 +101,7 @@
 \alias{iRho,ellipCopula-method}
 \alias{iRho,normalCopula-method}
 \alias{iRho,tCopula-method}
+\alias{iRho,archmCopula-method}
 \alias{iRho,claytonCopula-method}
 \alias{iRho,frankCopula-method}
 \alias{iRho,gumbelCopula-method}
@@ -111,8 +114,6 @@
 \alias{iRho,nacopula-method}
 \alias{iRho,rotCopula-method}
 
-
-\title{Dependence Measures for Bivariate Copulas}
 \description{
   These functions compute Kendall's tau, Spearman's rho, and the tail
   dependence index for \emph{bivariate} copulas.  \code{iTau} and \code{iRho},

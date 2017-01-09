@@ -29,7 +29,7 @@
 ##' @param df.fixed logical, TRUE = df fixed
 ##' @return an object of tCopula
 tCopula <- function(param = NA_real_, dim = 2L, dispstr = "ex",
-		    df = 4, df.fixed = FALSE)
+		    df = 4, df.fixed = FALSE, df.min = 0.01)
 {
     dim <- as.integer(dim)
     if(!is.numeric(param)) storage.mode(param) <- "double" # for NA, keeping attributes!
@@ -38,20 +38,20 @@ tCopula <- function(param = NA_real_, dim = 2L, dispstr = "ex",
 	pdim <- length(param <- rep(param, length.out = npar.ellip(dim, dispstr)))
     parameters <- c(param, df) ## df is another parameter __at end__
     param.names <- c(paste("rho", seq_len(pdim), sep="."), "df")
-    param.lowbnd <- c(rep.int(-1, pdim), 1e-6)
-    param.upbnd	 <- c(rep.int( 1, pdim), Inf)
-    attr(parameters, "fixed") <- c(isFixedP(param), df.fixed)
+    param.lowbnd <- c(lowbnd.rho.ellip(dim, dispstr, pdim), df.min)
+    param.upbnd	 <- c(rep.int( 1, pdim),                     Inf)
+    attr(parameters, "fixed") <- c(!isFreeP(param), df.fixed)
 
-    new("tCopula",
+    new("tCopula", # validRho() in ./Classes.R checks 'dispstr' and more:
 	dispstr = dispstr,
 	dimension = dim,
 	parameters = parameters,
-	## df = df, ## JY: need to deprecate this in the future
-	df.fixed = df.fixed,
+	## df = df, # (no longer)
+	df.fixed = df.fixed, # redundant; useful for quick access
 	param.names = param.names,
 	param.lowbnd = param.lowbnd,
 	param.upbnd = param.upbnd,
-	fullname = paste("t copula family", if(df.fixed) paste("df fixed at", df)),
+	fullname = "<deprecated slot>",#paste("t copula family", if(df.fixed) paste("df fixed at", df)),
 	getRho = function(obj) {
 	    par <- obj@parameters
             par[-length(par)]
@@ -75,7 +75,7 @@ as.df.fixed <- function(copula, classDef = getClass(class(copula))) {
         fixed <- c(rep(FALSE, length(copula@parameters) - 1L), TRUE)
     }
     attr(copula@parameters, "fixed") <- fixed
-    copula@df.fixed <- TRUE # (to be deprecated)
+    copula@df.fixed <- TRUE
     copula
 }
 
@@ -122,9 +122,9 @@ ptCopula <- function(u, copula, ...) {
   sigma <- getSigma(copula)
   df <- getdf(copula)
   if(!(df==Inf || df == as.integer(df)))
-    stop("'df' is not integer (or Inf); therefore, pCopula() cannot be computed yet")
+      stop("'df' is not integer (or Inf); therefore, pCopula() cannot be computed yet")
   ## more checks now  pCopula() *generic*
-  apply(u, 1, function(x) if(any(is.na(x))) NA_real_ else
+  apply(u, 1, function(x) if(anyNA(x)) NA_real_ else
 	pmvt(lower = i.lower, upper = qt(x, df = df), sigma = sigma, df = df, ...))
 }
 
@@ -135,19 +135,28 @@ dtCopula <- function(u, copula, log = FALSE, ...) {
   ## more checks now  dCopula() *generic*
   r <- numeric(nrow(u)) # i.e. 0  by default (i.e. "outside")
   ok <- u.in.01(u)
-  x <- qt(u[ok, , drop=FALSE], df)
-  ## work in log-scale [less over-/under-flow, then (maybe) transform]:
-  r[ok] <- dmvt(x, delta = rep.int(0, dim), sigma = sigma, df = df, log = TRUE) -
-      rowSums(dt(x, df = df, log=TRUE))
+  if(any(ok)) { # <- needed for R <= 3.4.0, and e.g., u = c(1,0,..,0,0)
+      x <- qt(u[ok, , drop=FALSE], df)
+      ## work in log-scale [less over-/under-flow, then (maybe) transform]:
+      r[ok] <- dmvt(x, delta = rep.int(0, dim), sigma = sigma, df = df, log = TRUE) -
+	  rowSums(dt(x, df = df, log=TRUE))
+  }
   if(log) r else exp(r)
 }
 
-showTCopula <- function(object) {
-  print.copula(object)
-  if (object@dimension > 2) cat("dispstr: ", object@dispstr, "\n")
-  if (object@df.fixed) cat("df is fixed at", getdf(object), "\n")
-  invisible(object)
+
+printTCopula <- function(x, ...) {
+  printCopula(x, ...)
+  if (x@dimension > 2) cat("dispstr: ", x@dispstr, "\n")
+  ## redundant now with := in params
+  ## if (x@df.fixed) cat("df is fixed at", getdf(x), "\n")
+  invisible(x)
 }
+
+## as long we think we need print.copula(), we also need this:
+print.tCopula <- printTCopula
+setMethod("show", signature("tCopula"), function(object) printTCopula(object))
+
 
 lambdaTCopula <- function(copula)
 {
@@ -165,11 +174,11 @@ lambdaTCopula <- function(copula)
 setMethod("rCopula", signature("numeric", "tCopula"), rtCopula)
 
 setMethod("pCopula", signature("matrix", "tCopula"), ptCopula)
-setMethod("pCopula", signature("numeric", "tCopula"),ptCopula)
 setMethod("dCopula", signature("matrix", "tCopula"), dtCopula)
-setMethod("dCopula", signature("numeric", "tCopula"),dtCopula)
+## pCopula() and dCopula() *generic* already deal with non-matrix case!
+## setMethod("pCopula", signature("numeric", "tCopula"),ptCopula)
+## setMethod("dCopula", signature("numeric", "tCopula"),dtCopula)
 
-setMethod("show", signature("tCopula"), showTCopula)
 
 setMethod("tau", "tCopula",
           function(copula) 2 * asin(copula@getRho(copula)) / pi)

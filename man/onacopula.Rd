@@ -110,7 +110,7 @@ copG <- onacopulaL("Gumbel", list(theta[1], NULL, list(list(theta[2], c(1,2)),
                                                        list(theta[4], c(5,6)))))
 set.seed(1)
 U <- rCopula(5000, copG)
-pairs(U, pch=".", gap=0, labels=as.expression( sapply(1:dim(copG),
-    function(j) bquote(italic(U[.(j)]))) ))
+pairs(U, pch=".", gap=0, labels = as.expression( lapply(1:dim(copG),
+                                     function(j) bquote(italic(U[.(j)]))) ))
 }
 \keyword{multivariate}

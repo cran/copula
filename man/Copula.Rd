@@ -1,4 +1,5 @@
 \name{Copula}
+\title{Density, Evaluation, and Random Number Generation for Copula Functions}
 \alias{Copula}
 \alias{dCopula}
 \alias{pCopula}
@@ -24,6 +25,8 @@
 \alias{dCopula,matrix,khoudrajiBivCopula-method}
 \alias{dCopula,matrix,khoudrajiExplicitCopula-method}
 \alias{dCopula,matrix,rotCopula-method}
+\alias{dCopula,matrix,rotExplicitCopula-method}
+\alias{dCopula,matrix,mixCopula-method}
 %\alias{dCopula,matrix,nacopula-method}-> ./dnacopula.Rd
 %
 \alias{dCopula,numeric,claytonCopula-method}
@@ -43,6 +46,7 @@
 \alias{dCopula,numeric,khoudrajiBivCopula-method}
 \alias{dCopula,numeric,khoudrajiExplicitCopula-method}
 \alias{dCopula,numeric,rotCopula-method}
+\alias{dCopula,numeric,mixCopula-method}
 %\alias{dCopula,numeric,nacopula-method}-> ./dnacopula.Rd
 % pCopula
 \alias{pCopula,matrix,claytonCopula-method}
@@ -61,6 +65,8 @@
 \alias{pCopula,matrix,indepCopula-method}
 \alias{pCopula,matrix,khoudrajiCopula-method}
 \alias{pCopula,matrix,rotCopula-method}
+\alias{pCopula,matrix,rotExplicitCopula-method}
+\alias{pCopula,matrix,mixCopula-method}
 %\alias{pCopula,matrix,nacopula-method}-> ./pnacopula.Rd
 %
 \alias{pCopula,numeric,claytonCopula-method}
@@ -79,6 +85,7 @@
 \alias{pCopula,numeric,indepCopula-method}
 \alias{pCopula,numeric,khoudrajiCopula-method}
 \alias{pCopula,numeric,rotCopula-method}
+\alias{pCopula,numeric,mixCopula-method}
 %\alias{pCopula,numeric,nacopula-method}-> ./pnacopula.Rd
 % rCopula
 \alias{rCopula,numeric,claytonCopula-method}
@@ -96,9 +103,9 @@
 \alias{rCopula,numeric,indepCopula-method}
 \alias{rCopula,numeric,khoudrajiCopula-method}
 \alias{rCopula,numeric,rotCopula-method}
+\alias{rCopula,numeric,mixCopula-method}
 \alias{rCopula,numeric,nacopula-method}
 % main
-\title{Density, Evaluation, and Random Number Generation for Copula Functions}
 \description{
   Density (\code{dCopula}), distribution function (\code{pCopula}), and
   random generation (\code{rCopula}) for a \code{copula} object.

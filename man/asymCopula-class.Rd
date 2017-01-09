@@ -6,6 +6,8 @@
 \alias{khoudrajiCopula-class}
 \alias{khoudrajiBivCopula-class}
 \alias{khoudrajiExplicitCopula-class}
+%
+\alias{dim,khoudrajiCopula-method}
 
 \description{
   The \emph{virtual} class \code{"asymCopula"} of (conceptually) all
@@ -39,8 +41,8 @@
 }
 \section{Methods}{
   When possible, methods are defined at the \code{"khoudrajiCopula"}
-  class level. The implementation of method \code{\link{dCopula}} for
-  instance is however not possible at that level. In addition, it
+  class level.  The implementation of method \code{\link{dCopula}} for
+  instance is however not possible at that level.  In addition, it
   differs for \code{"khoudrajiBivCopula"} and
   \code{"khoudrajiExplicitCopula"} classes.
 }

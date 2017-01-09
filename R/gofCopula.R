@@ -113,22 +113,26 @@ gofTstat <- function(u, method = c("Sn", "SnB", "SnC", "AnChisq", "AnGamma"),
 ### The parametric bootstrap (for computing different goodness-of-fit tests) ###
 gofPB <- function(copula, x, N, method = c("Sn", "SnB", "SnC"),
                   estim.method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
-                  trafo.method = c("none", "cCopula", "htrafo"),
-		  trafoArgs = list(), verbose = interactive(), useR = FALSE, ...) # IK: added useR
+		  trafo.method = if(method == "Sn") "none" else c("cCopula", "htrafo"),
+		  trafoArgs = list(), verbose = interactive(), useR = FALSE,
+                  ties = NA, ...)
 {
     .Deprecated("gofCopula(*, simulation = \"pb\")")
     .gofPB(copula, x, N, method=method, estim.method=estim.method,
-           trafo.method= trafo.method, trafoArgs=list(), verbose = interactive(), ...)
+           trafo.method=trafo.method, trafoArgs=trafoArgs, verbose=verbose,
+           useR=useR, ties=ties, ...)
 }
 
-##' revert to  gofPB()  once it is hidden
+
+##' revert to call  gofPB()  once that is gone
 .gofPB <- function(copula, x, N, method = c("Sn", "SnB", "SnC"),
                    estim.method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
-                   trafo.method = c("none", "cCopula", "htrafo"),
-                   trafoArgs = list(), verbose = interactive(), useR = FALSE, ...) # IK: added useR
+		   trafo.method = if(method == "Sn") "none" else c("cCopula", "htrafo"),
+                   trafoArgs = list(), verbose = interactive(), useR = FALSE,
+                   ties = NA, ...)
 {
-    ## Checks
-    stopifnot(is(copula, "copula"), N >= 1)
+    ## Checks -- NB: let the *generic* fitCopula() check 'copula'
+    stopifnot(N >= 1)
     if(!is.matrix(x)) {
         warning("coercing 'x' to a matrix.")
         stopifnot(is.matrix(x <- as.matrix(x)))
@@ -136,7 +140,8 @@ gofPB <- function(copula, x, N, method = c("Sn", "SnB", "SnC"),
     stopifnot((d <- ncol(x)) > 1, (n <- nrow(x)) > 0, dim(copula) == d)
     method <- match.arg(method)
     estim.method <- match.arg(estim.method)
-    trafo.method <- match.arg(trafo.method)
+    if(method != "Sn")
+	trafo.method <- match.arg(trafo.method, c("cCopula", "htrafo"))
     if(trafo.method == "htrafo") {
 	if(!is(copula, "outer_nacopula"))
 	    stop("'trafo.method' = \"htrafo\" only implemented for copula objects of type 'outer_nacopula'")
@@ -149,6 +154,13 @@ gofPB <- function(copula, x, N, method = c("Sn", "SnB", "SnC"),
         stop(sprintf("'trafo.method' must be \"cCopula\" or \"htrafo\" with 'method'=\"%s\"", method))
     if (method == "Sn" && trafo.method != "none")
         stop(sprintf("'trafo.method' must be \"none\" with 'method'=\"%s\"", method))
+
+    ## Ties: by default, if at least one column has at least one duplicated entry
+    if (is.na(ties <- as.logical(ties))) {
+	ties <- any(apply(x, 2, anyDuplicated))
+        if (ties)
+            warning("argument 'ties' set to TRUE")
+    }
 
     ## Progress bar
     if(verbose) {
@@ -178,9 +190,21 @@ gofPB <- function(copula, x, N, method = c("Sn", "SnB", "SnC"),
     if(verbose) setTxtProgressBar(pb, 1) # update progress bar
 
     ## 4) Simulate the test statistic under H_0
+
+    ## If ties, get tie structure from x  (FIXME?: what if 'x' has no ties, but 'ties = TRUE' ?? )
+    if (ties)
+        ir <- apply(x, 2, function(y) sort(rank(y, ties.method = "max")))
+
     T0 <- vapply(1:N, function(k) {
         ## 4.1) Sample the fitted copula
-        Uhat <- pobs( rCopula(n, C.th.n) )
+        U <- rCopula(n, C.th.n)
+        if(ties) { ## Sample x may have ties -- Reproduce tie structure of x
+            for (i in 1:d) {
+                U <- U[order(U[,i]),]
+                U[,i] <- U[ir[,i], i]
+            }
+        }
+        Uhat <- pobs(U)
 
         ## 4.2) Fit the copula
         C.th.n. <- fitCopula(copula, Uhat, method=estim.method,
@@ -199,20 +223,27 @@ gofPB <- function(copula, x, N, method = c("Sn", "SnB", "SnC"),
     }, NA_real_)
 
     ## 5) Return result object
+    tr.string <- if (trafo.method == "none") ""
+                 else sprintf(", 'trafo.method'=\"%s\"", trafo.method)
     structure(class = "htest",
-	      list(method = if (trafo.method == "none")
-                                sprintf("Parametric bootstrap goodness-of-fit test with 'method'=\"%s\", 'estim.method'=\"%s\"", method, estim.method) else sprintf("Parametric bootstrap goodness-of-fit test with 'method'=\"%s\", 'estim.method'=\"%s\", 'trafo.method'=\"%s\"", method, estim.method, trafo.method),
-                   parameter = c(parameter = getParam(C.th.n)),
+	      list(method = paste0(.gofTstr("Parametric", copula),
+				   sprintf(", with 'method'=\"%s\", 'estim.method'=\"%s\"%s:",
+					   method, estim.method, tr.string)),
+                   parameter = c(parameter = getTheta(C.th.n)),
                    statistic = c(statistic = T),
                    p.value = (sum(T0 >= T) + 0.5) / (N + 1), # typical correction => p-values in (0, 1)
                    data.name = deparse(substitute(x))))
 }
 
+.gofTstr <- function(type, copula)
+    paste(type, "bootstrap-based goodness-of-fit test of",
+          describeCop(copula, kind="short"))
+
 
 ### The multiplier bootstrap (for computing different goodness-of-fit tests) ###
 
 ##' @title J-score \hat{J}_{\theta_n} for the multiplier bootstrap
-##' @param copula An object of type 'copula'
+##' @param copula An 'copula' (or 'parCopula' or ..)
 ##' @param u An (n, d)-matrix of (pseudo-)observations
 ##' @param method "mpl" or one of "itau", "irho"
 ##' @return A p by n matrix containing \hat{J}_{\theta_n}
@@ -229,7 +260,7 @@ gofPB <- function(copula, x, N, method = c("Sn", "SnB", "SnC"),
 Jscore <- function(copula, u, method)
 {
     ## Checks
-    stopifnot(is(copula, "copula"))
+    stopifnot(is(copula, "Copula"))# and let methods below check more
     if(!is.matrix(u)) {
         warning("coercing 'u' to a matrix.")
         stopifnot(is.matrix(u <- as.matrix(u)))
@@ -245,8 +276,8 @@ Jscore <- function(copula, u, method)
            ## Integrals computed from n realizations by Monte Carlo
            influ0 <- dlogcdtheta(copula, u) # (n, p)-matrix
            derArg <- dlogcdu    (copula, u) # (n, d)-matrix
-           influ <- lapply(1:copula@dimension, function(i) influ0*derArg[,i])
-           p <- nFree(copula@parameters)
+           influ <- lapply(1:d, function(i) influ0*derArg[,i])
+           p <- nParam(copula, freeOnly=TRUE)
            S <- matrix(0, n, p)
            for(j in 1:d) {
                ij <- order(u[,j], decreasing=TRUE)
@@ -265,12 +296,12 @@ Jscore <- function(copula, u, method)
        },
            "itau"=
        { # See page 849 in Kojadinovic, Yan, and Holmes (2011)
-           stopifnot(dim(copula)==2)
+           stopifnot(d == 2)
            (4/dTau(copula)) * ( 2*pCopula(u, copula) - rowSums(u) + (1-tau(copula))/2 )
        },
            "irho"=
        { # See Equation (3.5) on page 847 in Kojadinovic, Yan, and Holmes (2011)
-           stopifnot(dim(copula)==2)
+           stopifnot(d == 2)
            i1 <- order(u[,1], decreasing=TRUE)
            i2 <- order(u[,2], decreasing=TRUE)
            n <- nrow(u)
@@ -294,14 +325,14 @@ gofMB <- function(copula, x, N, method = c("Sn", "Rn"),
            verbose=verbose, useR=useR, m=m, zeta.m=zeta.m, b=b, ...)
 }
 
-##' revert to  gofMB()  once it is hidden
+##' revert to call  gofMB()  once that is gone
 .gofMB <- function(copula, x, N, method = c("Sn", "Rn"),
                   estim.method = c("mpl", "ml", "itau", "irho"),
                   verbose = interactive(), useR = FALSE, m = 1/2,
                   zeta.m = 0, b = 1/sqrt(nrow(x)), ...)
 {
-    ## Checks
-    stopifnot(is(copula, "copula"), N>=1)
+    ## Checks -- NB: let the *generic* fitCopula() check 'copula'
+    stopifnot(N >= 1)
     if(!is.matrix(x)) {
         warning("coercing 'x' to a matrix.")
         stopifnot(is.matrix(x <- as.matrix(x)))
@@ -322,15 +353,15 @@ gofMB <- function(copula, x, N, method = c("Sn", "Rn"),
 
     ## 3) Compute the realized test statistic
     C.th.n. <- pCopula(u., C.th.n) # n-vector
-    denom <- rep(1, n) # Sn
-    if (method == "Rn") # Rn
-        denom <- (C.th.n.*(1-C.th.n.) + zeta.m)^m # n-vector
+    denom <-
+        if (method == "Rn") # Rn
+            (C.th.n.*(1-C.th.n.) + zeta.m)^m # n-vector
+        else ##  "Sn"
+            rep(1, n) # Sn
     Cn. <- F.n(u., u.) # n-vector
     T <- sum( ((Cn. - C.th.n.)/denom)^2 ) # test statistic Sn or Rn
 
-    if (useR)
-    {
-        ## R version ################################################
+    if (useR) { ## R version ################################################
 
         ## Obtain approximate realizations of the test statistic under H_0
 
@@ -398,10 +429,10 @@ gofMB <- function(copula, x, N, method = c("Sn", "Rn"),
 
     ## Return result object
     structure(class = "htest",
-	      list(method = sprintf(
-                       "Multiplier bootstrap goodness-of-fit test with 'method'=\"%s\", 'estim.method'=\"%s\"",
-                       method, estim.method),
-                   parameter = c(parameter = getParam(C.th.n)),
+	      list(method = paste0(.gofTstr("Multiplier", copula),
+				   sprintf(", with 'method'=\"%s\", 'estim.method'=\"%s\":",
+					  method, estim.method)),
+                   parameter = c(parameter = getTheta(C.th.n)),
                    statistic = c(statistic = T),
                    p.value = (sum(T0 >= T) + 0.5) / (N + 1), # typical correction =>  p-values in (0, 1)
                    data.name = deparse(substitute(x))))
@@ -409,8 +440,6 @@ gofMB <- function(copula, x, N, method = c("Sn", "Rn"),
 
 
 ### Wrapper ####################################################################
-
-setGeneric("gofCopula", function(copula, x, ...) standardGeneric("gofCopula"))
 
 ##' @title Goodness-of-fit test wrapper function
 ##' @param copula An object of type 'copula' representing the H_0 copula
@@ -430,7 +459,7 @@ gofCopulaCopula <- function(copula, x, N=1000, method = c("Sn", "SnB", "SnC", "R
                             verbose = interactive(), ...) # print.every=NULL, ...)
 {
     ## Checks
-    stopifnot(is(copula, "copula"), N >= 1)
+    stopifnot(N >= 1)
     if(!is.matrix(x)) {
         warning("coercing 'x' to a matrix.")
         stopifnot(is.matrix(x <- as.matrix(x)))
@@ -471,5 +500,5 @@ gofCopulaCopula <- function(copula, x, N=1000, method = c("Sn", "SnB", "SnC", "R
     stop("Invalid simulation method ", simulation))
 }
 
-setMethod("gofCopula", signature("copula"), gofCopulaCopula)
+setMethod("gofCopula", signature("parCopula"), gofCopulaCopula)
 

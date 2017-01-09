@@ -1,4 +1,5 @@
 \name{archmCopula-class}
+\title{Class "archmCopula"}
 \docType{class}
 \alias{archmCopula-class}
 \alias{claytonCopula-class}
@@ -6,11 +7,10 @@
 \alias{gumbelCopula-class}
 \alias{amhCopula-class}
 \alias{joeCopula-class}
-\title{Class "archmCopula"}
 \description{Archimedean copula class.}
 \section{Objects from the Class}{
-  Objects can be created by calls of the form \code{new("archmCopula",
-    ...)} or by function \code{\link{archmCopula}}.  Implemented
+  Created by calls of the form \code{new("archmCopula", ...)} or rather
+  typically by \code{\link{archmCopula}()}.  Implemented
   families are Clayton, Gumbel, Frank, Joe, and Ali-Mikhail-Haq.
 }
 \section{Slots}{

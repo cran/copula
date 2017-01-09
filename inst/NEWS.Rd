@@ -2,9 +2,71 @@
 %  news(db = tools:::.build_news_db_from_package_NEWS_Rd("~/R/Pkgs/copula/inst/NEWS.Rd"))
 \name{NEWS}
 \title{News for \R Package \pkg{copula}}% MM: look into ../svn-log-from.all
-\newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
-\section{Changes in version 0.999-15 (2016-05-21, svn r1435)}{
+\section{Changes in version 0.999-16 (2016-11-21, svn r1552)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{pK(u, log.p=TRUE)} now correctly checks \code{u}.
+      \item \code{rotCopula(cop)} now \emph{does} rotate in the default
+      case.
+      \item \code{vcov(fitCopula(*, "mpl"))} now works (returning a
+      matrix of \code{NA}s).
+      \item \code{fitCopula(joeCopula(), *, method = "itau")} gave an
+      error instead of warning.
+      \item \code{setTheta(<rotCopula>, <par>)} now works.
+      \item \code{xvCopula(<rotCopula>, <data>)} now works.
+
+      \item \code{fitMvdc()} now works again for a \dQuote{df.fixed-tCopula}.
+
+      \item \code{"mvdc"} methods for \code{contour()}, \code{persp()}
+      and \code{wireframe2()} now use \code{ylim} correctly.
+
+      \item \code{cCopula(<archmCopula>)} failed for 2-dimensional AMH,
+      Clayton, and Frank in the \emph{negative}-\eqn{\tau} case.
+
+      Also, \code{cCopula()} sometimes returned a vector instead of an
+      \eqn{n \times k}{n * k} matrix (which \code{?cCopula} has promised
+      always).
+
+      \item \code{pCopula()} was wrong (but gave a warning) for some
+      (unbalanced) nested archimedean copulas.
+    }
+  }
+  \subsection{New Features}{
+    \itemize{
+      \item Adding an abstraction level, using (currently hidden) "setr"
+      and "getr" methods, allows to simplify class definition for
+      \code{"khoudrajiCopula"} and \code{fitCopula()} now to also work
+      e.g. for \code{rotCopula(khoudrajiCopula(.), ..)}.
+
+      \item The \code{coef()} method for \code{fitCopula()} or
+      \code{fitMvdc()} results can get the matrix of parameters
+      \emph{and} their standard errors by the new option \code{SE = TRUE}.
+
+      \item \code{summary(fitCopula(*))} and \code{summary(fitMvdc(*))}
+      have a nicer \code{print()} method and print \emph{more} than just
+      printing the fitted objects.  Note that
+      \item printing \code{fitCopula(*)} or  \code{fitMvdc(*)} no longer
+      computes and prints standard errors (\code{"Std. Error"}), but
+      printing \code{summary(fit..(*))} does (see above).
+
+      \item improved documentation about \code{pK()} and \code{qK()}.
+
+      \item \code{mixCopula()} and \code{"mixCopula"} class for
+      arbitrary finite mixtures of copulas.
+      %% FIXME:  fixCopula() is *NOT* ok [sum(w) == 1] -- need reparametrization
+
+      \item \code{splom2()} now works when a single \dQuote{global}
+      color is specified.
+
+      %% TODO \item qK() gets a more accurate (still quite fast) default
+      %% method
+    }
+  }
+}
+
+\section{Changes in version 0.999-15 (2016-07-24, svn r1438)}{
   \itemize{
     \item \code{C.n(u, X, *)} now has \code{X} as second argument,
     calls \code{pobs(X)} and then \code{F.n(*,*)}; previously,
@@ -65,7 +127,9 @@
     should work with \code{cCopula()} instead.
 
     \item Various improvements in data visualization tools such as
-    \code{pairs2()}, \code{splom2()}, etc.
+    \code{contour()}, \code{persp()}, \code{contourplot2()},
+    \code{pairs2()}, \code{wireframe2()}, \code{cloud2()} and
+    \code{splom2()}.
 
     \item \code{qK()} gets \code{log.p} option.
   }

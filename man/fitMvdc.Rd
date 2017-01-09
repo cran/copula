@@ -20,9 +20,9 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
         lower = -Inf, upper = Inf,
         estimate.variance = fit$convergence == 0, hideWarnings = TRUE)
 
-\S3method{coef}{fittedMV}(object, ...)
-\S3method{logLik}{fittedMV}(object, ...)
-\S3method{vcov}{fittedMV}(object, ...)
+\S3method{coef}{fittedMV}(object, SE = FALSE, \dots)
+\S3method{logLik}{fittedMV}(object, \dots)
+\S3method{vcov}{fittedMV}(object, \dots)
 }
 \arguments{
   \item{param}{a vector of parameter values.  When specifying parameters for
@@ -32,9 +32,6 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
     parameters of one marginal must be specified.}
   \item{x}{a data matrix.}
   \item{mvdc}{a \code{"\linkS4class{mvdc}"} object. }
-  \item{hideWarnings}{logical indicating if warning messages from
-    likelihood maximization, e.g., from evaluating at invalid parameter
-    values, should be suppressed (via \code{\link{suppressWarnings}}).}
   \item{data}{a data matrix.}
   \item{start}{a vector of starting value for \code{"param"}.  See
     \code{"param"} above for ordering of this vector.}
@@ -45,8 +42,15 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
     \code{method = "L-BFGS-B"}.}
   \item{estimate.variance}{logical; if true (as by default, if the
     optimization converges), the asymptotic variance is estimated.}
+  \item{hideWarnings}{logical indicating if warning messages from
+    likelihood maximization, e.g., from evaluating at invalid parameter
+    values, should be suppressed (via \code{\link{suppressWarnings}}).}
 
   \item{object}{an \R object of class \code{"\linkS4class{fitMvdc}"}.}
+  \item{SE}{for the \code{\link{coef}} method, a logical indicating if
+    standard errors should be returned in addition to the estimated
+    parameters (in a \code{\link{matrix}}).  This is equivalent, but
+    more efficient than, e.g., \code{coef(summary(object))}.}
   \item{\dots}{potentially further arguments to methods.}
 }
 \value{
@@ -103,45 +107,49 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
   For fitting univariate marginals, \code{\link[MASS]{fitdistr}()}.
 }
 \examples{
-gumbel.cop <- gumbelCopula(3, dim=2)
-gMvd2 <- mvdc(gumbel.cop, c("exp","exp"),
-              list(list(rate=2), list(rate=4)))
-set.seed(11)
-x <- rMvdc(10000, gMvd2)
+G3 <- gumbelCopula(3, dim=2)
+gMvd2  <- mvdc(G3, c("exp","exp"),
+               param = list(list(rate=2), list(rate=4)))
 ## with identical margins:
-gMvd.I <- mvdc(gumbel.cop, "exp", param = list(rate=3), marginsIdentical=TRUE)
-if(copula:::doExtras()) { ## these are typically not run with CRAN checking:
- ## Takes about 25 sec. [2012-07]:
- fit2 <- fitMvdc(x, gMvd2, start = c(1,1, 2),
-                 hideWarnings=FALSE) ## <- show warnings here
- print(fit2)
- ## The (estimated, asymptotic) var-cov matrix:
- print( vcov(fit2) )
+gMvd.I <- mvdc(G3, "exp",
+               param = list(rate=3), marginsIdentical=TRUE)
 
- fitI <- fitMvdc(x, gMvd.I, start = c(3, 2),
-                 optim.control=list(trace= TRUE, REPORT= 2))
- print(coef(summary(fitI)))
- print(fitI)
+(Xtras <- copula:::doExtras()) # determine whether examples will be extra (long)
+n <- if(Xtras) 10000 else 200 # sample size (realistic vs short for example)
 
-  ## a wrong starting value can already be *the* problem:
-  f2 <- try(fitMvdc(x, gMvd.I, start = c(1, 1),
-	            optim.control=list(trace= TRUE, REPORT= 2)))
-  ##--> Error in optim( ... ) : non-finite finite-difference value [2]
+set.seed(11)
+x <- rMvdc(n, gMvd2)
+## Default:     hideWarnings = FALSE .. i.e. show warnings here
+fit2 <- fitMvdc(x, gMvd2, start = c(1,1, 2))
+fit2
+confint(fit2)
+summary(fit2) # slightly more
+## The estimated, asymptotic var-cov matrix [was used for confint()]:
+vcov(fit2)
 
-  ##==> "Solution" :  Using a more robust (but slower) optim() method:
-  fI.2 <- fitMvdc(x, gMvd.I, start = c(1, 1), method = "Nelder",
-		  optim.control=list(trace= TRUE))
+## with even more output for the "identical margin" case:
+fitI <- fitMvdc(x, gMvd.I, start = c(3, 2),
+                optim.control=list(trace= TRUE, REPORT= 2))
+summary(fitI)
+coef(fitI, SE = TRUE)
+stopifnot(is.matrix(coef(fitI, SE = TRUE)),
+          is.matrix(print( confint(fitI) )) )
 
- ## The (estimated, asymptotic) var-cov matrix:
- print( vcov(fit2) )
- str(sfI <- summary(fitI))
- stopifnot(is.matrix(coef(sfI)))
+## a wrong starting value can already be *the* problem:
+f2 <- try(fitMvdc(x, gMvd.I, start = c(1, 1),
+           optim.control=list(trace= TRUE, REPORT= 2)))
+##--> Error in optim( ... ) : non-finite finite-difference value [2]
+
+##==> "Solution" :  Using a more robust (but slower) optim() method:
+fI.2 <- fitMvdc(x, gMvd.I, start = c(1, 1), method = "Nelder",
+                optim.control=list(trace= TRUE))
+fI.2
 \dontshow{
- stopifnot(all.equal(coef(sfI),
-		     coef(summary(fI.2)),    tolerance = 2e-4),
+ stopifnot(all.equal(coef(fitI, SE = TRUE),
+		     coef(fI.2, SE = TRUE),  tolerance = 2e-4),
 	   all.equal(coef(fitI), coef(fI.2), tolerance = 1e-4))
 }%dont...
-}% if(..doExtras())
+
 }
 \keyword{models}
 \keyword{multivariate}

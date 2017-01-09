@@ -33,13 +33,16 @@ copAMH <-
                       if(log) log(res) else res
 		  },
 		  ## parameter interval
-		  paraInterval = interval("[0,1)"),
+		  ## For d = 2: paraInterval = interval("[-1,1)"),
+		  ## --- d > 2: paraInterval = interval("[ 0,1)"),
+		  paraInterval = interval("[0,1)"),#  smaller one, (d > 2)
+		  paraConstr = function (theta, dim = 2)
+		      length(theta) == 1 && (if(dim == 2) -1 else 0) <= theta && theta < 1,
 		  ## absolute value of generator derivatives
 		  absdPsi = function(t, theta, degree = 1, n.MC = 0, log = FALSE,
 				     is.log.t = FALSE,
-				     method = "negI-s-Eulerian", Li.log.arg=TRUE)
+				     method = "negI-s-Eulerian", Li.log.arg = (theta > 0))
 	      {
-		  lth <- log(theta)
 		  if(n.MC > 0) {
 		      if(is.log.t) t <- exp(t) # very cheap for now
 		      absdPsiMC(t, family="AMH", theta=theta, degree=degree,
@@ -50,6 +53,7 @@ copAMH <-
 
 		      ## Note: absdPsi(0, ...) is correct, namely (1-theta)/theta * polylog(theta, s=-degree)
 		      if(theta == 0) return(if(log) -t else exp(-t)) # independence
+		      if(log || Li.log.arg) lth <- log(theta)
 		      Li.arg <- if(Li.log.arg) lth - t else theta*exp(-t)
 		      Li. <- polylog(Li.arg, s = -degree, method=method, is.log.z = Li.log.arg, log=log)
 		      if(log)
@@ -89,7 +93,7 @@ copAMH <-
 		  ## if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
                   if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
                   n <- nrow(u)
-		  if(d > 2 && !C.@paraConstr(theta)) {
+		  if(!C.@paraConstr(theta, d)) {
 		      if(checkPar) stop("theta is outside its defined interval")
 		      return(rep.int(if(log) -Inf else 0, n))
 		  }
@@ -121,7 +125,7 @@ copAMH <-
 		  score = function(u, theta) {
 		      if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
 		      if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
-		      if(d > 2) stopifnot(C.@paraConstr(theta))
+		      stopifnot(C.@paraConstr(theta, d))
 		      omu <- 1-u
 		      b <- rowSums(omu/(1-theta*omu))
 		      h <- theta*apply(u/(1-theta*omu), 1, prod)
@@ -139,7 +143,7 @@ copAMH <-
                       (1-theta) / (u*(1-theta*omu)) * (theta*exp(Li.md1-Li.md) - 1)
                   },
 		  ## nesting constraint
-		  nestConstr = function(theta0,theta1) {
+		  nestConstr = function(theta0,theta1) { ## FIXME constraints dim==2 / dim!=2
 		      C.@paraConstr(theta0) &&
 		      C.@paraConstr(theta1) && theta1 >= theta0
 		  },
@@ -214,13 +218,17 @@ copClayton <-
     (function() { ## to get an environment where  C.  itself is accessible
 	C. <- new("acopula", name = "Clayton",
 		  ## generator
-		  psi = function(t, theta) { (1+t)^(-1/theta) },
+		  psi = .psiClayton, # ./claytonCopula.R - also for *negative* theta
 		  iPsi = function(u, theta, log=FALSE) {
-                      res <- u^(-theta) - 1
+                      res <- .iPsiClayton(u, theta) # -> ./claytonCopula.R
                       if(log) log(res) else res
 		  },
 		  ## parameter interval
-		  paraInterval = interval("(0,Inf)"),
+		  ## For d = 2: paraInterval = interval("[-1, Inf)"),
+		  ## --- d > 2: paraInterval = interval("[ 0, Inf)"),
+		  paraInterval = interval("[0, Inf)"), # smaller one, (d > 2)
+		  paraConstr = function (theta, dim = 2)
+		      length(theta) == 1 && (if(dim == 2) -1 else 0) <= theta && theta < Inf,
 		  ## absolute value of generator derivatives
 		  absdPsi = function(t, theta, degree=1, n.MC=0, log=FALSE) {
                       if(n.MC > 0) {
@@ -229,12 +237,22 @@ copClayton <-
                       } else {
                           ## Note: absdPsi(0, ...) is correct, namely gamma(d+1/theta)/gamma(1/theta)
                           alpha <- 1/theta
-                          res <- lgamma(degree+alpha)-lgamma(alpha)-(degree+alpha)*log1p(t)
-                          if(log) res else exp(res)
+                          if(theta > 0) {
+                              res <- lgamma(degree+alpha)-lgamma(alpha)-(degree+alpha)*log1p(t)
+                              if(log) res else exp(res)
+                          } else { ## for *negative* theta, have negative 't', possibly even t < -1
+                              ## and for odd 'degree' a sign flip
+                              res <- lgamma(degree+alpha) - lgamma(alpha)
+                              if(degree %% 2 == 1) res <- -res
+                              res <- res - (degree+alpha)*log1p(-t)
+                              if(log) res else exp(res)
+                          }
                       }
                   },
                   ## derivatives of the generator inverse
 		  absdiPsi = function(u, theta, degree=1, log=FALSE) {
+                      if(theta < 0) stop(if(NCOL(u) == 2) "theta < 0  not yet implemented"
+                                         else "theta < 0 is invalid for d > 2")
 		      switch(degree,
 			     ## 1 :
 			     if(log) log(theta)-(1+theta)*log(u) else theta*u^(-(1+theta)),
@@ -245,49 +263,63 @@ copClayton <-
 			     stop("not yet implemented for degree > 2"))
 		  },
 		  ## density of the diagonal
-		  dDiag = function(u, theta, d, log=FALSE){
-                      if(log) log(d)-(1+1/theta)*log(1+(d-1)*(1-u^theta)) else
-                      d*(1+(d-1)*(1-u^theta))^(-(1+1/theta))
+		  dDiag = function(u, theta, d, log=FALSE) {
+                      if(log)
+                          log(d)-(1+1/theta)*log1p((d-1)*(1-u^theta))
+                      else
+                          d*(1+(d-1)*(1-u^theta))^(-(1+1/theta))
                   },
 		  ## density  Clayton
 		  dacopula = function(u, theta, n.MC=0, log=FALSE, checkPar=TRUE) {
 		      ## if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
 		      if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
 		      n <- nrow(u)
-		      if(d > 2 && !C.@paraConstr(theta)) {
+		      if(!C.@paraConstr(theta, d)) {
 			  if(checkPar) stop("theta is outside its defined interval")
 			  return(rep.int(if(log) -Inf else 0, n))
 		      }
 		      ## f() := NaN outside and on the boundary of the unit hypercube
 		      res <- rep.int(NaN, n)
 		      n01 <- u.in.01(u)## indices for which density has to be evaluated
-		      ## if(!any(n01)) return(res)
-		      ## auxiliary results
-		      u. <- u[n01,, drop=FALSE]
-		      lu <- rowSums(log(u.))
-		      t <- rowSums(C.@iPsi(u., theta))
-		      ## main part
-		      if(n.MC > 0) { # Monte Carlo
-			  lu.mat <- matrix(rep(lu, n.MC), nrow=n.MC, byrow=TRUE)
-			  V <- C.@V0(n.MC, theta)
-			  ## stably compute log(colMeans(exp(lx)))
-			  lx <- d*(log(theta) + log(V)) - log(n.MC) - (1+theta)*lu.mat - V %*% t(t) # matrix of exponents; dimension n.MC x n ["V x u"]
-			  ## note: smle goes wrong if:
-			  ##       (1) d*log(theta*V) [old code]
-			  ##       (2) U is small (simultaneously)
-			  ##       (3) theta is large
-			  res[n01] <- lsum(lx)
-		      } else { # explicit
-			  res[n01] <- sum(log1p(theta*(0:(d-1)))) - (1+theta)*lu -
-                              (d+1/theta)*log1p(t)
-		      }
+                      if(!any(n01)) return(res) # all NaN
+                      if(theta == 0) {
+                          res[n01] <- if(log) 0 else 1
+                      } else {
+                          ## auxiliary results
+                          u. <- u[n01,, drop=FALSE]
+                          lu <- rowSums(log(u.))
+                          t <- rowSums(.iPsiClayton(u., theta))
+                          ## main part
+                          if(n.MC > 0) { # Monte Carlo
+                              ## FIXME for negative theta .. should not be hard(?)
+                              if(theta < 0) stop("theta < 0  not yet implemented for MC")
+                              lu.mat <- matrix(rep(lu, n.MC), nrow=n.MC, byrow=TRUE)
+                              V <- C.@V0(n.MC, theta)
+                              ## stably compute log(colMeans(exp(lx)))
+                              lx <- d*(log(theta) + log(V)) - log(n.MC) - (1+theta)*lu.mat - V %*% t(t) # matrix of exponents; dimension n.MC x n ["V x u"]
+                              ## note: smle goes wrong if:
+                              ##       (1) d*log(theta*V) [old code]
+                              ##       (2) U is small (simultaneously)
+                              ##       (3) theta is large
+                              res[n01] <- lsum(lx)
+                          } else if(theta < 0) { ## ==> d = 2
+                              posT <- t < 1 ## <==> T := (u1^-th + u2^-th -1) > 0
+                              i01 <- which(n01)
+                              res[i01[ posT]] <-
+                                  log1p(theta) - (1+theta) * lu[posT] - (d+1/theta) * log1p(-t[posT])
+                              res[i01[!posT]] <- -Inf # density == 0 "outside circle"
+                          } else { # theta > 0 (as theta == 0 has been treated above)
+                              res[n01] <- sum(log1p(theta*seq_len(d-1))) - (1+theta)*lu -
+                                  (d+1/theta)*log1p(t)
+                          }
+                      }
 		      if(log) res else exp(res)
 		  },
 		  ## score function
 		  score = function(u, theta) {
 		      if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
 		      if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
-		      if(d > 2) stopifnot(C.@paraConstr(theta))
+		      stopifnot(C.@paraConstr(theta, d))
 		      lu <- log(u)
 		      t <- rowSums(C.@iPsi(u, theta=theta))
 		      ltp1 <- log(1+t)
@@ -307,7 +339,7 @@ copClayton <-
                       tht*u^(-t1)-t1/u
                   },
 		  ## nesting constraint
-		  nestConstr = function(theta0,theta1) {
+		  nestConstr = function(theta0,theta1) { ## FIXME constraints dim==2 / dim!=2
 		      C.@paraConstr(theta0) &&
 		      C.@paraConstr(theta1) && theta1 >= theta0
 		  },
@@ -353,38 +385,17 @@ copFrank <-
     (function() { ## to get an environment where  C.  itself is accessible
 	C. <- new("acopula", name = "Frank",
 		  ## generator
-		  psi = function(t, theta) {
-                      ## = -log(1-(1-exp(-theta))*exp(-t))/theta
-		      ## -log1p(expm1(-theta)*exp(0-t))/theta # fails really small t, theta > 38
-		      -log1mexp(t-log1mexp(theta))/theta
-		  },
-		  iPsi = function(u, theta, log=FALSE) {
-		      ## == -log( (exp(-theta*u)-1) / (exp(-theta)-1) )
-		      thu <- u*theta # (-> recycling args)
-		      if(!length(thu)) return(thu) # {just for numeric(0) ..hmm}
-		      et1 <- expm1(-theta) # e^{-th} - 1 < 0
-		      ## FIXME ifelse() is not quite efficient
-		      ## FIXME(2): the "> c* th" is pi*Handgelenk
-### FIXME: use  delta = exp(-thu)*(1 - exp(thu-th)/ (-et1) =
-###                   = exp(-thu)* expm1(thu-theta)/et1   (4)
-
-###-- do small Rmpfr-study to find the best form -- (4) above and the three forms below
-
-		      r <- ifelse(abs(thu) > .01*abs(theta), # thu = u*th > .01*th <==> u > 0.01
-                              {   e.t <- exp(-theta)
-                                  ifelse(e.t > 0 & abs(theta - thu) < 1/2,# th -th*u = th(1-u) < 1/2
-                                         -log1p(e.t * expm1(theta - thu)/et1),
-                                         -log1p((exp(-thu)- e.t) / et1))
-                              },
-                                  ## for small u (u < 0.01) :
-                                  -log(expm1(-thu)/et1))
-                      if(log) log(r) else r
-		  },
+		  psi = .psiFrank,
+		  iPsi = .iPsiFrank,
 		  ## parameter interval
-		  paraInterval = interval("(0,Inf)"),
+		  ## For d = 2: paraInterval = interval("(-Inf, Inf)"),
+		  ## --- d > 2: paraInterval = interval("[  0, Inf)"),
+                  paraInterval = interval("[0, Inf)"), # smaller one, (d > 2)
+		  paraConstr = function (theta, dim = 2) # no constraints if d==2 :
+		      length(theta) == 1 && is.finite(theta) && (dim == 2 || 0 <= theta),
 		  ## absolute value of generator derivatives
 		  absdPsi = function(t, theta, degree = 1, n.MC = 0, log = FALSE, is.log.t = FALSE,
-				     method = "negI-s-Eulerian", Li.log.arg = TRUE)
+				     method = "negI-s-Eulerian", Li.log.arg = (theta > 0))
               {
                   if(n.MC > 0) {
                       absdPsiMC(t, family="Frank", theta=theta, degree=degree,
@@ -435,7 +446,7 @@ copFrank <-
 		  ## if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
 		  if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
 		  n <- nrow(u)
-		  if(d > 2 && !C.@paraConstr(theta)) {
+		  if(!C.@paraConstr(theta, d)) {
 		      if(checkPar) stop("theta is outside its defined interval")
 		      return(rep.int(if(log) -Inf else 0, n))
 		  }
@@ -471,7 +482,7 @@ copFrank <-
 		  score = function(u, theta) {
 		      if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
 		      if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
-		      if(d > 2) stopifnot(C.@paraConstr(theta))
+		      stopifnot(C.@paraConstr(theta, d))
 		      e <- exp(-theta)
 		      Ie <- -expm1(-theta) # == 1 - e == 1-e^{-theta}
 		      etu <- exp(mtu <- -theta*u) # exp(-theta*u)
@@ -495,7 +506,7 @@ copFrank <-
                       factor * (exp(Li.md+log(h)-theta*u - Li.mdm1) - 1)
                   },
 		  ## nesting constraint
-		  nestConstr = function(theta0,theta1) {
+		  nestConstr = function(theta0,theta1) { ## FIXME constraints dim==2 / dim!=2
 		      C.@paraConstr(theta0) &&
 		      C.@paraConstr(theta1) && theta1 >= theta0
 		  },
@@ -659,7 +670,7 @@ copGumbel <-
                   lmlu <- log(mlu) # log(-log(u))
                   ## may overflow to Inf: t <- rowSums(C.@iPsi(u., theta))
                   l.iP <- C.@iPsi(u., theta, log=TRUE)
-                  ln.t <- copula:::lsum(t(l.iP))
+                  ln.t <- lsum(t(l.iP))
                   ## main part
                   if(n.MC > 0) { # Monte Carlo
                       V <- C.@V0(n.MC, theta)
@@ -899,7 +910,7 @@ copJoe <-
                   ## if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
                   if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
 		  n <- nrow(u)
-		  if(d > 2 && !C.@paraConstr(theta)) {
+		  if(!C.@paraConstr(theta)) {
 		      if(checkPar) stop("theta is outside its defined interval")
 		      return(rep.int(if(log) -Inf else 0, n))
 		  }
@@ -936,7 +947,7 @@ copJoe <-
 		  score = function(u, theta, method=eval(formals(polyJ)$method)) {
 		      if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
 		      if((d <- ncol(u)) < 2) stop("u should be at least bivariate") # check that d >= 2
-		      if(d > 2) stopifnot(C.@paraConstr(theta))
+		      stopifnot(C.@paraConstr(theta))
 		      l1_u <- rowSums(log1p(-u)) # log(1-u)
 		      u.th <- (1-u)^theta # (1-u)^theta
 		      lh <- rowSums(log1p(-u.th)) # rowSums(log(1-(1-u)^theta)) = log(h)

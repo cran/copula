@@ -64,6 +64,9 @@ void exchtestCn(double *U, double *V, int *n, double *u, double *v,
 void exchtestCn_stat(double *U, double *V, int *n, double *u, double *v,
 		     int *m, double *stat);
 
+void radsymtestCn_stat(double *U, int *n, int *p, double *V, int *m,
+		       double *stat);
+
 // R_debye.c:
 // "_C": nameclash - already have R level 'debye_1'
 void debye_1_C(double *x, int *len, double *val, double *err, int *status);

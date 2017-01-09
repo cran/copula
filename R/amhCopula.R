@@ -31,9 +31,9 @@ amhCopula <- function(param = NA_real_, dim = 2L,
       }
   }
   ## get expressions of cdf and pdf
-  cdfExpr <- function(n) {
+  cdfExpr <- function(d) {
     expr <-   "log((1 - alpha * (1 - u1)) / u1)"
-    for (i in 2:n) {
+    for (i in 2:d) {
       ui <- paste0("u", i)
       cur <- gsub("u1", ui, expr)
       expr <- paste(expr, cur, sep=" + ")
@@ -42,9 +42,9 @@ amhCopula <- function(param = NA_real_, dim = 2L,
     parse(text = expr)
   }
 
-  pdfExpr <- function(cdf, n) {
+  pdfExpr <- function(cdf, d) {
     val <- cdf
-    for (i in 1:n) val <- D(val, paste0("u", i))
+    for (i in 1:d) val <- D(val, paste0("u", i))
     val
   }
 
@@ -58,7 +58,7 @@ amhCopula <- function(param = NA_real_, dim = 2L,
       param.names = "param",
       param.lowbnd = -1,# 0 for tau >= 0
       param.upbnd = 1,
-      fullname = "Amh copula family; Archimedean copula")
+      fullname = "<deprecated slot>")# "Amh copula family; Archimedean copula"
 }
 
 
@@ -154,7 +154,7 @@ pMatAmh <- function (u, copula, ...) {
     ## was pamhCopula
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
     th <- copula@parameters
-    if(d == 2 && !copAMH@paraConstr(th)) # for now, .. to support negative tau
+    if(d == 2 && th < 0) # for now, .. to support negative tau
         pamhCopula(copula, u)
     else
         pacopula(u, copAMH, theta=copula@parameters, ...)
@@ -164,7 +164,7 @@ dMatAmh <- function (u, copula, log = FALSE, checkPar=TRUE, ...) {
     ## was  damhCopula
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
     th <- copula@parameters
-    if(d == 2 && !copAMH@paraConstr(th)) # for now, .. to support negative tau
+    if(d == 2 && th < 0) # for now, .. to support negative tau
         damhCopula(u, copula, log=log)
     else
         copAMH@dacopula(u, theta=copula@parameters, log=log, checkPar=checkPar, ...)
@@ -172,15 +172,17 @@ dMatAmh <- function (u, copula, log = FALSE, checkPar=TRUE, ...) {
 
 setMethod("rCopula", signature("numeric", "amhCopula"), ramhCopula)
 
-setMethod("pCopula", signature("numeric", "amhCopula"),
-	  function (u, copula, ...)
-          pMatAmh(matrix(u, ncol = dim(copula)), copula, ...))
 setMethod("pCopula", signature("matrix", "amhCopula"), pMatAmh)
-
-setMethod("dCopula", signature("numeric", "amhCopula"),
-	  function (u, copula, log=FALSE, ...)
-	  dMatAmh(matrix(u, ncol = dim(copula)), copula, log=log, ...))
 setMethod("dCopula", signature("matrix", "amhCopula"), dMatAmh)
+
+## pCopula() and dCopula() *generic* already deal with non-matrix case!
+## setMethod("pCopula", signature("numeric", "amhCopula"),
+## 	  function (u, copula, ...)
+##           pMatAmh(matrix(u, ncol = dim(copula)), copula, ...))
+## setMethod("dCopula", signature("numeric", "amhCopula"),
+## 	  function (u, copula, log=FALSE, ...)
+## 	  dMatAmh(matrix(u, ncol = dim(copula)), copula, log=log, ...))
+
 
 setMethod("iPsi", signature("amhCopula"),
 	  function(copula, u) copAMH@iPsi(u, theta=copula@parameters))

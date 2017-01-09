@@ -14,8 +14,8 @@
 \usage{
 \S4method{splom2}{matrix}(x, varnames = NULL, varnames.null.lab = "U",
       xlab = "", col.mat = NULL, bg.col.mat = NULL, \dots)
-\S4method{splom2}{data.frame}(x, varnames = NULL, varnames.null.lab = "U",
-      xlab = "", col.mat = NULL, bg.col.mat = NULL, \dots)
+## ditto an identical  'data.frame'  method
+
 \S4method{splom2}{Copula}(x, n, \dots)
 \S4method{splom2}{mvdc}(x, n, varnames.null.lab = "X", \dots)
 }
@@ -30,9 +30,12 @@
     determining the \dQuote{base name} of the variable labels in case
     \code{varnames} is \code{NULL} and \code{x} does not have all column names given.}
   \item{xlab}{the x-axis label.}
-  \item{col.mat}{a matrix of colors for the plot symbols (the default is the
-    setting as obtained from
-    \code{\link[lattice]{trellis.par.get}("plot.symbol")$col}).}
+  \item{col.mat}{a matrix of colors (or one color) for the plot symbols;
+    if \code{NULL} (as by default),
+    \code{\link[lattice]{trellis.par.get}("plot.symbol")$col} is used
+    for all symbols.
+    (Note that in \pkg{copula} version 0.999-15, this was not true; instead
+    \code{"black"} was used.)}
   \item{bg.col.mat}{a matrix of colors for the background (the default is the
     setting as obtained from
     \code{\link[lattice]{trellis.par.get}("background")$col}).}
