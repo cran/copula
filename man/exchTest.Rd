@@ -40,18 +40,17 @@ exchTest(x, N = 1000, ties = NA, m = 0)
 %\author{Ivan Kojadinovic and Jun Yan}
 \references{
   Genest, C., G. \enc{Nešlehová}{Neslehova}, J. and Quessy,
-  J.-F. (2012).
-  Tests of symmetry for
-  bivariate copulas. \emph{Annals of the Institute of Statistical
-  Mathematics} \bold{64}, 811--834.
+  J.-F. (2012).  Tests of symmetry for bivariate copulas. \emph{Annals
+  of the Institute of Statistical Mathematics} \bold{64}, 811--834.
 
   Kojadinovic, I. and Yan, J. (2012). A nonparametric test of
   exchangeability for extreme-value and left-tail
   decreasing bivariate copulas. \emph{The Scandinavian Journal of
     Statistics} \bold{39:3}, 480--496.
 
-  Kojadinovic, I. (2016). Some copula inference procedures adapted to
-  the presence of ties. \url{http://arxiv.org/abs/1609.05519}.
+  Kojadinovic, I. (2017). Some copula inference procedures adapted to
+  the presence of ties. \emph{Computational Statistics and Data
+    Analysis} \bold{112}, 24--41, \url{http://arxiv.org/abs/1609.05519}.
 }
 \seealso{ \code{\link{radSymTest}}, \code{\link{exchEVTest}}, \code{\link{gofCopula}}. }
 \examples{

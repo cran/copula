@@ -11,7 +11,8 @@
   by means of a \emph{multiplier} technique.
 }
 \usage{
-evTestA(x, N = 1000, derivatives = c("An","Cn"))
+evTestA(x, N = 1000, derivatives = c("An","Cn"),
+        ties.method = eval(formals(rank)$ties.method))
 }
 \arguments{
   \item{x}{ a data matrix that will be transformed to pseudo-observations. }
@@ -20,6 +21,9 @@ evTestA(x, N = 1000, derivatives = c("An","Cn"))
   \item{derivatives}{string specifying how the derivatives of the unknown
     copula are estimated, either \code{"An"} or \code{"Cn"}.  The former
     gives better results for samples smaller than 400 but is slower.}
+  \item{ties.method}{\code{\link{character}} string specifying how ranks
+    should be computed if there are ties in any of the coordinate
+    samples of \code{x}; passed to \code{\link{pobs}}.}
 }
 \details{
   More details are available in the third reference.

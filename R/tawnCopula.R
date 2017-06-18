@@ -50,7 +50,7 @@ tawnCopula <- function(param = NA_real_) {
              dimension = dim,
              exprdist = c(cdf = cdf, pdf = pdf),
              parameters = param[1],
-             param.names = "param",
+             param.names = "alpha",
              param.lowbnd = 0,
              param.upbnd = 1,
              fullname = "<deprecated slot>")# "Tawn copula family; Extreme value copula"
@@ -82,12 +82,11 @@ tauTawnCopula <- function(copula) {
 }
 
 iTauTawnCopula <- function(copula, tau) {
-  alpha <- 1
-  taumax <- 8 * atan(sqrt(alpha / (4 - alpha))) / sqrt(alpha * (4 - alpha)) - 2
-  bad <- (tau < 0 | tau >= taumax)
-  if (any(bad)) warning("tau is out of the range [0, 0.4183992]")
-  ifelse(tau <= 0, 0,
-         ifelse(tau >= taumax, 1, iTauCopula(copula, tau)))
+    alpha <- 1
+    taumax <- 8 * atan(sqrt(alpha / (4 - alpha))) / sqrt(alpha * (4 - alpha)) - 2
+    bad <- (tau < 0 | tau >= taumax)
+    if (any(bad)) warning("For the Tawn copula, tau must be in [0, 0.4183992]. Replacing too small (large) values by lower (upper) bound.")
+    ifelse(tau <= 0, 0, ifelse(tau >= taumax, 1, iTauCopula(copula, tau)))
 }
 
 dTauTawnCopula <- function(copula) {
@@ -127,7 +126,7 @@ iRhoTawnCopula <- function(copula, rho) {
   n.na <- !is.na(rho)
   bad <- ((neg <- n.na & rho < 0) |
           (Lrg <- n.na & rho > rhomax))
-  if (any(bad)) warning("rho is out of the range [0, 0.58743682]")
+  if (any(bad)) warning("For the Tawn copula, rho must be in [0, 0.58743682]. Replacing too small (large) values by lower (upper) bound.")
   r <- rho
   r[neg | rho == 0     ] <- 0
   r[Lrg | rho == rhomax] <- 1

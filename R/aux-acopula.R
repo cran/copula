@@ -1360,23 +1360,25 @@ setMethod("setTheta", "ellipCopula",
 	      ## vectorized (and partial)  value <- NA_real_
 	      if(!is.double(value)) storage.mode(value) <- "double"
 	  }
-          df.f <- if(is(x, "tCopula")) x@df.fixed else TRUE
-          p <- npar.ellip(x@dimension, dispstr = x@dispstr, df.fixed = df.f)
-          fixed <- attr(x@parameters, "fixed")
-          if(freeOnly && !is.null(fixed) && any(fixed) &&
-	     ## fixed par.s apart from possibly 'df' via 'df.fixed':
-	     !(sum(fixed) == 1L && which(fixed) == length(fixed))) {
-### FIXME; not really hard (see 'fixedPar<-' in ./fixedPar.R )
-      stop("setTheta(<ellipCop>, freeOnly=TRUE) not yet implemented for partially fixed par")
-
-          }
+          is.t <- is(x, "tCopula")
+          p <- npar.ellip(x@dimension, dispstr = x@dispstr) +  as.integer(is.t) # 1_[if t-Cop]
+          par <- x@parameters
+          stopifnot(length(par) == p) # normal- / t-, df fixed or not
+          fixed <- attr(par, "fixed")
+	  if(freeOnly) {
+	      if(is.null(fixed)) fixed <- FALSE
+              p <- length(par[!fixed])
+	  }
           if(length(value) != p)
-              stop(gettextf("'length(value)' must be %d for this elliptical copula (dim=%d, dispstr=\"%s\")",
+              ## TODO: error message also depends on 'fixed' and 'freeOnly' !
+              stop(gettextf("'length(value)' must be %d for the elliptical copula (dim=%d, disp.=\"%s\")",
                             p, x@dimension, x@dispstr), domain=NA)
-	  if(all(ina) || noCheck || {
-	      all(is.na(value) | (x@param.lowbnd <= value & value <= x@param.upbnd))
-	  }) ## parameter constraints are fulfilled
-	      x@parameters[seq_along(value)] <- value
+	  sel <- if(freeOnly) !fixed else TRUE
+	  if(all(ina) || noCheck ||
+	     all(is.na(value) |
+		 (x@param.lowbnd[sel] <= value & value <= x@param.upbnd[sel])))
+	      ## parameter constraints are fulfilled
+	      x@parameters[sel] <- value
 	  else
 	      stop(gettextf("theta (=%s) is not inside parameter bounds",
 			    format(value)), domain=NA)

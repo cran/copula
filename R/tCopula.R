@@ -15,7 +15,7 @@
 
 
 ## DONE: allow "param = NA" --
-##  2) npar.ellip(dim, dispstr, df.fixed) |-->  "dimension" (length) of param
+##  2) npar.ellip(dim, dispstr) |-->  "dimension" (length) of rho-part of param
 ##  --> TODO: use it ---> define a generic  nparam(.) {with methods for all copula}
 ### TODO:  {also for "normalCopula"}
 ##  3) validity should check  pos.definiteness for "un"structured (maybe "toeplitz"
@@ -33,7 +33,7 @@ tCopula <- function(param = NA_real_, dim = 2L, dispstr = "ex",
 {
     dim <- as.integer(dim)
     if(!is.numeric(param)) storage.mode(param) <- "double" # for NA, keeping attributes!
-    stopifnot((pdim <- length(param)) >= 1)
+    stopifnot((pdim <- length(param)) >= 1) ## 'param' == rho here; 'df' is extra!
     if(pdim == 1 && is.na(param)) ## extend it (rho only!)
 	pdim <- length(param <- rep(param, length.out = npar.ellip(dim, dispstr)))
     parameters <- c(param, df) ## df is another parameter __at end__

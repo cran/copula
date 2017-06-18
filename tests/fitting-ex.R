@@ -155,8 +155,7 @@ mvt.2.ne <- mvdc(copula = ct.2, margins = c("norm", "exp"),
                  paramMargins = list(list(mean = 0, sd = 2), list(rate = 2)))
 mvt.2.ne ## --> four free parameters in total: rho, mean, sd, and rate:
 
-if(FALSE) ## FIXME
-copula:::getTheta(mvt.2.ne, attr = TRUE)
+copula:::getTheta(mvt.2.ne, attr = TRUE) # - shows only the copula parameter -- FIXME !
 
 ## simulate data and fit:
 set.seed(17); x.samp <- rMvdc(250, mvt.2.ne)

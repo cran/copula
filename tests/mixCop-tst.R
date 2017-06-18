@@ -53,12 +53,12 @@ stopifnot(
 )
 (llGG1 <- loglikCopula(c(2.5, 1., w = c(2,4)/6), u=uGG, copula = mGG))
 (llMC <-  loglikCopula(c(2.5, pi, rho.1=0.7, df = 4, w = c(2,2,4)/8), u = uM, copula = mC))
-## FIXME - discrepancy 32 bit <-> 64 bit --- still, *after* dMixCopula() bug fix ?!
+## discrepancy 32 bit <-> 64 bit --- still (after dMixCopula() bug fix):
 stopifnot(
-    all.equal(llGG1, 177.452426, ## 32 bit (Windows, Linux(FC 24)): ....
-              tol = if(isSun || isMac || is32) 0.4 else 7e-7),
-    all.equal(llMC,  532.8757887, ## 32 bit: .....
-              tol = if(isSun || isMac || is32) 0.1 else 7e-7)
+    all.equal(llGG1, 177.452426, ## 32 bit (Windows, Linux(FC 24)): 188.0358
+              tol = if(isSun || isMac || is32) 0.08 else 7e-7),
+    all.equal(llMC,  532.8757887, ## 32 bit: 551.8439
+              tol = if(isSun || isMac || is32) 0.05 else 7e-7)
 )
 
 ## "free" weights --- estimation == FIXME: will change after re-parametrization
@@ -94,3 +94,23 @@ if (doExtras) { # slowish
     print(summary(f2))
 }
 
+## partially fixed
+
+(tX4 <- tCopula( 0.2, df = 5, df.fixed=TRUE))
+(tn3 <- tCopula(-0.5, df = 3))
+getTheta(tX4, attr = TRUE) # freeOnly = TRUE is default
+## --> *not* showing df=5 as it is fixed
+(m3 <- mixCopula(list(normalCopula(0.4), tX4, tn3), w = (1:3)/6))
+                                        # -> shows 'm2.df := 5' as fixed !
+th. <- getTheta(m3, attr = TRUE)# ditto
+(th <- getTheta(m3, named= TRUE))
+trueAt <- function(i, n) { r <- logical(n); r[i] <- TRUE; r }
+stopifnot(
+    identical(th, structure(th., param.lowbnd=NULL, param.upbnd=NULL)),
+    identical(names(th), c("m1.rho.1", "m2.rho.1", "m3.rho.1", "m3.df",
+                           paste0("w", 1:3)))
+    ,
+    identical(isFree(m3), !trueAt(3, n=8))# free every but at [3]
+)
+
+fixedParam(m3) <- trueAt(c(3, 8), n=8)

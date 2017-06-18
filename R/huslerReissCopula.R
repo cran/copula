@@ -82,7 +82,7 @@ huslerReissCopula <- function(param = NA_real_) {
       dimension = dim,
       exprdist = c(cdf = cdf, pdf = pdf),
       parameters = param[1],
-      param.names = "param",
+      param.names = "alpha",
       param.lowbnd = 0,
       param.upbnd = Inf,
       fullname = "<deprecated slot>")# "Husler-Reiss copula family; Extreme value copula")
@@ -143,12 +143,12 @@ huslerReissTauFun <- function(alpha) {
 }
 
 iTauHuslerReissCopula <- function(copula, tau) {
-  if (any(tau < 0)) warning("some tau < 0")
-  huslerReissTauInv <- approxfun(x = .huslerReissTau$assoMeasFun$fm$ysmth,
-                                 y = .huslerReissTau$assoMeasFun$fm$x, rule = 2)
-  ss <- .huslerReissTau$ss
-  theta <- huslerReissTauInv(tau)
-  ifelse(tau <= 0, 0, .huslerReissTau$trFuns$backwardTransf(theta, ss))
+    if (any(tau < 0)) warning("For the Husler-Reiss copula, tau must be >= 0. Replacing negative values by 0.")
+    huslerReissTauInv <- approxfun(x = .huslerReissTau$assoMeasFun$fm$ysmth,
+                                   y = .huslerReissTau$assoMeasFun$fm$x, rule = 2)
+    ss <- .huslerReissTau$ss
+    theta <- huslerReissTauInv(tau)
+    ifelse(tau <= 0, 0, .huslerReissTau$trFuns$backwardTransf(theta, ss))
 }
 
 
@@ -175,13 +175,13 @@ huslerReissRhoFun <- function(alpha) {
 }
 
 iRhoHuslerReissCopula <- function(copula, rho) {
-  if (any(rho < 0)) warning("some rho < 0")
-  huslerReissRhoInv <- approxfun(x = .huslerReissRho$assoMeasFun$fm$ysmth,
-                                 y = .huslerReissRho$assoMeasFun$fm$x, rule = 2)
+    if (any(rho < 0)) warning("For the Husler-Reiss copula, rho must be >= 0. Replacing negative values by 0.")
+    huslerReissRhoInv <- approxfun(x = .huslerReissRho$assoMeasFun$fm$ysmth,
+                                   y = .huslerReissRho$assoMeasFun$fm$x, rule = 2)
 
-  ss <- .huslerReissRho$ss
-  theta <- huslerReissRhoInv(rho)
-  ifelse(rho <= 0, 0, .huslerReissRho$trFuns$backwardTransf(theta, ss))
+    ss <- .huslerReissRho$ss
+    theta <- huslerReissRhoInv(rho)
+    ifelse(rho <= 0, 0, .huslerReissRho$trFuns$backwardTransf(theta, ss))
 }
 
 huslerReissdRho <- function(alpha) {

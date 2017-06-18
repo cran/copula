@@ -1,8 +1,8 @@
 \name{estim.misc}
+\title{Various Estimators for (Nested) Archimedean Copulas}
 \alias{ebeta}
 \alias{edmle}
 \alias{etau}
-\title{Various Estimators for (Nested) Archimedean Copulas}
 \description{
   Various Estimators for (Nested) Archimedean Copulas, namely,
   \describe{
@@ -15,9 +15,9 @@
   }
 }
 \usage{
-ebeta(u, cop, interval = initOpt(cop@copula@name), ...)
-edmle(u, cop, interval = initOpt(cop@copula@name), warn=TRUE, ...)
- etau(u, cop, method = c("tau.mean", "theta.mean"), warn=TRUE, ...)
+ebeta(u, cop, interval = initOpt(cop@copula@name), \dots)
+edmle(u, cop, interval = initOpt(cop@copula@name), warn=TRUE, \dots)
+ etau(u, cop, method = c("tau.mean", "theta.mean"), warn=TRUE, \dots)
 }
 \arguments{
   \item{u}{\eqn{n\times d}{n x d}-matrix of (pseudo-)observations (each
@@ -47,7 +47,7 @@ edmle(u, cop, interval = initOpt(cop@copula@name), warn=TRUE, ...)
     }
   }
   \item{\dots}{additional arguments passed to
-    \code{\link{cor}} (for \code{etau}, but see \sQuote{Details}),
+    \code{\link{corKendall}} (for \code{etau}, but see \sQuote{Details}),
     to \code{\link{optimize}} (for \code{edmle}), or
     to \code{\link{safeUroot}} (for \code{ebeta}).}
 }
@@ -62,10 +62,17 @@ edmle(u, cop, interval = initOpt(cop@copula@name), warn=TRUE, ...)
   \code{edmle}, the parameter is estimated via maximum-likelihood
   estimation based on the diagonal.
 
-  For \code{etau}, if no additional arguments are provided to
-  \code{\link{cor}(*, method="kendall")} (see \code{\dots}), the much
-  faster \code{\link[pcaPP]{cor.fk}()} from package \CRANpkg{pcaPP} is
-  used.  Furthermore, \code{method="tau.mean"} means that the average
+  For \code{etau}, \code{\link{corKendall}(u, \dots)} is used and if there
+  are no \code{\link{NA}}s in \code{u}, by default (if no additional
+  arguments are provided), \code{corKendall()} calls the \eqn{O(n log(n))}
+  fast \code{\link[pcaPP]{cor.fk}()} from package \CRANpkg{pcaPP}
+  instead of the \eqn{O(n^2)} \code{\link{cor}(*, method="kendall")}.
+  Conversely, when \code{u} has \code{NA}s, by default,
+  \code{\link{corKendall}(u, \dots)} will use
+  \code{\link{cor}(u, method="kendall", use = "pairwise")} such that
+  \code{etau(u, *)} will work.
+  \cr
+  Furthermore, \code{method="tau.mean"} means that the average
   of sample versions of Kendall's tau are computed first and then the
   parameter is determined such that the population version of Kendall's
   tau matches this average (if possible); the \code{method="theta.mean"}
@@ -91,7 +98,7 @@ edmle(u, cop, interval = initOpt(cop@copula@name), warn=TRUE, ...)
       Kendall's tau for the chosen method.}
   }
 }
-%\author{Marius Hofert}
+%\author{Marius Hofert and Martin Maechler}
 \references{
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2013).
   Archimedean Copulas in High Dimensions: Estimators and Numerical
@@ -101,13 +108,15 @@ edmle(u, cop, interval = initOpt(cop@copula@name), warn=TRUE, ...)
   \bold{154}(1), 25--63.
 }
 \seealso{
+  \code{\link{corKendall}()}.
+
   The more sophisticated estimators \code{\link{emle}} (Maximum Likelihood) and
   \code{\link{emde}} (Minimum Distance). \code{\link{enacopula}}
   (wrapper for different estimators).
 }
 \examples{
 tau <- 0.25
-(theta <- copGumbel@iTau(tau)) # 4/3
+(theta <- copGumbel@iTau(tau)) # 4/3 = 1.333..
 d <- 20
 (cop <- onacopulaL("Gumbel", list(theta,1:d)))
 
@@ -126,5 +135,32 @@ theta.hat.etau
 
 system.time(theta.hat.etau. <- etau(U, cop=cop, method="theta.mean"))
 theta.hat.etau.
+
+## etau()  in the case of missing values (NA's)
+## ------                 ---------------------
+##' @title add Missing Values completely at random
+##' @param x  matrix or vector
+##' @param prob desired probability ("fraction") of missing values (\code{\link{NA}}s).
+##' @return x[] with some (100*prob percent) entries replaced by \code{\link{NA}}s.
+addNAs <- function(x, prob) {
+    np <- length(x)
+    x[sample.int(np, prob*np)] <- NA
+    x
+}
+
+## UM[] := U[] with 5\% missing values
+set.seed(7); UM <- addNAs(U, p = 0.05)
+mean(is.na(UM)) # 0.05
+## This error if x has NA's was happening for  etau(UM, cop=cop)
+## before copula version 0.999-17 (June 2017) :
+try(eM <- etau(UM, cop=cop, use = "everything"))
+        #  --> Error ... NA/NaN/Inf in foreign function call
+## The new default:
+eM0 <- etau(UM, cop=cop, use = "pairwise")
+eM1 <- etau(UM, cop=cop, use = "complete")
+##  use = "complete" is really equivalent to dropping all obs. with with missing values:
+stopifnot(all.equal(eM1, etau(na.omit(UM), cop=cop), tol = 1e-15))
+## but  use = "pairwise" ---> cor(*, use = "pairwise") is much better:
+rbind(etau.U = theta.hat.etau, etau.UM.pairwise = eM0, etau.UM.complete = eM1)
 }
 \keyword{models}

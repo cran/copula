@@ -1,6 +1,6 @@
 ---
 title: Archimedean Liouville Copulas
-author: Marius Hofertt
+author: Marius Hofert
 date: '`r Sys.Date()`'
 output:
   html_vignette:

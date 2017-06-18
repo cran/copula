@@ -21,12 +21,15 @@
 ##' @param x the data
 ##' @param N number of multiplier replications
 ##' @param estimator "Pickands" or "CFG"
+##' @param ties logical indicating whether ties are present
+##' @param ties.method passed to pobs
 ##' @param derivatives based on "An" or "Cn"
 ##' @param m grid size
 ##' @return an object of class 'htest'
 ##' @author Ivan Kojadinovic
 exchEVTest <- function(x, N = 1000, estimator = c("CFG", "Pickands"),
-                       ties = NA, m = 100, derivatives = c("Cn", "An")) {
+                       ties = NA, ties.method = eval(formals(rank)$ties.method), m = 100,
+                       derivatives = c("Cn", "An")) {
 
     ## Checks
     stopifnot(N >= 1L && m >= 5L)
@@ -35,11 +38,12 @@ exchEVTest <- function(x, N = 1000, estimator = c("CFG", "Pickands"),
         stopifnot(is.matrix(x <- as.matrix(x)))
     }
     estimator <- match.arg(estimator)
+    ties.method <- match.arg(ties.method)
     derivatives <- match.arg(derivatives)
 
     ## Make pseudo-observations
     n <- nrow(x)
-    u <- pobs(x)
+    u <- pobs(x, ties.method = ties.method)
 
     ## Make grid
     g <- seq(1/m, 0.5, len = m)
@@ -67,7 +71,7 @@ exchEVTest <- function(x, N = 1000, estimator = c("CFG", "Pickands"),
     if (ties) {
 
         ## Get ties structure from initial sample
-        ir <- apply(u, 2, function(y) sort(rank(y, ties.method = "max")))
+        ir <- apply(u, 2, function(y) rank(sort(y)))
 
         ## One replication
         one <- function() {
@@ -84,7 +88,7 @@ exchEVTest <- function(x, N = 1000, estimator = c("CFG", "Pickands"),
                 u.b[,i] <- u.b[ir[,i], i]
             }
             ## Compute pseudo-observations
-            u.b <- pobs(u.b)
+            u.b <- pobs(u.b, ties.method = ties.method)
 
             ## Compute the test statistic
             .C(evsymtest_stat,
@@ -184,7 +188,7 @@ exchTest <- function(x, N = 1000, ties = NA, m = 0) {
     if (ties) {
 
         ## Get ties structure from initial sample
-        ir <- apply(u, 2, function(y) sort(rank(y, ties.method = "max")))
+        ir <- apply(u, 2, function(y) rank(sort(y)))
 
         ## One replication
         one <- function() {
@@ -284,7 +288,8 @@ radSymTest <- function(x, N = 1000, ties = NA) {
 
     ## If ties, get ties structure from initial sample
     if (ties)
-        ir <- apply(u, 2, function(y) sort(rank(y, ties.method = "max")))
+        ir <- apply(u, 2, function(y) rank(sort(y)))
+
 
     ## One replication
     one <- function() {

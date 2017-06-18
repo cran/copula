@@ -12,7 +12,6 @@ nacPairthetas(x)
   \item{x}{an (outer) nacopula (with thetas sets).}
 }
 % \details{
-% %%  ~~ If necessary, more details than the description above ~~
 % }
 \value{
   a (\eqn{d \times d}{d x d}) matrix of thetas, say \code{T}, where
@@ -20,8 +19,6 @@ nacPairthetas(x)
   \eqn{C(U_j,U_k)}.
 }
 %\author{Martin Maechler}
-% \references{
-% }
 \seealso{
   the class \code{\linkS4class{nacopula}} (with its \code{\link{dim}}
   method).

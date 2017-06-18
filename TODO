@@ -1,6 +1,6 @@
 ##-*- org -*-->  Emacs .. [Tab] key + [Org] menu; C-c C-o to follow links
 * Short Term (before 1.0.0):
-** TODO [JY] Set up dispexpr (cdf, pdf) for rotExplicitCopula, mixExplicitCopula such that they and khoudrajiCopula woth with each other.
+** TODO [JY] Set up dispexpr (cdf, pdf) for rotExplicitCopula, mixExplicitCopula such that they and khoudrajiCopula work with each other.
 ** TODO [IK] gofPB(*, ties=TRUE) is *never* tested, *nor* documented (man/gofCopula.Rd); see FIXME, what if x has no ties?
 ** DONE [MM] warnings about `numDeriv()` to be displayed once per R session and could be suppressed.
 ** DONE [MM] copula@fullname: *abolish*, i.e., for now *deprecate* and replace by function _describeCop()_ generic & methods

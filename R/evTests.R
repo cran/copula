@@ -33,7 +33,7 @@ evTestC <- function(x, N = 1000) {
     ## make pseudo-observations
     p <- ncol(x)
     n <- nrow(x)
-    u <- pobs(x)
+    u <- pobs(x) # ties.method should not matter
 
     ## set r according to recommendations
     r <- 3:5
@@ -100,9 +100,11 @@ evTestC <- function(x, N = 1000) {
 ##' @param x the data
 ##' @param N number of multiplier replications
 ##' @param derivatives can be either "An" or "Cn"
+##' @param ties.method passed to pobs
 ##' @return an object of class 'htest'
 ##' @author Ivan Kojadinovic
-evTestA <- function(x, N = 1000, derivatives = c("An","Cn")) {
+evTestA <- function(x, N = 1000, derivatives = c("An","Cn"),
+                    ties.method = eval(formals(rank)$ties.method)) {
 
     ## checks
     stopifnot(N >= 1)
@@ -111,10 +113,11 @@ evTestA <- function(x, N = 1000, derivatives = c("An","Cn")) {
         stopifnot(is.matrix(x <- as.matrix(x)))
     }
     derivatives <- match.arg(derivatives)
+    ties.method <- match.arg(ties.method)
 
     ## make pseudo-observations
     n <- nrow(x)
-    u <- pobs(x)
+    u <- pobs(x, ties.method = ties.method)
 
     ## make grid
     ## m = 0
@@ -365,7 +368,7 @@ evTestK <- function(x, method = c("fsample","asymptotic","jackknife"),
     ## Compute bias if ties
     bias <- if (ties) {
                 ## Get ties structure from initial sample
-                ir <- apply(x, 2, function(y) sort(rank(y, ties.method = "max")))
+                ir <- apply(x, 2, function(y) rank(sort(y)))
                 ## Estimate the arameter of the Gumbel--Hougaard
                 tau <- cor(x[,1], x[,2], method="kendall")
                 theta <- iTau(gumbelCopula(), max(tau, 0))

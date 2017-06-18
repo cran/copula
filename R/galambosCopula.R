@@ -107,7 +107,7 @@ galambosCopula <- function(param = NA_real_) {
              dimension = dim,
              exprdist = c(cdf = cdf, pdf = pdf),
              parameters = param[1],
-             param.names = "param",
+             param.names = "alpha",
              param.lowbnd = 0,
              param.upbnd = Inf,
              fullname = "<deprecated slot>")# "Galambos copula family; Extreme value copula"
@@ -165,14 +165,14 @@ tauGalambosCopula <- function(copula) {
 }
 
 iTauGalambosCopula <- function(copula, tau) {
-  if (any(tau < 0)) warning("some tau < 0")
-  galambosTauInv <- approxfun(x = .galambosTau$assoMeasFun$fm$ysmth,
-                              y = .galambosTau$assoMeasFun$fm$x, rule = 2)
+    if (any(tau < 0)) warning("For the Galambos copula, tau must be >= 0. Replacing negative values by 0.")
+    galambosTauInv <- approxfun(x = .galambosTau$assoMeasFun$fm$ysmth,
+                                y = .galambosTau$assoMeasFun$fm$x, rule = 2)
 
-  ss <- .galambosTau$ss
-  theta <- galambosTauInv(tau)
-  ## 0.0001 is arbitrary
-  ifelse(tau <= 0.0001, 0, .galambosTau$trFuns$backwardTransf(theta, ss))
+    ss <- .galambosTau$ss
+    theta <- galambosTauInv(tau)
+    ## 0.0001 is arbitrary
+    ifelse(tau <= 0.0001, 0, .galambosTau$trFuns$backwardTransf(theta, ss))
 }
 
 galambosdTau <- function(alpha) {
@@ -205,13 +205,13 @@ rhoGalambosCopula <- function(copula) {
 }
 
 iRhoGalambosCopula <- function(copula, rho) {
-  if (any(rho < 0)) warning("rho is out of the range [0, 1]")
-  galambosRhoInv <- approxfun(x = .galambosRho$assoMeasFun$fm$ysmth,
-                              y = .galambosRho$assoMeasFun$fm$x, rule = 2)
+    if (any(rho < 0)) warning("For the Galambos copula, rho must be >= 0. Replacing negative values by 0.")
+    galambosRhoInv <- approxfun(x = .galambosRho$assoMeasFun$fm$ysmth,
+                                y = .galambosRho$assoMeasFun$fm$x, rule = 2)
 
-  ss <- .galambosRho$ss
-  theta <- galambosRhoInv(rho)
-  ifelse(rho <= 0, 0, .galambosRho$trFuns$backwardTransf(theta, ss))
+    ss <- .galambosRho$ss
+    theta <- galambosRhoInv(rho)
+    ifelse(rho <= 0, 0, .galambosRho$trFuns$backwardTransf(theta, ss))
 }
 
 galambosdRho <- function(alpha) {

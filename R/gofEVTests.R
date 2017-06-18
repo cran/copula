@@ -24,13 +24,17 @@
 ##' @param estimator nonparametric estimator of the Pickands dependence function
 ##' @param m grid size
 ##' @param verbose display progress bar if TRUE
+##' @param ties.method passed to pobs (not for fitting)
+##' @param fit.ties.meth passed to pobs (fitting only)
 ##' @param ... : all passed to fitCopula
 ##' @return an object of class 'htest'
 ##' @author Ivan Kojadinovic
 gofEVCopula <- function(copula, x, N = 1000,
                         method = c("mpl", "ml", "itau", "irho"),
                         estimator = c("CFG", "Pickands"), m = 1000,
-                        verbose = interactive(), ...)
+                        verbose = interactive(),
+                        ties.method = c("max", "average", "first", "last", "random", "min"),
+                        fit.ties.meth = eval(formals(rank)$ties.method), ...)
 {
     ## Checks
     stopifnot(is(copula, "copula"), N >= 1L, m>= 100L)
@@ -41,15 +45,20 @@ gofEVCopula <- function(copula, x, N = 1000,
     stopifnot((p <- ncol(x)) > 1, (n <- nrow(x)) > 1, dim(copula) == p)
     method <- match.arg(method)
     estimator <- match.arg(estimator)
+    ties.method <- match.arg(ties.method)
+    fit.ties.meth <- match.arg(fit.ties.meth)
 
     if (p != 2)
         stop("The copula and the data should be of dimension two")
 
     ## make pseudo-observations
-    u <- pobs(x)
+    u <- pobs(x, ties.method = ties.method)
+    u.fit <- if (ties.method == fit.ties.meth) u
+             else pobs(x, ties.method = fit.ties.meth)
+
 
     ## fit the copula
-    fcop <- fitCopula(copula, u, method, estimate.variance=FALSE, ...)@copula
+    fcop <- fitCopula(copula, u.fit, method, estimate.variance=FALSE, ...)@copula
 
     ## where to compute A
     g <- seq(0,1-1/m,by=1/m)
@@ -66,15 +75,17 @@ gofEVCopula <- function(copula, x, N = 1000,
 
     ## simulation of the null distribution
     s0 <- matrix(NA, N, 2)
-    if (verbose) {
-	pb <- txtProgressBar(max = N, style = if(isatty(stdout())) 3 else 1) # setup progress bar
+    if (verbose) { # setup progress bar:
+	pb <- txtProgressBar(max = N, style = if(isatty(stdout())) 3 else 1)
 	on.exit(close(pb)) # and close it on exit
     }
     for (i in 1:N) {
-        u0 <- pobs(rCopula(n, fcop))
+        u0 <- pobs(rCopula(n, fcop), ties.method = ties.method)
+        u0.fit <- if (ties.method == fit.ties.meth) u0
+                  else pobs(u0, ties.method = fit.ties.meth)
 
         ## fit the copula
-        fcop0 <-  fitCopula(copula, u0, method, estimate.variance=FALSE, ...)@copula
+        fcop0 <-  fitCopula(copula, u0.fit, method, estimate.variance=FALSE, ...)@copula
 
         s0[i,] <- .C(cramer_vonMises_Afun,
                      as.integer(n),
@@ -90,13 +101,14 @@ gofEVCopula <- function(copula, x, N = 1000,
 
     ## corrected version only
     structure(class = "htest",
-              list(method = paste("Parametric bootstrap based GOF test for EV copulas with argument 'method' set to '",
-                                  method, "' and argument 'estimator' set to '", estimator, "'", sep = ""),
+              list(method = paste0(
+   "Parametric bootstrap based GOF test for EV copulas with argument 'method' set to ",
+                                   sQuote(method), " and argument 'estimator' set to ",
+                                   sQuote(estimator)),
                    parameter = c(parameter = fcop@parameters),
                    statistic = c(statistic = s[1]),
                    p.value=(sum(s0[,1] >= s[1])+0.5)/(N+1),
                    data.name = deparse(substitute(x))))
-
 }
 
 

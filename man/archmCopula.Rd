@@ -147,6 +147,7 @@ dCopula(x, gumbelC.7)
 
 ## A 12-dim Joe copula
 joe.cop <- joeCopula(iTau(joeCopula(), 0.5), dim = 12)
+x <- rCopula(5, joe.cop)
 dCopula(x, joe.cop)
 }
 \keyword{distribution}

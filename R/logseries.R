@@ -26,9 +26,17 @@
 ##   if (log.p) log(val) else val
 ## }
 
-##' only used in  rfrankCopula() currently:
+
+## These call  ../src/logseries.c  code
+##             ~~~~~~~~~~~~~~~~~~
+## "FIXME":  use   ../src/rLog.c  and  R's  rLog()
+##  -----          ~~~~~~~~~~~~~
+
+##' only used in  rfrankCopula() in ./frankCopula.R  currently:
 rlogseries <- function(n, alpha) {
-  val <- integer(n)
-  alpha <- rep(alpha, len = n)
-  .C(rlogseries_R, as.integer(n), as.double(alpha), val = as.integer(val))$val
+  .C(rlogseries_R, as.integer(n), rep_len(as.double(alpha), n), val = integer(n))$val
+}
+
+rlogseries.ln1p <- function(n, h) { # 'double' result: integer overflows
+  .C(rlogseries_R_ln1p, as.integer(n), as.double(h), val = double(n))$val
 }

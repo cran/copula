@@ -28,7 +28,9 @@
 #include "indepTests.h"
 
 // ./logseries.c: __FIXME__ also have rLog_vec_c()  from nacopula
-void rlogseries_R(int *n, double *alpha, int *val);
+void rlogseries_R      (int *n, double *alpha, int *val);
+void rlogseries_R_ln1p (int *n, double *h,  double *val);
+
 
 // ./fgm.c:
 void validity_fgm(int *p, double *alpha, int *valid);

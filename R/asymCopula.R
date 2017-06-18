@@ -297,7 +297,7 @@ prepKhoudrajiCdfExpr <- function(copula, prefix, om = FALSE) {
     d <- dim(copula)
     cdf <- copula@exprdist$cdf
     ## originally, explicit copula expressions have alpha as parameter
-    cdf <- do.call(substitute, list(cdf, list(alpha = quote(param))))
+    ## cdf <- do.call(substitute, list(cdf, list(alpha = quote(param))))
     oldParNames <- names(getTheta(copula, freeOnly=FALSE, named=TRUE)) # paramNames(copula)
     npar <- length(oldParNames)
     ## replace parameters

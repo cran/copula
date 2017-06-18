@@ -115,12 +115,14 @@ gofPB <- function(copula, x, N, method = c("Sn", "SnB", "SnC"),
                   estim.method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
 		  trafo.method = if(method == "Sn") "none" else c("cCopula", "htrafo"),
 		  trafoArgs = list(), verbose = interactive(), useR = FALSE,
-                  ties = NA, ...)
+                  ties = NA, ties.method = c("max", "average", "first", "last", "random", "min"),
+                  fit.ties.meth = eval(formals(rank)$ties.method), ...)
 {
     .Deprecated("gofCopula(*, simulation = \"pb\")")
     .gofPB(copula, x, N, method=method, estim.method=estim.method,
            trafo.method=trafo.method, trafoArgs=trafoArgs, verbose=verbose,
-           useR=useR, ties=ties, ...)
+           useR=useR, ties=ties, ties.method=ties.method,
+           fit.ties.meth=fit.ties.meth,  ...)
 }
 
 
@@ -129,7 +131,8 @@ gofPB <- function(copula, x, N, method = c("Sn", "SnB", "SnC"),
                    estim.method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
 		   trafo.method = if(method == "Sn") "none" else c("cCopula", "htrafo"),
                    trafoArgs = list(), verbose = interactive(), useR = FALSE,
-                   ties = NA, ...)
+                   ties = NA, ties.method = c("max", "average", "first", "last", "random", "min"),
+                   fit.ties.meth = eval(formals(rank)$ties.method), ...)
 {
     ## Checks -- NB: let the *generic* fitCopula() check 'copula'
     stopifnot(N >= 1)
@@ -169,10 +172,12 @@ gofPB <- function(copula, x, N, method = c("Sn", "SnB", "SnC"),
     }
 
     ## 1) Compute the pseudo-observations
-    uhat <- pobs(x)
+    uhat <- pobs(x, ties.method = ties.method)
+    uhat.fit <- if (ties == FALSE || ties.method == fit.ties.meth) uhat
+                else pobs(x, ties.method = fit.ties.meth)
 
     ## 2) Fit the copula
-    C.th.n <- fitCopula(copula, uhat, method = estim.method,
+    C.th.n <- fitCopula(copula, uhat.fit, method = estim.method,
 			estimate.variance = FALSE, ...)@copula
     ## 3) Compute the realized test statistic
     doTrafo <- (method != "Sn" && trafo.method != "none") # (only) transform if method != "Sn" and trafo.method given
@@ -192,8 +197,9 @@ gofPB <- function(copula, x, N, method = c("Sn", "SnB", "SnC"),
     ## 4) Simulate the test statistic under H_0
 
     ## If ties, get tie structure from x  (FIXME?: what if 'x' has no ties, but 'ties = TRUE' ?? )
+    ## IK: If 'x' has no ties, but 'ties = TRUE', extra computations for nothing
     if (ties)
-        ir <- apply(x, 2, function(y) sort(rank(y, ties.method = "max")))
+        ir <- apply(x, 2, function(y) rank(sort(y)))
 
     T0 <- vapply(1:N, function(k) {
         ## 4.1) Sample the fitted copula
@@ -204,10 +210,13 @@ gofPB <- function(copula, x, N, method = c("Sn", "SnB", "SnC"),
                 U[,i] <- U[ir[,i], i]
             }
         }
-        Uhat <- pobs(U)
+        Uhat <- pobs(U, ties.method = ties.method)
+        Uhat.fit <- if (ties == FALSE || ties.method == fit.ties.meth) Uhat
+                    else pobs(U, ties.method = fit.ties.meth)
+
 
         ## 4.2) Fit the copula
-        C.th.n. <- fitCopula(copula, Uhat, method=estim.method,
+        C.th.n. <- fitCopula(copula, Uhat.fit, method=estim.method,
                              estimate.variance=FALSE, ...)@copula
         ## 4.3) Compute the test statistic
         u. <- if(doTrafo) { # (no checks needed; all done above)
@@ -318,18 +327,23 @@ Jscore <- function(copula, u, method)
 gofMB <- function(copula, x, N, method = c("Sn", "Rn"),
                   estim.method = c("mpl", "ml", "itau", "irho"),
                   verbose = interactive(), useR = FALSE, m = 1/2,
-                  zeta.m = 0, b = 1/sqrt(nrow(x)), ...)
+                  zeta.m = 0, b = 1/sqrt(nrow(x)),
+                  ties.method = c("max", "average", "first", "last", "random", "min"),
+                  fit.ties.meth = eval(formals(rank)$ties.method), ...)
 {
     .Deprecated("gofCopula(*, simulation = \"mult\")")
     .gofMB(copula, x, N, method=method, estim.method=estim.method,
-           verbose=verbose, useR=useR, m=m, zeta.m=zeta.m, b=b, ...)
+           verbose=verbose, useR=useR, m=m, zeta.m=zeta.m, b=b,
+           ties.method=ties.method, fit.ties.meth=fit.ties.meth,...)
 }
 
 ##' revert to call  gofMB()  once that is gone
 .gofMB <- function(copula, x, N, method = c("Sn", "Rn"),
                   estim.method = c("mpl", "ml", "itau", "irho"),
                   verbose = interactive(), useR = FALSE, m = 1/2,
-                  zeta.m = 0, b = 1/sqrt(nrow(x)), ...)
+                  zeta.m = 0, b = 1/sqrt(nrow(x)),
+                  ties.method = c("max", "average", "first", "last", "random", "min"),
+                  fit.ties.meth = eval(formals(rank)$ties.method), ...)
 {
     ## Checks -- NB: let the *generic* fitCopula() check 'copula'
     stopifnot(N >= 1)
@@ -345,11 +359,12 @@ gofMB <- function(copula, x, N, method = c("Sn", "Rn"),
         stop("only bivariate case possible for estim.method='irho' or ='itau'")
 
     ## 1) Compute the pseudo-observations
-    u. <- pobs(x)
+    u. <- pobs(x, ties.method = ties.method)
+    u.fit <- if (ties.method == fit.ties.meth) u.
+             else pobs(x, ties.method = fit.ties.meth)
 
     ## 2) Fit the copula (copula is the H_0 copula; C.th.n = C_{\theta_n}(.))
-    C.th.n <- fitCopula(copula, u., method=estim.method,
-			estimate.variance=FALSE, ...)@copula
+    C.th.n <- fitCopula(copula, u.fit, method=estim.method, estimate.variance=FALSE, ...)@copula
 
     ## 3) Compute the realized test statistic
     C.th.n. <- pCopula(u., C.th.n) # n-vector
@@ -449,14 +464,18 @@ gofMB <- function(copula, x, N, method = c("Sn", "Rn"),
 ##' @param estim.method An estimation method for the unknown parameter vector
 ##' @param simulation The parametric ('pb') or multiplier ('mult') bootstrap
 ##' @param verbose A logical indicating whether a progress bar is shown
+##' @param ties.method passed to pobs (not for fitting)
+##' @param fit.ties.meth passed to pobs (fitting only)
 ##' @param ... Additional arguments passed to the internal auxiliary functions
 ##'        gofPB() and gofMB()
 ##' @return An object of class 'htest'
 ##' @author Ivan Kojadinovic, Marius Hofert
 gofCopulaCopula <- function(copula, x, N=1000, method = c("Sn", "SnB", "SnC", "Rn"),
                             estim.method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
-                            simulation = c("pb", "mult"),
-                            verbose = interactive(), ...) # print.every=NULL, ...)
+                            simulation = c("pb", "mult"), verbose = interactive(),
+                            ties = NA,
+                            ties.method = c("max", "average", "first", "last", "random", "min"),
+                            fit.ties.meth = eval(formals(rank)$ties.method), ...)
 {
     ## Checks
     stopifnot(N >= 1)
@@ -468,6 +487,8 @@ gofCopulaCopula <- function(copula, x, N=1000, method = c("Sn", "SnB", "SnC", "R
     method <- match.arg(method)
     estim.method <- match.arg(estim.method)
     simulation <- match.arg(simulation)
+    ties.method <- match.arg(ties.method)
+    fit.ties.meth <- match.arg(fit.ties.meth)
 
     if (method == "Sn" && is(copula, "tCopula") && !copula@df.fixed)
 	stop("'method'=\"Sn\" not available for t copulas whose df are not fixed as pCopula() cannot be computed for non-integer degrees of freedom yet.")
@@ -491,11 +512,13 @@ gofCopulaCopula <- function(copula, x, N=1000, method = c("Sn", "SnB", "SnC", "R
     switch(simulation,
     "pb" = { ## parametric bootstrap
        .gofPB(copula, x, N=N, method=method, estim.method=estim.method,
-              verbose = verbose, ...)
+              verbose = verbose, ties = ties, ties.method = ties.method,
+              fit.ties.meth = fit.ties.meth, ...)
     },
     "mult" = { ## multiplier bootstrap
        .gofMB(copula, x=x, N=N, method=method, estim.method=estim.method,
-              verbose = verbose, ...)
+              verbose = verbose, ties.method = ties.method,
+              fit.ties.meth = fit.ties.meth, ...)
     },
     stop("Invalid simulation method ", simulation))
 }

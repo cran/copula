@@ -43,7 +43,7 @@ emde(u, cop,
   \item{repara}{logical indicating whether the distance function to be
     optimized is reparametrized (the default); see the code for more
     details.}
-  \item{\dots}{additional arguments passed to \code{\link{optimize}}.}
+  \item{\dots}{additional arguments passed to \code{\link{optimize}()}.}
 }
 \details{
   First, \code{\link{htrafo}} is applied to map the

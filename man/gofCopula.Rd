@@ -9,17 +9,14 @@
 \alias{gofPB}
 \description{
   The goodness-of-fit tests are based, by default, on the empirical
-  process
-  comparing the empirical copula with a parametric estimate of the
-  copula derived under the null hypothesis, the default test
-  statistic, "Sn", being the Cramer-von Mises functional
-  \eqn{S_n}{S[n]} defined
-  in Equation (2) of Genest, Remillard and Beaudoin (2009). In that
-  case, approximate p-values for the test statistic can be obtained
-  either
-  using a \emph{parametric bootstrap} (see references two and three)
-  or by means of a faster \emph{multiplier} approach
-  (see references four and five).
+  process comparing the empirical copula with a parametric estimate of
+  the copula derived under the null hypothesis, the default test
+  statistic, "Sn", being the Cramer-von Mises functional \eqn{S_n}{S[n]}
+  defined in Equation (2) of Genest, Remillard and Beaudoin (2009). In
+  that case, approximate p-values for the test statistic can be obtained
+  either using a \emph{parametric bootstrap} (see references two and
+  three) or by means of a faster \emph{multiplier} approach (see
+  references four and five).
 
   Alternative test statistics can be used, in particular if a
   \emph{parametric bootstrap} is employed.
@@ -33,20 +30,25 @@ gofCopula(copula, x, \dots)
 \S4method{gofCopula}{copula}(copula, x, N = 1000,
           method = c("Sn", "SnB", "SnC", "Rn"),
           estim.method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
-          simulation = c("pb", "mult"), verbose = interactive(), \dots)
+          simulation = c("pb", "mult"), verbose = interactive(), ties = NA,
+          ties.method = c("max", "average", "first", "last", "random", "min"),
+          fit.ties.meth = eval(formals(rank)$ties.method), \dots)
 
-## Internal 'helper' functions : --- % keep on help page, even if hidden !
+## Internal 'helper' functions : ---
 gofPB(copula, x, N, method = c("Sn", "SnB", "SnC"),
       estim.method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
       trafo.method = if(method == "Sn") "none" else c("cCopula", "htrafo"),
-      trafoArgs = list(), verbose = interactive(),
-      useR = FALSE, ties = NA, \dots)
+      trafoArgs = list(), verbose = interactive(), useR = FALSE, ties = NA,
+      ties.method = c("max", "average", "first", "last", "random", "min"),
+      fit.ties.meth = eval(formals(rank)$ties.method), \dots)
 
 gofMB(copula, x, N, method = c("Sn", "Rn"),
       estim.method = c("mpl", "ml", "itau", "irho"),
       verbose = interactive(), useR = FALSE, m = 1/2, zeta.m = 0,
-      b = 1/sqrt(nrow(x)), \dots)
-}
+      b = 1/sqrt(nrow(x)),
+      ties.method = c("max", "average", "first", "last", "random", "min"),
+      fit.ties.meth = eval(formals(rank)$ties.method), \dots)
+} % NB: keep internal helper functions on this help page, even if hidden !
 \arguments{
   \item{copula}{object of class \code{"\linkS4class{copula}"} representing the
     hypothesized copula family.}
@@ -88,6 +90,12 @@ gofMB(copula, x, N, method = c("Sn", "Rn"),
     transformation method (see \code{trafo.method} above).}
   \item{useR}{logical indicating whether an \R or C implementation is
     used.}
+  \item{ties.method}{string specifying how ranks should be computed,
+      except for fitting, if there are ties in any of the coordinate
+      samples of \code{x}; passed to \code{\link{pobs}}.}
+  \item{fit.ties.meth}{string specifying how ranks should be computed
+    when fitting by maximum pseudo-likelihood if there are ties in any
+    of the coordinate samples of \code{x}; passed to \code{\link{pobs}}.}
   \item{ties}{only for the parametric bootstrap.  Logical indicating
     whether a version of the parametric boostrap adapted to the
     presence of ties in any of the coordinate samples of \code{x}
@@ -120,9 +128,8 @@ gofMB(copula, x, N, method = c("Sn", "Rn"),
   \CRANpkg{numDeriv} is used (and a warning message is displayed).
 
   Although the empirical processes involved in the multiplier and the
-  parametric
-  bootstrap-based test are asymptotically equivalent under the null,
-  the finite-sample behavior of the two tests might differ
+  parametric bootstrap-based test are asymptotically equivalent under
+  the null, the finite-sample behavior of the two tests might differ
   significantly.
 
   Both for the parametric bootstrap and the multiplier,
@@ -135,12 +142,12 @@ gofMB(copula, x, N, method = c("Sn", "Rn"),
   sometimes necessary for further treatments. See Pesarin (2001) for
   more details.
 
-  For the normal and \eqn{t} copulas, several dependence structures can be
-  hypothesized: \code{"ex"} for exchangeable, \code{"ar1"} for AR(1),
+  For the normal and \eqn{t} copulas, several dependence structures can
+  be hypothesized: \code{"ex"} for exchangeable, \code{"ar1"} for AR(1),
   \code{"toep"} for Toeplitz, and \code{"un"} for unstructured (see
-  \code{\link{ellipCopula}()}). For the \eqn{t} copula, \code{"df.fixed"} has to
-  be set to \code{TRUE}, which implies that the degrees of freedom are
-  not considered as a parameter to be estimated.
+  \code{\link{ellipCopula}()}). For the \eqn{t} copula,
+  \code{"df.fixed"} has to be set to \code{TRUE}, which implies that the
+  degrees of freedom are not considered as a parameter to be estimated.
 
   The former argument \code{print.every} is deprecated and not
   supported anymore; use \code{verbose} instead.
@@ -155,9 +162,9 @@ gofMB(copula, x, N, method = c("Sn", "Rn"),
 }
 %\author{Marius Hofert, Ivan Kojadinovic, Martin Maechler and Jun Yan}
 \references{
-  Genest, C., Huang, W., and Dufour, J.-M. (2013).
-  A regularized goodness-of-fit test for copulas.
-  \emph{Journal de la Soci\enc{é}{e}t\enc{é}{e} fran\enc{ç}{c}aise de statistique}
+  Genest, C., Huang, W., and Dufour, J.-M. (2013).  A regularized
+  goodness-of-fit test for copulas.  \emph{Journal de la
+  Soci\enc{é}{e}t\enc{é}{e} fran\enc{ç}{c}aise de statistique}
   \bold{154}, 64--77.
 
   Genest, C. and R\enc{é}{e}millard, B. (2008). Validity of the parametric
@@ -180,11 +187,12 @@ gofMB(copula, x, N, method = c("Sn", "Rn"),
   Kojadinovic, I. and Yan, J. (2010).
   Modeling Multivariate Distributions with Continuous Margins Using the
   copula R Package.
-  \emph{Journal of Statistical Software} \bold{34}(9), 1--20.
+  \emph{Journal of Statistical Software} \bold{34}(9), 1--20,
   \url{http://www.jstatsoft.org/v34/i09/}.
 
-  Kojadinovic, I. (2016). Some copula inference procedures adapted to
-  the presence of ties. \url{http://arxiv.org/abs/1609.05519}.
+  Kojadinovic, I. (2017). Some copula inference procedures adapted to
+  the presence of ties. \emph{Computational Statistics and Data
+  Analysis} \bold{112}, 24--41, \url{http://arxiv.org/abs/1609.05519}.
 
   Pesarin, F. (2001).
   \emph{Multivariate Permutation Tests: With Applications in Biostatistics}.

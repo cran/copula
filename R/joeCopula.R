@@ -28,8 +28,8 @@ joeCopula <- function(param = NA_real_, dim = 2L,
   }
   ## cdf expression
   cdfExpr <- function(d) {
-    term <- paste0("(1 - (1 - ", paste0("u", 1:d), ")^param)", collapse = " * ")
-    cdf <- parse(text=paste0("1 - (1 - ", term, ")^(1 / param)"))
+    term <- paste0("(1 - (1 - ", paste0("u", 1:d), ")^alpha)", collapse = " * ")
+    cdf <- parse(text=paste0("1 - (1 - ", term, ")^(1 / alpha)"))
   }
   cdf <- cdfExpr(dim)
   pdf <- if (dim <= 6) cdfExpr2pdfExpr(cdf, dim)
@@ -41,7 +41,7 @@ joeCopula <- function(param = NA_real_, dim = 2L,
       dimension = as.integer(dim),
       parameters = param[1],
       exprdist = exprdist,
-      param.names = "param",
+      param.names = "alpha",
       param.lowbnd = 1, # 0.238733989880086 for tau >= -1 -- is NOT valid
       param.upbnd = Inf,
       fullname = "<deprecated slot>")# "Joe copula family; Archimedean copula"
@@ -71,11 +71,10 @@ setMethod("psi", signature("joeCopula"),
 setMethod("iPsi", signature("joeCopula"),
 	  function(copula, u) copJoe@iPsi(u, theta=copula@parameters))
 setMethod("diPsi", signature("joeCopula"),
-	  function(copula, u, degree=1, log=FALSE, ...)
-      {
-	  s <- if(log || degree %% 2 == 0) 1. else -1.
-	  s* copJoe@absdiPsi(u, theta=copula@parameters, degree=degree, log=log, ...)
-      })
+	  function(copula, u, degree=1, log=FALSE, ...) {
+    s <- if(log || degree %% 2 == 0) 1. else -1.
+    s* copJoe@absdiPsi(u, theta=copula@parameters, degree=degree, log=log, ...)
+})
 
 setMethod("tau", signature("joeCopula"),
           function(copula) tauJoe(theta=copula@parameters))
@@ -83,9 +82,11 @@ setMethod("lambda", signature("joeCopula"),
 	  function(copula) c(lower=0,
 			     upper=copJoe@lambdaU(theta=copula@parameters)))
 
-setMethod("iTau", signature("joeCopula"),
-	  function(copula, tau, tol = 1e-7) copJoe@iTau(tau, tol=tol))
-                                        # now that tauJoe() is accurate
+setMethod("iTau", signature("joeCopula"), # now that tauJoe() is accurate
+	  function(copula, tau, tol = 1e-7) {
+    if (any(tau < 0)) warning("For the Joe copula, tau must be >= 0. Replacing negative values by 0.")
+    copJoe@iTau(tau, tol=tol)
+})
 
 ## "TODO"
 ## setMethod("rho", signature("joeCopula"), ... ? ...)

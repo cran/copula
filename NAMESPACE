@@ -124,6 +124,8 @@ export(dMvdc, pMvdc, rMvdc)
 export(tau, rho, lambda)
 export(iTau, iRho)
 
+export(corKendall)
+
 ## archmCopula methods
 export(psi, iPsi, diPsi)
 
@@ -173,8 +175,9 @@ export(loglikCopula, loglikMvdc)
 export(fitCopula, fitMvdc, optimMeth)
 exportClasses(fittedMV, fitCopula, fitMvdc)
 
-## some parameters can be fixed ( ./R/fixedPar.R ) :
+## some parameters can be fixed ( ./R/fixedPar.R , ./man/fixedPar.Rd ) :
 export(fixParam, "fixedParam<-")
+export(isFree, isFreeP, nParam)# (utilities)
 
 ## estimation of tail dependence
 export(fitLambda)
@@ -203,6 +206,9 @@ export(evTestC, evTestA, evTestK)
 export(exchEVTest, exchTest)
 export(radSymTest)
 
+## variance reduction
+export(rAntitheticVariates)
+export(rLatinHypercube)
 
 ## For some, have S3 print() and S4 show() .. MM is not convinced
 S3method(print, parCopula)

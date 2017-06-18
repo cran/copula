@@ -87,8 +87,8 @@ mixCopula <- function(coplist, w = NULL) {
             parse(text = paste0("list(", paste0(nm1, "= quote(",nm2,")", collapse= ", "), ")"))
         for (i in 1:m) {
             ## original 6 basic families have alpha in expressions
-            cdfL[[i]] <- do.call(substitute, list(cdfL[[i]], list(alpha = quote(param))))
-            pdfL[[i]] <- do.call(substitute, list(pdfL[[i]], list(alpha = quote(param))))
+            ## cdfL[[i]] <- do.call(substitute, list(cdfL[[i]], list(alpha = quote(param))))
+            ## pdfL[[i]] <- do.call(substitute, list(pdfL[[i]], list(alpha = quote(param))))
             ## rename the parameters with a prefix of 'm<i>.'
             oldParNames <- names(getTheta(coplist[[i]], freeOnly=FALSE, named=TRUE))
             npar <- length(oldParNames)
@@ -157,7 +157,7 @@ setMethod("paramNames", signature("mixCopula"), function(x) {
       paste0("w", ic)[isFreeP(x@w)]) # FIXME reparametrize: -> theta
 })
 
-## get parameters -- used in loglikCopula()
+## get parameters -- used in loglikCopula() [in ./fitCopula.R ]
 setMethod("getTheta", "mixCopula",
 function(copula, freeOnly = TRUE, attr = FALSE, named = attr) {
     parC <- lapply(copula@cops, getTheta,

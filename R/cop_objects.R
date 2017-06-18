@@ -295,8 +295,9 @@ copClayton <-
                               if(theta < 0) stop("theta < 0  not yet implemented for MC")
                               lu.mat <- matrix(rep(lu, n.MC), nrow=n.MC, byrow=TRUE)
                               V <- C.@V0(n.MC, theta)
-                              ## stably compute log(colMeans(exp(lx)))
-                              lx <- d*(log(theta) + log(V)) - log(n.MC) - (1+theta)*lu.mat - V %*% t(t) # matrix of exponents; dimension n.MC x n ["V x u"]
+                              ## stably compute log(colMeans(exp(lx))) :
+                              ## lx := matrix of exponents; dimension n.MC x n ["V x u"]
+                              lx <- d*(log(theta) + log(V)) - log(n.MC) - (1+theta)*lu.mat - V %*% t(t)
                               ## note: smle goes wrong if:
                               ##       (1) d*log(theta*V) [old code]
                               ##       (2) U is small (simultaneously)
@@ -1035,7 +1036,8 @@ copJoe <-
 		  tau = tauJoe,
 		  iTau = function(tau, tol = .Machine$double.eps^0.25, ...) {
 		      sapply(tau,function(tau) {
-			  r <- safeUroot(function(th) C.@tau(th) - tau,
+                          if (tau < 0) return(1) # smallest possible theta
+                          r <- safeUroot(function(th) C.@tau(th) - tau,
 					 interval = c(1, 98),
 					 Sig = +1, tol=tol, check.conv=TRUE, ...)
 			  r$root

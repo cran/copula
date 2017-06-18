@@ -172,13 +172,16 @@ tauTevCopula <- function(copula) {
 }
 
 iTauTevCopula <- function(copula, tau) {
-  if (any(tau < 0)) warning("tau is out of the range [0, 1]")
-  tevTauInv <- approxfun(x = .tevTau$assoMeasFun$fm$ysmth,
-                         y = .tevTau$assoMeasFun$fm$x, rule=2)
+    if (any(neg <- tau < 0)) {
+        warning("For the t-ev copula, tau must be >= 0. Replacing negative values by 0.")
+        tau[neg] <- 0
+    }
+    tevTauInv <- approxfun(x = .tevTau$assoMeasFun$fm$ysmth,
+                           y = .tevTau$assoMeasFun$fm$x, rule=2)
 
-  ss <- .tevTau$ss
-  theta <- tevTauInv(tau)
-  .tevTau$trFuns$backwardTransf(theta, ss)
+    ss <- .tevTau$ss
+    theta <- tevTauInv(tau)
+    .tevTau$trFuns$backwardTransf(theta, ss)
 }
 
 tevdTau <- function(alpha) {
@@ -213,13 +216,17 @@ rhoTevCopula <- function(copula) {
 }
 
 iRhoTevCopula <- function(copula, rho) {
-  if (any(rho < 0)) warning("rho is out of the range [0, 1]")
-  tevRhoInv <- approxfun(x = .tevRho$assoMeasFun$fm$ysmth,
-                         y = .tevRho$assoMeasFun$fm$x, rule = 2)
+    if (any(neg <- rho < 0)) {
+        warning("For the t-ev copula, rho must be >= 0. Replacing negative values by 0.")
+        rho[neg] <- 0
+     }
 
-  ss <- .tevRho$ss
-  theta <- tevRhoInv(rho)
-  .tevRho$trFuns$backwardTransf(theta, ss)
+    tevRhoInv <- approxfun(x = .tevRho$assoMeasFun$fm$ysmth,
+                           y = .tevRho$assoMeasFun$fm$x, rule = 2)
+
+    ss <- .tevRho$ss
+    theta <- tevRhoInv(rho)
+    .tevRho$trFuns$backwardTransf(theta, ss)
 }
 
 tevdRho <- function(alpha) {

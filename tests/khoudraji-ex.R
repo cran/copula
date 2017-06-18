@@ -29,7 +29,7 @@ kcf <- khoudrajiCopula(copula2 = claytonCopula(6),
 kcf
 stopifnot(
     all.equal(getTheta(kcf, freeOnly = FALSE, named = TRUE) -> th.,
-              c(c2.param = 6, shape1 = 0.4, shape2 = 0.95)),
+              c(c2.alpha = 6, shape1 = 0.4, shape2 = 0.95)),
     identical(getTheta(kcf, named = TRUE), th.[1:2]))
 
 ## kcf@exprdist$cdf
@@ -73,7 +73,7 @@ stopifnot(isExplicit(monster))
 
 (th.mA <- getTheta(monster, freeOnly = FALSE, named = TRUE))
 (th.m <- getTheta(monster, named = TRUE))
-stopifnot(identical(th.m, th.mA[copula:::isFree(monster)]))
+stopifnot(identical(th.m, th.mA[isFree(monster)]))
 
 set.seed(488)
 U <- rCopula(100000, monster)
@@ -138,7 +138,7 @@ all.equal(copula:::dlogcdtheta(kcgcd3, u), copula:::dlogcdthetaNumer(kcgcd3, u, 
 do1 <- function(n, cop) {
     U <- pobs(rCopula(n, cop))
     fit <- try(fitCopula(cop, U, method = "mpl"))
-    p <- copula:::nParam(cop, freeOnly=TRUE)
+    p <- nParam(cop, freeOnly=TRUE)
     if (inherits(fit, "try-error")) rep(NA_real_, 2 * p)
     else c(coef(fit), sqrt(diag(vcov(fit))))
 }

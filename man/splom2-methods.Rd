@@ -48,6 +48,10 @@
 \seealso{
   \code{\link{pairs2}()} for a similar function (for matrices and data
   frames) based on \code{\link[graphics]{pairs}()}.
+
+  The \pkg{lattice}-based \code{\link{cloud2-methods}} for 3D data, and
+  \code{\link{wireframe2-methods}} and
+  \code{\link{contourplot2-methods}} for functions.
 }
 \examples{
 ## For 'matrix' objects

@@ -6,15 +6,37 @@
 \alias{fixedParam<-,khoudrajiCopula,logical-method}
 \alias{fixedParam<-,mixCopula,logical-method}
 \alias{fixedParam<-,rotCopula,logical-method}
+%
+\alias{isFree}
+\alias{isFree,copula-method}
+\alias{isFree,khoudrajiCopula-method}
+\alias{isFree,mixCopula-method}
+\alias{isFree,rotCopula-method}
+\alias{isFreeP}
+\alias{nParam}
+\alias{nParam,copula-method}
+\alias{nParam,khoudrajiCopula-method}
+\alias{nParam,mixCopula-method}
+\alias{nParam,rotCopula-method}
 
 \description{
   It is sometimes useful to keep fixed some components of a copula
   parameter vector whereas the others are \dQuote{free} and will be
   estimated, e.g., by \code{\link{fitCopula}}.
+
+  The first two functions set or modify the \dQuote{fixedness}, whereas
+  \code{isFree()}, \code{isFreeP()} and \code{nParam()} are utilities
+  enquiring about the \dQuote{fixedness} of the parameters (of a copula).
 }
 \usage{
 fixParam(param, fixed = TRUE)
 fixedParam(copula) <- value
+
+isFreeP(param)
+\S4method{isFree}{copula}(copula)
+## and specific '*Copula' methods
+\S4method{nParam}{copula}(copula, freeOnly = FALSE)
+## and specific '*Copula' methods
 }
 \arguments{
   \item{param}{numeric parameter vector}
@@ -22,6 +44,8 @@ fixedParam(copula) <- value
     indicating for each component \code{param[j]} if it is (going to be)
     fixed or not.}
   \item{copula}{a \code{"\linkS4class{copula}"} object.}
+  \item{freeOnly}{logical (scalar) indicating if only free parameters
+    should be counted or all.}
 }
 \value{
   \code{fixParam(param)} returns a \code{\link{numeric}} vector with

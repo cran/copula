@@ -142,6 +142,14 @@ optimMeth(copula, method, dim)
   \code{\link[Matrix]{nearPD}(*, corr=TRUE)} (from \CRANpkg{Matrix}) is
   applied to get a proper correlation matrix.
 
+  For normal and \eqn{t} copulas, \code{fitCopula(, method = "mpl")} and
+  \code{fitCopula(, method = "ml")} maximize the log-likelihood based on
+  \pkg{mvtnorm}'s \code{dmvnorm()} and \code{dmvt()}, respectively.
+  The latter two functions set the respective densities to zero if the
+  correlation matrices of the corresponding distributions are not
+  positive definite. As such, the estimated correlation matrices
+  will be positive definite.
+
   If methods \code{"itau"} or \code{"irho"} are used in
   \code{fitCopula()}, an estimate of the asymptotic variance (if
   available for the copula under consideration) will be correctly

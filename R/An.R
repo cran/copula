@@ -22,14 +22,18 @@
 ##' @param w points were to estimate A
 ##' @param estimator CFG or Pickands
 ##' @param corrected if TRUE, endpoint corrections applied
+##' @param ties.method passed to pobs
 ##' @return values of estimated A at w
 ##' @author Ivan Kojadinovic
-An.biv <- function(x, w, estimator = c("CFG", "Pickands"), corrected = TRUE) {
+An.biv <- function(x, w, estimator = c("CFG", "Pickands"), corrected = TRUE,
+                   ties.method = eval(formals(rank)$ties.method)) {
+
+    ties.method <- match.arg(ties.method)
     n <- nrow(x)
     m <- length(w)
 
     ## make pseudo-observations
-    u <- pobs(x)
+    u <- pobs(x, ties.method = ties.method)
     mlu <- -log(u)
 
     switch(match.arg(estimator),
@@ -66,10 +70,12 @@ Anfun <- function(x, w, estimator = c("CFG", "Pickands"), corrected = TRUE) {
 ##' @title Rank-based versions of the multivariate Pickands and CFG estimators
 ##' @param x data
 ##' @param w points were to estimate A
+##' @param ties.method passed to pobs
 ##' @return values of estimated A at w
 ##' @author Ivan Kojadinovic
-An <- function(x, w) {
+An <- function(x, w, ties.method = eval(formals(rank)$ties.method)) {
 
+    ties.method <- match.arg(ties.method)
     d <- ncol(x)
 
     if (d < 2)
@@ -81,7 +87,7 @@ An <- function(x, w) {
     m <- nrow(w)
 
     .C(mult_A,
-       as.double(pobs(x)),
+       as.double(pobs(x, ties.method = ties.method)),
        as.integer(n),
        as.integer(d),
        as.double(w),

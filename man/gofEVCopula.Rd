@@ -16,7 +16,9 @@
 gofEVCopula(copula, x, N = 1000,
             method = c("mpl", "ml", "itau", "irho"),
             estimator = c("CFG", "Pickands"), m = 1000,
-            verbose = interactive(), \dots)
+            verbose = interactive(),
+            ties.method = c("max", "average", "first", "last", "random", "min"),
+            fit.ties.meth = eval(formals(rank)$ties.method), \dots)
 }
 \arguments{
   \item{copula}{ object of class \code{"\linkS4class{evCopula}"}
@@ -36,6 +38,12 @@ gofEVCopula(copula, x, N = 1000,
     compute the test statistic numerically.}
   \item{verbose}{a logical specifying if progress of the bootstrap
     should be displayed via \code{\link[utils]{txtProgressBar}}.}
+  \item{ties.method}{string specifying how ranks should be computed,
+      except for fitting, if there are ties in any of the coordinate
+      samples of \code{x}; passed to \code{\link{pobs}}.}
+  \item{fit.ties.meth}{string specifying how ranks should be computed
+    when fitting by maximum pseudo-likelihood if there are ties in any
+    of the coordinate samples of \code{x}; passed to \code{\link{pobs}}.}
   \item{\dots}{further optional arguments, passed to
     \code{\link{fitCopula}()}, notably \code{optim.method}, the
     \code{method} for \code{\link{optim}()}.  In \pkg{copula} versions

@@ -94,8 +94,18 @@ doExtras <- function() {
     else FALSE
 }
 
-corKendall <- function(x, ...) {
-    if(length(list(...))) cor(x, method="kendall", ...) else cor.fk(x)
+## ===> ../man/corKendall.Rd
+##' @title (Fast) Computation of pairwise Kendall's taus
+##' @param x data, a n x p matrix (or less efficiently a data.frame).
+##' @param checkNA logical indicating if 'x' should be checked for NAs ....
+##' @param use a string to determine the treatment of NA's,...
+##' @return The p x p matrix K of pairwise Kendall's taus, K[i,j] := tau(x[,i], x[,j])
+##' @author Martin Maechler
+corKendall <- function(x, checkNA = TRUE,
+                       use = if(checkNA && anyNA(x)) "pairwise" else "everything") {
+    if(use != "everything")
+        cor(x, method="kendall", use = use)
+    else cor.fk(x) # from package pcaPP
 }
 
 ##' format() a 'call' -- used for print(<fitCopula>) and print(<fitMvdc>):

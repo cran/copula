@@ -54,6 +54,7 @@ setClass("copula", contains = c("parCopula", "VIRTUAL"),
 ## general methods for copula
 setGeneric("dCopula", function(u, copula, log=FALSE, ...) {
     if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
+    stopifnot(dim(copula) == ncol(u))
     u.is.out <- outside.01(u, strictly=FALSE)## on.boundary _or_ outside
     if(any.out <- any(u.is.out, na.rm=TRUE))
 	u[] <- pmax(0, pmin(1, u)) # <- "needed", as some methods give error
@@ -232,7 +233,8 @@ setClass("indepCopula", contains = c("evCopula", "archmCopula"))
 ### Other copulas ##############################################################
 
 ## Farlie-Gumbel-Morgenstern multivariate copula
-setClass("fgmCopula", contains = "copula", slots = c(exprdist = "expression"),
+setClass("fgmCopula", contains = "copula", slots = c(exprdist = "expression",
+                                                     subsets.char = "character"),
          ## verify that the pdf is positive at each vertex of [0,1]^dim
          validity = function(object) {
              dim <- object@dimension

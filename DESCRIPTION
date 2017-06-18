@@ -1,7 +1,7 @@
 Package: copula
-Version: 0.999-16
-VersionNote: Last CRAN: 0.999-15 on 2016-07-25
-Date: 2017-01-07
+Version: 0.999-17
+VersionNote: Last CRAN: 0.999-16 on 2017-01-07
+Date: 2017-06-17
 Title: Multivariate Dependence with Copulas
 Author: Marius Hofert <marius.hofert@uwaterloo.ca>,
  Ivan Kojadinovic <ivan.kojadinovic@univ-pau.fr>,
@@ -19,17 +19,18 @@ Suggests: MASS, KernSmooth, sfsmisc, scatterplot3d, Rmpfr, bbmle,
 SuggestsNote: the last lines' packages {parallel, ..., zoo} are only
         used in vignettes, demos and few tests.
 Enhances: nor1mix
-Description: Classes (S4) of commonly used elliptical, Archimedean, extreme
- value and some more copula families.  Methods for density, distribution,
- random number generation, bivariate dependence measures, perspective and
- contour plots.  Fitting copula models including variance estimates.
- Independence and serial (univariate and multivariate) independence tests,
- and other copula related tests. Empirical copula and multivariate CDF.
- Goodness-of-fit tests for copulas based on multipliers, the parametric
- bootstrap with several transformation options.
- Merged former package 'nacopula' for nested Archimedean copulas: Efficient
- sampling algorithms, various estimators, goodness-of-fit tests and related
- tools and special functions.
+Description: Classes (S4) of commonly used elliptical, Archimedean,
+ extreme-value and other copula families, as well as their rotations,
+ mixtures and asymmetrizations. Nested Archimedean copulas, related
+ tools and special functions. Methods for density, distribution, random
+ number generation, bivariate dependence measures, Rosenblatt transform,
+ Kendall distribution function, perspective and contour plots. Fitting of
+ copula models with potentially partly fixed parameters, including
+ standard errors. Serial independence tests, copula specification tests
+ (independence, exchangeability, radial symmetry, extreme-value
+ dependence, goodness-of-fit) and model selection based on
+ cross-validation. Empirical copula, smoothed versions, and
+ non-parametric estimators of the Pickands dependence function.
 License: GPL (>= 3) | file LICENCE
 ByteCompile: yes
 VignetteBuilder: knitr
@@ -47,11 +48,11 @@ Collate: AllClass.R Classes.R AllGeneric.R Auxiliaries.R aux-acopula.R
         indepTests.R joeCopula.R K.R logseries.R mvdc.R matrix_tools.R
         normalCopula.R opower.R plackettCopula.R plackettExpr.R
         rstable1.R safeUroot.R schlatherCopula.R stable.R timing.R
-        tCopula.R tawnCopula.R tawnExpr.R tevCopula.R wrapper.R
-        xvCopula.R zzz.R
+        tCopula.R tawnCopula.R tawnExpr.R tevCopula.R
+        varianceReduction.R wrapper.R xvCopula.R zzz.R
 Encoding: UTF-8
 URL: http://copula.r-forge.r-project.org/
 NeedsCompilation: yes
-Packaged: 2017-01-09 09:46:11 UTC; maechler
+Packaged: 2017-06-17 15:50:45 UTC; maechler
 Repository: CRAN
-Date/Publication: 2017-01-09 15:16:55
+Date/Publication: 2017-06-18 13:21:09 UTC

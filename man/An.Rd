@@ -9,8 +9,9 @@
   Genest and Segers (2009) and Gudendorf and Segers (2011).
 }
 \usage{
-An.biv(x, w, estimator = c("CFG", "Pickands"), corrected = TRUE)
-An(x, w)
+An.biv(x, w, estimator = c("CFG", "Pickands"), corrected = TRUE,
+       ties.method = eval(formals(rank)$ties.method))
+An(x, w, ties.method = eval(formals(rank)$ties.method))
 }
 \arguments{
   \item{x}{ a data matrix that will be transformed to
@@ -29,6 +30,10 @@ An(x, w)
     \code{"Pickands"}.}
   \item{corrected}{ TRUE means that the bivariate estimators will be
     corrected to ensure that their value at 0 and 1 is 1.}
+  \item{ties.method}{\code{\link{character}} string specifying how ranks
+    should be computed if
+    there are ties in any of the coordinate samples of \code{x}; passed
+    to \code{\link{pobs}}.}
 }
 \value{
   \code{An.biv()} returns a vector containing the values of the
@@ -52,7 +57,9 @@ An(x, w)
   \emph{Annals of Statistics} \bold{37}, 2990--3022.
 
   G. Gudendorf and J. Segers (2011). Nonparametric estimation of
-  multivariate extreme-value copulas. \emph{arXiv:1107.2410v1}.
+  multivariate extreme-value copulas. \emph{Journal of Statistical
+  Planning and Inference} \bold{142}, 3073--3085.
+  
 }
 \seealso{\code{\link{evCopula}}, \code{\link{A}}, and \code{\link{evTestA}}.
   Further, \code{\link{evTestC}}, \code{\link{evTestK}},

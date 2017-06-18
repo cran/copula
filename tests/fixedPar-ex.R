@@ -21,6 +21,45 @@ showProc.time()
 (doExtras <- copula:::doExtras())
 
 
+tC2.F <- tCopula(df=2, df.fixed=TRUE)
+(cm <- setTheta(tC2.F, value=-0.5, freeOnly=TRUE)) ## setTheta() had failed
+(cp <- setTheta(tC2.F, value= 0.5, freeOnly=TRUE))
+(c2 <- setTheta(tC2.F, value=c(0.5,3), freeOnly=FALSE)) ## had failed
+stopifnot(all.equal(getTheta(cm), -0.5), all.equal(getTheta(cp), +0.5),
+          all.equal(getTheta(cm, freeOnly=FALSE, named=TRUE),
+                    c(rho.1 = -0.5, df = 2)),
+          all.equal(getTheta(cp, freeOnly=FALSE), c(0.5, 2)),
+          all.equal(getTheta(c2, freeOnly=FALSE, named=TRUE),
+                    c(rho.1 = 0.5, df = 3)))
+
+(N3 <- normalCopula(c(0.5,0.3,0.2), dim=3, dispstr = "un"))
+fixedParam(N3) <- c(TRUE, FALSE, FALSE); N3
+(N3.2 <- setTheta(N3,     c( 0.4, 0.2) -> t2)) # partially fixed: works since 2017-02-11
+(N3.3 <- setTheta(N3, c(0.6, 0.4, 0.2) -> t3, freeOnly=FALSE))
+stopifnot(all.equal(getTheta(N3.2), t2),
+	  all.equal(getTheta(N3.3), t3[-1]),
+	  all.equal(getTheta(N3.2, freeOnly=FALSE), c(0.5, t2)),
+	  all.equal(getTheta(N3.3, freeOnly=FALSE), t3))
+
+(tC3 <- tCopula(c(0.5,0.3,0.2), dim=3, dispstr = "un")) # df = 4 is not fixed
+fixedParam(tC3) <- c(TRUE, FALSE, FALSE, TRUE); tC3 #-> df fixed, too
+(tC3.2 <- setTheta(tC3,     c( 0.4, 0.1)    -> t2)) # partially fixed: works since 2017-02-11
+(tC3.3 <- setTheta(tC3, c(0.6, 0.4, 0.1, 3) -> t3, freeOnly=FALSE))
+stopifnot(all.equal(getTheta(tC3.2), t2),
+	  all.equal(getTheta(tC3.3), t3[-c(1,4)]),
+	  all.equal(getTheta(tC3.2, freeOnly=FALSE), c(0.5, t2, 4)),
+	  all.equal(getTheta(tC3.3, freeOnly=FALSE), t3))
+
+fixedParam(tC3) <- c(TRUE, FALSE, FALSE, FALSE); tC3 # df remains free
+(tC3u.2 <- setTheta(tC3,     c( 0.4, 0.2, 5) -> t2)) # partially fixed: works since 2017-02-11
+(tC3u.3 <- setTheta(tC3, c(0.6, 0.4, 0.2, 3) -> t3, freeOnly=FALSE))
+stopifnot(all.equal(getTheta(tC3u.2), t2),
+	  all.equal(getTheta(tC3u.3), t3[-1]),
+	  all.equal(getTheta(tC3u.2, freeOnly=FALSE), c(0.5, t2)),
+	  all.equal(getTheta(tC3u.3, freeOnly=FALSE), t3))
+
+
+
 ### TEST FITTING ##########################################################
 
     n <- 100

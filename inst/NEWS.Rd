@@ -4,7 +4,54 @@
 \title{News for \R Package \pkg{copula}}% MM: look into ../svn-log-from.all
 \newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
-\section{Changes in version 0.999-16 (2016-11-21, svn r1552)}{
+\section{Changes in version 0.999-17 (2017-06-17, svn r1661)}{
+  \subsection{New Features}{
+    \itemize{
+      \item \code{C.n()} and several tests now get an optional
+      argument (\code{ties.method} or similar) to specify what happens
+      with ties.
+
+      \item \code{setTheta(cop, val)} now also works for a partially
+      fixed parameter elliptical copula.
+
+      \item Export the (formerly hidden) utilities \code{isFree()},
+      \code{isFreeP()}, and \code{nParam()}.
+
+      \item New \code{rLatinHypercube()} and \code{rAntitheticVariates()} utilities.
+
+      \item \code{dCopula(u, copula, *)} now signals an error if
+      \code{ncol(u)} and \code{dim(copula)} differ.
+
+      \item \code{corKendall()} now checks for \code{NA}'s by default
+      and then works pairwisely.  It is now documented and exported.
+      As a consequence, \code{etau(U, *)} now also works in the case
+      \code{U} has missing values.
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item In the case of \emph{ties}, several GOF tests now use a
+      better default method for dealing with ties in their calls to
+      \code{pobs()}.
+
+      \item \code{pobs(<zoo>, .)} continues working.
+
+      \item \code{setTheta(<tCopula>, ..)} now works correctly with
+      free/non-free parts of the parameters.
+
+      \item \code{fgmCopula()} fixed to work with \code{rotCopula()}.
+
+      \item \code{iTau()} fixed for \code{joeCopula()}.
+
+      \item Improved warning messages in \code{iTau()} and \code{iRho()}.
+
+      \item \code{rCopula(<frankCopula>)} now also works for the case of
+      large tau and \eqn{d > 2} (via re-parametrized log series distribution).
+    }
+  }
+}
+
+\section{Changes in version 0.999-16 (2017-01-07, svn r1611)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{pK(u, log.p=TRUE)} now correctly checks \code{u}.
@@ -55,7 +102,7 @@
 
       \item \code{mixCopula()} and \code{"mixCopula"} class for
       arbitrary finite mixtures of copulas.
-      %% FIXME:  fixCopula() is *NOT* ok [sum(w) == 1] -- need reparametrization
+      %% FIXME: fitCopula() is *NOT* ok [sum(w) == 1] -- need reparametrization
 
       \item \code{splom2()} now works when a single \dQuote{global}
       color is specified.
@@ -315,4 +362,3 @@
     for "nacopula".
   }
 }
-

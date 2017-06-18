@@ -55,7 +55,7 @@ claytonCopula <- function(param = NA_real_, dim = 2L,
       dimension = dim,
       parameters = param,
       exprdist = c(cdf = cdf, pdf = pdf),
-      param.names = "param",
+      param.names = "alpha",
       param.lowbnd = if(dim == 2) -1 else 0,
       param.upbnd = Inf,
       fullname = "<deprecated slot>") # "Clayton (Archimedean) copula"
@@ -104,45 +104,46 @@ pclaytonCopula <- function(copula, u) {
 
 
 ## Nowhere used (!)
-dclaytonCopula <- function(copula, u, ...) {
-  dim <- copula@dimension
-  ## if(!is.matrix(u)) u <- matrix(u, ncol = dim)
-  alpha <- copula@parameters[1]
-  if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
-  for (i in 1:dim) assign(paste0("u", i), u[,i])
-  val <- c(eval(copula@exprdist$pdf))
-  ## val[apply(u, 1, function(v) any(v < 0))] <- 0
-  ## val[apply(u, 1, function(v) any(v > 1))] <- 0
-##   if (alpha < 0) {
-##     cdf <- pCopula(u, copula)
-##     bad <- cdf == 0
-##     val[bad] <- 0
-##   }
-  if(log) log(val) else val
-}
+## dclaytonCopula <- function(copula, u, ...) {
+##   dim <- copula@dimension
+##   ## if(!is.matrix(u)) u <- matrix(u, ncol = dim)
+##   alpha <- copula@parameters[1]
+##   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
+##   for (i in 1:dim) assign(paste0("u", i), u[,i])
+##   val <- c(eval(copula@exprdist$pdf))
+##   ## val[apply(u, 1, function(v) any(v < 0))] <- 0
+##   ## val[apply(u, 1, function(v) any(v > 1))] <- 0
+## ##   if (alpha < 0) {
+## ##     cdf <- pCopula(u, copula)
+## ##     bad <- cdf == 0
+## ##     val[bad] <- 0
+## ##   }
+##   if(log) log(val) else val
+## }
 
+## Nowhere really used (!) (used below but commented out -- legacy)
 ## now only used for dim = d = 2  (for negative tau <=> negative alpha | theta)
 ## --- but it is *wrong* there "almost surely" exactly for the negative alpha | theta
-dclaytonCopula.pdf <- function(u, copula, log=FALSE) {
-  dim <- copula@dimension
-  if (dim > 10) stop("Clayton copula PDF not implemented for dimension > 10.")
-  ## if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-  stopifnot(!is.null(d <- ncol(u)), dim == d)
-  for (i in 1:dim) assign(paste0("u", i), u[,i])
-  alpha <- copula@parameters[1]
-  if (abs(alpha) <= .Machine$double.eps^.9)
-    return(rep.int(if(log) 0 else 1, nrow(u)))
-  val <- pmax(c(eval(claytonCopula.pdf.algr[dim])),0)
-  ## clean up -- now happens in dCopula()
-  ## val[apply(u, 1, function(v) any(v < 0))] <- 0
-  ## val[apply(u, 1, function(v) any(v > 1))] <- 0
+## dclaytonCopula.pdf <- function(u, copula, log=FALSE) {
+##   dim <- copula@dimension
+##   if (dim > 10) stop("Clayton copula PDF not implemented for dimension > 10.")
+##   ## if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
+##   stopifnot(!is.null(d <- ncol(u)), dim == d)
+##   for (i in 1:dim) assign(paste0("u", i), u[,i])
+##   alpha <- copula@parameters[1]
+##   if (abs(alpha) <= .Machine$double.eps^.9)
+##     return(rep.int(if(log) 0 else 1, nrow(u)))
+##   val <- pmax(c(eval(claytonCopula.pdf.algr[dim])),0)
+##   ## clean up -- now happens in dCopula()
+##   ## val[apply(u, 1, function(v) any(v < 0))] <- 0
+##   ## val[apply(u, 1, function(v) any(v > 1))] <- 0
 
-  ## val[apply(u, 1, function(v) any(v == 0) & any(v > 0))] <- 0
+##   ## val[apply(u, 1, function(v) any(v == 0) & any(v > 0))] <- 0
 
-  ## if (alpha > 0)
-  ## else
-  if(log) log(val) else val
-}
+##   ## if (alpha > 0)
+##   ## else
+##   if(log) log(val) else val
+## }
 
 claytonRhoFun <- function(alpha) {
   ss <- .claytonRhoNeg$ss
@@ -207,22 +208,23 @@ pMatClayton <- function (u, copula, ...) {
 dMatClayton <- function (u, copula, log = FALSE, checkPar=TRUE, ...) {
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
     th <- copula@parameters
-    if(d == 2 && th < 0) { # for now, to support negative tau-- TODO/FIXME: put into copClayton
-        ## wrong(!): dclaytonCopula.pdf(u, copula, log=log)
-        u_th <- u^-th
-        pt <- rowSums(u_th) - 1 # p-term pt = u1^-th + u2^-th - 1
-        r <- if(log) rep_len(-Inf, length(pt)) else numeric(length(pt))# = value for pt <= 0
-        pos <- pt > 0
-        u <- u[pos, , drop=FALSE]
-        pt <- pt[pos]
-        r[pos] <-
-	    if(log)
-		log1p(th) -(th+1)*rowSums(log(u)) - (1/th + 2) * log(pt)
-            else
-                (1+th) * (u[,1]*u[,2])^-(th+1)  * pt^(-1/th - 2)
-        r
-    } else
-        copClayton@dacopula(u, theta=copula@parameters, log=log, checkPar=checkPar, ...)
+    ##_ now _all_ this should happen in copClayton@dacopula():
+    ##_ if(d == 2 && th < 0) { # for now, to support negative tau-- TODO/FIXME: put into copClayton
+    ##_     ## wrong(!): dclaytonCopula.pdf(u, copula, log=log)
+    ##_     u_th <- u^-th
+    ##_     pt <- rowSums(u_th) - 1 # p-term pt = u1^-th + u2^-th - 1
+    ##_     r <- if(log) rep_len(-Inf, length(pt)) else numeric(length(pt))# = value for pt <= 0
+    ##_     pos <- pt > 0
+    ##_     u <- u[pos, , drop=FALSE]
+    ##_     pt <- pt[pos]
+    ##_     r[pos] <-
+    ##_         if(log)
+    ##_     	log1p(th) -(th+1)*rowSums(log(u)) - (1/th + 2) * log(pt)
+    ##_         else
+    ##_             (1+th) * (u[,1]*u[,2])^-(th+1)  * pt^(-1/th - 2)
+    ##_     r
+    ##_ } else
+    copClayton@dacopula(u, theta=th, log=log, checkPar=checkPar, ...)
 }
 
 setMethod("rCopula", signature("numeric", "claytonCopula"), rclaytonCopula)

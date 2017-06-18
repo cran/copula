@@ -13,7 +13,9 @@
     \item{\code{exprdist}:}{Object of class \code{"expression"},
       expressions for the cdf and pdf of the copula. These expressions
       are used in function \code{pCopula()} and \code{dCopula()}.}
-     \item{\code{dimension}:}{Object of class \code{"numeric"}, the
+    \item{\code{subsets.char}:}{Object of class \code{"character"},
+      containing the subsets of integers used for naming the parameters. }
+    \item{\code{dimension}:}{Object of class \code{"numeric"}, the
       dimension of the copula. }
     \item{\code{parameters}:}{Object of class \code{"numeric"},
       parameter values. }

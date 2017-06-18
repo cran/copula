@@ -41,9 +41,9 @@ radSymTest(x, N = 1000, ties = NA)
   radial symmetry for bivariate copulas. \emph{Statistical Papers}
   \bold{55}, 1107--1119.
 
-  Kojadinovic, I. (2016). Some copula inference procedures adapted to
-  the presence of ties. \url{http://arxiv.org/abs/1609.05519}.
-
+  Kojadinovic, I. (2017). Some copula inference procedures adapted to
+  the presence of ties. \emph{Computational Statistics and Data
+  Analysis} \bold{112}, 24--41, \url{http://arxiv.org/abs/1609.05519}.
 }
 \seealso{ \code{\link{exchTest}}, \code{\link{exchEVTest}}, \code{\link{gofCopula}}. }
 \examples{

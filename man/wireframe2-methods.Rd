@@ -78,6 +78,8 @@
 %\author{Marius Hofert; tweaks by Martin Maechler}
 \seealso{
   The \code{\link{persp-methods}} for drawing perspective plots via base graphics.
+
+  The \pkg{lattice}-based \code{\link{contourplot2-methods}}.
 }
 \examples{
 ## For 'matrix' objects

@@ -6,13 +6,14 @@
 %% \alias{.Fn}
 \alias{dCn}
 \description{
-  Given pseudo-observations from a distribution with continuous margins and
-  copula C, the \emph{empirical copula} is the empirical distribution function
-  of these pseudo-observations.  It is thus a natural nonparametric estimator of
-  C. The function \code{C.n()} computes the empirical copula or two
-  alternative smoothed versions of the latter: the \emph{empirical beta copula} or the
-  \emph{empirical checkerboard copula}; see Eqs. (2.1) and (4.1) in
-  Segers, Sibuya and Tsukahara (2016), and the references therein.
+  Given pseudo-observations from a distribution with continuous margins
+  and copula C, the \emph{empirical copula} is the empirical
+  distribution function of these pseudo-observations.  It is thus a
+  natural nonparametric estimator of C. The function \code{C.n()}
+  computes the empirical copula or two alternative smoothed versions of
+  the latter: the \emph{empirical beta copula} or the \emph{empirical
+  checkerboard copula}; see Eqs. (2.1) and (4.1) in Segers, Sibuya and
+  Tsukahara (2017), and the references therein.
 
   The function \code{dCn()} approximates first-order partial derivatives
   of the unknown copula using the empirical copula.
@@ -22,8 +23,9 @@
   *)} simply calls \code{F.n(u, pobs(X), *)} after checking \code{u}.
 }
 \usage{
-C.n(u, X, smoothing=c("none", "beta", "checkerboard"),
-    offset=0, method=c("C", "R"))
+C.n(u, X, smoothing = c("none", "beta", "checkerboard"),
+    offset = 0, method = c("C", "R"),
+    ties.method = c("max", "average", "first", "last", "random", "min"))
 dCn(u, U, j.ind=1:d, b=1/sqrt(nrow(U)), ...)
 
 F.n(x, X, offset=0, method=c("C", "R"))
@@ -48,6 +50,9 @@ Cn(x, w) ## <-- deprecated!  use  C.n(w, x) instead!
     the empirical copula (\code{smoothing="none"}), the empirical beta
     copula (\code{smoothing="beta"}) or the empirical checkerboard
     copula (\code{smoothing="checkerboard"}) is computed.}
+  \item{ties.method}{\code{\link{character}} string specifying how ranks should be computed if
+    there are ties in any of the coordinate samples of \code{x}; passed
+    to \code{\link{pobs}}.}
   \item{j.ind}{\code{\link{integer}} vector of indices \eqn{j} between 1
     and \eqn{d} indicating the dimensions with respect to which
     first-order partial derivatives are approximated.}
@@ -132,8 +137,9 @@ Cn(x, w) ## <-- deprecated!  use  C.n(w, x) instead!
   between two copulas. \emph{Journal of Multivariate Analysis}, 100(3),
   pages 377-386.
 
-  Segers, J., Sibuya, M. and Tsukahara, H. (2016). The Empirical Beta
-  Copula. \emph{Journal of Multivariate Analysis}, in press, arXiv:1607.04430.
+  Segers, J., Sibuya, M. and Tsukahara, H. (2017). The Empirical Beta
+  Copula. \emph{Journal of Multivariate Analysis}, 155, pages 35--51,
+  \url{http://arxiv.org/abs/1607.04430}.
 
   %% Genest, C., G. \enc{Nešlehová}{Neslehova}, J., and Quessy, J.-F. (2012).
   %% Tests of symmetry for bivariate copulas,

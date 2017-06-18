@@ -15,7 +15,8 @@
   considerably faster (if \eqn{k} is \dQuote{small} compared to \eqn{n}).
 }
 \usage{
-xvCopula(copula, x, k = NULL, verbose = interactive(), \dots)
+xvCopula(copula, x, k = NULL, verbose = interactive(),
+         ties.method = eval(formals(rank)$ties.method), \dots)
 }
 \arguments{
   \item{copula}{object of class \code{"\linkS4class{copula}"}
@@ -26,6 +27,10 @@ xvCopula(copula, x, k = NULL, verbose = interactive(), \dots)
     cross-validation).}
   \item{verbose}{a logical indicating if progress of the cross validation
     should be displayed via \code{\link[utils]{txtProgressBar}}.}
+  \item{ties.method}{string specifying how ranks should be computed if
+     there are ties in any of the coordinate samples of \code{x} and
+     fitting is based on maximum pseudo-likelihood; passed
+     to \code{\link{pobs}}.}
   \item{\dots}{additional arguments passed to \code{\link{fitCopula}()}.}
 }
 %\details{}

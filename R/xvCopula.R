@@ -25,11 +25,14 @@
 ##' @param k number of blocks for cross-validation
 ##'        if NULL, leave-one out cross-validation is performed
 ##' @param verbose logical indicating whether a progress bar is shown
+##' @param ties.method passed to pobs
 ##' @return "cross validated log-likelihood"
 ##' @author Ivan Kojadinovic, Martin Maechler
-xvCopula <- function(copula, x, k=NULL, verbose = interactive(), ...)
+xvCopula <- function(copula, x, k=NULL, verbose = interactive(),
+                     ties.method = eval(formals(rank)$ties.method), ...)
 {
     ## checks -- not too many! -- fitCopula() does check [and is generic!]
+    ties.method <- match.arg(ties.method)
     if(!is.matrix(x))
     {
         warning("coercing 'x' to a matrix.")
@@ -61,7 +64,7 @@ xvCopula <- function(copula, x, k=NULL, verbose = interactive(), ...)
     for (i in seq_len(k)) {
         sel <- (b[i] + 1):b[i+1] # m[i] lines of current block
         ## estimate copula from all lines except those in sel
-        u <- pobs(x.not.s <- x[-sel, , drop=FALSE])
+        u <- pobs((x.not.s <- x[-sel, , drop=FALSE]), ties.method = ties.method)
         copula <- fitCopula(copula, u, #method = "mpl",
                             estimate.variance=FALSE, ...)@copula
         imi <- seq_len(m[i])

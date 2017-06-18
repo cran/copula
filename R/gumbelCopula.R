@@ -93,7 +93,7 @@ gumbelCopula <- function(param = NA_real_, dim = 2L,
       dimension = dim,
       parameters = param,
       exprdist = c(cdf = cdf, pdf = pdf),
-      param.names = "param",
+      param.names = "alpha",
       param.lowbnd = 1,
       param.upbnd = Inf,
       fullname = "<deprecated slot>")# "Gumbel copula family; Archimedean copula; Extreme value copula"
@@ -150,12 +150,11 @@ dgumbelCopula.pdf <- function(u, copula, log=FALSE) {
 
 
 iTauGumbelCopula <- function(copula, tau) {
-  r <- 1/(1 - tau)
-  if (any(neg <- tau < 0)) {
-    warning("some tau < 0")
-    r[neg] <- 1
-  }
-  r
+    if (any(neg <- tau < 0)) {
+        warning("For the Gumbel copula, tau must be >= 0. Replacing negative values by 0.")
+        tau[neg] <- 0
+    }
+    1/(1 - tau)
 }
 
 
@@ -176,7 +175,10 @@ gumbeldRho <- function(alpha) {
 
 
 iRhoGumbelCopula <- function(copula, rho) {
-  if (any(rho < 0)) warning("rho is out of the range [0, 1]")
+    if (any(neg <- rho < 0)) {
+        warning("For the Gumbel copula, rho must be >= 0. Replacing negative values by 0.")
+        rho[neg] <- 0
+    }
   gumbelRhoInv <- approxfun(x = .gumbelRho$assoMeasFun$fm$ysmth,
                             y = .gumbelRho$assoMeasFun$fm$x, rule = 2)
   ss <- .gumbelRho$ss
@@ -205,11 +207,10 @@ setMethod("psi", signature("gumbelCopula"),
 	  function(copula, s) copGumbel@psi(s, theta=copula@parameters))
 
 setMethod("diPsi", signature("gumbelCopula"),
-	  function(copula, u, degree=1, log=FALSE, ...)
-      {
-	  s <- if(log || degree %% 2 == 0) 1. else -1.
-	  s* copGumbel@absdiPsi(u, theta=copula@parameters, degree=degree, log=log, ...)
-      })
+	  function(copula, u, degree=1, log=FALSE, ...) {
+    s <- if(log || degree %% 2 == 0) 1. else -1.
+    s* copGumbel@absdiPsi(u, theta=copula@parameters, degree=degree, log=log, ...)
+})
 
 
 setMethod("tau", "gumbelCopula", function(copula) 1 - 1/copula@parameters)
@@ -217,7 +218,7 @@ setMethod("tau", "gumbelCopula", function(copula) 1 - 1/copula@parameters)
 setMethod("rho", "gumbelCopula", function(copula) gumbelRhoFun(copula@parameters))
 
 setMethod("lambda", signature("gumbelCopula"), function(copula, ...)
-  c(lower = 0, upper = 2 - 2^(1/copula@parameters)))
+    c(lower = 0, upper = 2 - 2^(1/copula@parameters)))
 
 
 setMethod("iTau", signature("gumbelCopula"), iTauGumbelCopula)

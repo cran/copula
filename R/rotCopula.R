@@ -77,7 +77,7 @@ rotExplicitCopula <- function(copula, flip = TRUE) {
 
     ## preparation for cdf
     cdf <- copula@exprdist$cdf
-    cdf <- do.call(substitute, list(cdf, list(alpha = quote(param))))
+    ## cdf <- do.call(substitute, list(cdf, list(alpha = quote(param))))
     unames <- paste0("u", 1L:d)
     lo <- ifelse(flip, unames, 0L)
     up <- ifelse(flip, 1L, unames)
@@ -125,7 +125,7 @@ rotExplicitCopula <- function(copula, flip = TRUE) {
     ## } else {
     ## }
     pdf <- copula@exprdist$pdf
-    pdf <- do.call(substitute, list(pdf, list(alpha = quote(param))))
+    ## pdf <- do.call(substitute, list(pdf, list(alpha = quote(param))))
     pdf <- as.expression(do.call(substitute, list(pdf, eval(flip.l))))
     pdf.algr <- deriv(pdf, "nothing")
 

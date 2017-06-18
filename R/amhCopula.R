@@ -55,7 +55,7 @@ amhCopula <- function(param = NA_real_, dim = 2L,
       dimension = dim,
       parameters = param,
       exprdist = c(cdf = cdf, pdf = pdf),
-      param.names = "param",
+      param.names = "alpha",
       param.lowbnd = -1,# 0 for tau >= 0
       param.upbnd = 1,
       fullname = "<deprecated slot>")# "Amh copula family; Archimedean copula"
@@ -112,21 +112,21 @@ ramhCopula <- function(n, copula) {
 }
 
 iTauAmhCopula <- function(copula, tau, ...) {
-  ## "..." may contain uniroot args: (tol, trace, maxiter, ...)
-  tauMin <- (5 - 8*log(2)) / 3
-  iSml <- tau < tauMin
-  iLrg <- tau > 1/3
-  if(any(out <- iSml | iLrg))
-      warning("tau is out of the range [(5 - 8 log 2) / 3, 1/3] ~= [-0.1817, 0.3333]")
-  else if(tau == tauMin) out <- iSml <- TRUE
-  else if(tau ==  1/3  ) out <- iLrg <- TRUE
-  ## A _faster_ version of  r <- ifelse(tau < tauMin, -1, ifelse(tau > 1/3, 1, ....)):
-  r <- tau
-  r[iSml] <- -1.
-  r[iLrg] <- +1.
-  if(any(in. <- !out))
-      r[in.] <- iTauCopula(copula, tau[in.], ...)
-  r
+    ## "..." may contain uniroot args: (tol, trace, maxiter, ...)
+    tauMin <- (5 - 8*log(2)) / 3
+    iSml <- tau < tauMin
+    iLrg <- tau > 1/3
+    if(any(out <- iSml | iLrg))
+        warning("For the AMH copula, tau must be in [(5 - 8 log 2) / 3, 1/3] ~= [-0.1817, 0.3333]. Replacing too small (large) values by lower (upper) bound.")
+    else if(tau == tauMin) out <- iSml <- TRUE
+    else if(tau ==  1/3  ) out <- iLrg <- TRUE
+    ## A _faster_ version of  r <- ifelse(tau < tauMin, -1, ifelse(tau > 1/3, 1, ....)):
+    r <- tau
+    r[iSml] <- -1.
+    r[iLrg] <- +1.
+    if(any(in. <- !out))
+        r[in.] <- iTauCopula(copula, tau[in.], ...)
+    r
 }
 
 rhoAmhCopula <- function(copula, ...) {

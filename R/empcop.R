@@ -28,9 +28,11 @@ Cn <- function(x,w) {
 ##' @param x (m, d) matrix of evaluation points
 ##' @param X (n, d) matrix of pseudo-data based on which the empirical copula
 ##'        is computed.
+##' @param smoothing usual, beta or checkerboard empirical copula
 ##' @param offset scaling factor of result which is  sum(....)/(n+offset)
 ##' @param method method string ("C" for C code; "R" for R code)
 ##' @return empirical CDF / copula of X at x
+##' @param ties.method passed to pobs
 ##' @author Ivan Kojadinovic, Marius Hofert and Martin (C.n -> F.n; re-organisation)
 ##' Note: See ../man/empcop.Rd for a nice graphical check with the Kendall function
 
@@ -94,10 +96,12 @@ F.n <- function(x, X, offset=0, method=c("C", "R"))
     .Fn(x=x, X=X, offset=offset, method=method, smoothing="none")
 
 C.n <- function(u, X, smoothing=c("none", "beta", "checkerboard"),
-                offset=0, method = c("C", "R")) {
+                offset=0, method = c("C", "R"),
+                ties.method = c("max", "average", "first", "last", "random", "min")) {
     if(any(u < 0, 1 < u))
         stop("'u' must be in [0,1].")
-    .Fn(u, pobs(X), offset=offset, method=method, smoothing=smoothing)
+    ties.method <- match.arg(ties.method)
+    .Fn(u, pobs(X, ties.method = ties.method), offset=offset, method=method, smoothing=smoothing)
 }
 
 ##' @title Estimated Partial Derivatives of a Copula Given the Empirical Copula

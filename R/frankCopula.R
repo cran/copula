@@ -118,7 +118,7 @@ frankCopula <- function(param = NA_real_, dim = 2L,
       dimension = dim,
       parameters = param,
       exprdist = c(cdf = cdf, pdf = pdf),
-      param.names = "param",
+      param.names = "alpha",
       param.lowbnd = if(dim == 2) -Inf else 0,
       param.upbnd = Inf,
       fullname = "<deprecated slot>")# "Frank copula family; Archimedean copula"
@@ -142,8 +142,13 @@ rfrankCopula <- function(n, copula) {
 ##   if (abs(alpha) <= .Machine$double.eps^.9)
 ##     return (matrix(runif(n * dim), nrow = n))
   if (dim == 2) return (rfrankBivCopula(n, alpha))
-  ## the frailty is a log series distribution with a = 1 - exp(-alpha)
-  fr <- rlogseries(n, -expm1(-alpha))
+  ## the frailty is a  log(a)  series distribution with a = 1 - exp(-alpha) = - expm1(-alpha)
+  ##  log(1 - a) =: h =  -alpha
+  ##
+  if(log1mexp(alpha) == 0) ## alpha is too large: cannot use the rlogseries.ln1p()
+      return(matrix(1, n, dim))
+  ## else, this should work :
+  fr <- rlogseries.ln1p(n, -alpha) # >> ./logseries.R
   fr <- matrix(fr, nrow = n, ncol = dim)
   U <- matrix(runif(dim * n), nrow = n)
   psi(copula, - log(U) / fr)
@@ -161,19 +166,19 @@ pfrankCopula <- function(copula, u) {
   eval(cdf)
 }
 
-dfrankCopula <- function(u, copula, log=FALSE, ...) {
-  if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
-  pdf <- copula@exprdist$pdf
-  dim <- copula@dimension
-  for (i in 1:dim) assign(paste0("u", i), u[,i])
-  alpha <- copula@parameters[1]
-  if(log) stop("'log=TRUE' not yet implemented")
-  if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
-  val <- eval(pdf)
-#  val[apply(u, 1, function(v) any(v <= 0))] <- 0
-#  val[apply(u, 1, function(v) any(v >= 1))] <- 0
-  val
-}
+## dfrankCopula <- function(u, copula, log=FALSE, ...) {
+##   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
+##   pdf <- copula@exprdist$pdf
+##   dim <- copula@dimension
+##   for (i in 1:dim) assign(paste0("u", i), u[,i])
+##   alpha <- copula@parameters[1]
+##   if(log) stop("'log=TRUE' not yet implemented")
+##   if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
+##   val <- eval(pdf)
+## #  val[apply(u, 1, function(v) any(v <= 0))] <- 0
+## #  val[apply(u, 1, function(v) any(v >= 1))] <- 0
+##   val
+## }
 
 ## dfrankCopula.expr <- function(copula, u) {
 ##   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
@@ -183,7 +188,7 @@ dfrankCopula <- function(u, copula, log=FALSE, ...) {
 ##   pdf
 ## }
 
-## Only used for  dim == 2  and  theta = alpha < 0:
+## Only used for  dim == 2  and  theta = alpha < 0 (see dMatFrank() below):
 dfrankCopula.pdf <- function(u, copula, log=FALSE) {
   dim <- copula@dimension
   if (dim > 6) stop("Frank copula PDF not implemented for dimension > 6.")
@@ -195,7 +200,6 @@ dfrankCopula.pdf <- function(u, copula, log=FALSE) {
     log(c(eval(frankCopula.pdf.algr[dim])))
   else  c(eval(frankCopula.pdf.algr[dim]))
 }
-
 
 tauFrankCopula <- function(copula) .tauFrankCopula(copula@parameters)
 .tauFrankCopula <- function(a) { # 'a', also called 'alpha' or 'theta'

@@ -25,7 +25,7 @@ plackettCopula <- function(param = NA_real_) {
              dimension = dim,
              parameters = param[1],
              exprdist = c(cdf = cdfExpr, pdf = pdfExpr),
-             param.names = "param",
+             param.names = "alpha",
              param.lowbnd = 0,
              param.upbnd = Inf,
              fullname = "<deprecated slot>")# "Plackett copula family"

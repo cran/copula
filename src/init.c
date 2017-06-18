@@ -80,7 +80,8 @@ static R_NativePrimitiveArgType cramer_vonMises_Afun_t[7] = {
 
 // ./logseries.c ///////////////////////////////////////////////////////////////
 
-static R_NativePrimitiveArgType rlogseries_R_t[3] = { INTSXP, REALSXP, INTSXP };
+static R_NativePrimitiveArgType rlogseries_R_t     [3] = { INTSXP, REALSXP, INTSXP };
+static R_NativePrimitiveArgType rlogseries_R_ln1p_t[3] = { INTSXP, REALSXP, REALSXP };
 
 
 // ./evtest.c //////////////////////////////////////////////////////////////////
@@ -190,6 +191,7 @@ static const R_CMethodDef CEntries[]  = {
     CDEF(cramer_vonMises_Afun),
 
     CDEF(rlogseries_R),
+    CDEF(rlogseries_R_ln1p),
 
     CDEF(evtest),
     CDEF(evtestA),

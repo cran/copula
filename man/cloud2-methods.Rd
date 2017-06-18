@@ -57,6 +57,11 @@
   An object of class \dQuote{trellis} as returned by \code{\link[lattice]{cloud}()}.
 }
 %\author{Marius Hofert; tweaks by MM}
+\seealso{
+  The \pkg{lattice}-based \code{\link{splom2-methods}} for data, and
+  \code{\link{wireframe2-methods}} and
+  \code{\link{contourplot2-methods}} for functions.
+}
 \examples{
 ## For 'matrix' objects
 cop <- gumbelCopula(2, dim = 3)

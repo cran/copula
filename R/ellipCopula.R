@@ -15,22 +15,21 @@
 
 ##' Length of parameter vector for an 'ellipCopula' (tCopula or normCopula)
 ##'
-##' @title Parameter length of an 'ellipCopula'
+##' @title Parameter length of an 'ellipCopula' [rho-part only!]
 ##' @param dim dimension of copula
 ##' @param dispstr dispersion string
 ##' @param df.fixed [for tCopula():] logical indicating if 'df' is fixed or a parameter
 ##' @return integer
 ##' @author Martin Maechler
 ## NOTE: This is related to  validRho() (== validityMethod for "ellipCopula") in ./Classes.R
-npar.ellip <- function(dim, dispstr, df.fixed = TRUE) {
-    (!df.fixed) + # add 1 if 'df' is not fixed
+npar.ellip <- function(dim, dispstr) {
     switch(dispstr, ## also checking for correct 'dispstr'
 	   "ar1" =,
            "ex" = 1 ,
 	   "un" = dim * (dim - 1) / 2,
 	   "toep" = dim - 1,
 	   ## otherwise
-	   return("'dispstr' not supported (yet)"))
+	   stop("'dispstr' not supported (yet)"))
 }
 
 ## Lower bound for the rho_j
