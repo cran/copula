@@ -91,8 +91,7 @@ pairwiseIndepTest <-
 	     verbose=TRUE, idT.verbose=verbose, ...)
 {
     ## 1) simulate test statistic under independence
-    stopifnot(length(dim. <- dim(cu.u)) == 3L)
-    stopifnot(dim.[2]==dim.[3])
+    stopifnot(length(dim. <- dim(cu.u)) == 3L, dim.[2] == dim.[3])
     n <- dim.[1]
     d <- dim.[2]
     if(verbose)

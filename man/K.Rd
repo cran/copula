@@ -26,12 +26,12 @@
 }
 \usage{
 % K(u, copula, d, n.MC=0, log.p=FALSE) # is deprecated
-Kn(u, x) # empirical Kendall distribution function
+Kn(u, x, method = c("GR", "GNZ")) # empirical Kendall distribution function
 dK(u, copula, d, n.MC = 0, log.p = FALSE) # density
 pK(u, copula, d, n.MC = 0, log.p = FALSE) # df
 qK(p, copula, d, n.MC = 0, log.p = FALSE, # quantile function
    method = c("default", "simple", "sort", "discrete", "monoH.FC"),
-   u.grid, \dots)
+   u.grid, xtraChecks = FALSE, \dots)
 rK(n, copula, d) # random number generation
 }
 \arguments{
@@ -50,8 +50,8 @@ rK(n, copula, d) # random number generation
   \item{log.p}{\code{\link{logical}}; if \code{TRUE}, probabilities
     \eqn{p} are given as \eqn{\log p}{log(p)}.}
   \item{p}{probabilities or log-probabilities if \code{log.p} is true.}
-  \item{method}{string for the method to compute the quantile function
-    of \eqn{K}. Currently, one of
+  \item{method}{for \code{qK()}, character string for the method how to
+    compute the quantile function of \eqn{K}; available are:
     \describe{
       \item{"default"}{default method. Currently chooses
 	\code{method="monoH.FC"} with \code{u.grid = 0:128/128}. This
@@ -68,9 +68,20 @@ rK(n, copula, d) # random number generation
 	Based on this approximation, quantiles are computed with
 	\code{\link{uniroot}}.}
     }
+    For \code{Kn()}, character string indicating the method according
+    to which the empirical Kendall distribution is computed; available are:
+    \describe{
+      \item{"GR"}{the default. Computed as in Genest and Rivest (1993,
+        Equations (4) and (5)).}
+      \item{"GNZ"}{computed as in Genest et al. (2011, Equation (19) and
+        Lemma 1); this is guaranteed to satisfy that the estimator lies above
+	the diagonal at any point in [0,1).}
+    }
   }
   \item{u.grid}{(for \code{method="discrete"}:) The grid on which
     \eqn{K} is evaluated, a \code{\link{numeric}} vector.}
+  \item{xtraChecks}{\emph{experimental} logical indicating if extra
+    checks should be done before calling \code{\link{uniroot}()} in some cases.}
   \item{\dots}{additional arguments passed to \code{\link{uniroot}} (for
     \code{method="default"}, \code{method="simple"}, \code{method="sort"}, and
     \code{method="monoH.FC"}) or \code{\link{findInterval}} (for
@@ -89,9 +100,6 @@ rK(n, copula, d) # random number generation
     (-(\psi^{-1})'(u))(\psi^{-1}(u))^{d-1}}{%
     (-1)^d
     psi^{(d)}(psi^{-1}(u))(-(psi^{-1})'(u))(psi^{-1}(u))^{d-1}/(d-1)!}
-
-  The empirical Kendall distribution function is computed as in Genest,
-  G. \enc{Nešlehová}{Neslehova}, Ziegel (2011).
 }
 \value{
   The empirical Kendall distribution function, density, distribution
@@ -112,6 +120,10 @@ rK(n, copula, d) # random number generation
   Likelihood inference for Archimedean copulas in high dimensions
   under known margins. \emph{Journal of Multivariate Analysis}
   \bold{110}, 133--150.
+
+  Genest, C. and Rivest, L.-P. (1993). Statistical inference procedures
+  for bivariate Archimedean copulas.
+  \emph{Journal of the American Statistical Association} \bold{88}, 1034--1043.
 
   Genest, C., G. \enc{Nešlehová}{Neslehova}, J., and Ziegel, J. (2011).
   Inference in multivariate Archimedean copula models. \emph{TEST}
@@ -142,7 +154,7 @@ lines(u, K.n, col = "royalblue3") # Kn
 ## Difference at 0
 edfK(0) # edf of K at 0
 K.n[1] # K_n(0); this is > 0 since K.n is the edf of a discrete distribution
-## => therefore, Kn(K.sample, x=X) is not uniform
+## => therefore, Kn(K.sample, x = X) is not uniform
 plot(Kn(K.sample, x = X), ylim = 0:1)
 ## Note: Kn(0) -> 0 for n -> Inf
 

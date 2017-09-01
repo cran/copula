@@ -22,19 +22,33 @@ K <- function(u, copula, d, n.MC = 0, log = FALSE){
     pK(u, copula = copula, d = d, n.MC = n.MC, log.p = log) # call the new function
 }
 
-##' @title Empirical Kendall distribution function K_{n,d} as in Lemma 1 of
-##'        Genest, Neslehova, Ziegel (2011)
+##' @title Empirical Kendall distribution function
 ##' @param u evaluation points u in [0,1]
 ##' @param x data (in IR^d) based on which K is estimated
-##' @return K_{n,d}(u)
+##' @param method character string indicating the method used:
+##'        "GR": as in Genest and Rivest (1993)
+##'        "GNZ": as in Genest, Neslehova, Ziegel (2011); for Archimedean copulas
+##' @return \hat{K}_n(u)
 ##' @author Marius Hofert
-##' Note: This is the empirical distribution function of a discrete radial part
-##'       and thus K_{n,d}(0) > 0. The mass at the largest value of the support
-##'       of R determines K_{n,d}(0)
-Kn <- function(u, x)
+##' @note It's an empirical df based on certain pseudo-observations. In case of
+##'       "GNZ", it's the edf of a discrete radial part and thus satisfies
+##'       \hat{K}_n(0) > 0; the mass at the largest value of the support
+##'       of R determines \hat{K}_n(0).
+Kn <- function(u, x, method = c("GR", "GNZ"))
 {
-    stopifnot(0 <= u, u <= 1, (n <- nrow(x)) >= 1, (d <- ncol(x)) >= 1)
-    W <- vapply(seq_len(n), function(i) sum( colSums(t(x)<x[i,])==d ) / (n+1), NA_real_)
+    stopifnot(0 <= u, u <= 1, (d <- ncol(x)) >= 1)
+    method <- match.arg(method)
+    n <- nrow(x)
+    switch(method,
+    "GR" = {
+        stopifnot(n >= 2)
+        W <- vapply(seq_len(n), function(i) sum( colSums(t(x) < x[i,]) == d ) / (n-1), NA_real_)
+    },
+    "GNZ" = {
+        stopifnot(n >= 1)
+        W <- vapply(seq_len(n), function(i) sum( colSums(t(x) < x[i,]) == d ) / (n+1), NA_real_)
+    },
+    stop("Wrong 'method'"))
     ecdf(W)(u)
 }
 
@@ -51,7 +65,7 @@ Kn <- function(u, x)
 pK <- function(u, copula, d, n.MC = 0, log.p = FALSE)
 {
     stopifnot(inherits(copula, "acopula"), 0 <= u, u <= 1)
-    .pK(u, copula=copula, d=d, n.MC=n.MC, log.p=log.p)
+    .pK(u, copula = copula, d = d, n.MC = n.MC, log.p = log.p)
 }
 
 ## not exported :
@@ -81,19 +95,19 @@ pK <- function(u, copula, d, n.MC = 0, log.p = FALSE)
             if(log.p) log(uN01) else uN01 # K(u) = u
         } else if(d == 2) { # d == 2
             ## K(u) = u - psi^{-1}(u) / (psi^{-1})'(u)
-            r <- uN01 + exp( copula@iPsi(uN01, theta=th, log=TRUE) -
-                             copula@absdiPsi(uN01, th, log=TRUE) )
+            r <- uN01 + exp( copula@iPsi(uN01, theta = th, log = TRUE) -
+                             copula@absdiPsi(uN01, theta = th, log = TRUE) )
             if(log.p) log(r) else r
         } else { # d >= 3
             j <- seq_len(d-1)
-            lpsiI. <- copula@iPsi(uN01, theta=th, log=TRUE)
+            lpsiI. <- copula@iPsi(uN01, theta = th, log = TRUE)
             psiI. <- exp(lpsiI.)
             ## (d-1) x n  matrix
             ##  containing log( (-1)^j * psi^{(j)}(psi^{-1}(u)) ) in the j-th row
-            lx <- vapply(j, function(j.) copula@absdPsi(psiI., theta=th, degree = j., log=TRUE),
+            lx <- vapply(j, function(j.) copula@absdPsi(psiI., theta = th, degree = j., log = TRUE),
                          numeric(n))
-            lfac.j <- cumsum(log(j)) ## == lfactorial(j)
-            lx <- (if(n==1) lx else t(lx)) + tcrossprod(j, lpsiI.) - lfac.j # (d-1) x n matrix
+            lfac.j <- cumsum(log(j)) # == lfactorial(j)
+            lx <- (if(n == 1) lx else t(lx)) + tcrossprod(j, lpsiI.) - lfac.j # (d-1) x n matrix
             ## lsum( < d x n matrix containing the logarithms of the summands of K> ) :
             ls <- lsum(rbind(log(uN01), lx)) # log(K(u))
             if(log.p) ls else pmin(exp(ls), 1) # ensure we are in [0,1] {numerical inaccuracy}
@@ -128,10 +142,10 @@ pK <- function(u, copula, d, n.MC = 0, log.p = FALSE)
 ##' @return Quantile function of the Kendall distribution function at p
 ##' Note: - K(u) >= u  <==>  p >= K^{-1}(p)   (since  K(.) is montone)
 ##'       - K for smaller dimensions would also give upper bounds for K^{-1}(p),
-##'         but even for d=2, there is no explicit formula for K^{-1}(p) known.
+##'         but even for d = 2, there is no explicit formula for K^{-1}(p) known.
 qK <- function(p, copula, d, n.MC = 0, log.p = FALSE,
                method = c("default", "simple", "sort", "discrete", "monoH.FC"),
-               u.grid, ...)
+               u.grid, xtraChecks=FALSE, ...)
 {
     stopifnot(is(copula, "acopula"))
     if(log.p) stopifnot(p <= 0) else stopifnot(0 <= p, p <= 1)
@@ -193,7 +207,7 @@ qK <- function(p, copula, d, n.MC = 0, log.p = FALSE,
                    for(i in 2:lnot01){
                        lower <- p0
                        upper <- min(pN01o[i], q[i-1]+eps)
-                       if(FALSE){       # checks for debugging
+                       if(xtraChecks) { # checks for debugging
                            if(lower >= upper) stop("lower=", lower, ", upper=", upper)
                            f.lower <- f(lower, pN01o[i])
                            f.upper <- f(upper, pN01o[i])

@@ -23,7 +23,7 @@
       par.settings = standard.theme(color = FALSE),
       draw.4.pCoplines = FALSE, \dots)
 
-## _identical_ method for  'data.frame' instead of 'matrix'
+## _identical_ method for  'data.frame'  as for  'matrix'
 
 \S4method{wireframe2}{Copula}(x, FUN, n.grid = 26, delta = 0,
       xlim = 0:1, ylim = 0:1, zlim = NULL,

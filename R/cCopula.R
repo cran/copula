@@ -145,20 +145,21 @@ iRosenblatt <- function(u, copula, indices = 1:dim(copula), log = FALSE, drop = 
 {
     if (!is.matrix(u)) # minimal checking here!
         u <- rbind(u, deparse.level = 0L)
-
+    n <- nrow(u) # sample size
     if(is(copula, "normalCopula")) { # Gauss copula (see, e.g., Cambou, Hofert, Lemieux)
 
-        P <- getSigma(copula) # (d, d)-matrix
+        P <- getSigma(copula) # (d, d)-matrix, always symmetric
         U <- u # consider u as U[0,1]^d
         max.ind <- tail(indices, n = 1) # maximal index
         x <- qnorm(u[, 1:max.ind, drop = FALSE]) # will be updated
         for(j in seq_len(max.ind)) {
             if(j == 1) {
                 if(log) U[,1] <- log(U[,1]) # adjust the first column for 'log'
-            } else {
-                P. <- P[j, 1:(j-1), drop = FALSE] %*% solve(P[1:(j-1), 1:(j-1), drop = FALSE]) # (1, j-1) %*% (j-1, j-1) = (1, j-1)
-                mu.cond <- as.numeric(P. %*% t(x[, 1:(j-1), drop = FALSE])) # (1, j-1) %*% (j-1, n) = (1, n) = n
-                P.cond <- P[j, j] - P. %*% P[1:(j-1), j, drop = FALSE] # (1, 1) - (1, j-1) %*% (j-1, 1) = (1, 1)
+            } else { # j >= 2
+                ji <- seq_len(j-1L)
+                P. <- P[j, ji, drop = FALSE] %*% solve(P[ji, ji, drop = FALSE]) # (1, j-1) %*% (j-1, j-1) = (1, j-1)
+                mu.cond <- as.numeric(tcrossprod(P., x[, ji, drop = FALSE])) # (1, j-1) %*% (j-1, n) = (1, n) = n
+                P.cond <- P[j, j] - P. %*% P[ji, j, drop = FALSE] # (1, 1) - (1, j-1) %*% (j-1, 1) = (1, 1)
                 U[,j] <- pnorm(qnorm(u[, j], mean = mu.cond, sd = sqrt(P.cond)), log.p = log)
                 x[,j] <- qnorm(if(log) exp(U[,j]) else U[,j]) # update x[,j]
             }
@@ -166,24 +167,27 @@ iRosenblatt <- function(u, copula, indices = 1:dim(copula), log = FALSE, drop = 
 
     } else if(is(copula, "tCopula")) { # t copula (see, e.g., Cambou, Hofert, Lemieux)
 
-        P <- getSigma(copula) # (d, d)-matrix
+        P <- getSigma(copula) # (d, d)-matrix, always symmetric
         nu <- getdf(copula) # degrees of freedom
         U <- u # consider u as U[0,1]^d
-        n <- nrow(u) # sample size
         max.ind <- tail(indices, n = 1) # maximal index
         x <- qt(u[, 1:max.ind, drop = FALSE], df = nu) # will be updated
         for(j in seq_len(max.ind)) {
             if(j == 1) {
                 if(log) U[,1] <- log(U[,1]) # adjust the first column for 'log'
-            } else {
-                P1.inv <- solve(P[1:(j-1), 1:(j-1), drop = FALSE])
-                x1 <- x[, 1:(j-1), drop = FALSE]
-                g  <- vapply(1:n, function(i) x1[i, , drop = FALSE] %*% P1.inv %*%
-                                              t(x1[i, , drop = FALSE]), numeric(1))
+            } else { # j >= 2
+                ji <- seq_len(j-1L)
+                ## compute solve(), as we need it n times:
+                P1.inv <- solve(P[ji, ji, drop = FALSE])
+                x1 <- x[, ji, drop = FALSE]
+                g  <- vapply(1:n, function(i) { x1i <- x1[i, , drop = FALSE] #  X1 P1i X1' :
+                                                x1i %*% tcrossprod(P1.inv, x1i) },
+                             numeric(1))
                 P.inv <- solve(P[1:j, 1:j, drop = FALSE])
+                sPj <- sqrt(P.inv[j, j])
                 s1 <- sqrt((nu + j - 1) / (nu + g))
-                s2 <- (x1 %*% P.inv[1:(j-1), j, drop = FALSE]) / sqrt(P.inv[j, j])
-                U[,j] <- pt((qt(u[, j], df = nu+j-1) / s1 - s2) / sqrt(P.inv[j, j]),
+                s2 <- x1 %*% P.inv[ji, j, drop = FALSE]
+                U[,j] <- pt((qt(u[, j], df = nu+j-1)/s1 - s2/sPj) / sPj,
                             df = nu, log.p = log)
                 x[,j] <- qt(if(log) exp(U[,j]) else U[,j], df = nu) # update x[,j]
             }

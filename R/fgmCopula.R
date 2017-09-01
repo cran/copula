@@ -155,9 +155,7 @@ pfgmCopula <- function(u, copula) {
 ## pdf of the copula ###########################################################
 
 dfgmCopula <- function(u, copula, log=FALSE, ...) {
-    ## if(..) fails when u has NAs ; treatment now via generic dCopula()
-    ## if (any(u < 0) || any(u > 1))
-    ##     stop("u values should lie between 0 and 1")
+    ## NAs ; treatment now via generic dCopula()
     dim <- copula@dimension
     param <- copula@parameters
     pdf <- copula@exprdist$pdf

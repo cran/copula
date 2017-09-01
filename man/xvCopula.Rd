@@ -4,15 +4,19 @@
 \description{
   Computes the leave-one-out cross-validation criterion (or a
   \code{k}-fold version of it) for the hypothesized parametric copula
-  family using, by default, maximum pseudo-likelihood estimation.  The
-  leave-one-out criterion is a crossvalidated log likelihood, denoted
-  \eqn{\widehat{xv}_n}{xv^n}, defined in
-  equation (42) of Gr\enc{ø}{o}nneberg and Hjort (2014).
+  family using, by default, maximum pseudo-likelihood estimation.
 
-  For \eqn{k < n}, \eqn{n} the sample size, the \code{k}-fold version
-  uses \eqn{k} randomly chosen (almost) equally sized data blocks
-  instead of \eqn{n}.  When \eqn{n} is large, \eqn{k}-fold is
-  considerably faster (if \eqn{k} is \dQuote{small} compared to \eqn{n}).
+  The leave-one-out criterion is a crossvalidated log likelihood. It is
+  denoted by \eqn{\widehat{xv}_n}{xv^n} in Gr\enc{ø}{o}nneberg and Hjort
+  (2014) and defined in equation (42) therein. When computed for several
+  parametric copula families, it is thus meaningful to select the family
+  maximizing the criterion.
+
+  For \eqn{k < n}, \eqn{n} the sample size, the \code{k}-fold version is
+  an approximation of the leave-one-out criterion that uses \eqn{k}
+  randomly chosen (almost) equally sized data blocks instead of \eqn{n}.
+  When \eqn{n} is large, \eqn{k}-fold cross-validation is considerably
+  faster (if \eqn{k} is \dQuote{small} compared to \eqn{n}).
 }
 \usage{
 xvCopula(copula, x, k = NULL, verbose = interactive(),

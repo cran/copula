@@ -48,7 +48,7 @@ dnormalCopula <- function(u, copula, log=FALSE, ...) {
   dim <- copula@dimension
   sigma <- getSigma(copula)
   if(!is.matrix(u)) u <- matrix(u, ncol = dim)
-  r <- numeric(nrow(u)) # i.e. 0  by default (i.e. "outside")
+  r <- rep(NA_real_, nrow(u))
   ok <- !apply(u, 1, anyNA)
   x <- qnorm(u[ok, , drop=FALSE])
   ## work in log-scale [less over-/under-flow, then (maybe) transform:

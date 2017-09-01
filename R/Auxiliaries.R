@@ -51,7 +51,7 @@ interval <- function(ch) {
 ##' @title Closed Interval from Numeric
 ##' @param x numeric vector of length two
 ##' @param open logical, of length one or two
-##' @return
+##' @return an \code{"interval"} object
 ##' @author Martin Maechler
 num2interval <- function(x, open = FALSE) {
     stopifnot(is.numeric(x), length(x) == 2,

@@ -438,13 +438,14 @@ pairs2 <- function(x, labels = NULL, labels.null.lab = "U", ...)
 
 ### 3.1 contourplot() methods ##################################################
 
+##---> ../man/contourplot2-methods.Rd
+##     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 ##' @title Contour Plot Method for Classes "matrix" and "data.frame"
 ##' @param x A numeric matrix or as.matrix(.)able
 ##' @param aspect The aspect ratio
-##' @param xlim The x-axis limits
-##' @param ylim The y-axis limits
-##' @param xlab The x-axis label
-##' @param ylab The y-axis label
+##' @param xlim, ylim  The x- and y-axis limits
+##' @param xlab, ylab  The x-/y-axis label
 ##' @param cuts The number of levels
 ##' @param labels A logical indicating whether the contours should be labeled.
 ##'        Use labels = list(cex = 0.7) to have nicer small labels
@@ -454,16 +455,16 @@ pairs2 <- function(x, labels = NULL, labels.null.lab = "U", ...)
 ##' @param col.regions The colors used for the colored regions
 ##' @return A contourplot() object
 ##' @author Marius Hofert
-##' @note Note that '...' has to come before 'col.regions', otherwise 'col = "red"'
-##'       is interpreted as 'col.regions = "red"'
 contourplot2Matrix <- function(x, aspect = 1,
                                xlim = range(x[,1], finite = TRUE),
                                ylim = range(x[,2], finite = TRUE),
                                xlab = NULL, ylab = NULL,
-                               cuts = 16, labels = !region,
+                               cuts = 16, labels = !region, pretty = !labels,
                                scales = list(alternating = c(1,1), tck = c(1,0)),
                                region = TRUE, ...,
-                               col.regions = gray(seq(0.4, 1, length.out = 100)))
+                               ## Note that '...' must be before 'col.regions', otherwise
+                               ## col = "red" is interpreted as 'col.regions = "red"'
+                               col.regions = gray(seq(0.4, 1, length.out = max(100,4*cuts))))
 {
     ## Checking
     if(!is.matrix(x)) x <- as.matrix(x)
@@ -616,7 +617,7 @@ panel.3dwire.4 <- function(x, y, z, rot.mat, distance,
                  ...)
     X <- xlim.scaled; x0 <- X[1]; x1 <- X[2]
     Y <- ylim.scaled; y0 <- Y[1]; y1 <- Y[2]
-    Z <- zlim.scaled; z0 <- Z[1]; z1 <- Z[2]
+    Z <- zlim.scaled; z0 <- Z[1]# z1 <- Z[2]
     segs <- list(rbind(X,  y0, z0), # X-axis
                  rbind(x0,  Y, z0), # Y-axis
                  rbind(x1,  Y,  Z), # Y-Z diagonal (at x1)

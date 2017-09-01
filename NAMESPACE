@@ -152,6 +152,7 @@ export(fgmCopula)
 
 ## generic utilities:
 export(describeCop) # generic & methods
+export(margCopula)  # marginal copula for specified margins to keep
 
 ## "transformed" copula classes
 export(rotCopula)

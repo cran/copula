@@ -195,7 +195,7 @@ dfrankCopula.pdf <- function(u, copula, log=FALSE) {
   if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
   for (i in 1:dim) assign(paste0("u", i), u[,i])
   alpha <- copula@parameters[1] # used in 'frankCopula.pdf.algr'
-  ## FIXME: improve log-case
+  ## FIXME: improve log-case, and the alpha ~= 0 case (e.g. alpha = -1e-13 is POOR!
   if(log)
     log(c(eval(frankCopula.pdf.algr[dim])))
   else  c(eval(frankCopula.pdf.algr[dim]))
@@ -250,7 +250,7 @@ dMatFrank <- function (u, copula, log = FALSE, checkPar=TRUE, ...) {
     ## was  dfrankCopula.pdf
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
     th <- copula@parameters
-    if(d == 2 && th < 0) # for now, copFrank does not yet support negative tau
+    if(d == 2 && th < 0) # for now, copFrank does not yet support negative tau (FIXME?)
         dfrankCopula.pdf(u, copula, log=log)
     else
         copFrank@dacopula(u, theta=th, log=log, checkPar=checkPar, ...)

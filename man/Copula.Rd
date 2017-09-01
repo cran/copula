@@ -136,6 +136,11 @@ rCopula(n, copula, \dots)
   corresponding function slots of the Archimedean copula objects, such
   as \code{\link{copClayton}}, \code{\link{copGumbel}}, etc.
 
+  If an \eqn{u_j}{u[j]} is outside \eqn{(0,1)} we declare the density to be
+  zero, and this is true even when another \eqn{u_k, k \ne j}{u[k], k != j}
+  is \code{\link{NA}} or \code{\link{NaN}}; see also the
+  \dQuote{outside} example.
+
   The distribution function of a \code{t} copula uses \code{pmvt} from
   package \pkg{mvtnorm}; similarly, the density (\code{dCopula}) calls
   \code{\link[mvtnorm]{dmvt}} from \pkg{mvtnorm}.
@@ -212,6 +217,15 @@ Fu2 <- pCopula(v, onacopula("Clayton", C(2.0, 1:3)))
 ## The density and cumulative values are the same:
 stopifnot(all.equal(fu1, fu2, tolerance= 1e-14),
           all.equal(Fu1, Fu2, tolerance= 1e-15))
+
+## NA and "outside" u[]
+u <- v[1:12,]
+## replace some by values outside (0,1) and some by NA/NaN
+u[1, 2:3] <- c(1.5, NaN); u[2, 1] <- 2; u[3, 1:2] <- c(NA, -1)
+u[cbind(4:9, 1:3)] <- c(NA, NaN)
+f <- dCopula(u, cl3)
+cbind(u, f) # note: f(.) == 0 at [1] and [3] inspite of NaN/NA
+stopifnot(f[1:3] == 0, is.na(f[4:9]), 0 < f[10:12])
 }
 \keyword{distribution}
 \keyword{multivariate}

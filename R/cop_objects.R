@@ -283,7 +283,7 @@ copClayton <-
 		      n01 <- u.in.01(u)## indices for which density has to be evaluated
                       if(!any(n01)) return(res) # all NaN
                       if(theta == 0) {
-                          res[n01] <- if(log) 0 else 1
+			  res[n01] <- 0
                       } else {
                           ## auxiliary results
                           u. <- u[n01,, drop=FALSE]
@@ -455,28 +455,32 @@ copFrank <-
                   res <- rep.int(NaN, n)
 		  n01 <- u.in.01(u)## indices for which density has to be evaluated
 		  ## if(!any(n01)) return(res)
-		  ## auxiliary results
-		  u. <- u[n01,, drop=FALSE]
-		  u.sum <- rowSums(u.)
-		  lp  <- log1mexp(theta)    # log(1 - exp(-theta))
-		  lpu <- log1mexp(theta*u.) # log(1 - exp(-theta * u))
-		  lu <- rowSums(lpu)
-		  ## main part
-		  res[n01] <-
-		      if(n.MC > 0) { # Monte Carlo
-			  V <- C.@V0(n.MC, theta)
-			  lx <- rep(-theta*u.sum, each=n.MC) + d*(log(theta) +
-                                                  log(V) - V*lp) - log(n.MC) +
-                                                      (V-1) %*% t(lu)
-			  lsum(lx)
-		      } else { # explicit
-			  Li.arg <-
-			      if(Li.log.arg) lp + rowSums(lpu-lp)
-			      else -expm1(-theta)*exp(rowSums(lpu-lp))
-			  Li. <- polylog(Li.arg, s = -(d-1), log=TRUE,
-					 method=method, is.log.z = Li.log.arg)
-			  (d-1)*log(theta) + Li. - theta*u.sum - lu
-		      }
+                  if(theta > 0) {
+                      ## auxiliary results
+                      u. <- u[n01,, drop=FALSE]
+                      u.sum <- rowSums(u.)
+                      lp  <- log1mexp(theta)    # log(1 - exp(-theta))
+                      lpu <- log1mexp(theta*u.) # log(1 - exp(-theta * u))
+                      lu <- rowSums(lpu)
+                      ## main part
+                      res[n01] <-
+                          if(n.MC > 0) { # Monte Carlo
+                              V <- C.@V0(n.MC, theta)
+                              lx <- rep(-theta*u.sum, each=n.MC) + d*(log(theta) +
+                                                                      log(V) - V*lp) - log(n.MC) +
+                                  (V-1) %*% t(lu)
+                              lsum(lx)
+                          } else { # explicit
+                              Li.arg <-
+                                  if(Li.log.arg) lp + rowSums(lpu-lp)
+                                  else -expm1(-theta)*exp(rowSums(lpu-lp))
+                              Li. <- polylog(Li.arg, s = -(d-1), log=TRUE,
+                                             method=method, is.log.z = Li.log.arg)
+                              (d-1)*log(theta) + Li. - theta*u.sum - lu
+                          }
+                  } else { ## theta == 0
+                      res[n01] <- 0
+                  }
 		  if(log) res else exp(res)
 	      },
 		  ## score function

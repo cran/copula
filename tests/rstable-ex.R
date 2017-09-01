@@ -13,10 +13,13 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
+###  Checks for rstable __and__  rCopula() more generally
 
 require(copula)
 
 source(system.file("Rsource", "utils.R", package="copula", mustWork=TRUE))
+source(system.file("Rsource", "cops.R", package="copula", mustWork=TRUE))
+## --> copcl, copObs, copBnds,  excl.2 , copO.2, copBnd.2
 
 set.seed(101)
 X <- rstable1(1e4, alpha=.9999, beta=1, gamma= .25, delta=1)
@@ -59,16 +62,11 @@ aCt2 <- unlist(lapply(taus, function(TAU) {
     lapply(aCops, function(COP) {
         th <- iTau(COP, TAU); onacopulaL(COP, list(th, 1:2))})}))
 
-## Now the IJ-copulas:
-(csubc <- names(getClass("copula")@subclasses))
-## and only keep the "actual" (i.e. non-virtual) ones:
-(csubc <- Filter(Negate(isVirtualClass), csubc))
-## schlatherCopula() e.g. has no constructor:
-(cfnms <- intersect(csubc, ls(pkg, pattern = "[A-Za-z]+Copula$")))
+## copcl (etc) from ../inst/Rsource/cops.R
 stopList <- c("khoudrajiCopula", #"khoudrajiBivCopula",  "khoudrajiExplicitCopula",
               "indepCopula", "rotCopula")
-cfnms <- cfnms[is.na(match(cfnms, stopList))]
-str(cfn <- sapply(cfnms, get, pkg, simplify=FALSE))
+copcl <- copcl[is.na(match(copcl, stopList))]
+str(cfn <- sapply(copcl, get, pkg, simplify=FALSE))
 str(th.25 <- lapply(cfn, function(F) iTau(F(), 0.25)))
 Ct2 <- unlist(lapply(taus, function(TAU) {
     lapply(cfn, function(cFn) { th <- iTau(cFn(), TAU); cFn(th)})}))
@@ -81,17 +79,26 @@ set.seed(17)
 Uc <- lapply(cops, rCopula, n = 1024)
 
 ## rPosStable [coverage]
-gC <- cops[[match("gumbelCopula", names(cops))]]
+gC <- cops[[match("gumbelCopula", names(cops))]] # the 1st
 set.seed(17); Uc <- c(Uc, list(gumbelC.x  = rCopula(gC, n = nrow(Uc[[1]]))))
 options('copula:rstable1' = "rPosStable")
 set.seed(17); Uc <- c(Uc, list(gumbelC.rP = rCopula(gC, n = nrow(Uc[[1]]))))
 options('copula:rstable1' = NULL) # check that things *are* reproducible
 set.seed(17); stopifnot(all.equal(Uc[["gumbelC.x"]], rCopula(gC, n = nrow(Uc[[1]]))))
 
+## NOTE: The *names* are not unique ==> uses integer indices
 
 ## 1) Check the tau's
-
-## TODO
+tau.c <- t(sapply(seq_along(cops), function(i) {
+    U <- Uc[[i]]
+    c(tauC = tau(cops[[i]]),
+      tauHat = cor(U[,1], U[,2], method="kendall"))
+}))
+relE <- apply(tau.c, 1, function(r) (1 - r[[2]]/r[[1]])) # relative "errors"
+stopifnot(-0.41 < relE, relE < 0.67, median(abs(relE)) < 0.09)
+round(cbind(tau.c, relE), 3)
+## we could look at cases which were "bad" ..
+plot(tau.c[,"tauC"], relE) # error is larger for small true taus
 
 
 ## 2) Check the margins: all must be uniform

@@ -58,7 +58,7 @@ setGeneric("dCopula", function(u, copula, log=FALSE, ...) {
     u.is.out <- outside.01(u, strictly=FALSE)## on.boundary _or_ outside
     if(any.out <- any(u.is.out, na.rm=TRUE))
 	u[] <- pmax(0, pmin(1, u)) # <- "needed", as some methods give error
-    r <- standardGeneric("dCopula")
+    r <- standardGeneric("dCopula") # the result of calling  <dCopula-method)(u, copula, ..)
     if(any.out) ## on boundary _or_ outside cube  ==> zero mass :
 	r[u.is.out & !is.na(u.is.out)] <- if(log) -Inf else 0.
     r

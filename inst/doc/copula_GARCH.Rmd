@@ -42,8 +42,7 @@ Now we simulate two ARMA(1,1)-GARCH(1,1) processes with these copula-dependent
 innovations. To this end, recall that an ARMA($p_1$,$q_1$)-GARCH($p_2$,$q_2$) model is given by
 \begin{align}
     X_t &= \mu_t + \epsilon_t\ \text{for}\ \epsilon_t = \sigma_t Z_t,\\
-  \mu_t &= \mu + \sum_{k=1}^{p_1} \phi_k  (X_{t-k}-\mu) +
-  \sum_{k=1}^{q_1} \theta_k (X_{t-k}-\mu_{t-k}),\\
+  \mu_t &= \mu + \sum_{k=1}^{p_1} \phi_k  (X_{t-k}-\mu) + \sum_{k=1}^{q_1} \theta_k \epsilon_{t-k},\\
   \sigma_t^2 &= \alpha_0 + \sum_{k=1}^{p_2} \alpha_k (X_{t-k}-\mu_{t-k})^2 +
             \sum_{k=1}^{q_2} \beta_k \sigma_{t-k}^2.
 \end{align}

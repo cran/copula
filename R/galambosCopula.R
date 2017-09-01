@@ -123,7 +123,7 @@ pgalambosCopula <- function(u, copula) {
 dgalambosCopula <- function(u, copula, log=FALSE, ...) {
   dim <- copula@dimension
   alpha <- copula@parameters[1]
-  if (abs(alpha) <= .Machine$double.eps^.9) return (rep(1, nrow(u)))
+  if (abs(alpha) <= .Machine$double.eps^.9) return (rep.int(if(log) 0 else 1, nrow(u)))
   for (i in 1:dim) assign(paste0("u", i), u[,i])
   ## FIXME: improve log-case
   if(log)

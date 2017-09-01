@@ -4,6 +4,24 @@
 \title{News for \R Package \pkg{copula}}% MM: look into ../svn-log-from.all
 \newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
+\section{Changes in version 0.999-18 (2017-08-31, svn r1681)}{
+  \subsection{New Features}{
+    \itemize{
+      \item \code{contourplot2()} now gets argument \code{pretty}, to be
+      passed on, with a better (but not back-compatible) default (\code{!labels}).
+
+      \item new \code{margCopula()} constructor of marginal copulas,
+      currently for normal-, t-, and Archimedean copulas only.
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{cCopula(*, inverse=TRUE)} now also works for
+      non-Clayton Archmedean copulas.
+    }
+  }
+}
+
 \section{Changes in version 0.999-17 (2017-06-17, svn r1661)}{
   \subsection{New Features}{
     \itemize{

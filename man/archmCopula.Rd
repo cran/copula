@@ -72,17 +72,28 @@ joeCopula(param = NA_real_, dim = 2,
   bivariate case is available; however \code{\link{copAMH}} has no such
   limitation.
 
-  The maximum dimension for which the expression of the density (pdf) is
-  available is 6 for the Clayton, Gumbel and Frank families.  The
-  cumulative distribution (cdf) expression is always available.
+%%__ This has been _written_ still for copula 0.999-17 (2017-06) but it
+%%__ was no longer true, since at least 0.999-0 (2012-07-28) !!!
+
+  %% The maximum dimension for which the expression of the density (pdf) is
+  %% available is 6 for the Clayton, Gumbel and Frank families.  The
+  %% cumulative distribution (cdf) expression is always available.
 
   % The maximum dimension for which \code{"dCopula"} can be evaluated is
   % 10 for the Clayton and Gumbel families, and 6 for the Frank family.
   % They are also the maximum dimensions for which maximum likelihood
   % estimation can be done.
-  For \eqn{d > 2}, i.e. \code{dim > 2}, it is now recommended to work with the
-  \code{\linkS4class{acopula}}-classed Archimedean copulas, as there is
-  no restriction on the dimension there.
+
+  Note that in all cases except for Frank and AMH, and \eqn{d = 2} and
+  \eqn{theta < 0}, the densities (\code{\link{dCopula}()} methods) are
+  evaluated via the \code{dacopula} slot of the corresponding
+  \code{\linkS4class{acopula}}-classed Archimedean copulas, implemented
+  in a numeric stable way without any restriction on the dimension \eqn{d}.
+  \cr%%---
+  Similarly, the (cumulative) distribution function
+  (\dQuote{"the copula"} \eqn{C()}) is evaluated via the corresponding
+  \code{\linkS4class{acopula}}-classed Archimedean copula's functions in
+  the \code{psi} and \code{iPsi} slots.
 }
 %\author{Marius Hofert, Ivan Kojadinovic, Martin Maechler and Jun Yan}
 \references{

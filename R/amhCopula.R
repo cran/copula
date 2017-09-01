@@ -76,8 +76,6 @@ pamhCopula <- function(copula, u) {
 damhCopula <- function(u, copula, log = FALSE, ...) {
   alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (rep.int(if(log) 0 else 1, nrow(u)))
-  ## dim <- copula@dimension
-  ## for (i in 1:dim) assign(paste0("u", i), u[,i])
   ## bivariate anyway
   u1 <- u[,1]
   u2 <- u[,2]
@@ -154,7 +152,7 @@ pMatAmh <- function (u, copula, ...) {
     ## was pamhCopula
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
     th <- copula@parameters
-    if(d == 2 && th < 0) # for now, .. to support negative tau
+    if(d == 2 && th < 0) # for now, .. to support negative tau  (FIXME(?): rather in copAMH)
         pamhCopula(copula, u)
     else
         pacopula(u, copAMH, theta=copula@parameters, ...)

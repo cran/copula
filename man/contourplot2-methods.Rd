@@ -13,22 +13,16 @@
   contour plots of two dimensional distributions from package \pkg{copula}.
 }
 \usage{
+## NB: The 'matrix' and 'data.frame' methods are identical - documenting the former
 \S4method{contourplot2}{matrix}(x, aspect = 1,
       xlim = range(x[,1], finite = TRUE),
       ylim = range(x[,2], finite = TRUE),
       xlab = NULL, ylab = NULL,
-      cuts = 16, labels = !region,
+      cuts = 16, labels = !region, pretty = !labels,
       scales = list(alternating = c(1,1), tck = c(1,0)),
       region = TRUE, \dots,
-      col.regions = gray(seq(0.4, 1, length.out = 100)))
-\S4method{contourplot2}{data.frame}(x, aspect = 1,
-      xlim = range(x[,1], finite = TRUE),
-      ylim = range(x[,2], finite = TRUE),
-      xlab = NULL, ylab = NULL,
-      cuts = 16, labels = !region,
-      scales = list(alternating = c(1,1), tck = c(1,0)),
-      region = TRUE, \dots,
-      col.regions = gray(seq(0.4, 1, length.out = 100)))
+      col.regions = gray(seq(0.4, 1, length.out = max(100, 4*cuts))))
+
 \S4method{contourplot2}{Copula}(x, FUN, n.grid = 26, delta = 0,
       xlim = 0:1, ylim = 0:1,
       xlab = quote(u[1]), ylab = quote(u[2]), \dots)
@@ -44,9 +38,14 @@
   \item{xlab, ylab}{the x- and y-axis labels. If at least one is
     \code{NULL}, useful \code{xlab} and \code{ylab} are determined
     automatically; the behavior depends on the class of \code{x}.}
-  \item{cuts}{the number of levels; see \code{\link{contourplot}()}.}
-  \item{labels}{a \code{\link{logical}} indicating whether the contour
-    lines are labeled; see \code{\link{contourplot}()}.}
+  \item{cuts}{the number of levels; see \code{\link{contourplot}()}.
+      Note that specifying \code{useRaster = TRUE} is often considerably
+      more efficient notably for larger values of \code{cuts}.}
+  \item{labels, pretty}{\code{\link{logical}}s indicating whether the contour
+    lines are labeled and whether pretty labels are enforced; in
+      \pkg{copula} versions before \code{0.999-18}, implicitly
+      \code{pretty = TRUE} was used (giving \bold{un}equal z-cut
+      spacing), see \code{\link{contourplot}()}.}
   \item{scales}{a \code{\link{list}} determining how the axes are drawn;
     see \code{\link{contourplot}()}.}
   \item{region}{a \code{\link{logical}} indicating whether regions

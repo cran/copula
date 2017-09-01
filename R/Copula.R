@@ -20,7 +20,7 @@ printCopula <- function(x, digits = getOption("digits"),
   validObject(x)
   descr.kind <- match.arg(descr.kind)
   cat(describeCop(x, kind = descr.kind), "\n")
-  cat("Dimension: ", (d <- dim(x)), "\n")
+  cat("Dimension: ", dim(x), "\n")
   if (length(par <- getTheta(x, freeOnly=FALSE, attr = TRUE)) > 0) {
     ## hasFx <- !is.null(.fixed <- attr(par, "fixed")) && any(.fixed)
     ## JY: no attribute "fixed" is available from getTheta

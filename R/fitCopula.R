@@ -486,7 +486,7 @@ fitCopula.itau.mpl <- function(copula, u, posDef=TRUE, lower=NULL, upper=NULL,
     freeParam(copula) <- estimate
 
     loglik <- fit$objective
-    has.conv <- TRUE # FIXME? use tryCatch() above to catch non-convergence
+    ## has.conv <- TRUE # FIXME? use tryCatch() above to catch non-convergence
 
     ## Deal with the variance
     if (is.na(estimate.variance))

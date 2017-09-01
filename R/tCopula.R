@@ -133,7 +133,7 @@ dtCopula <- function(u, copula, log = FALSE, ...) {
   sigma <- getSigma(copula)
   df <- getdf(copula)
   ## more checks now  dCopula() *generic*
-  r <- numeric(nrow(u)) # i.e. 0  by default (i.e. "outside")
+  r <- rep(NA_real_, nrow(u))
   ok <- u.in.01(u)
   if(any(ok)) { # <- needed for R <= 3.4.0, and e.g., u = c(1,0,..,0,0)
       x <- qt(u[ok, , drop=FALSE], df)
