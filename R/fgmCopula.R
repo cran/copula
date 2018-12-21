@@ -77,7 +77,7 @@ fgmCopula <- function(param = NA_real_, dim = 2L) {
 
     ## create new object
     new("fgmCopula",
-        dimension = dim,
+        dimension = as.integer(dim),
         parameters = param,
         exprdist = c(cdf = cdf, pdf = pdf),
         subsets.char = subsets.char,

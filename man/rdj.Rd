@@ -8,7 +8,7 @@
   data were analysed in Chapter 5 of McNeil, Frey and
   Embrechts (2005).
 }
-\usage{data(rdj)}
+\usage{data(rdj, package="copula")}
 \format{
   A data frame of 1262 daily log-returns from 1996 to 2000.
   \describe{

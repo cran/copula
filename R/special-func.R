@@ -159,7 +159,7 @@ lsum <- function(lx, l.off) {
 lssum <- function (lxabs, signs, l.off = apply(lxabs, 2, max), strict = TRUE) {
     stopifnot(length(dim(lxabs)) == 2L) # is.matrix(.) generalized
     sum. <- colSums(signs * exp(lxabs - rep(l.off, each=nrow(lxabs))))
-    if (any(is.nan(sum.) || sum. <= 0))
+    if(anyNA(sum.) || any(sum. <= 0))
         (if(strict) stop else warning)("lssum found non-positive sums")
     l.off + log(sum.)
 }

@@ -422,29 +422,29 @@ setMethod("dCopula", signature("matrix", "khoudrajiBivCopula"),
 ## A: Pickands dependence function only if copula1 and copula2 are extreme-value
 # setMethod("A", signature("khoudrajiBivCopula"), function(copula, w) {
 setMethod("A", signature("khoudrajiCopula"), function(copula, w) {
-    ## the A function can be computed only if the argument copulas are extreme-value copulas
-    if(!is(copula@copula1, "evCopula") ||
-       !is(copula@copula2, "evCopula"))
-        stop("For Pickands A(<khoudrajiBivCop.>) both component copulas must be extreme-value ones")
+    ## A() can be computed only if the argument copulas are extreme-value copulas
+    isEV <- function(C) is(C, "indepCopula") || is(C, "evCopula")
+    if(!(isEV(C1 <- copula@copula1) &&
+         isEV(C2 <- copula@copula2)))
+        stop("For Pickands A(<khoudrajiCop.>) both component copulas must be extreme-value ones")
 
     a1 <- copula@shapes[1];  a2 <- copula@shapes[2]
     den1 <- (1 - a1) * (1 - w) + (1 - a2) * w
     den2 <- a1 * (1 - w) + a2 * w
     t1 <- (1 - a2) * w / den1; t1[is.na(t1)] <- 1
     t2 <-      a2  * w / den2; t2[is.na(t2)] <- 1
-    den1 * A(copula@copula1, t1) + den2 * A(copula@copula2, t2)
+    den1 * A(C1, t1) + den2 * A(C2, t2)
 })
 
 ## dCdu: Restricted to *bivariate* Khoudraji copulas
 setMethod("dCdu", signature("khoudrajiBivCopula"),
           function(copula, u, ...) {
-    a1 <- copula@shapes[1]
-    a2 <- copula@shapes[2]
-
     ## dCdu can be computed only if dCdu is implemented for argument copulas
     if (!hasMethod(dCdu, class(copula@copula1)) ||
-        !hasMethod(dCdu, class(copula@copula2)))
-        stop("The argument copulas must both have the 'dCdu()' method implemented")
+	!hasMethod(dCdu, class(copula@copula2)))
+	stop("The argument copulas must both have the 'dCdu()' method implemented")
+    a1 <- copula@shapes[1]
+    a2 <- copula@shapes[2]
 
     g <- KhoudFn$g ; dgdu <- KhoudFn$dgdu
     gu1 <- cbind(g(u[,1], 1 - a1), g(u[,2], 1 - a2))

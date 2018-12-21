@@ -8,10 +8,13 @@
 \alias{describeCop,archmCopula,character-method}
 \alias{describeCop,ellipCopula,character-method}
 \alias{describeCop,fgmCopula,character-method}
+\alias{describeCop,moCopula,character-method}
 \alias{describeCop,indepCopula,character-method}
 \alias{describeCop,khoudrajiCopula,character-method}
 \alias{describeCop,mixCopula,character-method}
 \alias{describeCop,rotCopula,character-method}
+\alias{describeCop,fhCopula,character-method}
+\alias{describeCop,empCopula,character-method}
 \docType{methods}
 \description{
   Describe a \code{\linkS4class{copula}} object, i.e., its basic

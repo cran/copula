@@ -33,9 +33,10 @@ copJoe
       \deqn{\psi(t)=(1-\theta)/(\exp(t)-\theta),\	t\in[0,\infty],
       }{psi(t)=(1-theta)/(exp(t)-theta), t in [0,Inf],}
       with \eqn{\theta\in[0,1)}{theta in [0,1)}.  The range of
-      admissible Kendall's tau is [0,1/3).  Note that the lower and upper
-      tail-dependence coefficients are both zero, that is, this copula
-      family does not allow for tail dependence.}
+      admissible Kendall's tau is \eqn{[0,1/3)}. 
+
+      Note that the lower and upper tail-dependence coefficients are
+      both zero, that is, this copula family does not allow for tail dependence.}
 
      \item{\code{copClayton}:}{Archimedean family of Clayton with
        parametric generator
@@ -43,8 +44,10 @@ copJoe
 	      psi(t)=(1+t)^{-1/theta}, t in [0,Inf],}
        with \eqn{\theta\in(0,\infty)}{theta in (0,Inf)}.  The range of
      admissible Kendall's tau, as well as that of the lower
-     tail-dependence coefficient, is (0,1).  Note that this copula does
-     not allow for upper tail dependence.}
+     tail-dependence coefficient, is (0,1).  For dimension \eqn{d = 2},
+     \eqn{\theta\in(-1,\infty)}{theta in (-1,Inf)} is admissible where
+     negative \eqn{\theta} allow negative Kendall's taus.
+     Note that this copula does not allow for upper tail dependence.}
 
      \item{\code{copFrank}:}{Archimedean family of Frank with parametric
        generator

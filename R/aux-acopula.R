@@ -14,7 +14,7 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-if((Rv <- getRversion()) < "3.2.1") {
+if((Rv <- getRversion()) < "3.2.0") {
     lengths <- function (x, use.names = TRUE) vapply(x, length, 1L, USE.NAMES = use.names)
     ## now have  Depends: R (>= 3.1.0)
     ## if(Rv < "3.1.0") {
@@ -25,7 +25,7 @@ if((Rv <- getRversion()) < "3.2.1") {
     ##             paste0 <- function(...) paste(..., sep = '')
     ##     }
     ## }
-} ## R < 3.2.1
+} ## R < 3.2.0
 
 
 #### Functions and Methods for "acopula" objects
@@ -247,6 +247,13 @@ rlogR <- function(n, p, Ip = 1-p) {
     }
     vec
 }
+
+## FIXME: rlog() is called only once, in  copFrank@V0 ( . )  as
+## -----  rlog(n, -expm1(-theta), exp(-theta))
+## now for really large |theta|,  to evade heavy cancellation,
+## we should rather pass 'theta = - log(Ip)' to rlog()
+
+
 
 ### state-of-the art: sampling a logarithmic distribution, C version
 
@@ -1134,6 +1141,7 @@ tauJoe <- function(theta, method = c("hybrid", "digamma", "sum"), noTerms=446)
 	       digam1 <- digamma(1) ## == - (Euler's) gamma = -0.5772157
 	       trigam1 <- pi^2/6 ##  == psigamma(1, d=1) = trigamma(1)
 	       vapply(theta, function(th) {
+		   if(is.na(th)) return(th)
 		   if(th == 2) return(2 - trigam1)
 		   if(th > 1e17) return(1)
 		   q <- 2/th
@@ -1149,6 +1157,7 @@ tauJoe <- function(theta, method = c("hybrid", "digamma", "sum"), noTerms=446)
 	   "digamma" = {
 	       digam1 <- digamma(1) ## == - (Euler's) gamma = -0.5772157
 	       vapply(theta, function(th) {
+		   if(is.na(th)) return(th)
 		   if(th == 2) return(2 - pi^2/6)
 		   q <- 2/th
 		   ## A <- 1/(q*(q-1)) ## only for q != 1,	 i.e.,	th != 2
@@ -1160,12 +1169,11 @@ tauJoe <- function(theta, method = c("hybrid", "digamma", "sum"), noTerms=446)
 	   },
 	   "sum" = {
 	       k <- noTerms:1
-	       sapply(theta,
-		      function(th) {
-			  tk2 <- th*k + 2
-			  1 - 4*sum(1/(k*tk2*(tk2 - th)))
-			  ## ==... (1/(k*(th*k+2)*(th*(k-1)+2)))
-		      })
+	       vapply(theta, function(th) {
+		   tk2 <- th*k + 2
+		   1 - 4*sum(1/(k*tk2*(tk2 - th)))
+		   ## ==... (1/(k*(th*k+2)*(th*(k-1)+2)))
+	       }, 0.)
 	   },
 	   stop("unsupported method: ", method))
 }
@@ -1399,7 +1407,7 @@ mkParaConstr <- function(int) {
     is.o <- int@open
     if(is.o[1]) eL[[1]] <- quote(`<`) # instead of '<='
     if(is.o[2]) eR[[1]] <- quote(`<`)
-    bod <- substitute(length(theta) == 1 && LEFT && RIGHT,
+    bod <- substitute(length(theta) == 1 && !is.na(theta) && LEFT && RIGHT,
                       list(LEFT = eL, RIGHT= eR))
     as.function(c(alist(theta=, dim=), bod), parent.env(environment()))
     ## which is a fast version of

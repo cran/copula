@@ -150,7 +150,8 @@ fitCopStart <- function(copula, u, default = getTheta(copula, freeOnly = TRUE), 
                                 warn.df=FALSE, ...)@estimate # fitCopula.icor(, method="itau")
 	if(.par.df) # add starting value for 'df'
 	    start <- c(start, getdf(copula))
-	if(is.finite(loglikCopula(start, u=u, copula=copula)))
+	ll <- loglikCopula(start, u=u, copula=copula)
+	if(is.finite(ll))
             start
         else {
             if (is(copula, "claytonCopula") && dim(copula) == 2) {
@@ -162,8 +163,8 @@ fitCopStart <- function(copula, u, default = getTheta(copula, freeOnly = TRUE), 
                 }
                 start
             }
-            else
-                default
+            else if(!is.na(ll) && ll == +Inf) start # e.g. for perfectly correlated data
+            else default
         }
     } else default
 }
@@ -178,9 +179,9 @@ fitCopStart <- function(copula, u, default = getTheta(copula, freeOnly = TRUE), 
 ##' @return L
 getL <- function(copula) {
     ## for ellipCopula only!
-    dim <- dim(copula) # GETR
+    dim <- dim(copula)
     dd <- dim * (dim - 1) / 2
-    free <- isFree(copula) # GETR
+    free <- isFree(copula)
     if (.hasSlot(copula, "df.fixed")) free <- free[-length(free)]
 
     dgidx <- outer(1:dim, 1:dim, "-")
@@ -213,11 +214,11 @@ getL <- function(copula) {
 ##' @param copula Copula object
 ##' @return dd by p Design matrix for method-of-moments estimators via lm()
 getXmat <- function(copula) { ## FIXME(?) only works for "copula" objects, but not rotCopula, mixed*, ...
-    dim <- dim(copula) # GETR
+    dim <- dim(copula)
     dd <- dim * (dim - 1) / 2
     xmat <-
     if (!is(copula, "ellipCopula")) # one-parameter non-elliptical copula
-	if((n.th <- nParam(copula, freeOnly=TRUE)) == 1L) # GETR
+	if((n.th <- nParam(copula, freeOnly=TRUE)) == 1L)
 	    matrix(1, nrow=dd, ncol=1)
 	else stop(gettextf( ## should not happen currently, but s
 		 "getXmat() not yet implemented for non-elliptical copulas with %d parameters",
@@ -239,7 +240,7 @@ getXmat <- function(copula) { ## FIXME(?) only works for "copula" objects, but n
                },
                stop("Not implemented yet for the dispersion structure ", copula@dispstr))
     }
-    free <- isFree(copula) # GETR ## the last one is for df and not needed
+    free <- isFree(copula) ## the last one is for df and not needed
     if (.hasSlot(copula, "df.fixed")) free <- free[-length(free)]
     xmat[, free, drop=FALSE]
 }
@@ -259,9 +260,9 @@ var.icor <- function(cop, u, method=c("itau", "irho"))
 {
     ## Check if variance can be computed
     method <- match.arg(method)
-    dim <- dim(cop) # GETR
+    dim <- dim(cop)
     dd <- dim * (dim - 1) / 2
-    free <- isFree(cop) # GETR
+    free <- isFree(cop)
     n <- nrow(u)
     v <- matrix(0, n, dd)
 
@@ -352,6 +353,7 @@ var.mpl <- function(cop, u)
     ## If df.fixed = FALSE, Jscore() cannot be computed
     if(has.par.df(cop, ccl, isEll)) {
         cop <- as.df.fixed(cop, classDef = ccl)
+        warning("the covariance matrix of the parameter estimates is computed as if 'df.fixed = TRUE' with df = ",getdf(cop))
         ans[-p, -p] <- var(t(Jscore(cop, u, method = "mpl")))
         ans
     } else
@@ -385,7 +387,7 @@ fitCopula.icor <- function(copula, x, estimate.variance, method=c("itau", "irho"
             warning("\"", method, "\" fitting ==> copula coerced to 'df.fixed=TRUE'")
         copula <- as.df.fixed(copula, classDef = ccl)
     }
-    stopifnot(any(free <- isFree(copula))) # GETR
+    stopifnot(any(free <- isFree(copula)))
     if(missing(call)) call <- match.call()
     if (.hasSlot(copula, "df.fixed")) free <- free[-length(free)]
     icor <- fitCor(copula, x, method=method, posDef=posDef, matrix=FALSE, ...)
@@ -442,7 +444,7 @@ fitCopula.itau.mpl <- function(copula, u, posDef=TRUE, lower=NULL, upper=NULL,
                                estimate.variance, tol=.Machine$double.eps^0.25,
                                traceOpt = FALSE, call, ...)
 {
-    stopifnot(any(free <- isFree(copula))) # GETR
+    stopifnot(any(free <- isFree(copula)))
     if(any(u < 0) || any(u > 1))
         stop("'u' must be in [0,1] -- probably rather use pobs(.)")
     ## Note: We require dispstr = "un" as it is a) the method of Mashal, Zeevi (2002) and
@@ -452,7 +454,7 @@ fitCopula.itau.mpl <- function(copula, u, posDef=TRUE, lower=NULL, upper=NULL,
         stop("method \"itau.mpl\" is only applicable for \"tCopula\" with 'dispstr=\"un\"'")
     if(copula@df.fixed) stop("Use method=\"itau\" for 'tCopula' with 'df.fixed=TRUE'")
     stopifnot(is.numeric(d <- ncol(u)), d >= 2)
-    if (dim(copula) != d) # GETR
+    if (dim(copula) != d)
         stop("The dimension of the data and copula do not match")
     if(missing(call)) call <- match.call()
     if(is.null(lower)) lower <- 0  # <=>  df=Inf <=> Gaussian
@@ -534,7 +536,7 @@ fitCopula.ml <- function(copula, u, method=c("mpl", "ml"), start, lower, upper,
 			 finiteLARGE = .Machine$double.xmax,
 			 ...)
 {
-    stopifnot((q <- nParam(copula, freeOnly=TRUE)) > 0L, # GETR
+    stopifnot((q <- nParam(copula, freeOnly=TRUE)) > 0L,
 	      is.list(optim.control) || is.null(optim.control),
 	      is.character(optim.method), length(optim.method) == 1,
               is.finite(finiteLARGE), length(finiteLARGE) == 1, finiteLARGE > 0)
@@ -542,7 +544,7 @@ fitCopula.ml <- function(copula, u, method=c("mpl", "ml"), start, lower, upper,
     if(any(u < 0) || any(u > 1))
         stop("'u' must be in [0,1] -- probably rather use pobs(.)")
     stopifnot(is.numeric(d <- ncol(u)), d >= 2)
-    if (dim(copula) != d) # GETR
+    if (dim(copula) != d)
         stop("The dimension of the data and copula do not match")
     if(missing(call)) call <- match.call()
     if(is.null(start))
@@ -680,7 +682,7 @@ fitCopula_dflt <- function(copula, data,
                            optim.control = list(maxit=1000),
                            estimate.variance = NA, hideWarnings = FALSE, ...)
 {
-    stopifnot(any(isFree(copula)), # GETR
+    stopifnot(any(isFree(copula)),
 	      is.list(optim.control) || is.null(optim.control))
     if(!is.matrix(data)) {
         warning("coercing 'data' to a matrix.")

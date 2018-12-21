@@ -76,15 +76,15 @@ xvCopula(tCopula(), x)
 xvCopula(plackettCopula(), x)
 }% dont test
 
-## The same with 10-fold cross-validation
+## The same with 5-fold cross-validation [to save time ...]
 set.seed(1) # k-fold is random (for k < n) !
-xvCopula(gumbelCopula(),  x, k=10)
-xvCopula(frankCopula(),   x, k=10)
-xvCopula(joeCopula(),     x, k=10)
-xvCopula(claytonCopula(), x, k=10)
-xvCopula(normalCopula(),  x, k=10)
-xvCopula(tCopula(),       x, k=10)
-xvCopula(plackettCopula(),x, k=10)
+xvCopula(gumbelCopula(),  x, k=5)
+xvCopula(frankCopula(),   x, k=5)
+xvCopula(joeCopula(),     x, k=5)
+xvCopula(claytonCopula(), x, k=5)
+xvCopula(normalCopula(),  x, k=5)
+xvCopula(tCopula(),       x, k=5)
+xvCopula(plackettCopula(),x, k=5)
 }
 \keyword{models}
 \keyword{multivariate}

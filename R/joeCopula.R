@@ -55,8 +55,10 @@ setMethod("pCopula", signature("matrix", "joeCopula"),
 	  function(u, copula, ...) .pacopula(u, copJoe, theta=copula@parameters))
 
 setMethod("dCopula" , signature("matrix", "joeCopula"),
-	  function (u, copula, log = FALSE, ...)
-	  copJoe@dacopula(u, theta=copula@parameters, log=log, ...))
+	  function (u, copula, log = FALSE, ...) {
+	      if(is.na(th <- copula@parameters[1])) stop("parameter is NA")
+	      copJoe@dacopula(u, theta=th, log=log, ...)
+	  })
 
 ## pCopula() and dCopula() *generic* already deal with non-matrix case!
 ## setMethod("pCopula", signature("numeric", "joeCopula"),

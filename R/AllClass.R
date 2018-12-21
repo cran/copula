@@ -23,6 +23,12 @@ setClass("parCopula", contains = c("Copula", "VIRTUAL"))
 setClass("xcopula", contains = c("parCopula", "VIRTUAL"),
          slots = c(copula = "parCopula"))
 
+##' Virtual class of copulas with explicit 'dimension':
+setClass("dimCopula", contains = c("Copula", "VIRTUAL"),
+         slots = c(dimension = "integer"))
+
+setMethod("dim", signature(x = "dimCopula"), function(x) x@dimension)
+
 ## This has advantage that arithmetic with scalars works "for free" already:
 setClass("interval", contains = "numeric", # of length 2
 	 slots = c(open  = "logical"),# of length 2
@@ -197,7 +203,6 @@ setClass("outer_nacopula", contains = "nacopula",
              ##
              TRUE
          })
-
 
 ## The dim() method is nicely defined  *recursive*ly :
 setMethod("dim", signature(x = "nacopula"),

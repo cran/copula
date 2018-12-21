@@ -7,11 +7,8 @@ expr2R <- function(fname) {
 #  myexpr <- sub("\\)$", "", myexpr)
 #  myexpr <- strsplit(myexpr, ",")[[1]]
 
-  myexpr <- c(parse(text=myexpr)) ## c is important!
-#### The following no longer work because it adds an attribute
-#### which stops the sourcing
-#  myexpr <- parse(text=myexpr)
-  myexpr
+  ## return
+  parse(text=myexpr, keep.source=FALSE)
 }
 
 getDExpr <- function(expr, name) {
@@ -155,7 +152,7 @@ algr2dump <- function(copula) {
 }
 
 library(copula)
-algr2dump(plackettCopula(1))      ## generates plackettExpr.R
-algr2dump(galambosCopula(1))      ## generates galambosExpr.R
-algr2dump(huslerReissCopula(1))   ## generates huslerReissExpr.R
-algr2dump(tawnCopula(0))          ## generates tawnExpr.R
+algr2dump(plackettCopula(1))      ## generates ../../../R/plackettExpr.R
+algr2dump(galambosCopula(1))      ## generates ../../../R/galambosExpr.R
+algr2dump(huslerReissCopula(1))   ## generates ../../../R/huslerReissExpr.R
+algr2dump(tawnCopula(0))          ## generates ../../../R/tawnExpr.R

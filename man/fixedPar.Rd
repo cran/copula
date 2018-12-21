@@ -8,12 +8,14 @@
 \alias{fixedParam<-,rotCopula,logical-method}
 %
 \alias{isFree}
+\alias{isFree,parCopula-method}
 \alias{isFree,copula-method}
 \alias{isFree,khoudrajiCopula-method}
 \alias{isFree,mixCopula-method}
 \alias{isFree,rotCopula-method}
 \alias{isFreeP}
 \alias{nParam}
+\alias{nParam,parCopula-method}
 \alias{nParam,copula-method}
 \alias{nParam,khoudrajiCopula-method}
 \alias{nParam,mixCopula-method}
@@ -27,6 +29,8 @@
   The first two functions set or modify the \dQuote{fixedness}, whereas
   \code{isFree()}, \code{isFreeP()} and \code{nParam()} are utilities
   enquiring about the \dQuote{fixedness} of the parameters (of a copula).
+%% FIXME: Say for each of these three what they do (here or in \value{..}
+%% ==> use the (roxygen) comments in ../R/fixedPar.R !!
 }
 \usage{
 fixParam(param, fixed = TRUE)

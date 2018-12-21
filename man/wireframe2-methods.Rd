@@ -47,7 +47,8 @@
   \item{par.settings}{See \code{\link{wireframe}()}.}
   \item{FUN}{the \code{\link{function}} to be plotted; for a "copula", typically
     \code{\link{dCopula}} or \code{\link{pCopula}}; for an "mvdc",
-    rather \code{\link{dMvdc}}, etc.}
+    rather \code{\link{dMvdc}}, etc.  In general of the form
+    \code{function(x, copula)}.}
   \item{n.grid}{the number of grid points used in each dimension.  This
     can be a vector of length two, giving the number of grid points used
     in x- and y-direction, respectively; the function \code{FUN} will be
@@ -103,6 +104,8 @@ wireframe2(cop, pCopula, shade = TRUE, col = "gray60") # ditto, "shaded"+grid
 wireframe2(cop, pCopula, drape = TRUE, xlab = quote(x[1])) # adjusting an axis label
 wireframe2(cop, dCopula, delta=0.01) # the density
 wireframe2(cop, dCopula) # => the density is set to 0 on the margins
+wireframe2(cop, function(u, copula) dCopula(u, copula, log=TRUE),
+           zlab = list(quote(log(c(u[1],u[2]))), rot=90), main = "dCopula(.., log=TRUE)")
 
 
 ## For 'mvdc' objects

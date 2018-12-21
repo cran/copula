@@ -51,8 +51,9 @@ fitLambda(u, method = c("Schmid.Schmidt", "t"), p = min(100/nrow(u), 0.1),
   Springer, Lecture Notes in Statistics -- Proceedings.
 
   Schmid, F., Schmidt, R. (2007). Multivariate conditional versions of
-  Spearman's rho and related measures of tail dependence. \emph{Journal
-  of Multivariate Analysis} \bold{98}, 1123--1140.
+  Spearman's rho and related measures of tail dependence.
+  \emph{Journal of Multivariate Analysis} \bold{98}, 1123--1140.
+  \doi{10.1016/j.jmva.2006.05.005}
 }
 \examples{
 n <- 10000 # sample size

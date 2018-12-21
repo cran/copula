@@ -1,24 +1,24 @@
 Package: copula
-Version: 0.999-18
-VersionNote: Last CRAN: 0.999-17 on 2017-06-17
-Date: 2017-08-31
+Version: 0.999-19
+VersionNote: Last CRAN: 0.999-18 on 2017-08-31
+Date: 2018-12-19
 Title: Multivariate Dependence with Copulas
-Author: Marius Hofert <marius.hofert@uwaterloo.ca>,
- Ivan Kojadinovic <ivan.kojadinovic@univ-pau.fr>,
- Martin Maechler <maechler@stat.math.ethz.ch>, and
- Jun Yan <jun.yan@uconn.edu>
-Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
+Authors@R: c(person("Marius", "Hofert", role = "aut", email = "marius.hofert@uwaterloo.ca",       comment = c(ORCID = "0000-0001-8009-4665"))
+	   , person("Ivan", "Kojadinovic", role = "aut", email = "ivan.kojadinovic@univ-pau.fr",  comment = c(ORCID = "0000-0002-2903-1543"))
+	   , person("Martin","Maechler", role=c("aut","cre"), email="maechler@stat.math.ethz.ch", comment = c(ORCID = "0000-0002-8685-9910"))
+	   , person("Jun", "Yan", rol = "aut", email = "jun.yan@uconn.edu",                       comment = c(ORCID = "0000-0003-4401-7296"))
+	   , person(c("Johanna", "G."), "Nešlehová", role = "ctb", comment = c("evTestK()", ORCID = "0000-0001-9634-4796")))
 Depends: R (>= 3.1.0)
 Imports: stats, graphics, methods, stats4, Matrix, lattice, colorspace,
         gsl, ADGofTest, stabledist (>= 0.6-4), mvtnorm, pcaPP, pspline,
         numDeriv
 Suggests: MASS, KernSmooth, sfsmisc, scatterplot3d, Rmpfr, bbmle,
-        knitr, parallel, gridExtra, lcopula, mvnormtest, partitions,
-        polynom, qrng, randtoolbox, rugarch, Runuran, tseries, VGAM,
-        VineCopula, zoo
-SuggestsNote: the last lines' packages {parallel, ..., zoo} are only
-        used in vignettes, demos and few tests.
-Enhances: nor1mix
+        knitr, abind, crop, gridExtra, lcopula, mev, mvnormtest,
+        parallel, partitions, polynom, qrng, randtoolbox, rugarch,
+        Runuran, tseries, VGAM, VineCopula, zoo
+SuggestsNote: the last lines' packages {abind, ..., zoo} are only used
+        in vignettes, demos and few tests.
+Enhances: nor1mix, copulaData
 Description: Classes (S4) of commonly used elliptical, Archimedean,
  extreme-value and other copula families, as well as their rotations,
  mixtures and asymmetrizations. Nested Archimedean copulas, related
@@ -38,21 +38,29 @@ Collate: AllClass.R Classes.R AllGeneric.R Auxiliaries.R aux-acopula.R
         asymCopula.R mixCopula.R rotCopula.R Copula.R special-func.R
         amhCopula.R claytonCopula.R frankCopula.R cop_objects.R
         nacopula.R dC-dc.R amhExpr.R An.R archmCopula.R cCopula.R
-        claytonExpr.R ellipCopula.R empcop.R empPsi.R acR.R
+        claytonExpr.R ellipCopula.R empCopula.R empPsi.R acR.R
         estimation.R evCopula.R evTests.R exchTests.R fgmCopula.R
         fitCopula.R fitLambda.R fitMvdc.R fixedPar.R frankExpr.R
         galambosCopula.R galambosExpr-math.R galambosExpr.R
         ggraph-tools.R pairsRosenblatt.R prob.R gofTrafos.R
         gofEVTests.R gofCopula.R graphics.R gumbelCopula.R gumbelExpr.R
-        huslerReissCopula.R huslerReissExpr.R indepCopula.R
-        indepTests.R joeCopula.R K.R logseries.R mvdc.R margCopula.R
-        matrix_tools.R normalCopula.R opower.R plackettCopula.R
-        plackettExpr.R rstable1.R safeUroot.R schlatherCopula.R
-        stable.R timing.R tCopula.R tawnCopula.R tawnExpr.R tevCopula.R
-        varianceReduction.R wrapper.R xvCopula.R zzz.R
+        huslerReissCopula.R huslerReissExpr.R indepCopula.R fhCopula.R
+        lowfhCopula.R upfhCopula.R indepTests.R joeCopula.R K.R
+        logseries.R mvdc.R margCopula.R matrix_tools.R normalCopula.R
+        opower.R plackettCopula.R plackettExpr.R moCopula.R rstable1.R
+        safeUroot.R schlatherCopula.R stable.R timing.R tCopula.R
+        tawnCopula.R tawnExpr.R tevCopula.R varianceReduction.R
+        wrapper.R xvCopula.R zzz.R
 Encoding: UTF-8
 URL: http://copula.r-forge.r-project.org/
 NeedsCompilation: yes
-Packaged: 2017-08-31 15:24:16 UTC; maechler
+Packaged: 2018-12-20 09:01:55 UTC; maechler
+Author: Marius Hofert [aut] (<https://orcid.org/0000-0001-8009-4665>),
+  Ivan Kojadinovic [aut] (<https://orcid.org/0000-0002-2903-1543>),
+  Martin Maechler [aut, cre] (<https://orcid.org/0000-0002-8685-9910>),
+  Jun Yan [aut] (<https://orcid.org/0000-0003-4401-7296>),
+  Johanna G. Nešlehová [ctb] (evTestK(),
+    <https://orcid.org/0000-0001-9634-4796>)
+Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
 Repository: CRAN
-Date/Publication: 2017-09-01 11:33:14 UTC
+Date/Publication: 2018-12-21 14:50:18 UTC

@@ -34,7 +34,7 @@
   }
 }
 \section{Extends}{
-  Class \code{"ellipCopula"} extends class \code{"\linkS4class{copula}"}
+  Class \code{"ellipCopula"} extends class \code{\linkS4class{copula}}
   directly. Classes \code{"normalCopula"} and \code{"tCopula"} extend
   \code{"ellipCopula"} directly.
 }

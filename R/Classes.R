@@ -13,12 +13,19 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
-### basic copula class #########################################################
 
+## NB: Mother classes "Copula" (and "parCopula") are in ./AllClass.R
+##							  ~~~~~~~~~~
 
-setClass("copula", contains = c("parCopula", "VIRTUAL"),
-         slots = c(dimension = "integer", # as for "nacopula"
-                   parameters = "numeric",
+## The independence copula; don't want it to inherit "funny slots" =>
+setClass("indepCopula", contains = c("dimCopula", "parCopula"),
+         slots = c(exprdist = "expression"))
+# no validity needed anymore: have no 'parameters'
+
+### Basic copula class #########################################################
+
+setClass("copula", contains = c("dimCopula", "parCopula", "VIRTUAL"),
+         slots = c(parameters = "numeric",
                    param.names = "character",
                    param.lowbnd = "numeric",
                    param.upbnd = "numeric",
@@ -33,11 +40,11 @@ setClass("copula", contains = c("parCopula", "VIRTUAL"),
              param <- object@parameters
              upper <- object@param.upbnd
              lower <- object@param.lowbnd
-             lp <- length(param)
-             if (lp != length(upper) && length(upper) != 1)
-                 return("Parameter and upper bound have non-equal length")
-             if (lp != length(lower) && length(lower) != 1)
-                 return("Parameter and lower bound have non-equal length")
+             lp <- length(param) # if that is > 1, we allow |upper| or |lower| = 1
+             if(!(lp == length(upper) || (lp > 1L && length(upper) == 1L)))
+		 return("Parameter and upper bound have non-equal length")
+             if(!(lp == length(lower) || (lp > 1L && length(lower) == 1L)))
+		 return("Parameter and lower bound have non-equal length")
              intervChk <- ## TODO: mkParaConstr(object@paraInterval)
                  function(par) all(is.na(param) | (lower <= param & param <= upper))
              ina.p <- is.na(param)
@@ -45,13 +52,12 @@ setClass("copula", contains = c("parCopula", "VIRTUAL"),
 		 ##if(any(ina.p)) return("some (but not all) parameter values are  NA")
                  if(!intervChk(param)) return("Parameter value(s) out of bound")
              }
-
-	     ## want to allow (all) NA parameters:
+	     ## to allow (all) NA parameters: "not-yet-parametrized"
 	     TRUE
          })
 
 
-## general methods for copula
+## Methods for 'copula'
 setGeneric("dCopula", function(u, copula, log=FALSE, ...) {
     if(!is.matrix(u)) u <- rbind(u, deparse.level = 0L)
     stopifnot(dim(copula) == ncol(u))
@@ -77,11 +83,10 @@ setGeneric("iTau", function(copula, tau, ...) standardGeneric("iTau"))
 setGeneric("iRho", function(copula, rho, ...) standardGeneric("iRho"))
 setGeneric("dTau", function(copula, ...) standardGeneric("dTau"))
 setGeneric("dRho", function(copula, ...) standardGeneric("dRho"))
-
 setGeneric("dTauFun", function(copula) standardGeneric("dTauFun"))
 setGeneric("dRhoFun", function(copula) standardGeneric("dRhoFun"))
 
-## Defunct:
+## Defunct methods
 calibKendallsTau <- function(copula, tau) { .Defunct("iTau"); iTau(copula,tau) }
 calibSpearmansRho <- function(copula, rho) { .Defunct("iRho"); iRho(copula,rho) }
 kendallsTau <- function(copula) { .Defunct("tau"); tau(copula) }
@@ -90,21 +95,52 @@ genInv <- function(copula, s) { .Defunct("psi"); psi(copula,s) }
 genFun <- function(copula, u) { .Defunct("iPsi"); iPsi(copula, u) }
 genFunDer1 <- function(copula, u){ .Defunct("diPsi"); diPsi(copula, u) }
 genFunDer2 <- function(copula, u){ .Defunct("diPsi(*, degree=2)"); diPsi(copula, u, degree=2) }
-
 AfunDer <- function(copula, w) { .Defunct("dAdu"); dAdu(copula, w) }
 Afun    <- function(copula, w) { .Defunct("A"); A(copula, w) }
-
 pcopula <- function(copula, u, ...) { .Defunct("pCopula"); pCopula(u, copula) }
 dcopula <- function(copula, u, ...) { .Defunct("dCopula"); dCopula(u, copula, ...) }
 rcopula <- function(copula, n, ...) { .Defunct("rCopula"); rCopula(n, copula, ...) }
 
-## Deprecated (mid 2016):
-tailIndex <- function(copula) { .Deprecated("lambda"); lambda(copula) }
+## Deprecated methods
+tailIndex <- function(copula) { .Deprecated("lambda"); lambda(copula) } # mid 2016
 
 
-### elliptical copulas, contains normalCopula and tCopula ######################
+### Frechet--Hoeffding bounds ##################################################
 
-## NOTE: This is related to  npar.ellip() in ./ellipCopula.R
+setClass("fhCopula", contains = c("dimCopula", "parCopula", "VIRTUAL"),
+         slots = c(exprdist = "expression")) # -> used in dC-dc.R
+
+## Lower Frechet--Hoeffding bound W
+setClass("lowfhCopula", contains = "fhCopula")
+
+## Upper Frechet--Hoeffding bound M
+setClass("upfhCopula", contains = "fhCopula")
+
+##-> fhCopula.R, lowfhCopula.R, upfhCopula.R  for implementation
+##   ~~~~~~~~~~  ~~~~~~~~~~~~~  ~~~~~~~~~~~~
+
+### Empirical copula ###########################################################
+
+setClass("empCopula", contains = "Copula",
+         slots = c(X = "matrix",
+		   smoothing = "character",
+		   offset = "numeric",
+		   ties.method = "character"),
+	 ## validity methods must return TRUE or string
+	 validity = function(object) {
+	    X <- object@X
+	    if(ncol(X) < 2L)
+		"X must have at least 2 columns"
+	    else if(anyNA(X) || any(X < 0) || any(X > 1))
+		"All entries of X[] must be in [0,1]"
+	    else
+		TRUE
+	 })
+
+
+### Elliptical copulas (normalCopula, tCopula) #################################
+
+## NOTE: This is related to npar.ellip() in ./ellipCopula.R
 validRho <- function(dispstr, dim, lenRho) {
     switch(dispstr, ## checking for correct 'dispstr'
 	   "ar1" =, "ex" = {
@@ -128,7 +164,6 @@ validRho <- function(dispstr, dim, lenRho) {
     TRUE
 }
 
-
 setClass("ellipCopula", contains = c("copula", "VIRTUAL"),
 	 slots = c(dispstr = "character", getRho = "function"),
          validity = function(object)
@@ -142,7 +177,6 @@ setClass("normalCopula", contains = "ellipCopula"
          ## }
          )
 
-
 setClass("tCopula", contains = "ellipCopula",
 	 , slots = c(df.fixed = "logical")
          ## validity =  function(object) {
@@ -154,33 +188,37 @@ setClass("tCopula", contains = "ellipCopula",
          )
 
 
-## methods for ellipCopula??
-
-### Archimedean copulas, contains AMH, Clayton, Frank, Gumbel, ... #############
+### Archimedean copulas (AMH, Clayton, Frank, Gumbel, Joe) #####################
 
 setClass("archmCopula", contains = c("copula", "VIRTUAL"),
-         slots = c(exprdist = "expression"))
+         slots = c(exprdist = "expression"),
+         ## extra check in addition to "copula" validity:
+         validity = function(object) {
+	     if(length(object@parameters) != 1)
+		 "Our Archimedean copulas must currently have a 1-dimensional parameter"
+	     else
+		 TRUE
+         })
 
-## clayton copula
+## Clayton
 setClass("claytonCopula", contains = "archmCopula")
 
-## gumbel copula, also an ev copula
+## Gumbel (also an evCopula) --> see below
 
-## frank copula
+## Frank
 setClass("frankCopula", contains = "archmCopula")
 
-## amh copula
+## AMH
 setClass("amhCopula", contains = "archmCopula")
 
-## Joe copula
+## Joe
 setClass("joeCopula", contains = "archmCopula")
 
-## These can have negative tau for d=2 only:
+## These can have negative tau for d = 2 only:
 ## setClassUnion(..) # <- over kill?; should be enough:
 archm.neg.tau <- c("amhCopula", "claytonCopula", "frankCopula")
 
-
-## methods for archmCopulas
+## Methods for 'archmCopula'
 setGeneric("psi", function(copula, s) standardGeneric("psi"))
 ##FIXME 'log' compulsory:
 ##setGeneric("iPsi", function(copula, u, log, ...) standardGeneric("iPsi"))
@@ -189,26 +227,26 @@ setGeneric("dPsi", function(copula, s, ...) standardGeneric("dPsi"))
 setGeneric("diPsi", function(copula, u, degree=1, log=FALSE, ...) standardGeneric("diPsi"))
 
 
-### Extreme value copulas, contains galambos, husler-reiss, gumbel, ... ########
+### Extreme value copulas (Galambos, Husler--Reiss, Gumbel, Tawn, tEV) #########
 
 setClass("evCopula", contains = c("copula", "VIRTUAL"))
 
-## galambos copula
+## Galambos
 setClass("galambosCopula", contains = "evCopula",
 	 slots = c(exprdist = "expression"))
 
-## gumbel copula, also an archm copula;
+## Gumbel (also an Archimedean copula)
 setClass("gumbelCopula", contains = list("archmCopula", "evCopula"))
 
-## husler-reiss copula
+## Husler--Reiss
 setClass("huslerReissCopula", contains = "evCopula",
 	 slots = c(exprdist = "expression"))
 
-## tawn copula; does not offer full range of dependence
+## Tawn (does not offer full range of dependence)
 setClass("tawnCopula", contains = "evCopula",
 	 slots = c(exprdist = "expression"))
 
-## tEV copula
+## tEV
 setClass("tevCopula", contains = "evCopula"
 	 , slots = c(df.fixed = "logical")
          ## , validity = function(object) {
@@ -223,43 +261,40 @@ setGeneric("A", function(copula, w) standardGeneric("A"))
 setGeneric("dAdu", function(copula, w) standardGeneric("dAdu"))
 setGeneric("dAdtheta", function(copula, w) standardGeneric("dAdtheta"))
 
-### independent copula class ###################################################
-
-## it should contain all three *virtual* superclasses,
-## but we don't want it to inherit "funny slots"
-setClass("indepCopula", contains = c("evCopula", "archmCopula"))
-
 
 ### Other copulas ##############################################################
 
-## Farlie-Gumbel-Morgenstern multivariate copula
+## Marshall--Olkin copula
+setClass("moCopula", contains = "copula", slots = c(exprdist = "expression"))
+
+## Farlie-Gumbel-Morgenstern copula
 setClass("fgmCopula", contains = "copula", slots = c(exprdist = "expression",
                                                      subsets.char = "character"),
          ## verify that the pdf is positive at each vertex of [0,1]^dim
-         validity = function(object) {
-             dim <- object@dimension
-             if (dim == 2)
-                 return(TRUE)
-             param <- object@parameters
-             valid <- .C(validity_fgm,
-                         as.integer(dim),
-                         as.double(c(rep(0,dim+1),param)),
-                         valid = integer(1))$valid
-             if (valid == 0)
-                 return("Bad vector of parameters")
-             else
-                 return(TRUE)
-         })
+	 validity = function(object) {
+	     dim <- object@dimension
+	     if (dim < 2)
+		 "must be 2-dimensional"
+	     else if (dim == 2)
+		 TRUE
+	     else { # dim >= 3
+		 param <- object@parameters
+		 valid <- .C(validity_fgm,
+			     as.integer(dim),
+			     as.double(c(rep(0,dim+1),param)),
+			     valid = integer(1))$valid
+		 if (valid == 0) "Bad vector of parameters" else TRUE
+	     }
+	 })
+
+## Plackett copula
+setClass("plackettCopula", contains = "copula", slots = c(exprdist = "expression"))
 
 
-## plackett copula
-setClass("plackettCopula", contains = "copula",
-	 slots = c(exprdist = "expression"))
-
-### Multivariate distibution via copula ########################################
+### Multivariate distibutions via copulas ######################################
 
 validMvdc <- function(object) {
-    dim <- object@copula@dimension
+    dim <- dim(object@copula) # @dimension may not exist
     if(!is.finite(dim) || dim < 2)
 	return("'dimension' must be integer >= 2")
     if(dim != length(object@margins))
@@ -339,8 +374,7 @@ logLik.fittedMV <- function(object, ...) {
 	      class = "logLik")
 }
 
-
-##' does the copula have 'df' as *free*, i.e., non-fixed parameter?
+##' Does the copula have 'df' as *free*, i.e., non-fixed parameter?
 has.par.df <- function(cop, classDef = getClass(class(cop)),
                        isEllip = extends(classDef, "ellipCopula")) {
     ((isEllip && extends(classDef, "tCopula")) || extends(classDef, "tevCopula")) &&

@@ -11,7 +11,8 @@
   bootstrap otherwise.
 }
 \usage{
-exchTest(x, N = 1000, ties = NA, m = 0)
+exchTest(x, N = 1000, ties = NA,
+         ties.method = eval(formals(rank)$ties.method), m = 0)
 }
 \arguments{
   \item{x}{ a data matrix that will be transformed to pseudo-observations.}
@@ -19,10 +20,13 @@ exchTest(x, N = 1000, ties = NA, m = 0)
     simulate realizations of the test statistic under the null
     hypothesis.}
   \item{ties}{ logical; if \code{FALSE}, approximate p-values are computed by
-    means of multiplier bootstrap; if \code{TRUE}, a boostrap adapted to the
+    means of a multiplier bootstrap; if \code{TRUE}, a boostrap adapted to the
     presence of ties in any of the coordinate samples of \code{x}
     is used; the default value of \code{NA} indicates that the
     presence/absence of ties will be checked for automatically.}
+  \item{ties.method}{string specifying how ranks should be computed if
+    there are ties in any of the coordinate samples of \code{x}; passed
+    to \code{\link{pobs}}.}
   \item{m}{ if \code{m=0}, integration in the Cramér--von Mises
     statistic is carried out with respect to the empirical copula; if
   \code{m > 0}, integration is carried out with respect to the Lebesgue

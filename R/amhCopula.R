@@ -61,10 +61,10 @@ amhCopula <- function(param = NA_real_, dim = 2L,
       fullname = "<deprecated slot>")# "Amh copula family; Archimedean copula"
 }
 
-
+## for dim = 2 only :
 pamhCopula <- function(copula, u) {
-  alpha <- copula@parameters[1]
-  if (abs(alpha) <= .Machine$double.eps^.9) return (apply(u, 1, prod))
+  if (abs(alpha <- copula@parameters[1]) <= .Machine$double.eps^.9)
+    return (apply(u, 1, prod))
   ## dim = 2
   ## for (i in 1:dim) assign(paste0("u", i), u[,i])
   u1 <- u[,1]
@@ -72,10 +72,10 @@ pamhCopula <- function(copula, u) {
   u1 * u2 / (1 - alpha * (1 - u1) * (1 - u2))
 }
 
-
+## for dim = 2 only :
 damhCopula <- function(u, copula, log = FALSE, ...) {
-  alpha <- copula@parameters[1]
-  if (abs(alpha) <= .Machine$double.eps^.9) return (rep.int(if(log) 0 else 1, nrow(u)))
+  if (abs(alpha <- copula@parameters[1]) <= .Machine$double.eps^.9)
+    return (rep.int(if(log) 0 else 1, nrow(u)))
   ## bivariate anyway
   u1 <- u[,1]
   u2 <- u[,2]
@@ -84,10 +84,9 @@ damhCopula <- function(u, copula, log = FALSE, ...) {
   if(log) log(r) else r
 }
 
-
 ramhCopula <- function(n, copula) {
   dim <- copula@dimension
-  alpha <- copula@parameters[1]
+  if(is.na(alpha <- copula@parameters[1])) stop("parameter is NA")
   val <- matrix(runif(n * dim), nrow = n)
   if (abs(alpha) <= 100 * .Machine$double.eps)
     return (val)  ## the limit is independence
@@ -132,6 +131,7 @@ rhoAmhCopula <- function(copula, ...) {
   .rhoAmhCopula(copula@parameters[1])
 }
 .rhoAmhCopula <- function(a) {
+    if(is.na(a)) return(a)
     ## Nelsen (2006, p.172); need dilog function, where his dilog(x) = Li_2(1-x) = polylog(1-x, 2)
     ## range of rho: 33 - 48 log 2, 4 pi^2 - 39] ~= [-0.2711, 0.4784]
     ## if |alpha| << 1, do better than the direct formula:
@@ -151,25 +151,24 @@ rhoAmhCopula <- function(copula, ...) {
 pMatAmh <- function (u, copula, ...) {
     ## was pamhCopula
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
-    th <- copula@parameters
+    if(is.na(th <- copula@parameters[1])) stop("parameter is NA")
     if(d == 2 && th < 0) # for now, .. to support negative tau  (FIXME(?): rather in copAMH)
         pamhCopula(copula, u)
     else
-        pacopula(u, copAMH, theta=copula@parameters, ...)
+        pacopula(u, copAMH, theta=th, ...)
 }
 
 dMatAmh <- function (u, copula, log = FALSE, checkPar=TRUE, ...) {
     ## was  damhCopula
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
-    th <- copula@parameters
+    if(is.na(th <- copula@parameters[1])) stop("parameter is NA")
     if(d == 2 && th < 0) # for now, .. to support negative tau
         damhCopula(u, copula, log=log)
     else
-        copAMH@dacopula(u, theta=copula@parameters, log=log, checkPar=checkPar, ...)
+        copAMH@dacopula(u, theta=th, log=log, checkPar=checkPar, ...)
 }
 
 setMethod("rCopula", signature("numeric", "amhCopula"), ramhCopula)
-
 setMethod("pCopula", signature("matrix", "amhCopula"), pMatAmh)
 setMethod("dCopula", signature("matrix", "amhCopula"), dMatAmh)
 
@@ -195,9 +194,7 @@ setMethod("diPsi", signature("amhCopula"),
 
 
 setMethod("tau", signature("amhCopula"), function(copula) tauAMH(copula@parameters[1]))
-
 setMethod("rho", signature("amhCopula"), rhoAmhCopula)
 setMethod("lambda", signature("amhCopula"), function(copula) c(lower=0, upper=0))
-
 setMethod("iTau", signature("amhCopula"), iTauAmhCopula)
 ## iRho() uses default method:  uniroot(rho(.) - rh)

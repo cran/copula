@@ -4,6 +4,63 @@
 \title{News for \R Package \pkg{copula}}% MM: look into ../svn-log-from.all
 \newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
+\section{Changes in version 0.999-19 (2018-12-19, svn r1808)}{
+  \subsection{New Features}{
+    \itemize{
+      \item \code{exchTest()} gets new argument \code{ties.method}.
+
+      \item a new vignette \file{HAXC} on Hierarchical Archimax Copulas.
+
+      \item New simple classes and constructor \code{fhCopula()} for
+      lower and upper Frechet--Hoeffding bounds (\eqn{W} and \eqn{M}),
+      see \code{?fhCopula}.
+
+      \item Empirical copulas now get an explicit class and constructor
+      \code{empCopula()}.
+
+      \item Marshall-Olkin copulas for the bivariate case (\eqn{d = 2})
+      get a class representation and are constructed via \code{moCopula()}.
+
+      \item In the case where \code{loglikCopula(start, u=u,
+	copula=copula)} is \code{+Inf}, as e.g., in the case of data with
+      duplicate columns (perfect correlation), the internal
+      \code{fitCopStart()} and hence \code{fitCopula()} tries harder to
+      work with the iTau()-generated \code{start} values.
+
+      \item The \code{plot()} method for copula objects uses a somewhat
+      experimental smart default for the \code{main} title.
+
+      \item The \code{"copula"} class now gets its \code{dimension} slot
+      from the new virtual class \code{"dimCopula"} which contains all
+      copulas with an explicit \code{dimension} slot.
+
+      \item the \code{"indepCopula"} now extends only \code{"dimCopula"}
+      and \code{"parCopula"} and hence no longer has unuseful slots such
+      as \code{parameter}.
+
+      \item contributors now are all mentioned in \file{DESCRIPTION};
+      and all are listed including their ORCID's.
+
+      \item \code{gofCopula()} gets new argument \code{test.method}.
+
+      \item \code{cCopula()} now works for \code{rotCopula} objects
+      and bivariate \code{mixCopula} objects.
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item Bugfix in \code{dCopula()} method of
+      \code{empCopula(*, smoothing = "beta")}.
+      \item Better error messages when copula parameters are \code{NA}
+      (and hence, e.g. \code{pCopula()} gives an error).
+      \item Bugfix in \code{rCopula(, copula = mixCopula())} if the
+      weights are unit vectors.
+      \item \code{mvdc(<rotCopula>, *)} now works, too.
+      \item fixed thinko in internal \code{chkFun()} called e.g., by \code{perspMvdc()}.
+    }
+  }
+}
+
 \section{Changes in version 0.999-18 (2017-08-31, svn r1681)}{
   \subsection{New Features}{
     \itemize{

@@ -10,7 +10,7 @@
   measured for the following elements: Uranium (U), Lithium (Li), Cobalt
   (Co), Potassium (K), Cesium (Cs), Scandium (Sc), And Titanium (Ti).
 }
-\usage{data(uranium)}
+\usage{data(uranium, package="copula")}
 \format{
   A data frame with 655 observations of the following 7 variables:
   \describe{

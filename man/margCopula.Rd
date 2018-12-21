@@ -23,7 +23,7 @@ margCopula(copula, keep)
   easily obtained.  For a general copula, this may not be an easy problem.
 
   The current implementation only supports normal/t/Archimedean
-  copulas. \code{margCopula} is generic function with methods for the
+  copulas.  \code{margCopula} is generic function with methods for the
   different copula classes.
 }
 \value{

@@ -21,11 +21,14 @@
 \alias{tau,frankCopula-method}
 \alias{tau,gumbelCopula-method}
 \alias{tau,indepCopula-method}
+\alias{tau,lowfhCopula-method}
+\alias{tau,upfhCopula-method}
 \alias{tau,joeCopula-method}
 \alias{tau,normalCopula-method}
 \alias{tau,tCopula-method}
 \alias{tau,fgmCopula-method}
 \alias{tau,plackettCopula-method}
+\alias{tau,moCopula-method}
 \alias{tau,galambosCopula-method}
 \alias{tau,huslerReissCopula-method}
 \alias{tau,tawnCopula-method}
@@ -46,9 +49,12 @@
 \alias{rho,amhCopula-method}
 \alias{rho,fgmCopula-method}
 \alias{rho,plackettCopula-method}
+\alias{rho,moCopula-method}
 \alias{rho,galambosCopula-method}
 \alias{rho,huslerReissCopula-method}
 \alias{rho,indepCopula-method}
+\alias{rho,lowfhCopula-method}
+\alias{rho,upfhCopula-method}
 \alias{rho,tawnCopula-method}
 \alias{rho,tevCopula-method}
 \alias{rho,evCopula-method}
@@ -64,9 +70,12 @@
 \alias{lambda,frankCopula-method}
 \alias{lambda,gumbelCopula-method}
 \alias{lambda,indepCopula-method}
+\alias{lambda,lowfhCopula-method}
+\alias{lambda,upfhCopula-method}
 \alias{lambda,amhCopula-method}
 \alias{lambda,joeCopula-method}
 \alias{lambda,plackettCopula-method}
+\alias{lambda,moCopula-method}
 \alias{lambda,normalCopula-method}
 \alias{lambda,tCopula-method}
 \alias{lambda,acopula-method}
@@ -154,7 +163,7 @@ iRho (copula, rho, \dots)
   Understanding relationships using copulas.
   \emph{North American Actuarial Journal} \bold{2}, 1--25.
 
-  Iwan Kojadinovic and Jun Yan (2010)
+  Iwan Kojadinovic and Jun Yan (2010) %% <--> numerical approximations
   Comparison of three semiparametric methods for estimating dependence
   parameters in copula models.
   \emph{Insurance: Mathematics and Economics} \bold{47}, 52--63.

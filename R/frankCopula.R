@@ -211,6 +211,10 @@ tauFrankCopula <- function(copula) .tauFrankCopula(copula@parameters)
     1 - 4 / a * (1 - debye1(a))
 }
 
+## debye1(a) = 1 - a/4 + a^2 /36 - a^4 /3600  + O(a^5)
+## debye2(a) = 1 - a/3 + a^2 /48 - a^4 /4320  + O(a^5)
+
+
 rhoFrankCopula <- function(copula) .rhoFrankCopula(copula@parameters)
 .rhoFrankCopula <- function(a) { # 'a', also called 'alpha' or 'theta'
   ## For small alpha (not just alpha = 0), need Taylor approx:
@@ -223,15 +227,20 @@ rhoFrankCopula <- function(copula) .rhoFrankCopula(copula@parameters)
     1 + 12/a * (debye2(a) - debye1(a))
 }
 
+
 dTauFrankCopula <- function(copula) .dTauFrankCopula(copula@parameters)
 .dTauFrankCopula <- function(a) {
-  ## FIXME: use Taylor for small |a|
+  ## FIXME: use Taylor for small |a| :
   (2/a)^2 * (a/expm1(a) + 1 - 1/a * debye1(a))
+  ##  a/expm1(a) = 1 - a/2 + a^2 /12 - a^4 /720 + O(a^5)
+  ##  (2/a)^2 * (a/expm1(a) + 1 - 1/a * debye1(a)) =
+  ##  (2/a)^2 * (-1/a + 9/4 - 19/36*a + a^2/12 + a^3/3600 - a^4/720 + O(a^5)) ;  MM, 25.April 2018
+
 }
 
 dRhoFrankCopula <- function(copula) .dRhoFrankCopula(copula@parameters)
 .dRhoFrankCopula <- function(a) {
-  ## FIXME: use Taylor for small |a|
+  ## FIXME: use Taylor for small |a|, using a/expm1(a) = 1 - a/2 + a^2 /12 - a^4 /720 + O(a^5)
   12 / a^2 * (a/expm1(a) - 3 * debye2(a) + 2 * debye1(a))
 }
 
@@ -239,17 +248,17 @@ dRhoFrankCopula <- function(copula) .dRhoFrankCopula(copula@parameters)
 pMatFrank <- function (u, copula, ...) {
     ## was  pfrankCopula
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
-    th <- copula@parameters
+    if(is.na(th <- copula@parameters[1])) stop("parameter is NA")
     if(d == 2 && th < 0) # for now, .. to support negative tau
         pfrankCopula(copula, u=u)
     else
-        pacopula(u, copFrank, theta=copula@parameters, ...)
+        pacopula(u, copFrank, theta=th, ...)
 }
 
 dMatFrank <- function (u, copula, log = FALSE, checkPar=TRUE, ...) {
     ## was  dfrankCopula.pdf
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
-    th <- copula@parameters
+    if(is.na(th <- copula@parameters)) stop("parameter is NA")
     if(d == 2 && th < 0) # for now, copFrank does not yet support negative tau (FIXME?)
         dfrankCopula.pdf(u, copula, log=log)
     else

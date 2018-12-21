@@ -74,8 +74,8 @@ rclaytonBivCopula <- function(n, alpha) {
 
 
 rclaytonCopula <- function(n, copula) {
+  if(is.na(alpha <- copula@parameters[1])) stop("parameter is NA")
   dim <- copula@dimension
-  alpha <- copula@parameters[1]
   if (abs(alpha - 0) < .Machine$double.eps ^ (1/3))
     return(rCopula(n, indepCopula(dim)))
   if (dim == 2) return (rclaytonBivCopula(n, alpha))
@@ -93,9 +93,9 @@ rclaytonCopula <- function(n, copula) {
 ## unused now: it is *CLEARLY WRONG* for negative tau, since pmax(*, 0) is "in the wrong place"
 if(FALSE)
 pclaytonCopula <- function(copula, u) {
+  if(is.na(alpha <- copula@parameters[1])) stop("parameter is NA")
   dim <- copula@dimension
   stopifnot(!is.null(d <- ncol(u)), dim == d)
-  alpha <- copula@parameters[1]
   if (abs(alpha) <= .Machine$double.eps^.9) return (apply(u, 1, prod))
   cdf <- copula@exprdist$cdf
   for (i in 1:dim) assign(paste0("u", i), u[,i])
@@ -146,6 +146,7 @@ pclaytonCopula <- function(copula, u) {
 ## }
 
 claytonRhoFun <- function(alpha) {
+  if(is.na(alpha)) return(alpha)
   ss <- .claytonRhoNeg$ss
   forwardTransf <- .claytonRhoNeg$trFuns$forwardTransf
   valFunNeg <- .claytonRhoNeg$assoMeasFun$valFun
@@ -157,14 +158,16 @@ claytonRhoFun <- function(alpha) {
 
 ##' dRho : derivative of rho(.)
 claytondRho <- function(alpha) {
+  if(is.na(alpha)) return(alpha)
   ss <- .claytonRhoNeg$ss
   forwardTransf <- .claytonRhoNeg$trFuns$forwardTransf
   forwardDer <- .claytonRhoNeg$trFuns$forwardDer
   valFunNeg <- .claytonRhoNeg$assoMeasFun$valFun
   valFunPos <- .claytonRhoPos$assoMeasFun$valFun
   theta <- forwardTransf(alpha, ss)
-
-  as.vector(if(alpha <= 0) valFunNeg(theta, 1) else valFunPos(theta, 1)) * forwardDer(alpha, ss)
+  as.vector(if(alpha <= 0)
+                 valFunNeg(theta, 1)
+            else valFunPos(theta, 1)) * forwardDer(alpha, ss)
 }
 
 rhoClaytonCopula <- function(copula) claytonRhoFun(copula@parameters[1])
@@ -181,24 +184,22 @@ iRhoClaytonCopula <- function(copula, rho) {
 }
 
 dRhoClaytonCopula <- function(copula) {
-  alpha <- copula@parameters[1]
+  if(is.na(alpha <- copula@parameters[1])) return(alpha)
   claytondRho(alpha)
 }
 
 lambdaClaytonCopula <- function(copula) {
-  alpha <- copula@parameters
+  if(is.na(alpha <- copula@parameters[1])) return(rep(alpha, 2))
   c(lower= if(alpha > 0) 2 ^ (-1/alpha) else 0,
     upper= 0)
 }
 
-dTauClaytonCopula <- function(copula) {
-  return( 2 / (copula@parameters+2)^2 )
-}
+dTauClaytonCopula <- function(copula) 2 / (copula@parameters+2)^2
 
 if(FALSE) # unused
 pMatClayton <- function (u, copula, ...) {
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
-    th <- copula@parameters
+    if(is.na(th <- copula@parameters[1])) stop("parameter is NA")
     ## if(d == 2 && th < 0) # for now, .. to support negative tau
     ##     pclaytonCopula(copula, u=u)
     ## else
@@ -207,7 +208,7 @@ pMatClayton <- function (u, copula, ...) {
 
 dMatClayton <- function (u, copula, log = FALSE, checkPar=TRUE, ...) {
     stopifnot(!is.null(d <- ncol(u)), d == copula@dimension)
-    th <- copula@parameters
+    if(is.na(th <- copula@parameters[1])) stop("parameter is NA")
     ##_ now _all_ this should happen in copClayton@dacopula():
     ##_ if(d == 2 && th < 0) { # for now, to support negative tau-- TODO/FIXME: put into copClayton
     ##_     ## wrong(!): dclaytonCopula.pdf(u, copula, log=log)
@@ -229,7 +230,10 @@ dMatClayton <- function (u, copula, log = FALSE, checkPar=TRUE, ...) {
 
 setMethod("rCopula", signature("numeric", "claytonCopula"), rclaytonCopula)
 setMethod("pCopula", signature("matrix", "claytonCopula"),
-          function(u, copula, ...) pacopula(u, copClayton, theta=copula@parameters))
+          function(u, copula, ...) {
+              if(is.na(th <- copula@parameters[1])) stop("parameter is NA")
+              pacopula(u, copClayton, theta=th)
+          })
 setMethod("dCopula", signature("matrix", "claytonCopula"), dMatClayton)
 ## pCopula() and dCopula() *generic* already deal with non-matrix case!
 

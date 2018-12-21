@@ -7,7 +7,7 @@
 Indemnity payment and allocated loss adjustment expense from an insurance
 company.
 }
-\usage{data(loss)}
+\usage{data(loss, package="copula")}
 \format{
   A data frame with 1500 observations of the following 4 variables:
   \describe{

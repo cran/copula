@@ -20,35 +20,43 @@ showProc.time()
 
 (doExtras <- copula:::doExtras())
 
-
 m <- 10 # number of random points
 tau <- 0.5
+set.seed(47)
 
 ## bivariate comparisons
 d <- 2
 u <- pobs(matrix(runif(d * m), m, d))
 
-## each with  4  warnings  "... numerical differentiation used":
-comparederiv(claytonCopula (iTau(claytonCopula(), tau)), u)
-comparederiv(gumbelCopula  (iTau(gumbelCopula(),  tau)), u)
-comparederiv(frankCopula   (iTau(frankCopula(),   tau)), u)
-comparederiv(plackettCopula(iTau(plackettCopula(),tau)), u)
-comparederiv(normalCopula  (iTau(normalCopula(),  tau)), u)
-comparederiv(tCopula(iTau(tCopula(), tau), df.fixed = TRUE), u)
-
+## (Warnings suppressed now via default may.warn=FALSE)
+cDer <- rbind(
+    clayton = comparederiv(claytonCopula (iTau(claytonCopula(), tau)), u),
+    gumbel  = comparederiv(gumbelCopula  (iTau(gumbelCopula(),  tau)), u),
+    frank   = comparederiv(frankCopula   (iTau(frankCopula(),   tau)), u),
+    plackett= comparederiv(plackettCopula(iTau(plackettCopula(),tau)), u),
+    normal  = comparederiv(normalCopula  (iTau(normalCopula(),  tau)), u),
+    tC.fixed= comparederiv(tCopula       (iTau(tCopula(), tau), df.fixed = TRUE), u))
+cDer
+stopifnot(cDer[,"dCdu"      ] <= 0.004, # max: normal   = 0.002166
+          cDer[,"dCdtheta"  ] <= 11e-14,# max: tC.fixed = 5.537e-14
+          cDer[,"dlogcdu"   ] <= 15e-8, # max: normal   = 7.51e-8
+          cDer[,"dlogcdtheta"]<= 6e-9)  # max: normal   = 2.92e-9
 showProc.time()
+
 
 if (doExtras)
 {
     ## d-dimensional
-    d <- 4
+    d <- 4 ; set.seed(44)
     u <- pobs(matrix(runif(d * m), m, d))
 
     nC4 <- normalCopula(rep(iTau(normalCopula(), tau), d * (d-1)/2), dim=d, dispstr = "un")
-    comparederiv(nC4, u)
-
-    tC4 <- tCopula(rep(iTau(tCopula(), tau), d * (d-1)/2), dim=d, dispstr = "un", df.fixed = TRUE)
-    comparederiv(tC4, u)
+    tC4 <- tCopula     (rep(iTau(tCopula(),      tau), d * (d-1)/2), dim=d, dispstr = "un",
+                        df.fixed = TRUE)
+    cD <- rbind(comparederiv(nC4, u),
+                comparederiv(tC4, u))
+    print(cD, digits = 5)
+    stopifnot(apply(cD, 2, max) < c(0.42, 0.18, 2.1e-07, 1.6e-08))
     showProc.time()
 }
 

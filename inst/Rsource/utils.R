@@ -60,13 +60,13 @@ setPar <- function(cop, par) {
 
 ##' Compare true and numerical derivatives
 ##' @return max error of d_C_d*() and d_logc_d*() :
-comparederiv <- function(cop, u) {
+comparederiv <- function(cop, u, may.warn=FALSE) {
     c(dCdu = max(abs((copula:::dCdu     (cop, u) -
-                      copula:::dCduNumer(cop, u, may.warn=FALSE)))),
+                      copula:::dCduNumer(cop, u, may.warn=may.warn)))),
       dCdtheta = max(abs(copula:::dCdtheta     (cop, u) -
-                         copula:::dCdthetaNumer(cop, u, may.warn=FALSE))),
+                         copula:::dCdthetaNumer(cop, u, may.warn=may.warn))),
       dlogcdu = max(abs(copula:::dlogcdu     (cop, u) -
-                        copula:::dlogcduNumer(cop, u, may.warn=FALSE))),
+                        copula:::dlogcduNumer(cop, u, may.warn=may.warn))),
       dlogcdtheta = max(abs(copula:::dlogcdtheta     (cop, u) -
-                            copula:::dlogcdthetaNumer(cop, u, may.warn=FALSE))))
+                            copula:::dlogcdthetaNumer(cop, u, may.warn=may.warn))))
 }

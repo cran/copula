@@ -26,7 +26,7 @@
     \item{\code{param.upbnd}:}{Object of class \code{"numeric"},
       parameter upper bound. }
     \item{\code{fullname}:}{Object of class \code{"character"}, family names
-      of the copula. }
+      of the copula (deprecated).}
   }
 }
 \section{Methods}{

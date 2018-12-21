@@ -43,7 +43,7 @@
 }
 \section{Extends}{
   Class \code{"archmCopula"} extends class \code{"\linkS4class{copula}"}
-  directly.  Class \code{"claytonCopula"}, \code{"frankCopula"},
+  directly. Class \code{"claytonCopula"}, \code{"frankCopula"},
   \code{"gumbelCopula"}, \code{"amhCopula"} and \code{"joeCopula"}
   extends class \code{"archmCopula"} directly.
 }

@@ -10,7 +10,10 @@ vignette: >
   %\VignetteIndexEntry{Wild Animals: Examples of Nonstandard Copulas}
   %\VignetteEncoding{UTF-8}
 ---
-## 1 Example from Marius Hofert and Frederik Vrins
+## 1 Swiss Alps copulas of Hofert, Vrins (2013) ################################
+
+This example implements the Swiss Alps copulas of Hofert, Vrins (2013, "Sibuya
+copulas").
 
 ### Lambda and its inverse
 ```{r}
@@ -91,14 +94,14 @@ C <- function(u, H, Lambda, S1Inv, S2Inv) {
 }
 ```
 Compute the singular component (given $u_1=$ `u1`, find $u_2=$ `u2` on the singular component)
-$u_2 = S2(S1^{-1}(u_1))$ :
+$u_2 = S2(S1^{-1}(u_1))$:
 ```{r}
 s.comp <- function(u1, H, S1Inv, S2){
     if(u1 == 0) 0 else S2 (S1Inv(u1,H), H)
 }
 ```
 
-Generate one bivariate random vector from `C`
+Generate one bivariate random vector from `C`:
 <!-- MM: FIXME make faster: no need to grow  't_h', 'I_' all the time -->
 ```{r, rC1}
 rC1 <- function(H, LambdaInv, S1, S2, p1, p2, p1Inv, p2Inv) {
@@ -205,13 +208,13 @@ wf.plot(grid=grid, val.grid=val.grid, s.comp=s.comp, val.s.comp=val.s.comp,
 ```
 
 
-## 2 A nice example from Wolfgang Trutschnig and Manuela Schreyer ############
+## 2 An example from Wolfgang Trutschnig and Manuela Schreyer ##################
 
 For more details, see
 Trutschnig, Fernandez Sanchez (2014)
-*Copulas with continuous, strictly increasing singular conditional distribution functions*
+"Copulas with continuous, strictly increasing singular conditional distribution functions"
 
-Roughly, one defines an **Iterated Function System** whose attractor is the word
+Roughly, one defines an *Iterated Function System* whose attractor is the word
 "Copula" and starts the chaos game.
 
 ### Define the Iterated Function System
@@ -296,6 +299,62 @@ whereas `U`, the copula sample, indeed is peculiar and contains the word
 par(pty="s")
 plot(U, pch=".", xlab = quote(italic(U[1]) %~% ~ "U[0,1]"),
      asp = 1,    ylab = quote(italic(U[2]) %~% ~ "U[0,1]"))
+```
+
+## 3 Sierpinski tetrahedron ####################################################
+
+This is an implementation of Example 2.3 in
+[https://arxiv.org/pdf/0906.4853.pdf](https://arxiv.org/pdf/0906.4853.pdf)
+
+```{r}
+library(abind) # for merging arrays via abind()
+library(lattice) # for cloud()
+library(sfsmisc) # for polyn.eval()
+```
+
+Implement the random number generator:
+```{r}
+##' @title Generate samples from the Sierpinski tetrahedron
+##' @param n sample size
+##' @param N digits in the base-2 expansion
+##' @return (n, 3)-matrix
+##' @author Marius Hofert
+rSierpinskyTetrahedron <- function(n, N)
+{
+    stopifnot(n >= 1, N >= 1)
+    ## Build coefficients in the base-2 expansion
+    U12coeff <- array(sample(0:1, size = 2*n*N, replace = TRUE),
+                      dim = c(2, n, N), dimnames = list(U12 = c("U1", "U2"),
+                                                        sample = 1:n,
+                                                        base2digit = 1:N)) # (2, n, N)-array
+    U3coeff <- apply(U12coeff, 2:3, function(x) sum(x) %% 2) # (n, N)-matrix
+    Ucoeff <- abind(U12coeff, U3 = U3coeff, along = 1)
+    ## Convert to U's
+    t(apply(Ucoeff, 1:2, function(x)
+        polyn.eval(coef = rev(x), x = 2))/2^N) # see sfsmisc::bi2int
+}
+```
+
+Draw vectors of random numbers following a "Sierpinski tetrahedron copula":
+```{r}
+set.seed(271)
+U <- rSierpinskyTetrahedron(1e4, N = 6)
+```
+
+Use a scatterplot matrix to check all bivariate margins:
+```{r, splom.U, fig.align="center", fig.width=6, fig.height=6}
+pairs(U, gap = 0, cex = 0.25, col = "black",
+      labels = as.expression( sapply(1:3, function(j) bquote(U[.(j)])) ))
+```
+
+All pairs "look" independent but, of course, they aren't:
+```{r, cloud.U, fig.align="center", fig.width=6, fig.height=6}
+cloud(U[,3] ~ U[,1] * U[,2], cex = 0.25, col = "black", zoom = 1,
+      scales = list(arrows = FALSE, col = "black"), # ticks instead of arrows
+      par.settings = list(axis.line = list(col = "transparent"), # to remove box
+                          clip = list(panel = "off"),
+                          standard.theme(color = FALSE)),
+      xlab = expression(U[1]), ylab = expression(U[2]), zlab = expression(U[3]))
 ```
 
 ### Session information

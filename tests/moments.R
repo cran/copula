@@ -24,6 +24,7 @@ source(system.file("Rsource", "utils.R", package="copula", mustWork=TRUE))
 source(system.file("Rsource", "cops.R", package="copula", mustWork=TRUE))
 ## --> copcl, copcl., copObs, copBnds,  excl.2 , copO.2, copBnd.2
 
+options(width = 125)# -> nicer table printing
 showProc.time()
 
 copcl ## the classes (incl. 'indepCopula')
@@ -41,15 +42,14 @@ tau.s <- c(-.999, -.1, 0, (1:3)/10, .5, .999)
 tau(tevCopula(0)) # 0.05804811
 ## restricted tau-range works better
 tau.s <- c(       -.1, 0, 0.05805, (1:2)/9, 0.3)
-
 names(tau.s) <- paste0("tau=", sub("0[.]", ".", formatC(tau.s)))
-tTau <- sapply(tau.s, function(tau)
-               sapply(copObs, iTau, tau = tau))
+tTau <- sapply(tau.s, function(tau) vapply(copObs, iTau, numeric(1), tau = tau))
+## -> 7 warnings: (Joe, Gumbel, Galambos, Husler-Reiss, Tawn, t-ev, FGM)
 tTau
-tTau["joeCopula", "tau=-.1"] <- 1 # tauJoe() "works outside admissible range"
 
 stopifnot(rep(copBnds["min",],ncol(tTau)) <= tTau + 1e-7,
           tTau <= rep(copBnds["max",],ncol(tTau)),
+          tTau["joeCopula", "tau=-.1"] == 1,
           ## theta and tau are comonotone :
           apply(tTau, 1, diff) >= -1e9)
 

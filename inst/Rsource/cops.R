@@ -13,7 +13,7 @@ copcl <- copClasses()
 ## ----  ==> take only those which have a 'dim' argument
 ##' generates a list of copulas (dim = 2) from their class names
 copObjs <- function(cl, first.arg = c("dim", "param"),
-                    exclude = c("indepCopula"),
+                    exclude = c("indepCopula", "lowfhCopula", "upfhCopula", "moCopula"), # don't have iTau(), for example.
                     envir = asNamespace("copula"))
 {
     copF <- sapply(cl, get, envir=envir)

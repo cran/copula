@@ -19,7 +19,9 @@
 ##' @param copula An object of class Copula
 ##' @param indices A vector of indices j in {1,..,d} for which
 ##'        C_{j|1,..,j-1}(u_j | u_1,..,u_{j-1}) is computed
-##' @param log A logical indicating whether the log-transform is computed
+##' @param log A logical indicating whether a vector is return when n = 1
+##' @param drop logical indicating whether one-column matrices are returned
+##'        as vectors
 ##' @param ... Additional arguments
 ##' @return An (n, |indices|) matrix U of supposedly multivariate uniformly
 ##'         distributed realizations (or the log of
@@ -34,8 +36,8 @@ rosenblatt <- function(u, copula, indices = 1:dim(copula), log = FALSE, drop = T
 
     if(is(copula, "normalCopula")) { # Gauss copula (see, e.g., Cambou, Hofert, Lemieux)
 
-        P <- getSigma(copula) # (d, d)-matrix
         max.ind <- tail(indices, n = 1) # maximal index
+        P <- getSigma(copula) # (d, d)-matrix
         x <- qnorm(u[, 1:max.ind, drop = FALSE]) # compute all 'x' we need
         C.j <- function(j) # C_{j|1,..,j-1}(u_j | u_1,..,u_{j-1})
         {
@@ -50,10 +52,16 @@ rosenblatt <- function(u, copula, indices = 1:dim(copula), log = FALSE, drop = T
             }
         }
 
+        ## Return
+        if(drop || n > 1)
+            vapply(indices, C.j, numeric(n))
+        else # n == 1, !drop
+            rbind(vapply(indices, C.j, 1.))#, deparse.level = 0L)
+
     } else if(is(copula, "tCopula")) { # t copula (see, e.g., Cambou, Hofert, Lemieux)
 
-        P <- getSigma(copula) # (d, d)-matrix
         max.ind <- tail(indices, n = 1) # maximal index
+        P <- getSigma(copula) # (d, d)-matrix
         nu <- getdf(copula) # degrees of freedom
         x <- qt(u[, 1:max.ind, drop = FALSE], df = nu) # compute all 'x' we need
         C.j <- function(j) # C_{j|1,..,j-1}(u_j | u_1,..,u_{j-1})
@@ -73,6 +81,12 @@ rosenblatt <- function(u, copula, indices = 1:dim(copula), log = FALSE, drop = T
                 if(log) lres else exp(lres)
             }
         }
+
+        ## Return
+        if(drop || n > 1)
+            vapply(indices, C.j, numeric(n))
+        else # n == 1, !drop
+            rbind(vapply(indices, C.j, 1.))#, deparse.level = 0L)
 
     } else if((NAC <- is(copula, "outer_nacopula")) ||
               is(copula, "archmCopula")) { # (nested) Archimedean copulas
@@ -114,19 +128,53 @@ rosenblatt <- function(u, copula, indices = 1:dim(copula), log = FALSE, drop = T
             }
         }
 
+        ## Return
+        if(drop || n > 1)
+            vapply(indices, C.j, numeric(n))
+        else # n == 1, !drop
+            rbind(vapply(indices, C.j, 1.))#, deparse.level = 0L)
+
+    } else if(is(copula, "rotCopula")) {
+
+        ## Compute the Rosenblatt transform of a rotCopula object
+        ## Note: Similar to the pCopula method for rotCopula objects
+        u.flip <- apply.flip(u, copula@flip) # u with columns suitably flipped so that cCopula(u.flip) = rotated conditional copula
+        res <- cCopula(u.flip, copula = copula@copula, indices = indices, log = log, drop = drop)
+        ## Note: The first component of 'u' should be the original one (not changed)
+        ##       as the 'change' (going to u.flip) was only done to compute the
+        ##       conditional copula functions of a rotated copula.
+        if(1 %in% indices) res[,1] <- u[,1]
+        res
+
+    } else if(is(copula, "mixCopula")) {
+
+        ## Check
+        ## Note: For d > 2, note that Schmitz' formula for conditional copulas is a
+        ##       fraction of weighted sums of copulas and thus not equal to a weighted
+        ##       sum of fractions (unless d = 2 in which case the denominators are all 1).
+        if(dim(copula) != 2)
+            stop("cCopula() is currently only available for bivariate mixCopula objects")
+
+        ## Compute the Rosenblatt transform of a bivariate mixture copula
+        ## Note: Similar to the pCopula method for mixCopula objects.
+        w <- copula@w # vector of mixture weights
+        m <- length(w) # number of copulas in the mixture
+        len.ind <- length(indices)
+        w.cond.cop <- vapply(1:m, FUN = function(k) # (n, len.ind, m)-array
+            w[k] * cCopula(u, copula = copula@cops[[k]], indices = indices,
+                           inverse = FALSE, log = FALSE, drop = FALSE),
+                           FUN.VALUE = matrix(NA_real_, nrow = n,
+                                              ncol = len.ind), ...)
+        wccop <- array(w.cond.cop, dim = c(n, len.ind, m)) # make sure to indeed have an array (e.g., if n = 1)
+        res <- apply(wccop, 1:2, sum) # aggregate over all components of the mixCopula object
+        if(log) res <- log(res)
+
+        ## Return (note: correctly returns a vector if 'drop = TRUE' and n = 1)
+        if(drop && n == 1) drop(res) else res
+
     } else {
 	stop("Not yet implemented for copula class ", class(copula))
     }
-
-    ## Return; drop(): if arg is a 1-col matrix, a vector is returned
-    ## if(drop)
-    ##     drop(vapply(indices, C.j, numeric(n)))
-    ## else
-    ##     vapply(indices, C.j, numeric(n))
-    if(drop || n > 1)
-	vapply(indices, C.j, numeric(n))
-    else # n == 1, !drop
-	rbind(vapply(indices, C.j, 1.))#, deparse.level = 0L)
 }
 
 
@@ -136,6 +184,8 @@ rosenblatt <- function(u, copula, indices = 1:dim(copula), log = FALSE, drop = T
 ##' @param indices A vector of indices j in {1,..,d} for which
 ##'        C^-_{j|1,..,j-1}(u_j | u_1,..,u_{j-1}) is computed
 ##' @param log A logical indicating whether the log-transform is computed
+##' @param drop logical indicating whether one-column matrices are returned
+##'        as vectors
 ##' @param ... Additional arguments
 ##' @return An (n, |indices|) matrix U of copula distributed samples
 ##'         (or the log of the result if log = TRUE)
@@ -264,6 +314,8 @@ iRosenblatt <- function(u, copula, indices = 1:dim(copula), log = FALSE, drop = 
 ##'        C^-_{j|1,..,j-1}(u_j | u_1,..,u_{j-1}) is computed (known as
 ##'        'conditional distribution method' for sampling)
 ##' @param log logical indicating whether the log-transform is computed
+##' @param drop logical indicating whether one-column matrices are returned
+##'        as vectors
 ##' @param ... Additional arguments passed to the underlying
 ##'         rosenblatt() and iRosenblatt()
 ##' @return An (n, d) matrix U of supposedly U[0,1]^d realizations
@@ -279,13 +331,14 @@ cCopula <-  function(u, copula, indices = 1:dim(copula), inverse = FALSE,
     d <- ncol(u)
     stopifnot(0 <= u, u <= 1, d >= 2, is(copula, "Copula"),
               is.logical(inverse), is.logical(log))
-    if(1 > indices || indices > dim(copula))
-        stop("'indices' have to be between 1 and the copula dimension.")
-    if(is.unsorted(indices))
-        stop("'indices' have to be unique and given in increasing order.")
-    if(tail(indices, n = 1) > d)
-        stop("The maximal index must be less than or equal to the number of columns of 'u'")
-
+    if(!missing(indices)) {
+        if(!all(1 <= indices & indices <= dim(copula)))
+            stop("'indices' have to be between 1 and the copula dimension.")
+        if(is.unsorted(indices))
+            stop("'indices' have to be unique and given in increasing order.")
+        if(indices[length(indices)] > d)
+            stop("The maximal index must be less than or equal to the number of columns of 'u'")
+    }
     ## Call work horses
     if(inverse)
         iRosenblatt(u, copula=copula, indices=indices, log=log, drop=drop, ...)

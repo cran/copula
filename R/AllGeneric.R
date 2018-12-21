@@ -48,9 +48,12 @@ setMethod("setTheta", "xcopula", ## set parameter for  daughter copula
 ## get parameters
 setGeneric("getTheta", function(copula, freeOnly = TRUE, attr = FALSE, named = attr)
     standardGeneric("getTheta"), signature = "copula")
+## -- general methods --
 setMethod("getTheta", "xcopula", ## from  daughter copula
 	  function(copula, freeOnly = TRUE, attr = FALSE, named = attr)
 	      getTheta(copula@copula, freeOnly=freeOnly, attr=attr, named=named))
+##' default methods [e.g. for khoudraj & indepCopula]: empty parameter
+setMethod("getTheta", "parCopula", function(copula) numeric())
 
 
 ## assign free parameter *value*s:
@@ -65,4 +68,7 @@ setGeneric("isFree", function(copula) standardGeneric("isFree"))
 setGeneric("nParam", function(copula, freeOnly = FALSE) standardGeneric("nParam"),
            signature = "copula")
 
+##' default methods: empty parameter
+setMethod("isFree",   "parCopula", function(copula) logical())
+setMethod("nParam",   "parCopula", function(copula) 0L)
 

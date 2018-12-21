@@ -25,7 +25,7 @@ chkFun <- function(FUN)
     if(!is.function(FUN)) stop("the 'FUN' argument is not even a function")
     isObj <- function(nm) any(nm == c("copula", "mvdc")) ## [pdq][Cc]opula
     nf <- names(formals(FUN))
-    if(isObj(nf[2]) || nf[1:2] == c("x","X")) ## || is F.n()
+    if(isObj(nf[2]) || all(nf[1:2] == c("x","X"))) ## || is F.n()
         TRUE
     else if(isObj(nf[1])) FALSE
     else NA # and the caller will produce an error eventually
@@ -41,22 +41,22 @@ chkFun <- function(FUN)
 chiPlot <- function(x, plot = TRUE, pval = 0.95, ...)
 {
     if (!is.matrix(x)) x <- as.matrix(x) # (n, 2)-matrix
+    if(ncol(x) != 2) stop("must be a matrix of two columns")
     n <- nrow(x)
-    hfg <- sapply(1:n,
-                  function(i) {
-        H <- (sum(x[,1] <= x[i,1] & x[,2] <= x[i,2]) - 1) / (n - 1)
-        F <- (sum(x[,1] <= x[i,1]) - 1) / (n - 1)
-        G <- (sum(x[,2] <= x[i,2]) - 1) / (n - 1)
-        c(H, F, G)
-    })
-    H <- hfg[1,]
-    F <- hfg[2,]
-    G <- hfg[3,]
+    hfg <- t(sapply(1:n, function(i) {
+        tF <- (x[,1L] <= x[i,1L])
+        tG <- (x[,2L] <= x[i,2L])
+        c(H = sum(tF & tG), F = sum(tF), G = sum(tG))
+    }) - 1) / (n - 1)
+    H <- hfg[,"H"]
+    F <- hfg[,"F"]
+    G <- hfg[,"G"]
     chi <-(H - F * G) / sqrt(F * (1 - F) * G * (1 - G))
     lambda <- 4 * sign( (F - 0.5) * (G - 0.5) ) * pmax( (F - 0.5)^2, (G - 0.5)^2 )
-    cp <- c(1.54, 1.78, 2.18)
-    idx <- pmatch(pval, c(0.9, 0.95, 0.99))
-    if(is.na(idx))
+    cp <- c(1.54, 1.78, 2.18) # critical points
+    stopifnot(is.numeric(pval), length(pval) == 1L)
+    idx <- which(abs(pval - c(0.9, 0.95, 0.99)) < 1e-6)
+    if(length(idx) != 1L)
         stop("pval must be one of 0.9, 0.95, 0.99.")
     cp <- cp[idx]
     ymax <- max(abs(na.omit(chi)), cp / sqrt(n))
@@ -67,15 +67,18 @@ chiPlot <- function(x, plot = TRUE, pval = 0.95, ...)
         abline(- cp / sqrt(n), 0, lty = 3, col="blue")
         lines(c(0, 0), c(-2, 2), lty = 3, col="gray")
     }
-    invisible(cbind(H, F, G, chi, lambda))
+    invisible(cbind(hfg, chi, lambda))
 }
 
 ## Genest and Boies (2003, American Statistician)
-Kplot <- function(x, plot = TRUE, ...) {
+Kplot <- function(x, plot = TRUE, xlim = c(0,1), ylim = c(0,1), ...) {
     if (!is.matrix(x)) x <- as.matrix(x)
+    if(ncol(x) != 2) stop("must be a matrix of two columns")
     n <- nrow(x)
-    H <- sapply(1:n,
-                function(i) (sum(x[,1] <= x[i,1] & x[,2] <= x[i,2]) - 1) / (n - 1))
+### FIXME: should define another 'offset' (or offset of length 2!) such that we could use
+### ----   H <- .Fn(x, offset = c(-1,-1))
+    H <- (sapply(1:n,
+                 function(i) (sum(x[,1] <= x[i,1] & x[,2] <= x[i,2]))) - 1) / (n - 1)
     H <- sort(H)
     K0 <- function(x) x - x * log(x)
     k0 <- function(x) - log(x)
@@ -85,21 +88,16 @@ Kplot <- function(x, plot = TRUE, ...) {
                                       rel.tol=.Machine$double.eps^0.25)$value)
     W <- n * choose(n - 1, 1:n - 1) * W
     if (plot) {
-        plot(W, H, xlim=c(0, 1), ylim=c(0, 1))
+        plot(W, H, xlim=xlim, ylim=ylim, ...)
         curve(K0(x), add=TRUE, col="blue")
         abline(0, 1, col="gray")
     }
     invisible(cbind(H, W))
 }
 
-if(FALSE) { ## Examples for help file
-    ## For now,  ":::" because they are not exported yet
-    x <- c(-2.224, -1.538, -0.807, 0.024, 0.052, 1.324)
-    y <- c(0.431, 1.035, 0.586, 1.465, 1.115, -0.847)
-    copula:::chiPlot(cbind(x, y))
-    copula:::Kplot(cbind(x, y))
-}
-
+## ==> Example for help file (and test):
+## --> ../tests/misc.R
+##     ^^^^^^^^^^^^^^^
 
 ### 2 Base graphics ############################################################
 
@@ -374,13 +372,16 @@ qqplot2 <- function(x, qF, log="", qqline.args=if(log=="x" || log=="y") list(unt
 ##' @return invisible()
 ##' @author Marius Hofert
 plotCopula <- function(x, n, xlim = 0:1, ylim = 0:1,
-                       xlab = quote(U[1]), ylab = quote(U[2]), ...)
+                       xlab = quote(U[1]), ylab = quote(U[2]), main=NULL, ...)
 {
     stopifnot(n >= 1)
     if(dim(x) != 2)
         stop("The copula needs to be bivariate.")
     U <- rCopula(n, copula = x)
-    plot(U, xlim = xlim, ylim = ylim, xlab = xlab, ylab = ylab, ...)
+    xnam <- deparse(substitute(x, parent.frame())) # parent: as called from plot()
+    if(isTRUE(main) || (is.null(main) && grepl("[Cc]opula\\b", xnam)))
+	main <- xnam
+    plot(U, xlim=xlim, ylim=ylim, xlab=xlab, ylab=ylab, main=main, ...)
 }
 
 ##' @title Scatter Plot Method for Class "mvdc"

@@ -66,7 +66,7 @@ dCduNumer <- function(copula, u, method.args = gradControl(d = 0.1), may.warn=TR
 	"dCdu", dQuote(cl)), domain=NA)
     }
     logC <- function(x) log(pCopula(x, copula))
-    dim <- dim(copula) # GETR
+    dim <- dim(copula)
     res <- t(apply(u, 1, function(u.)
         grad(logC, u., side = sides(u., dim, method.args$d, 0, 1),
              method.args = method.args))) * pCopula(u, copula)
@@ -141,7 +141,7 @@ dCduIndepCopula <- function(copula, u, ...) {
 }
 
 
-setMethod("dCdu", signature("parCopula"), dCduNumer) # GETR
+setMethod("dCdu", signature("parCopula"), dCduNumer)
 setMethod("dCdu", signature("joeCopula"), dCduExplicit)
 setMethod("dCdu", signature("archmCopula"), dCduExplicit)
 setMethod("dCdu", signature("plackettCopula"), dCduExplicit)
@@ -358,7 +358,7 @@ dCdthetaEvCopula <- function(copula, u, ...) {
   as.matrix(pCopula(u, copula) * loguv * dAdtheta(copula, w))
 }
 
-setMethod("dCdtheta", signature("parCopula"), dCdthetaNumer) # GETR
+setMethod("dCdtheta", signature("parCopula"), dCdthetaNumer)
 setMethod("dCdtheta", signature("joeCopula"), dCdthetaExplicit)
 setMethod("dCdtheta", signature("tevCopula"), dCdthetaNumer)
 setMethod("dCdtheta", signature("archmCopula"), dCdthetaExplicit)
@@ -468,7 +468,7 @@ dlogcduNumer <- function(copula, u, method.args = gradControl(d=1e-5), may.warn 
 	"dlogcdu", dQuote(cl)), domain=NA)
     }
     logc <- function(x) dCopula(x, copula, log = TRUE)
-    dim <- dim(copula) # GETR
+    dim <- dim(copula)
     t(apply(u, 1, function(u.)
         grad(logc, u., side = sides(u., dim, method.args$d, 0, 1),
              method.args = method.args)))
@@ -502,7 +502,7 @@ dlogcduExplicit <- function(copula, u, ...) {
     mat / dCopula(u, copula)
 }
 
-setMethod("dlogcdu", signature("parCopula"), dlogcduNumer) # GETR
+setMethod("dlogcdu", signature("parCopula"), dlogcduNumer)
 setMethod("dlogcdu", signature("joeCopula"), dlogcduExplicit)
 setMethod("dlogcdu", signature("tevCopula"), dlogcduNumer)
 setMethod("dlogcdu", signature("archmCopula"), dlogcduExplicit)
@@ -602,7 +602,7 @@ dlogcdthetaExplicit <- function(copula, u, ...) {
     mat
 }
 
-setMethod("dlogcdtheta", signature("parCopula"), dlogcdthetaNumer) # GETR
+setMethod("dlogcdtheta", signature("parCopula"), dlogcdthetaNumer)
 setMethod("dlogcdtheta", signature("joeCopula"), dlogcdthetaExplicit)
 setMethod("dlogcdtheta", signature("tevCopula"), dlogcdthetaNumer)
 setMethod("dlogcdtheta", signature("archmCopula"), dlogcdthetaExplicit)

@@ -14,39 +14,33 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-indepCopula <- function(dim = 2L) {
+### Independence copula ########################################################
+
+## Constructor
+indepCopula <- function(dim = 2L)
+{
     ## get expressions of cdf and pdf
-  cdfExpr <- function(n) {
-    uis <- paste0("u", 1:n)
-    expr <- paste(uis, collapse="*")
-    parse(text = expr)
-  }
-
-  pdfExpr <- function(cdf, n) {
-    val <- cdf
-    for (i in 1:n) {
-      val <- D(val, paste0("u", i))
+    cdfExpr <- function(d) {
+        uis <- paste0("u", 1:d)
+        expr <- paste(uis, collapse="*")
+        parse(text = expr)
     }
-    val
-  }
-  cdf <- cdfExpr((dim <- as.integer(dim)))
-  pdf <- pdfExpr(cdf, dim)
-
-  new("indepCopula",
-             dimension = dim,
-             exprdist = c(cdf=cdf, pdf=pdf),
-             parameters = double(0),
-             param.names = character(0),
-             param.lowbnd = double(0),
-             param.upbnd = double(0),
-             fullname = "<deprecated slot>")# "Independence copula"
+    pdfExpr <- function(cdf, d) {
+        val <- cdf
+        for (i in 1:d) {
+            val <- D(val, paste0("u", i))
+        }
+        val
+    }
+    cdf <- cdfExpr((dim <- as.integer(dim)))
+    new("indepCopula", dimension = dim,
+        exprdist = c(cdf = cdf, pdf = pdfExpr(cdf, d = dim)))
 }
 
-setMethod("A", signature("indepCopula"), function(copula, w) rep.int(1, length(w)))
 
+## Methods
 setMethod("rCopula", signature("numeric", "indepCopula"),
           function(n, copula) matrix(runif(n * copula@dimension), nrow = n))
-
 setMethod("pCopula", signature("matrix", "indepCopula"),
 	  function(u, copula, log.p=FALSE) {
 	      stopifnot(ncol(u) == copula@dimension)
@@ -57,11 +51,11 @@ setMethod("dCopula", signature("matrix", "indepCopula"),
 	      stopifnot(ncol(u) == copula@dimension)
 	      rep.int(if(log) 0 else 1, nrow(u))
 	  })
-
 setMethod("tau", "indepCopula", function(copula, ...) 0)
 setMethod("rho", "indepCopula", function(copula, ...) 0)
 setMethod("lambda", "indepCopula",
-          function(copula, ...)  c(lower=0, upper = 0))
+          function(copula, ...)  c(lower = 0, upper = 0))
+setMethod("A", signature("indepCopula"), function(copula, w) rep.int(1, length(w)))
 
 ## GETR
 setMethod("describeCop", c("indepCopula", "character"),

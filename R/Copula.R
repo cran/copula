@@ -117,8 +117,6 @@ setMethod("iRho", signature("archmCopula"), iRhoCopula)
 
 ###-- "Copula" methods + glue  former "copula" <--> former "nacopula" ---------
 
-setMethod("dim", signature("copula"), function(x) x@dimension)
-
 ## Dummy bail-out methods for all generics --> ./zzz.R
 ##  "nacopula" methods                     --> ./nacopula.R
 

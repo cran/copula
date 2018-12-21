@@ -7,7 +7,7 @@
   and natural gas. These data should be very close to those analysed in
   Gr\enc{é}{e}goire, Genest and Gendron (2008).
 }
-\usage{data(gasoil)}
+\usage{data(gasoil, package="copula")}
 \format{
   A data frame of 762 daily prices from 2003 to 2006.
   \describe{

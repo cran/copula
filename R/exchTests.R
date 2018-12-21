@@ -141,9 +141,11 @@ exchEVTest <- function(x, N = 1000, estimator = c("CFG", "Pickands"),
 ##' @param N number of multiplier replications
 ##' @param m grid size; if 0, use pseudo-observations
 ##' @param ties logical indicating whether ties are present
+##' @param ties.method passed to pobs
 ##' @return an object of class 'htest'
 ##' @author Ivan Kojadinovic
-exchTest <- function(x, N = 1000, ties = NA, m = 0) {
+exchTest <- function(x, N = 1000, ties = NA,
+                     ties.method = eval(formals(rank)$ties.method), m = 0) {
 
     ## Checks
     stopifnot(N >= 1L && m >= 0L)
@@ -154,7 +156,7 @@ exchTest <- function(x, N = 1000, ties = NA, m = 0) {
 
     ## Make pseudo-observations
     n <- nrow(x)
-    u <- pobs(x)
+    u <- pobs(x, ties.method = ties.method)
 
     ## Make grid
     if (m > 0L) {
@@ -205,7 +207,7 @@ exchTest <- function(x, N = 1000, ties = NA, m = 0) {
                 u.b[,i] <- u.b[ir[,i], i]
             }
             ## Compute pseudo-observations
-            u.b <- pobs(u.b)
+            u.b <- pobs(u.b, ties.method = ties.method)
 
             ## Make grid if necessary
             if (m == 0L)

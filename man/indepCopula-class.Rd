@@ -11,21 +11,10 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{exprdist}:}{Object of class \code{"expression"}:
-      expressions of the cdf and pdf of the copula. These expressions
-      are used in function 'pcopula' and 'dcopula'. }
     \item{\code{dimension}:}{Object of class \code{"numeric"}, dimension
-    of the copula. }
-    \item{\code{parameters}:}{Object of class \code{"numeric"},
-      parameter values. }
-    \item{\code{param.names}:}{Object of class \code{"character"},
-      parameter names. }
-    \item{\code{param.lowbnd}:}{Object of class \code{"numeric"},
-      parameter lower bounds. }
-    \item{\code{param.upbnd}:}{Object of class \code{"numeric"},
-      parameter upper bounds. }
-    \item{\code{fullname}:}{\bold{deprecated}; object of class \code{"character"}, family names
-      of the copula. }
+      of the copula.}
+    \item{\code{exprdist}:}{an \code{\link{expression}} of length two,
+      for the \dQuote{formulas} of the cdf and pdf of the copula.}% used in ../R/dC-dc.R
   }
 }
 \section{Methods}{
@@ -37,14 +26,14 @@
   }
 }
 \section{Extends}{
-  Class \code{"indepCopula"} extends classes
-  \code{"\linkS4class{archmCopula}"} and
-  \code{"\linkS4class{evCopula}"} directly.
+  Class \code{"indepCopula"} directly extends classes
+  \code{"\linkS4class{dimCopula}"} and \code{"\linkS4class{parCopula}"}.
 }
-%\author{Ivan Kojadinovic and Jun Yan}
+%\author{Ivan Kojadinovic, Jun Yan and Martin M}
 \seealso{
-  \code{\link{indepCopula}},
-  \code{\link{copula-class}}.
+  \code{\link{indepCopula}}; documentation for classes
+  \code{\linkS4class{dimCopula}} and
+  \code{\linkS4class{parCopula}}.
 }
 \examples{
 getClass("indepCopula")

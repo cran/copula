@@ -9,13 +9,14 @@
 }
 \usage{
 ellipCopula (family, param, dim = 2, dispstr = "ex", df = 4, ...)
+
 normalCopula(param, dim = 2, dispstr = "ex")
-    tCopula (param, dim = 2, dispstr = "ex", df = 4, df.fixed = FALSE, df.min = 0.01)
+     tCopula(param, dim = 2, dispstr = "ex", df = 4, df.fixed = FALSE, df.min = 0.01)
 }
 \arguments{
   \item{family}{a character string specifying the family of an
     elliptical copula.  Must be \code{"normal"} (the default) or \code{"t"}.}
-  \item{param}{a numeric vector specifying the parameter values;
+  \item{param}{a \code{\link{numeric}} vector specifying the parameter values;
     \code{P2p()} accesses this vector, whereas
     \code{\link{p2P}()} and \code{\link{getSigma}()} provide
     the corresponding \dQuote{P} matrix, see below.}

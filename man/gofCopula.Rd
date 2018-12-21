@@ -30,22 +30,24 @@ gofCopula(copula, x, \dots)
 \S4method{gofCopula}{copula}(copula, x, N = 1000,
           method = c("Sn", "SnB", "SnC", "Rn"),
           estim.method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
-          simulation = c("pb", "mult"), verbose = interactive(), ties = NA,
+          simulation = c("pb", "mult"), test.method = c("family", "single"),
+          verbose = interactive(), ties = NA,
           ties.method = c("max", "average", "first", "last", "random", "min"),
           fit.ties.meth = eval(formals(rank)$ties.method), \dots)
 
-## Internal 'helper' functions : ---
+## (Deprecated) internal 'helper' functions : ---
 gofPB(copula, x, N, method = c("Sn", "SnB", "SnC"),
       estim.method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
       trafo.method = if(method == "Sn") "none" else c("cCopula", "htrafo"),
-      trafoArgs = list(), verbose = interactive(), useR = FALSE, ties = NA,
+      trafoArgs = list(), test.method = c("family", "single"),
+      verbose = interactive(), useR = FALSE, ties = NA,
       ties.method = c("max", "average", "first", "last", "random", "min"),
       fit.ties.meth = eval(formals(rank)$ties.method), \dots)
 
 gofMB(copula, x, N, method = c("Sn", "Rn"),
       estim.method = c("mpl", "ml", "itau", "irho"),
-      verbose = interactive(), useR = FALSE, m = 1/2, zeta.m = 0,
-      b = 1/sqrt(nrow(x)),
+      test.method = c("family", "single"), verbose = interactive(),
+      useR = FALSE, m = 1/2, zeta.m = 0, b = 1/sqrt(nrow(x)),
       ties.method = c("max", "average", "first", "last", "random", "min"),
       fit.ties.meth = eval(formals(rank)$ties.method), \dots)
 } % NB: keep internal helper functions on this help page, even if hidden !
@@ -64,12 +66,19 @@ gofMB(copula, x, N, method = c("Sn", "Rn"),
     For \code{simulation = "mult"}, one of
     \code{"Sn"} or \code{"Rn"}, where the latter is \eqn{R_n} from
     Genest et al. (2013).}
-  \item{estim.method}{a character string specifying the estimation method to
-    be used to estimate the dependence parameter(s); see \code{\link{fitCopula}()}.}
+  \item{estim.method}{a \code{\link{character}} string specifying the
+    estimation method to be used to estimate the dependence
+    parameter(s); see \code{\link{fitCopula}()}.}
   \item{simulation}{a string specifying the resampling method for
     generating approximate realizations of the test statistic under the null
     hypothesis; can be either \code{"pb"} (parametric bootstrap) or
     \code{"mult"} (multiplier).}
+  \item{test.method}{a \code{\link{character}} string specifying the
+    test method to be used. Only in exceptional cases should this be
+    different from the default \code{test.method = "family"}.
+    If \code{test.method = "single"}, a test precisely for the provided
+    copula (not its parametric family) is conducted. This makes sense only for
+    specific applications such as testing random number generators.}
   \item{verbose}{a logical specifying if progress of the parametric bootstrap
     should be displayed via \code{\link[utils]{txtProgressBar}}.}
   \item{\dots}{for \code{gofCopula}, additional arguments passed to
@@ -231,6 +240,7 @@ n <- 200; N <- 1000 # realistic (but too large for interactive use)
 n <-  60; N <-  200 # (time (and tree !) saving ...)
 
 ## A two-dimensional data example ----------------------------------
+set.seed(271)
 x <- rCopula(n, claytonCopula(3))
 
 ## Does the Gumbel family seem to be a good choice (statistic "Sn")?

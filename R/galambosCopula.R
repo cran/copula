@@ -144,7 +144,7 @@ rgalambosCopula <- function(n, copula) {
   }
   u2 <- vapply(1:n, function(i) uniroot(myfun, c(eps, 1 - eps), v=v[i], u1=u1[i])$root,
                NA_real_)
-  cbind(u1, u2)
+  cbind(u1, u2, deparse.level=0L)
 }
 
 

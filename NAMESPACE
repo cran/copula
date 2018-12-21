@@ -20,7 +20,7 @@ useDynLib(copula, .registration=TRUE)
 ## import all we need, but not more..
 
 importFrom("stats", D, approxfun, cor # 'coef': from "bblme"; 'logLik': from "stats4"
-	 , deriv, dnorm, dpois, dt, ecdf, integrate, .lm.fit, median, model.matrix
+	 , deriv, dnorm, dpois, dt, dbeta, ecdf, integrate, .lm.fit, median, model.matrix
          , na.omit, nobs
          , optimize, optim, p.adjust.methods, p.adjust
          , pchisq, pgamma, pnorm, ppois, ppoints, printCoefmat, pt
@@ -118,6 +118,29 @@ exportMethods(## for "other" (i.e. non copula-package !) generics:
 
 ## Part I: Mainly former copula ----------------------------------------
 
+exportClasses(mvdc)
+exportClasses(Copula, parCopula, xcopula, copula, # virtual classes
+	      ellipCopula, archmCopula, evCopula, fhCopula)
+exportClasses(normalCopula, tCopula)
+exportClasses(claytonCopula, frankCopula, gumbelCopula, amhCopula, joeCopula)
+exportClasses(galambosCopula, huslerReissCopula, tawnCopula, tevCopula)
+exportClasses(fgmCopula, plackettCopula)
+exportClasses(moCopula)
+exportClasses(indepCopula)
+exportClasses(lowfhCopula, upfhCopula)
+exportClasses(empCopula)
+
+export(mvdc)
+export(ellipCopula, archmCopula, evCopula, fhCopula)
+export(normalCopula, tCopula)
+export(claytonCopula, frankCopula, gumbelCopula, amhCopula, joeCopula)
+export(galambosCopula, huslerReissCopula, tawnCopula, tevCopula)
+export(fgmCopula, plackettCopula)
+export(moCopula)
+export(indepCopula)
+export(lowfhCopula, upfhCopula)
+export(empCopula)
+
 export(dCopula, pCopula, rCopula)
 export(cCopula)
 export(dMvdc, pMvdc, rMvdc)
@@ -131,24 +154,6 @@ export(psi, iPsi, diPsi)
 
 ## evCopula methods
 export(A, dAdu, An.biv, An)
-
-exportClasses(mvdc)
-exportClasses(Copula, parCopula, xcopula, copula, # virtual classes
-	      ellipCopula, archmCopula, evCopula)
-exportClasses(indepCopula)
-exportClasses(normalCopula, tCopula)
-exportClasses(claytonCopula, frankCopula, gumbelCopula, amhCopula, joeCopula)
-exportClasses(galambosCopula, huslerReissCopula, tawnCopula, tevCopula)
-exportClasses(fgmCopula, plackettCopula)
-
-export(mvdc)
-export(ellipCopula, archmCopula, evCopula)
-export(normalCopula, tCopula)
-export(indepCopula)
-export(claytonCopula, frankCopula, gumbelCopula, amhCopula, joeCopula)
-export(galambosCopula, huslerReissCopula, tawnCopula, tevCopula)
-export(plackettCopula)
-export(fgmCopula)
 
 ## generic utilities:
 export(describeCop) # generic & methods
@@ -169,7 +174,7 @@ exportClasses(mixCopula) # , parClist , mixWeights  (TODO, notably 'parClist' ??
 export(p2P, P2p, getSigma, extremePairs)
 
 ## empirical copula
-export(F.n, C.n, dCn)# .Fn
+export(F.n, dCn, C.n, toEmpMargins) # .Fn
 
 ## fitting copula
 export(loglikCopula, loglikMvdc)

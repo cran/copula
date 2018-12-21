@@ -104,6 +104,7 @@ rgumbelCopula <- function(n, copula) {
   ## frailty is stable(1,0,0) with 1/alpha
   dim <- copula@dimension
   alpha <- copula@parameters[1]
+  if(is.na(alpha <- copula@parameters[1])) stop("parameter is NA")
   ## reduce to indepCopula
   if (alpha - 1 < .Machine$double.eps ^(1/3) )
       return(rCopula(n, indepCopula(dim=dim)))
@@ -136,6 +137,7 @@ dgumbelCopula <- function(u, copula, log=FALSE, ...) {
   eval(copula@exprdist$pdf)
 }
 
+if(FALSE) # not used anymore -- rather copGumbel@dacopula
 dgumbelCopula.pdf <- function(u, copula, log=FALSE) {
   dim <- copula@dimension
   if (dim > 10) stop("Gumbel copula PDF not implemented for dimension > 10.")

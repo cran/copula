@@ -203,11 +203,18 @@ showProc.time()
 
 showProc.time()
 
-    comparederiv(nc2, v) ## from  ../inst/Rsource/utils.R
-    comparederiv(nc1, v)
-    comparederiv(tc2, v)
-    comparederiv(tc1, v)
-
+cD <- rbind(## comparederiv() <<-- ../inst/Rsource/utils.R
+    Nc2 = comparederiv(nc2, v),
+    Nc1 = comparederiv(nc1, v),
+    tc2 = comparederiv(tc2, v),
+    tc1 = comparederiv(tc1, v))
+cD
+stopifnot(
+    cD[,"dCdu"    ] < 0.3, # max: 0.2357 for 'tc2'
+    cD[,"dCdtheta"] < 0.2, # max: 0.1529 for 'tc2'
+    ## bug the dlog* are "good":
+    cD[,"dlogcdu"    ] < 7e-8, # see 3.886e-8 for both 'Nc'
+    cD[,"dlogcdtheta"] < 4e-8) # max: 1.54e-8 for 'tc2'
 showProc.time()
 
 if (doExtras) {## ~ 7 secs

@@ -297,7 +297,7 @@ function(copula, value) {
 })
 
 
-## describe copula
+## Describe copula
 setMethod(describeCop, c("mixCopula", "character"), function(x, kind, prefix="", ...) {
     m <- length(x@w)
     c1 <- paste0(prefix, "mixCopula from ", m, " components")
@@ -310,8 +310,7 @@ setMethod(describeCop, c("mixCopula", "character"), function(x, kind, prefix="",
 	   "  with weights:\n", dputNamed(x@w))
 })
 
-
-##' The  C() function :
+## The copula
 pMixCopula <- function(u, copula, ...) {
     as.vector(
 	vapply(copula@cops, pCopula, FUN.VALUE=numeric(nrow(u)), u=u, ...)
@@ -321,7 +320,7 @@ pMixCopula <- function(u, copula, ...) {
 
 setMethod("pCopula", signature("matrix",  "mixCopula"), pMixCopula)
 
-##' The  c() function :
+## The density
 dMixCopula <- function(u, copula, log = FALSE, ...) {
     n <- nrow(u) ## stopifnot(is.numeric(n))
     fu <- vapply(copula@cops, dCopula, FUN.VALUE=numeric(n), u=u, log=log, ...)
@@ -332,31 +331,28 @@ dMixCopula <- function(u, copula, log = FALSE, ...) {
     else
 	as.numeric(fu %*% w) # as.*(): drop dimension
 }
-
 setMethod("dCopula", signature("matrix",  "mixCopula"), dMixCopula)
 
 ## Random Number Generation
 setMethod("rCopula", signature("numeric", "mixCopula"),
 	  function(n, copula) {
-	      m <- length(w <- copula@w)
-	      if(n == 1) {
-		  j <- sample(m, size = 1, prob = w)
-		  rCopula(1, copula@cops[[j]])
-	      } else {
-		  nj <- as.vector(rmultinom(n=1, size = n, prob = w))
-		  ## sample nj from j-th copula
-		  U <- lapply(seq(along=nj),
-			      function(j) rCopula(nj[j], copula@cops[[j]]))
-		  ## bind rows, and permute finally:
-		  do.call(rbind, U)[sample.int(n), ]
-	      }
-})
+    ## Determine number of samples from each copula
+    nj <- as.vector(rmultinom(n = 1, size = n, prob = copula@w))
+    ## Draw nj samples from the jth copula
+    U <- lapply(seq(along = nj),
+                function(j) if(nj[j] > 0) rCopula(nj[j], copula@cops[[j]]) else NULL) # fix to work with do.call() if nj == 0
+    ## Bind rows together and randomly permute the entries
+    do.call(rbind, U)[sample.int(n), ]
+          })
 
+## Tail dependence
 setMethod("lambda", "mixCopula", function(copula, ...)
     setNames(c(vapply(copula@cops, lambda, numeric(2)) %*% copula@w),
              c("lower", "upper")))
 
-
-setMethod("rho", "mixCopula", function(copula, ...)
+## Spearman's rho
+setMethod("rho", "mixCopula", function(copula, ...) # note: Kendall's tau non-trivial
     c(vapply(copula@cops, rho, 1.1) %*% copula@w))
+
+
 

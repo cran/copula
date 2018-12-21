@@ -101,15 +101,14 @@ phuslerReissCopula <- function(u, copula) {
 
 dhuslerReissCopula <- function(u, copula, log=FALSE, ...) {
   ## always 2-dim: dim <- copula@dimension
-  u1 <- u[,1]
-  u2 <- u[,2]
   alpha <- copula@parameters[1]
   ## Joe (1997, p.142)
-  u1p <- -log(u1); u2p <- -log(u2); z <- u1p / u2p
-  val <- 1/ (u1 * u2) * pCopula(u, copula) *
-    (pnorm(1/alpha - 0.5 * alpha * log(z)) *
-     pnorm(1/alpha + 0.5 * alpha * log(z)) +
-     0.5 * alpha / u2p * dnorm(1/alpha + 0.5 * alpha * log(z)))
+  l.u <- -log(u) ; u2p <- l.u[,2L]
+  log.z <- log(l.u[,1L] / u2p)
+  val <- 1/ (u[,1L] * u[,2L]) * phuslerReissCopula(u, copula) *
+    (pnorm(1/alpha - 0.5 * alpha * log.z) *
+     pnorm(1/alpha + 0.5 * alpha * log.z) +
+     0.5 * alpha / u2p * dnorm(1/alpha + 0.5 * alpha * log.z))
   ## FIXME: improve log-case
   if(log) log(val) else val
 }
@@ -122,11 +121,13 @@ rhuslerReissCopula <- function(n, copula) {
   eps <- .Machine$double.eps ^ 0.8  ## don't know a better way
   myfun <- function(u2, u1, v) {
     ## Joe (1997, p.147)
-    phuslerReissCopula(cbind(u1, u2), copula) / u1 *
+    phuslerReissCopula(cbind(u1, u2, deparse.level=0L), copula) / u1 *
         pnorm(1/alpha + 0.5 * alpha * log(log(u1) / log(u2))) - v
   }
-  u2 <- sapply(1:n, function(x) uniroot(myfun, c(eps, 1 - eps), v=v[x], u1=u1[x])$root)
-  cbind(u1, u2)
+  cbind(u1, if(n >= 1) vapply(1:n, function(i) uniroot(myfun, c(eps, 1 - eps),
+                                                       v=v[i], u1=u1[i])$root, double(1))
+            else v,
+        deparse.level=0L)
 }
 
 ################################################################################

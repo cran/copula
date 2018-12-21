@@ -78,7 +78,7 @@ double rLog(double p, double Ip) {
  */
 SEXP rLog_vec_c(SEXP n_, SEXP p_, SEXP Ip_) {
     int n = asInteger(n_);
-    double p = asReal(p_),Ip = asReal(Ip_);
+    double p = asReal(p_), Ip = asReal(Ip_);
     SEXP res = PROTECT(allocVector(REALSXP, n));
     double* X = REAL(res);
 

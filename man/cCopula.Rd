@@ -166,6 +166,20 @@ stopifnot(
               cCopula(U, copula = fN @copula, log = TRUE), tolerance = tol),
     all.equal(log(U.Rt),
               cCopula(U, copula = f.t@copula, log = TRUE), tolerance = tol)
- )
+)
+
+## 4) cCopula() for a more sophisticated mixture copula (bivariate case only!)
+
+tau <- 0.5
+cc <- claytonCopula(iTau(claytonCopula(), tau = tau)) # first mixture component
+tc <- tCopula(iTau(tCopula(), tau = tau), df = 3) # t_3 copula
+tc90 <- rotCopula(tc, flip = c(TRUE, FALSE)) # t copula rotated by 90 degrees
+wts <- c(1/2, 1/2) # mixture weights
+mc <- mixCopula(list(cc, tc90), w = wts) # mixture copula with one copula rotated
+
+set.seed(271)
+U <- rCopula(n, copula = mc)
+U. <- cCopula(U, copula = mc) # Rosenblatt transform back to U(0,1)^2 (as a check)
+plot(U., xlab = quote(U*"'"[1]), ylab = quote(U*"'"[2])) # check for uniformity
 }
 \keyword{distribution}

@@ -35,6 +35,7 @@ fixParam <- function(param, fixed = TRUE) {
 ##' @return vector of logicals, TRUE = free
 ##' @author Jun Yan
 isFreeP <- function(param) {
+    stopifnot(is.numeric(param))# => error e.g. if passed a <copula>
     if (is.null(fixed <- attr(param, "fixed"))) rep(TRUE, length(param))
     else if(identical(fixed, TRUE)) rep(FALSE, length(param))
     else !fixed

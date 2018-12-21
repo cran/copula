@@ -1,34 +1,38 @@
----
-title: Copula Constructions for Tail-Dependence Matrices
-author: Marius Hofert
-date: '`r Sys.Date()`'
-output:
-  html_vignette:
-    css: style.css
-vignette: >
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Copula Constructions for Tail-Dependence Matrices}
----
-```{r, message=FALSE}
-require(copula)
+## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 3 of the License, or (at your option) any later
+## version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, see <http://www.gnu.org/licenses/>.
+
+
+### This demo accompanies the paper Embrechts, Hofert, Wang ("Bernoulli and
+### Tail-Dependence Compatibility", 2016)
+
+library(copula)
 doPDF <- FALSE
-```
 
 
-## 1 Plot Liebscher copula
+### 1 Plot Liebscher copula ####################################################
 
-The example we consider is
-\[
-	\mathbf{U}=(\mathrm{max}\{U_{11}^2, U_{21}^2\},\ \mathrm{max}\{U_{12}^2, U_{22}^2\})\sim C\quad\text{for}\quad C(u_1,u_2) = C_1(\sqrt{u_1},\sqrt{u_2}) C_2(\sqrt{u_1},\sqrt{u_2}).
-\]
 
-#### General example setup
-```{r}
+## The example we consider is
+## \[
+## 	\mathbf{U}=(\mathrm{max}\{U_{11}^2, U_{21}^2\},\ \mathrm{max}\{U_{12}^2, U_{22}^2\})\sim C\quad\text{for}\quad C(u_1,u_2) = C_1(\sqrt{u_1},\sqrt{u_2}) C_2(\sqrt{u_1},\sqrt{u_2}).
+## \]
+
+## General example setup
 n <- 2000
 set.seed(271)
-```
 
-```{r}
 ## Define copula/df of U1
 ## lambda_l = 2^{-1/th}; th = 2^{-(1-tau)/(2*tau)}
 family <- "Clayton"
@@ -59,9 +63,7 @@ U. <- cbind(pmax(U1[,1], U3[,1]), pmax(U1[,2], U3[,2]))^2 # Liebscher based on C
 ## => off-diagonal entry of Lambda(_l) is:
 (lambda <- lambda1*lambda2) # 2^(-1/4) * 2 * pt(-2/3, df=4) ~= 0.4553
 (lambda. <- lambda1*lambda3) # 2^(-1/4) * 2^(-3/4) = 1/2
-```
 
-```{r, fig.align="center", fig.width=7.5, fig.height=6}
 ## Plots
 if(doPDF) pdf(file=(file <- "U_Liebscher_n=2000_U1=C_th=4_U2=t3_th=0.5.pdf"), width=6, height=6)
 par(pty="s")
@@ -71,14 +73,12 @@ if(doPDF) pdf(file=(file <- "U_Liebscher_n=2000_U1=C_th=4_U2=sMO_a1=0.6_a2=0.8.p
 par(pty="s")
 plot(U., xlab=expression(italic(U[1])), ylab=expression(italic(U[2])))
 if(doPDF) dev.off()
-```
 
 
-## 2 Sample $\mathbf{Y} = X\mathbf{U} + \mathbf{Z}\circ\mathbf{V}$
+### 2 Sample $\mathbf{Y} = X\mathbf{U} + \mathbf{Z}\circ\mathbf{V}$ ############
 
-Note that the margins are standard uniform by construction.
+## Note that the margins are standard uniform by construction.
 
-```{r}
 ##' @title Sampling Y = XU + Z circ V
 ##' @param n sample size
 ##' @param copU copula of U (m-dimensional) or an (n, m) matrix of samples
@@ -149,17 +149,13 @@ rY <- function(n, copU, copV, X.method=c("random", "multinomial"), ...)
     }
     Y
 }
-```
 
 
-### 2.1 $\mathbf{U}\sim t_3$, $\mathbf{V}\sim\Pi$ or $\mathbf{V}\sim G$
+### 2.1 $\mathbf{U}\sim t_3$, $\mathbf{V}\sim\Pi$ or $\mathbf{V}\sim G$ ########
 
-```{r}
 d <- 2
 set.seed(271)
-```
 
-```{r}
 ## Setup for U
 m <- 2
 family.U <- "t" # copula family
@@ -180,10 +176,9 @@ Y1 <- rY(n, copU=copU, copV=V, X.method="random")
 Y2 <- rY(n, copU=copU, copV=V, X.method="multinomial", prob=c(0.5, 0.5))
 Y3 <- rY(n, copU=copU, copV=copV2, X.method="random")
 Y4 <- rY(n, copU=copU, copV=copV2, X.method="multinomial", prob=c(0.5, 0.5))
-```
 
-```{r, fig.align="center", fig.width=6, fig.height=6}
-## Plot (left: X ~ random; right: X ~ multinomial; top: V ~ Pi; bottom: V ~ G)
+## Plot (left: X ~ random; right: X ~ multinomial; top: V ~ Pi; bottom: V ~ G;
+##       this plot is not contained in the paper)
 opar <- par(no.readonly=TRUE)
 par(pty="s", mar=c(2.6, 2, 1, 1) + 0.1)
 lay <- matrix(1:4, ncol=2, byrow=TRUE) # layout matrix
@@ -196,12 +191,10 @@ par(opar)
 ## Note:
 ## - the shape of Y is mainly determined by U, X
 ## - for X ~ multinomial, the choice of copula for V is barely visible
-```
 
 
 ### 2.2 $\mathbf{U}\sim$ survival MO, $\mathbf{V}\sim\Pi$ or $\mathbf{V}\sim G$
 
-```{r}
 ## Sample U
 alpha <- c(0.25, 0.75) # parameters
 U. <- matrix(runif(3*n), ncol=3) # U'_1, U'_2, U'_12
@@ -219,10 +212,9 @@ Y1. <- rY(n, copU=U, copV=V, X.method="random")
 Y2. <- rY(n, copU=U, copV=V, X.method="multinomial", prob=c(0.5, 0.5))
 Y3. <- rY(n, copU=U, copV=copV3, X.method="random")
 Y4. <- rY(n, copU=U, copV=copV3, X.method="multinomial", prob=c(0.5, 0.5))
-```
 
-```{r, fig.align="center", fig.width=6, fig.height=6}
-## Plot (left: X ~ random; right: X ~ multinomial; top: V ~ Pi; bottom: V ~ G)
+## Plot (left: X ~ random; right: X ~ multinomial; top: V ~ Pi; bottom: V ~ G;
+##       this plot is not contained in the paper)
 opar <- par(no.readonly=TRUE)
 par(pty="s", mar=c(2.6, 2, 1, 1) + 0.1)
 lay <- matrix(1:4, ncol=2, byrow=TRUE) # layout matrix
@@ -249,12 +241,10 @@ plot(Y1., xlab=expression(italic(Y[1])), ylab=expression(italic(Y[2])), cex=0.5)
 plot(Y2., xlab=expression(italic(Y[1])), ylab=expression(italic(Y[2])), cex=0.5) # U=sMO, X=multinomial, V=Pi
 par(opar)
 if(doPDF) dev.off()
-```
 
 
-## 3 Example of Federico Degen
+### 3 Example of Federico Degen ################################################
 
-```{r}
 ## Y for the example of Federico Degen (note: m=1)
 rY.FD <- function(n, copV, alpha)
 {
@@ -293,9 +283,7 @@ rY.FD <- function(n, copV, alpha)
     ## 5) build Y
     X*U + Z*V
 }
-```
 
-```{r}
 ## General example setup
 d <- 4
 alpha <- 1/(d-1) # maximal allowed alpha
@@ -311,9 +299,7 @@ copV <- ellipCopula(family, param=th, dim=d) # V ~ Ga
 ## Sample Y
 Y  <- rY.FD(n, copV=V, alpha=alpha)
 Y. <- rY.FD(n, copV=copV, alpha=alpha)
-```
 
-```{r, fig.align="center", fig.width=6, fig.height=6}
 ## Plots
 if(doPDF) pdf(file=(file <- "Y_n=2000_FD_max_alpha_V=Pi.pdf"), width=6, height=6)
 par(pty="s")
@@ -324,4 +310,3 @@ if(doPDF) pdf(file=(file <- "Y_n=2000_FD_max_alpha_V=Ga_tau=0.8.pdf"), width=6, 
 par(pty="s")
 pairs(Y., labels=as.expression( sapply(1:d, function(j) bquote(italic(Y[.(j)]))) ), gap=0, cex=0.25)
 if(doPDF) dev.off()
-```

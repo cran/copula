@@ -114,7 +114,7 @@ h <- c(0.15, 0.15) # h_-, h_+ (for initial value)
 
 ### Sampling
 
-```{r, fig.align="center", fig.width=7.5, fig.height=6}
+```{r, fig.align="center", fig.width=7.5, fig.height=6, fig.show="hide"}
 theta <- iTau.GIG(tau, c(nu, NA)) # determine theta such that tau is matched (for given nu)
 set.seed(1000)
 U <- rnacopula.GIG(n, d, theta)

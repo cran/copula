@@ -36,12 +36,36 @@
   \emph{Journal of the Royal Statistical Society: Series C (Applied
     Statistics)} \bold{30}, 3, 249--253.
 }
+\note{
+  In the \pkg{copula} package, the Log(p) distribution is needed only
+  for generating Frank copula observations, namely in
+  \code{\link{copFrank}@V0()}, where \eqn{p = 1 - exp(-\theta)}, i.e.,
+  \code{p = -expm1(-theta)} and \code{Ip = exp(-theta)}.
+
+  For large \eqn{\theta} it would be desirable to pass \code{-theta}
+  to \code{rlog()} instead of \code{p}.  This has not yet been implemented.
+}
 \examples{
 ## Sample n random variates from a Log(p) distribution and plot a
-## histogram
+## "histogram"
 n <- 1000
 p <- .5
 X <- rlog(n, p)
-hist(X, prob = TRUE)
+table(X) ## distribution on the integers {1, 2, ..}
+## ==> The following plot is more reasonable than a  hist(X, prob=TRUE) :
+plot(table(X)/n, type="h", lwd=10, col="gray70")
+
+## case closer to numerical boundary:
+lV <- log10(V <- rlog(10000, Ip = 2e-9))# Ip = exp(-theta) <==> theta ~= 20
+hV <- hist(lV, plot=FALSE)
+dV <- density(lV)
+## Plot density and histogram on log scale with nice axis labeling & ticks:
+plot(dV, xaxt="n", ylim = c(0, max(hV$density, dV$y)),
+     main = "Density of [log-transformed] Log(p),  p=0.999999..")
+abline(h=0, lty=3); rug(lV); lines(hV, freq=FALSE, col = "light blue"); lines(dV)
+rx <- range(pretty(par("usr")[1:2]))
+sx <- outer(1:9, 10^(max(0,rx[1]):rx[2]))
+axis(1, at=log10(sx),     labels= FALSE, tcl = -0.3)
+axis(1, at=log10(sx[1,]), labels= formatC(sx[1,]), tcl = -0.75)
 }
 \keyword{distribution}

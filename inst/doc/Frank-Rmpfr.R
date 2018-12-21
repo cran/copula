@@ -146,22 +146,24 @@ require("Rmpfr")## compute the same with *high* accuracy ...
 MPrecBits <- c(160, 128, 96)
 mkNm <- function(bits) sprintf("%03d.bits", bits)
 ## As it takes a while, cache the result:
-fnam <- sprintf("mlogL_mpfr_%s.rda", Sys.info()[["machine"]])
-if (!file.exists(fn <- file.path(copDDir,fnam))) {
-  print(system.time(
+fnam <- sprintf("mlogL_mpfr_%s.rds", Sys.info()[["machine"]])
+if(file.exists(fn <- file.path(copDDir, fnam))) {
+    nllMP <- readRDS(fn)
+} else {
+    print(system.time(
     nllMP <- lapply(MPrecBits, function(pBit) {
         nlM <- thM <- mpfr(thet, precBits = pBit)
         ## (vapply() does not work for "Rmpfr":)
         for(i in seq_along(thet)) nlM[i] <- mlogL(thM[i])
         nlM
     })
-  )) ## 91.226 0.013 91.506 [nb-mm icore 5]
+  )) ## ~ 18 sec [R 3.5.1 nb-mm4 core I7vPro]; was 91 sec [2011-06-14 nb-mm icore 5]
   names(nllMP) <- mkNm(MPrecBits)
   copSrcDDir <- if(Sys.getenv("USER") == "maechler")
       '~/R/Pkgs/copula/inst/doc' else ""
   if(file.exists(copSrcDDir))# <<- only for certain users; not on CRAN etc
-      save(nllMP, file = file.path(copSrcDDir, fnam))
-} else load(fn)
+      saveRDS(nllMP, file = file.path(copSrcDDir, fnam), version = 2)
+}
 
 colB <- c("blue3","violetred4","tan3")
 ltyB <- c(5:3)

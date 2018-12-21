@@ -31,10 +31,11 @@ mvdc <- function(copula, margins, paramMargins, marginsIdentical = FALSE,
 		 check = TRUE, fixupNames = TRUE)
 {
     if (marginsIdentical) {
+        dim <- dim(copula)
 	if(length(margins) == 1)
-	    margins <- rep(margins, copula@dimension)
+	    margins <- rep(margins, dim)
 	if(length(paramMargins) == 1)
-	    paramMargins <- rep(paramMargins, copula@dimension)
+	    paramMargins <- rep(paramMargins, dim)
     }
     if(check) {
 	mvdCheckM(margins, "p")
@@ -66,7 +67,7 @@ mvdc <- function(copula, margins, paramMargins, marginsIdentical = FALSE,
 ##' @author Martin Maechler
 margpnames <- function(mv) {
     nMar <- lengths(mv@paramMargins) # or vapply(mv@paramMargins, nFree, 1L)
-    p <- mv@copula@dimension
+    p <- dim(mv@copula)
     pnms <- unlist(lapply(mv@paramMargins, names)) # maybe NULL
     if (sum(nMar) == 0) character()
     else if(mv@marginsIdentical) ## all the same ==> names only of *first* margin
@@ -98,7 +99,7 @@ asCall <- function(fun, param)
 }
 
 dMvdc <- function(x, mvdc, log=FALSE) {
-  dim <- mvdc@copula@dimension
+  dim <- dim(mvdc@copula)
   densmarg <- if(log) 0 else 1
   if (is.vector(x)) x <- matrix(x, nrow = 1)
   u <- x
@@ -120,7 +121,7 @@ dMvdc <- function(x, mvdc, log=FALSE) {
 }
 
 pMvdc <- function(x, mvdc) {
-  dim <- mvdc@copula@dimension
+  dim <- dim(mvdc@copula)
   if (is.vector(x)) x <- matrix(x, nrow = 1)
   u <- x
   for (i in 1:dim) {
@@ -131,7 +132,7 @@ pMvdc <- function(x, mvdc) {
 }
 
 rMvdc <- function(n, mvdc) {
-  dim <- mvdc@copula@dimension
+  dim <- dim(mvdc@copula)
   u <- rCopula(n, mvdc@copula)
   x <- u
   for (i in 1:dim) {

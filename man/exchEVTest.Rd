@@ -28,7 +28,7 @@ exchEVTest(x, N = 1000,  estimator = c("CFG", "Pickands"),
     the Pickands dependence function \eqn{A()} to use; can be either
     \code{"CFG"} or \code{"Pickands"}; see Genest and Segers (2009).}
   \item{ties}{logical; if \code{FALSE}, approximate p-values are computed by
-    means of multiplier bootstrap; if \code{TRUE}, a boostrap adapted to the
+    means of a multiplier bootstrap; if \code{TRUE}, a boostrap adapted to the
     presence of ties in any of the coordinate samples of \code{x}
     is used; the default value of \code{NA} indicates that the
     presence/absence of ties will be checked for automatically.}

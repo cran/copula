@@ -67,7 +67,6 @@ rotCopula <- function(copula, flip = TRUE) {
 ##'        the default value is all TRUE which gives the survival copula
 ##' @return a new "rotExplicitCopula" object; see above
 ##' @author Jun Yan
-
 rotExplicitCopula <- function(copula, flip = TRUE) {
     stopifnot(isExplicit(copula))
     d <- dim(copula)
@@ -105,9 +104,9 @@ rotExplicitCopula <- function(copula, flip = TRUE) {
         term <- do.call(substitute, list(cdf, eval(rep.l)))
         rotCdf <- substitute(a + sgn * b, list(a = rotCdf, b = term, sgn = Sign[i]))
     }
-    oldu <- paste0("u", 1:d)[flip]
+    oldu <- paste0("u", 1:d)[flip] # TODO: is character(0) if flip = rep(FALSE, ...); probably needs if(any(flip)) ... else ...
     newu <- paste0("1 - ", oldu)
-    flip.l <- parse(text = paste0(
+    flip.l <- parse(text = paste0( # TODO: fails for 'oldu' = character(0) (if flip = c(FALSE, FALSE))
                         "list(",
                         paste0(oldu, " = quote(", newu, ")", collapse = ", "),
                         ")"))
@@ -141,8 +140,9 @@ rotExplicitCopula <- function(copula, flip = TRUE) {
 ### Basic methods
 ##################################################################################
 
-## dimension setMethod("dim", signature("rotCopula"), ...) : via "xcopula"
-
+## dimension
+## setMethod("dim", signature("rotCopula"), function(x) dim(x@copula))
+## MM: already works by inheritance
 
 ## parameter names
 setMethod("paramNames", signature("rotCopula"), function(x) paramNames(x@copula))
