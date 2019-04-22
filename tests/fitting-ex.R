@@ -24,6 +24,7 @@ source(system.file("Rsource", "utils.R",     package="copula", mustWork=TRUE))
 
 uu <- array(c(9, 7, 8, 3, 2,   4, 1, 5, 6, 10,
               6, 9, 1, 7, 3,   2, 5, 8, 4, 10), dim = c(10L, 2L)) / 11
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(7)
 u3 <- cbind(uu, round(runif(10),2))
 

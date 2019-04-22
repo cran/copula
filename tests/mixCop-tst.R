@@ -40,6 +40,7 @@ stopifnot(dim(mGG) == 2, inherits(mGG, "mixCopula"),
 )
 mGG # 4 parameters
 
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(17)
 uM  <- rCopula( 600, mC)
 uGG <- rCopula(1000, mGG)
