@@ -75,9 +75,9 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
   with components \code{method}, \code{loglik}, and \code{convergence},
   all three from corresponding slots of the
   \code{"\linkS4class{fitMvdc}"} objects, and
+
   \item{coefficients}{a matrix of estimated coefficients, standard
   errors, t values and p-values.}
-
 }
 \note{
   User-defined marginal distributions can be used as long as the

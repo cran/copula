@@ -1,14 +1,14 @@
 Package: copula
-Version: 0.999-19.1
-VersionNote: Last CRAN: 0.999-18 on 2017-08-31
-Date: 2018-12-19
+Version: 0.999-20
+VersionNote: Last CRAN: 0.999-19 on 2018-12-19
+Date: 2020-02-03
 Title: Multivariate Dependence with Copulas
 Authors@R: c(person("Marius", "Hofert", role = "aut", email = "marius.hofert@uwaterloo.ca",       comment = c(ORCID = "0000-0001-8009-4665"))
 	   , person("Ivan", "Kojadinovic", role = "aut", email = "ivan.kojadinovic@univ-pau.fr",  comment = c(ORCID = "0000-0002-2903-1543"))
 	   , person("Martin","Maechler", role=c("aut","cre"), email="maechler@stat.math.ethz.ch", comment = c(ORCID = "0000-0002-8685-9910"))
 	   , person("Jun", "Yan", rol = "aut", email = "jun.yan@uconn.edu",                       comment = c(ORCID = "0000-0003-4401-7296"))
 	   , person(c("Johanna", "G."), "Nešlehová", role = "ctb", comment = c("evTestK()", ORCID = "0000-0001-9634-4796")))
-Depends: R (>= 3.1.0)
+Depends: R (>= 3.2.0)
 Imports: stats, graphics, methods, stats4, Matrix, lattice, colorspace,
         gsl, ADGofTest, stabledist (>= 0.6-4), mvtnorm, pcaPP, pspline,
         numDeriv
@@ -16,8 +16,9 @@ Suggests: MASS, KernSmooth, sfsmisc, scatterplot3d, Rmpfr, bbmle,
         knitr, abind, crop, gridExtra, lcopula, mev, mvnormtest,
         parallel, partitions, polynom, qrng, randtoolbox, rugarch,
         Runuran, tseries, VGAM, VineCopula, zoo
-SuggestsNote: the last lines' packages {abind, ..., zoo} are only used
-        in vignettes, demos and few tests.
+SuggestsNote: packages {abind, ..., zoo} (last lines above) are only
+        used in vignettes, demos and a few tests.
+VignetteBuilder: knitr
 Enhances: nor1mix, copulaData
 Description: Classes (S4) of commonly used elliptical, Archimedean,
  extreme-value and other copula families, as well as their rotations,
@@ -33,7 +34,6 @@ Description: Classes (S4) of commonly used elliptical, Archimedean,
  non-parametric estimators of the Pickands dependence function.
 License: GPL (>= 3) | file LICENCE
 ByteCompile: yes
-VignetteBuilder: knitr
 Collate: AllClass.R Classes.R AllGeneric.R Auxiliaries.R aux-acopula.R
         asymCopula.R mixCopula.R rotCopula.R Copula.R special-func.R
         amhCopula.R claytonCopula.R frankCopula.R cop_objects.R
@@ -54,7 +54,7 @@ Collate: AllClass.R Classes.R AllGeneric.R Auxiliaries.R aux-acopula.R
 Encoding: UTF-8
 URL: http://copula.r-forge.r-project.org/
 NeedsCompilation: yes
-Packaged: 2019-04-21 08:56:20 UTC; ripley
+Packaged: 2020-02-04 16:31:00 UTC; maechler
 Author: Marius Hofert [aut] (<https://orcid.org/0000-0001-8009-4665>),
   Ivan Kojadinovic [aut] (<https://orcid.org/0000-0002-2903-1543>),
   Martin Maechler [aut, cre] (<https://orcid.org/0000-0002-8685-9910>),
@@ -63,4 +63,4 @@ Author: Marius Hofert [aut] (<https://orcid.org/0000-0001-8009-4665>),
     <https://orcid.org/0000-0001-9634-4796>)
 Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
 Repository: CRAN
-Date/Publication: 2019-04-22 06:55:54 UTC
+Date/Publication: 2020-02-06 06:20:20 UTC

@@ -1,11 +1,13 @@
 \name{mvdc-class}
-\title{Class "mvdc"}
+\title{Class "mvdc": Multivariate Distributions from Copulas}
 \docType{class}
 \alias{mvdc-class}
 \alias{dim,mvdc-method}
 \alias{show,mvdc-method}
-\description{Class representing multivariate distributions constructed
-  using Sklar's theorem. }
+\description{
+  \code{"mvdc"} is a \code{\link{class}} representing
+  \bold{m}ulti\bold{v}ariate \bold{d}istributions constructed via
+  \bold{c}opula and margins, using Sklar's theorem. }
 \section{Objects from the Class}{
   Objects are typically created by \code{\link{mvdc}()}, or
   can be created by calls of the form \code{new("mvdc", ...)}.

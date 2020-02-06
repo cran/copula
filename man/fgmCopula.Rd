@@ -11,7 +11,6 @@ fgmCopula(param, dim = 2)
 \arguments{
   \item{param}{a numeric vector specifying the parameter values.}
   \item{dim}{the dimension of the copula.}
-  \item{\dots}{ currently nothing. }
 }
 \value{
   A Farlie-Gumbel-Morgenstern copula object of class

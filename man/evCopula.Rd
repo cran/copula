@@ -15,21 +15,21 @@ galambosCopula(param)
 huslerReissCopula(param)
 tawnCopula(param)
 tevCopula(param, df = 4, df.fixed = FALSE)
-%gumbelCopula(param)
+%gumbelCopula(param) ==> ./archmCopula.Rd
 }
 \arguments{
-  \item{family}{ a character string specifying the family of an
-    extreme-value copula. %Implemented families are "gumbel", "galambos" and
-    %"gumbel".
-  }
+  \item{family}{a character string specifying the family of an
+    extreme-value copula.  Currently implemented are %% <--> ../R/evCopula.R
+    \code{"galambos", "gumbel", "huslerReiss", "tawn", "tev"}.}
   \item{param}{ a numeric vector specifying the parameter values. }
-  \item{dim}{ the dimension of the copula. }
-  \item{df}{ a numerical value specifying the number of degrees of
-    freedom the t extreme-value copula.}
-  \item{df.fixed}{ TRUE means that the degrees of freedom will never be
-    considered as a parameter to be estimated; FALSE means that
+  \item{dim}{the dimension of the copula.  Currently, only \code{"gumbel"}
+    allows \code{dim > 2}.}
+  \item{df}{a number specifying the degrees of freedom of the t
+    extreme-value copula, \code{tevCopula()}.}
+  \item{df.fixed}{logical; if true, the degrees of freedom will never be
+    considered as a parameter to be estimated; \code{FALSE} means that
     \code{df} will be estimated if the object is passed as argument to
-    \code{fitCopula}.}
+    \code{\link{fitCopula}}.}
 
   \item{\dots}{ currently nothing. }
 }

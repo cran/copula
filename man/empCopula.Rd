@@ -231,6 +231,13 @@ ecop.orig  <- empCopula(X) # smoothing = "none"
 ecop.beta  <- empCopula(X, smoothing = "beta")
 ecop.check <- empCopula(X, smoothing = "checkerboard")
 
+## Sample from these (smoothed) empirical copulas
+m <- 50
+U.orig  <-  rCopula(m, copula = ecop.orig)
+U.beta  <-  rCopula(m, copula = ecop.beta)
+U.check <-  rCopula(m, copula = ecop.check)
+## Note: They all obviously just resample from the original n = 10 observations
+
 ## Plot
 wireframe2(ecop.orig,  FUN = pCopula, draw.4.pCoplines = FALSE)
 wireframe2(ecop.beta,  FUN = pCopula)

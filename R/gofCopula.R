@@ -14,22 +14,73 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-### Various goodness-of-fit tests ##############################################
+### Various goodness-of-fit test statistics and tests ##########################
 
 
-### Test statistics ############################################################
+### Two-sample test statistic of Remillard, Scaillet (2009) ####################
 
-##' @title Test statistics for tests of U[0,1]^d
-##' @param u An (n, d)-matrix of supposedly U[0,1]^d observations
-##' @param method Various test statistics. Available are:
+##' @title Test Statistic of Remillard, Scaillet (2009, "Testing for equality
+##'        between two copulas")
+##' @param u1 (n1, d)-sample of copula observations (in [0,1]^d)
+##' @param u2 (n2, d)-sample of copula observations (in [0,1]^d)
+##' @param useR logical indicating whether R or C implementations are used
+##' @return value of the test statistic
+##' @author Marius Hofert
+##' @note - See p. 3 in Remillard, Scaillet (2009)
+##'       - R version slow for larger n1, n2 or d
+gofT2stat <- function(u1, u2, useR = FALSE)
+{
+    ## Checks, basic variables etc.
+    if(!is.matrix(u1)) u1 <- rbind(u1)
+    if(!is.matrix(u2)) u2 <- rbind(u2)
+    d1 <- ncol(u1)
+    d2 <- ncol(u2)
+    if(d1 != d2)
+        stop("'u1' and 'u2' must be of the same dimension (same number of columns)")
+    ## Main
+    if(useR)
+    {
+        n1 <- nrow(u1)
+        n2 <- nrow(u2)
+        ## Part 1: u1 with u1
+        res1 <- sum(vapply(seq_len(n1), function(i) {
+            sum(vapply(seq_len(n1), function(k) {
+                prod(1-pmax(u1[i,], u1[k,]))
+            }, numeric(1))
+            )}, numeric(1)))
+        ## Part 2: u1 with u2
+        res2 <- sum(vapply(seq_len(n1), function(i) {
+            sum(vapply(seq_len(n2), function(k) {
+                prod(1-pmax(u1[i,], u2[k,]))
+            }, numeric(1))
+            )}, numeric(1)))
+        ## Part 3: u2 with u2
+        res3 <- sum(vapply(seq_len(n2), function(i) {
+            sum(vapply(seq_len(n2), function(k) {
+                prod(1-pmax(u2[i,], u2[k,]))
+            }, numeric(1))
+            )}, numeric(1)))
+        ## Return
+        (res1/n1^2 - 2*res2/(n1*n2) + res3/n2^2) / (1/n1 + 1/n2)
+    } else {
+        .Call(gofT2stat_c, u1, u2)
+    }
+}
+
+
+### Test statistics for gofCopula()-based tests ################################
+
+##' @title Test Statistics for Tests of U[0,1]^d
+##' @param u (n, d)-matrix of supposedly U[0,1]^d observations
+##' @param method various test statistics. Available are:
 ##'        "Sn"     : the test statistic S_n (Cramer-von Mises) in Genest, Remillard, Beaudoin (2009)
 ##'        "SnB"    : the test statistic S_n^{(B)} in Genest, Remillard, Beaudoin (2009)
 ##'        "SnC"    : the test statistic S_n^{(C)} in Genest, Remillard, Beaudoin (2009)
 ##'        "AnChisq": Anderson-Darling test statistic after map to a chi-square distribution
 ##'        "AnGamma": Anderson-Darling test statistic after map to an Erlang/Gamma distribution
-##' @param useR A logical indicating whether R or C implementations are used
-##' @param ... Additional arguments for the different methods
-##' @return An n-vector of values of the chosen test statistic
+##' @param useR logical indicating whether R or C implementations are used
+##' @param ... additional arguments for the different methods
+##' @return n-vector of values of the chosen test statistic
 ##' @author Marius Hofert and Martin Maechler
 gofTstat <- function(u, method = c("Sn", "SnB", "SnC", "AnChisq", "AnGamma"),
 		     useR = FALSE, ...)
@@ -111,6 +162,8 @@ gofTstat <- function(u, method = c("Sn", "SnB", "SnC", "AnChisq", "AnGamma"),
 
 
 ### The parametric bootstrap (for computing different goodness-of-fit tests) ###
+
+## See gofCopula() for most arguments
 gofPB <- function(copula, x, N, method = c("Sn", "SnB", "SnC"),
                   estim.method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
 		  trafo.method = if(method == "Sn") "none" else c("cCopula", "htrafo"),
@@ -127,7 +180,7 @@ gofPB <- function(copula, x, N, method = c("Sn", "SnB", "SnC"),
 }
 
 
-##' revert to call gofPB() once that is gone
+## See gofCopula() for most arguments
 .gofPB <- function(copula, x, N, method = c("Sn", "SnB", "SnC"),
                    estim.method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
 		   trafo.method = if(method == "Sn") "none" else c("cCopula", "htrafo"),

@@ -1,6 +1,6 @@
 
-R version 3.3.2 Patched (2016-12-07 r71752) -- "Sincere Pumpkin Patch"
-Copyright (C) 2016 The R Foundation for Statistical Computing
+R version 3.6.2 Patched (2020-02-04 r77768) -- "Dark and Stormy Night"
+Copyright (C) 2020 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -37,10 +37,12 @@ Loading required package: tools
 > ##-> assertError()
 > 
 > ## fCopulae: don't do on CRAN, and really "can not" suggest fCopulae
-> tryfCop <- TRUE # for interactive convenience
-> ## when run as BATCH:
-> tryfCop <- nzchar(Sys.getenv("R_copula_check_fCop")) ||
-+     identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING")))
+> (tryfCop <- if(interactive())
++                TRUE # for interactive convenience
++             else ## when run as BATCH:
++                nzchar(Sys.getenv("R_copula_check_fCop")) ||
++                    identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING"))))
+[1] FALSE
 > 
 > if(tryfCop) { ## will only "work" if not "--as-cran"
 +     .r <- require
@@ -200,11 +202,46 @@ Parameters:
 +     )
 + }
 > 
+> ###----------------- Compare with fitLambda() , both methods: --------------
+> 
+> set.seed(101)
+> U.7.3 <- rCopula(n = 2^15, t.7.3) # pretty large n .. still
+> U.9.2 <- rCopula(n = 2^15, t.9.2)
+> 
+> showSys.time(fL.7.3 <- fitLambda(U.7.3))              # 0.03 sec
+Time    user  system elapsed 
+Time   0.023   0.000   0.024 
+> showSys.time(fL.9.2 <- fitLambda(U.9.2))              #  "
+Time    user  system elapsed 
+Time   0.023   0.000   0.023 
+> showSys.time(fLt7.3 <- fitLambda(U.7.3, method="t"))  # 2.25 sec
+Time    user  system elapsed 
+Time   1.576   0.006   1.584 
+> fL.7.3
+        [,1]    [,2]
+[1,] 1.00000 0.40137
+[2,] 0.40137 1.00000
+> stopifnot(
++     all.equal(fL.7.3[1,2], 0.401369993)
++     ,
++     all.equal(fL.9.2[1,2], 0.89522363)
++     ,
++     names(fLt7.3) == c("Lambda", "P", "Nu")
++     ,
++     all.equal(fLt7.3$Lambda[1,2], 0.447410146)
++ )
+> (doExtras <- copula:::doExtras() && getRversion() >= "3.4") # so have withAutoprint(.)
+[1] FALSE
+> if(doExtras) withAutoprint({
++     showSys.time(fLt9.2 <- fitLambda(U.9.2, method="t"))
++     fLt9.2
++     stopifnot(all.equal(fLt9.2$Lambda[1,2], 0.719807333))
++ })
 > 
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ''statistical reasons''
-Time elapsed:  0.755 0.13 1.029 0.001 0.002 
+Time elapsed:  2.586 0.092 2.821 0.003 0.005 
 > 
 > proc.time()
    user  system elapsed 
-  0.756   0.132   1.029 
+  2.590   0.097   2.822 

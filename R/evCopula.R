@@ -22,14 +22,17 @@ evCopula <- function(family, param = NA_real_, dim = 2L, ...) {
   if (fam == -1)
     stop("Valid family names are ",
          paste(familiesImplemented, collapse=", "))
-
+  else if(fam != 2 && dim != 2L)
+      stop(gettextf("Family '%s' is not yet available for dim > 2",
+		    familiesImplemented[[fam]]), domain=NA)
   switch(fam,
 	 galambosCopula	  (param),
-	 gumbelCopula	  (param),
+	 gumbelCopula	  (param, dim=dim, ...),
 	 huslerReissCopula(param),
 	 tawnCopula	  (param),
-	 tevCopula	  (param),
-	 stop("family ", fam, "not yet available, at least via evCopula()"))
+	 tevCopula	  (param, ...),
+         # cannot happen (with correct test above):
+	 stop("family ", fam, " not yet available, at least via evCopula()"))
 }
 
 lambdaEvCopula <- function(copula) {

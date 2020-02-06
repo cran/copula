@@ -1,19 +1,26 @@
 \name{gofTstat}
 \alias{gofTstat}
+\alias{gofT2stat}
 \title{Goodness-of-fit Test Statistics}
 \description{
   \code{gofTstat()} computes various goodness-of-fit test statistics
   typically used in \code{\link{gofCopula}(*, simulation = "pb")}.
+  \code{gofT2stat()} computes the two-sample goodness of fit test
+  statistic of R\enc{é}{e}millard and Scaillet (2009).
 }
 \usage{
 gofTstat(u, method = c("Sn", "SnB", "SnC", "AnChisq", "AnGamma"),
          useR = FALSE, \dots)
+gofT2stat(u1, u2, useR = FALSE)
 }
 \arguments{
   \item{u}{\eqn{n\times d}{n x d}-matrix of values in \eqn{[0,1]},
     supposedly independent uniform observations in the
     hypercube, that is, \eqn{U_i \sim U[0,1]^d}{U_i ~ U[0,1]^d}, i.i.d.,
     for \eqn{i \in \{1,\dots,n\}}{i in 1..n}.}
+  \item{u1, u2}{\eqn{n\times d}{n x d}-matrices of copula samples
+    to be compare against. The two matrices must have an equal number
+    of columns \eqn{d} but can differ in \eqn{n} (number of rows).}
   \item{method}{a \code{\link{character}} string specifying the
     goodness-of-fit test statistic to be used, which has to be one (or a unique
     abbreviation) of
@@ -55,9 +62,9 @@ gofTstat(u, method = c("Sn", "SnB", "SnC", "AnChisq", "AnGamma"),
     test statistics.}
 }
 \details{
-  This function should be used with care.  The different test statistics
+  These functions should be used with care. The different test statistics
   were implemented (partly) for different purposes and goodness-of-fit
-  tests and should be used only with knowledge about such (see the
+  tests and should be used only with knowledge about such test (see the
   references for more details).
 }
 \value{
@@ -81,10 +88,15 @@ gofTstat(u, method = c("Sn", "SnB", "SnC", "AnChisq", "AnGamma"),
   Likelihood inference for Archimedean copulas in high dimensions
   under known margins. \emph{Journal of Multivariate Analysis}
   \bold{110}, 133--150.
+
+  R\enc{é}{e}millard, B. and Scaillet, O. (2009).
+  Testing for equality between two copulas.
+  \emph{Journal of Multivariate Analysis}
+  \bold{100}, 377--386.
 }
 \seealso{
   \code{\link{gofCopula}()} for goodness-of-fit tests where (some of)
-  these test statistics are used.
+  the test statistics of \code{gofTstat()} are used.
 }
 \examples{
 ## generate data

@@ -17,12 +17,13 @@
 
 /**
  * @file   gof.c
- * @author Ivan Kojadinovic
- * @date   2008
+ * @author Ivan Kojadinovic, Marius Hofert
+ * @date   2008, 2019
  *
- * @brief  Goodness-of-fit tests for copulas and EV copulas
- *         based on the parametric bootstrap and on a multiplier
- *         bootstrap
+ * @brief  - Two-sample goodness-of-fit test statistic of Remillard, Scaillet (2009)
+ *         - Goodness-of-fit tests for copulas and EV copulas
+ *           based on the parametric bootstrap and on a multiplier
+ *           bootstrap
  *
  */
 
@@ -34,6 +35,72 @@
 #include "gof.h"
 #include "empcop.h"
 #include "indepTests.h" // for progress bar
+#include "nacopula.h"
+
+
+/**
+ * @title Two-sample goodness-of-fit test statistic of Remillard, Scaillet (2009)
+ * @param u1_ (n1, d) matrix of copula observations
+ * @param u2_ (n2, d) matrix of copula observations
+ * @return Numeric(1) giving the two-sample goodness-of-fit test statistic
+ * @author Marius Hofert
+ */
+SEXP gofT2stat_c(SEXP u1_, SEXP u2_) {
+    /* Setup */
+    int *dims1 = INTEGER(getAttrib(u1_, R_DimSymbol));
+    int n1 = dims1[0];
+    int d = dims1[1];
+    int *dims2 = INTEGER(getAttrib(u2_, R_DimSymbol));
+    int n2 = dims2[0];
+    double* u1 = REAL(u1_);
+    double* u2 = REAL(u2_);
+    int k1, k2, j; /* k1, k2 run over all rows, j runs over all cols */
+    double p, res1, res2, res3; /* for sub-results */
+    SEXP res = PROTECT(allocVector(REALSXP, 1)); /* final result object ('numeric(1)') */
+
+    /* Main (note: u1[k, j] = u1[n1 * j + k] (u1 is stored in column-major order)) */
+
+    /* Part 1: u1 with u1 */
+    res1 = 0.0;
+    for(k1 = 0; k1 < n1; k1++) {
+	for(k2 = 0; k2 < n1; k2++) {
+	    p = 1.0;
+	    for(j = 0; j < d; j++) {
+		p *= 1.0 - MAX(u1[n1 * j + k1], u1[n1 * j + k2]);
+	    }
+	    res1 += p;
+        }
+    }
+
+    /* Part 2: u1 with u2 */
+    res2 = 0.0;
+    for(k1 = 0; k1 < n1; k1++) {
+	for(k2 = 0; k2 < n2; k2++) {
+	    p = 1.0;
+	    for(j = 0; j < d; j++) {
+		p *= 1.0 - MAX(u1[n1 * j + k1], u2[n2 * j + k2]);
+	    }
+	    res2 += p;
+        }
+    }
+
+    /* Part 3: u2 with u2 */
+    res3 = 0.0;
+    for(k1 = 0; k1 < n2; k1++) {
+	for(k2 = 0; k2 < n2; k2++) {
+	    p = 1.0;
+	    for(j = 0; j < d; j++) {
+		p *= 1.0 - MAX(u2[n2 * j + k1], u2[n2 * j + k2]);
+	    }
+	    res3 += p;
+        }
+    }
+
+    /* Return */
+    REAL(res)[0] = ((res1 / (n1 * n1) - 2 * res2 / (n1 * n2) + res3 / (n2 * n2)) / (1.0/n1 + 1.0/n2));
+    UNPROTECT(1);
+    return res;
+}
 
 /**
  * Cramer-von Mises test statistic

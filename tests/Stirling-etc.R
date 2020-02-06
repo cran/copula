@@ -243,3 +243,4 @@ stopifnot(all.equal(lsum(lx1), lsum0(lx1)),
 	  identical(lsum(m6), c(lm3, lx4=ls3, lx5=Inf, lx6=lx6[1])),
           TRUE)
 
+## TODO: lssum()   testing !!

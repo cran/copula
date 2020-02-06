@@ -18,10 +18,11 @@ source(system.file("Rsource", "utils.R", package="copula", mustWork=TRUE))
 ##-> assertError()
 
 ## fCopulae: don't do on CRAN, and really "can not" suggest fCopulae
-tryfCop <- TRUE # for interactive convenience
-## when run as BATCH:
-tryfCop <- nzchar(Sys.getenv("R_copula_check_fCop")) ||
-    identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING")))
+(tryfCop <- if(interactive())
+               TRUE # for interactive convenience
+            else ## when run as BATCH:
+               nzchar(Sys.getenv("R_copula_check_fCop")) ||
+                   identical("true", unname(Sys.getenv("R_MM_PKG_CHECKING"))))
 
 if(tryfCop) { ## will only "work" if not "--as-cran"
     .r <- require
@@ -147,6 +148,31 @@ if(tryfCop && .r(fCopulae)) { ## Rmetrics
     )
 }
 
+###----------------- Compare with fitLambda() , both methods: --------------
+
+set.seed(101)
+U.7.3 <- rCopula(n = 2^15, t.7.3) # pretty large n .. still
+U.9.2 <- rCopula(n = 2^15, t.9.2)
+
+showSys.time(fL.7.3 <- fitLambda(U.7.3))              # 0.03 sec
+showSys.time(fL.9.2 <- fitLambda(U.9.2))              #  "
+showSys.time(fLt7.3 <- fitLambda(U.7.3, method="t"))  # 2.25 sec
+fL.7.3
+stopifnot(
+    all.equal(fL.7.3[1,2], 0.401369993)
+    ,
+    all.equal(fL.9.2[1,2], 0.89522363)
+    ,
+    names(fLt7.3) == c("Lambda", "P", "Nu")
+    ,
+    all.equal(fLt7.3$Lambda[1,2], 0.447410146)
+)
+(doExtras <- copula:::doExtras() && getRversion() >= "3.4") # so have withAutoprint(.)
+if(doExtras) withAutoprint({
+    showSys.time(fLt9.2 <- fitLambda(U.9.2, method="t"))
+    fLt9.2
+    stopifnot(all.equal(fLt9.2$Lambda[1,2], 0.719807333))
+})
 
 
 cat('Time elapsed: ', proc.time(),'\n') # for ''statistical reasons''

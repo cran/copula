@@ -28,8 +28,8 @@ double der2bivCn(const double U[], const double V[], int n, double u, double v);
 double multCn(const double U[], int n, int p, const double V[], int m, int k, double o);
 double der_multCn(const double U[], int n, int p, const double u[], const double v[], double denom);
 
-// called .C; empirical, beta and checkerboard versions
+// called via .C(..); empirical, beta and checkerboard versions
 void Cn_C(double *U, int *n, int *p, double *V, int *m, double *ec, double *offset,
-	  double type);
+	  int *type);
 
 #endif

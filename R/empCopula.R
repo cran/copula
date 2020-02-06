@@ -245,7 +245,7 @@ setMethod("dCopula", signature("matrix", "empCopula"),
 
 ## rCopula method
 setMethod("rCopula", signature("numeric", "empCopula"),
-	  function(n, copula) copula@X[sample(1:nrow(copula@X), size = n), ])
+	  function(n, copula) copula@X[sample(1:nrow(copula@X), size = n, replace = TRUE), ])
 
 ## pCopula method
 setMethod("pCopula", signature("matrix", "empCopula"),

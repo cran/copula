@@ -143,10 +143,10 @@ pairsColList(P, pdiv = c(1e-04, 0.001, 0.01, 0.05, 0.1, 0.5),
 }
 %\author{Marius Hofert and Martin Maechler}
 \references{
-  Hofert, M. and \enc{Mächler}{Maechler}, M. (2013)
+  Hofert, M. and \enc{Mächler}{Maechler}, M. (2014)
   A graphical goodness-of-fit test for dependence models in higher dimensions;
   \emph{Journal of Computational and Graphical Statistics},
-  \bold{23}(3), 700--716.
+  \bold{23}(3), 700--716.  \doi{10.1080/10618600.2013.812518}
 }
 \seealso{
   \code{\link{pairwiseCcop}()} for the tools behind the scenes.

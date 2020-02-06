@@ -19,7 +19,7 @@
 ##' @param copula An object of class Copula
 ##' @param indices A vector of indices j in {1,..,d} for which
 ##'        C_{j|1,..,j-1}(u_j | u_1,..,u_{j-1}) is computed
-##' @param log A logical indicating whether a vector is return when n = 1
+##' @param log A logical indicating whether the log-transform is computed
 ##' @param drop logical indicating whether one-column matrices are returned
 ##'        as vectors
 ##' @param ... Additional arguments
@@ -34,7 +34,42 @@ rosenblatt <- function(u, copula, indices = 1:dim(copula), log = FALSE, drop = T
         u <- rbind(u, deparse.level = 0L)
     n <- nrow(u) # sample size
 
-    if(is(copula, "normalCopula")) { # Gauss copula (see, e.g., Cambou, Hofert, Lemieux)
+    if(is(copula, "indepCopula")) {
+
+        U <- if(log) log(u) else u
+        U[, indices, drop = drop]
+
+    } else if(is(copula, "moCopula")) {
+
+        if(dim(copula) != 2)
+            stop("cCopula() is currently only available for bivariate moCopula objects")
+        u1 <- u[,1, drop = FALSE]
+        u2 <- u[,2, drop = FALSE]
+        a <- attr(copula, "parameters") # alpha_1, alpha_2
+        ## Fix u1 and consider C_2(u_2|u_1), which is given by (1-a[1])*u1^(-a[1])*u2
+        ## if u2 < u1^(a[1]/a[2]) and by u2^(1-a[2]) if u2 >= u1^(a[1]/a[2]). Note that
+        ## C_2(u_2|u_1) jumps in u1^(a[1]/a[2]) from (1-a[1])*u1. to u1. (see below)
+        ## which is why we implement the generalized distributional transform to
+        ## get uniformity in the Rosenblatt transformed sample. Also note that
+        ## if u2 == u1^(a[1]/a[2]), we need to work with all.equal() due to exact
+        ## equality not picking up all samples on the singular component (see, e.g.,
+        ## moCopula(c(0.9, 0.75))).
+        ii1 <- 0 <= u2 & u2 < u1^(a[1]/a[2])
+        ii2 <- u1^(a[1]/a[2]) < u2 & u2 <= 1
+        ## Determine singular component
+        all.all.equal <- function(x)
+            apply(x, 1, function(x.) isTRUE(all.equal(x.[1],x.[2], check.attributes = FALSE)))
+        ii3 <- all.all.equal(cbind(u1^a[1], u2^a[2]))
+        U <- matrix(, nrow = length(u1), ncol = 2)
+        U[,1] <- u1
+        U[ii1, 2] <- (1-a[1]) * u1[ii1]^(-a[1]) * u2[ii1]
+        U[ii2, 2] <- u2[ii2]^(1-a[2])
+        u1. <- u1[ii3]^(a[1]*(1/a[2] - 1))
+        U[ii3, 2] <- runif(sum(ii3), min = (1-a[1])*u1., max = u1.) # singular component (do generalized distributional transform idea)
+        if(log) U <- log(U)
+        U[, indices, drop = drop]
+
+    } else if(is(copula, "normalCopula")) { # Gauss copula (see, e.g., Cambou, Hofert, Lemieux)
 
         max.ind <- tail(indices, n = 1) # maximal index
         P <- getSigma(copula) # (d, d)-matrix
@@ -196,7 +231,30 @@ iRosenblatt <- function(u, copula, indices = 1:dim(copula), log = FALSE, drop = 
     if (!is.matrix(u)) # minimal checking here!
         u <- rbind(u, deparse.level = 0L)
     n <- nrow(u) # sample size
-    if(is(copula, "normalCopula")) { # Gauss copula (see, e.g., Cambou, Hofert, Lemieux)
+    if(is(copula, "indepCopula")) {
+
+        U <- if(log) log(u) else u
+
+    } else if(is(copula, "moCopula")) {
+
+        if(dim(copula) != 2)
+            stop("cCopula(, inverse = TRUE) is currently only available for bivariate moCopula objects")
+        u1 <- u[,1, drop = FALSE]
+        u2 <- u[,2, drop = FALSE]
+        a <- attr(copula, "parameters") # alpha_1, alpha_2
+        ## See Cambou et al. (2017)
+        u1. <- u[1]^(a[1] * (1/a[2]-1))
+        ii1 <- 0 <= u2 & u2 <= (1-a[1]) * u1.
+        ii2 <- (1-a[1]) * u1. < u2 & u2 < u1.
+        ii3 <- u1. <= u2 & u2 <= 1
+        U <- matrix(, nrow = length(u1), ncol = 2)
+        U[,1] <- u1
+        U[ii1,2] <- u1[ii1]^a[1] * u2[ii1] / (1-a[1])
+        U[ii2,2] <- u1[ii2]^(a[1]/a[2])
+        U[ii3,2] <- u2[ii3]^(1/(1-a[2]))
+        if(log) U <- log(U)
+
+    } else if(is(copula, "normalCopula")) { # Gauss copula (see, e.g., Cambou, Hofert, Lemieux)
 
         P <- getSigma(copula) # (d, d)-matrix, always symmetric
         U <- u # consider u as U[0,1]^d
@@ -299,7 +357,7 @@ iRosenblatt <- function(u, copula, indices = 1:dim(copula), log = FALSE, drop = 
     }
 
     ## Return
-    U[, indices, drop=drop]
+    U[, indices, drop = drop]
 }
 
 

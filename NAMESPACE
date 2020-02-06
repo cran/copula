@@ -265,7 +265,7 @@ export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        ,"debye1", "debye2" # <- since we extend the gsl ones
        ,"ebeta", "etau", "emde", "dDiag", "edmle", "emle", "enacopula"
        ## goodness-of-fit
-       ,"gofTstat", "htrafo"
+       ,"gofT2stat" ,"gofTstat", "htrafo"
        ## distribution of the radial part for Archimedean copulas
        ,"pacR", "qacR"
        ## Kendall distribution

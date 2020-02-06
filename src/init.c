@@ -18,7 +18,6 @@
 
 #include <R.h>
 #include <Rinternals.h>
-
 #include <R_ext/Rdynload.h>
 
 #include "copula.h"
@@ -63,7 +62,7 @@ static R_NativePrimitiveArgType k_power_set_char_t[4] = {
 // ./gof.c & gof.h /////////////////////////////////////////////////////////////
 
 static R_NativePrimitiveArgType cramer_vonMises_t[5] = {
-    INTSXP, INTSXP, REALSXP,  REALSXP, REALSXP };
+    INTSXP, INTSXP, REALSXP, REALSXP, REALSXP};
 static R_NativePrimitiveArgType cramer_vonMises_grid_t[7] = {
     INTSXP, REALSXP, INTSXP, REALSXP, INTSXP, REALSXP, REALSXP };
 static R_NativePrimitiveArgType multiplier_t[11] = {
@@ -94,11 +93,16 @@ static R_NativePrimitiveArgType evtest_t[] = {
 static R_NativePrimitiveArgType evtestA_t[] = {REALSXP, REALSXP, INTSXP, REALSXP, REALSXP,
 	     INTSXP, INTSXP, INTSXP, REALSXP};
 
-static R_NativePrimitiveArgType evtestA_derA_t[] = {REALSXP, REALSXP, INTSXP, REALSXP, REALSXP,
-		  INTSXP, INTSXP, INTSXP, REALSXP};
-
-static R_NativePrimitiveArgType evtestA_stat_t[] = {REALSXP, REALSXP, INTSXP, REALSXP, REALSXP, INTSXP,
-		  INTSXP, REALSXP, REALSXP};
+static R_NativePrimitiveArgType evtestA_derA_t[] = {
+    REALSXP, REALSXP, INTSXP,
+    REALSXP, REALSXP, INTSXP,
+    INTSXP, INTSXP, REALSXP
+};
+static R_NativePrimitiveArgType evtestA_stat_t[] = {
+    REALSXP, REALSXP, INTSXP,
+    REALSXP, REALSXP, INTSXP,
+    INTSXP, REALSXP, REALSXP
+};
 
 // ./exchtest.c ////////////////////////////////////////////////////////////////
 
@@ -234,6 +238,8 @@ static R_CallMethodDef CallEntries[] = {
 
     CALLDEF(rF01Frank_vec_c, 5),
     CALLDEF(rF01Joe_vec_c, 3),
+
+    CALLDEF(gofT2stat_c, 2),
 
     {NULL, NULL, 0}
 };

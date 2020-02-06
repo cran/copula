@@ -1,12 +1,14 @@
 \name{fgmCopula-class}
 \docType{class}
 \alias{fgmCopula-class}
-\title{Class "fgmCopula" }
-\description{Multivariate Multiparameter Farlie-Gumbel-Morgenstern
-  Copula.}
+\title{Class "fgmCopula" - Multivariate Multiparameter Farlie-Gumbel-Morgenstern Copulas}
+\description{
+  The class of multivariate multiparameter Farlie-Gumbel-Morgenstern
+  copulas are typically created via \code{\link{fgmCopula}(..)}.
+}
 \section{Objects from the Class}{
-  Objects can be created by calls of the form \code{new("fgmCopula",
-    ...)}.
+  Objects are typically created by \code{\link{fgmCopula}(..)}, or more
+  low-level by (careful) calls to \code{new("fgmCopula", ..)}.
 }
 \section{Slots}{
   \describe{
@@ -51,6 +53,7 @@
   for dimensions higher than 2.
 }
 \seealso{
-  \code{\link{copula-class}}, \code{\link{fgmCopula-class}}.
+  \code{\link{copula-class}}, \code{\link{fgmCopula-class}}; to create such
+  objects, use \code{\link{fgmCopula}()}; see there, also for examples.
 }
 \keyword{classes}

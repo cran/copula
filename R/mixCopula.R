@@ -3,8 +3,9 @@ setClass("parClist",  contains = "list",
 	 validity = function(object) {
 	     if(!length(object))
 		 return("empty parCopula lists are not valid")
-	     cls  <- vapply(object, class, "")
-	     is.pC <- vapply(cls, extends, NA, class2 = "parCopula")
+	     if(!all(lengths(cls <- lapply(object, class)) == 1L))
+		 return("parCopula list must have parCopula components")
+	     is.pC <- vapply(unlist(cls), extends, NA, class2 = "parCopula")
 	     if(!all(is.pC))
 		 return(paste("components", paste(which(!is.PC), collapse=", "),
 			      "do not inherit from \"parCopula\""))

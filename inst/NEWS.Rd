@@ -4,6 +4,30 @@
 \title{News for \R Package \pkg{copula}}% MM: look into ../svn-log-from.all
 \newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
+\section{Changes in version 0.999-20 (2020-02-03, svn r1832)}{
+  \subsection{New Features}{
+    \itemize{
+      \item \code{evTestA()} got new options \code{trace.lev} and
+      \code{report.err} for reporting numerical intergration problems.
+
+      \item \code{gofT2stat()} implements the two-sample test statistic
+      of R\enc{é}{e}millard and Scaillet (2009).
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{rCopula()} of an \code{empCopula} object failed
+      because sampling was done without \code{replace = TRUE}.
+
+      \item \code{cCopula()} now should work for \code{indepCopula()} and
+      \code{"moCopula"} objects (via internal \code{rosenblatt()}.
+
+      \item fix \file{src/empcop.h} and \file{man/fgmCopula.Rd}
+      inconsistencies, found by latest checks on CRAN.
+    }
+  }
+}
+
 \section{Changes in version 0.999-19 (2018-12-19, svn r1808)}{
   \subsection{New Features}{
     \itemize{

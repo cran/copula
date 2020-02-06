@@ -44,8 +44,8 @@ void evtest(double *U, int *n, int *p, double *g, int *m,
 void evtestA(double *U, double *V, int *n, double *u, double *v,
 	     int *m, int *CFG, int *N, double *s0);
 
-void evtestA_derA(double *U, double *V, int *n, double *u, double *v,
-		  int *m, int *CFG, int *N, double *s0);
+void evtestA_derA(double *U, double *V, int *n,
+		  double *u, double *v, int *m, int *CFG_tr__etc, int *N, double *s0);
 
 void evtestA_stat(double *U, double *V, int *n, double *u, double *v, int *m,
 		  int *CFG, double *stat, double *offset);

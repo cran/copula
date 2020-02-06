@@ -174,7 +174,7 @@ double der_multCn(const double U[], int n, int p,
  * @author Ivan Kojadinovic
  */
 void Cn_C(double *U, int *n, int *p, double *V, int *m, double *ec, double *offset,
-	  int *type) {
+	  int *type) { // called via .C() from ../R/empCopula.R
     switch(*type) {
 
     case 2 : /* empirical beta copula */

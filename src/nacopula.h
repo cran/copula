@@ -34,6 +34,8 @@ SEXP rSibuya_vec_c(SEXP n_, SEXP alpha_);
 SEXP rF01Frank_vec_c(SEXP V0_, SEXP theta_0_, SEXP theta_1_, SEXP rej_, SEXP approx_);
 SEXP rF01Joe_vec_c(SEXP V0_, SEXP alpha_, SEXP approx_);
 
+SEXP gofT2stat_c(SEXP u1_, SEXP u2_);
+
 /**
  * C API---for "us" but maybe also other R packages
  * "export" it via ../inst/include/

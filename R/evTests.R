@@ -103,11 +103,11 @@ evTestC <- function(x, N = 1000) {
 ##' @param ties.method passed to pobs
 ##' @return an object of class 'htest'
 ##' @author Ivan Kojadinovic
-evTestA <- function(x, N = 1000, derivatives = c("An","Cn"),
-                    ties.method = eval(formals(rank)$ties.method)) {
-
+evTestA <- function(x, N = 1000, derivatives = c("An", "Cn"),
+                    ties.method = eval(formals(rank)$ties.method),
+                    trace.lev = 0L, report.err = FALSE) {
     ## checks
-    stopifnot(N >= 1)
+    stopifnot(!is.na(N <- as.integer(N)), N >= 1L)
     if(!is.matrix(x)) {
         warning("coercing 'x' to a matrix.")
         stopifnot(is.matrix(x <- as.matrix(x)))
@@ -117,24 +117,26 @@ evTestA <- function(x, N = 1000, derivatives = c("An","Cn"),
 
     ## make pseudo-observations
     n <- nrow(x)
+    if(n > .Machine$integer.max) stop("n too large (not implemented)")
+    n <- as.integer(n)
     u <- pobs(x, ties.method = ties.method)
-
+    if(!is.double(u)) storage.mode(u) <- "double"
     ## make grid
     ## m = 0
     g <- u
-    m <- n
+    m <- n # << option? Could have it smaller/differ
 
-    estimator <- "CFG"
+    estimator <- "CFG" # -- why is this hardwired -- FIXME ?
     offset <- 0.5
 
     ## compute the test statistic
     s <- .C(evtestA_stat,
-            as.double(u[,1]),
-            as.double(u[,2]),
-            as.integer(n),
-            as.double(g[,1]),
-            as.double(g[,2]),
-            as.integer(m),
+            u[,1],
+            u[,2],
+            n,
+            g[,1],
+            g[,2],
+            m,
             as.integer(estimator == "CFG"),
             stat = double(1),
             as.double(offset))$stat
@@ -142,25 +144,25 @@ evTestA <- function(x, N = 1000, derivatives = c("An","Cn"),
 
     s0 <- if (derivatives == "Cn")
               .C(evtestA,
-                 as.double(u[,1]),
-                 as.double(u[,2]),
-                 as.integer(n),
-                 as.double(g[,1]),
-                 as.double(g[,2]),
-                 as.integer(m),
+                 u[,1],
+                 u[,2],
+                 n,
+                 g[,1],
+                 g[,2],
+                 m,
                  as.integer(estimator == "CFG"),
-                 as.integer(N),
+                 N,
                  s0 = double(N))$s0
-         else # "An"
+         else # "An", the default
              .C(evtestA_derA,
-                as.double(u[,1]),
-                as.double(u[,2]),
-                as.integer(n),
-                as.double(g[,1]),
-                as.double(g[,2]),
-                as.integer(m),
-                as.integer(estimator == "CFG"),
-                as.integer(N),
+                u[,1], # U[]
+                u[,2], # V[]
+                n,
+                g[,1], # u[]
+                g[,2], # v[]
+                m,
+                as.integer(c(estimator == "CFG", trace.lev, report.err)),
+                N,
                 s0 = double(N))$s0
 
     structure(class = "htest",

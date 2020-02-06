@@ -14,7 +14,7 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 source(system.file(package="Matrix", "test-tools-1.R", mustWork=TRUE))
-##--> showProc.time(), assertError(), relErrV(), ...
+##--> tryCatch.W.E(), showProc.time(), assertError(), relErrV(), ...
 
 ##' @title If needed, get file from internet - but do not "error out"
 ##' @param file

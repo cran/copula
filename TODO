@@ -1,5 +1,8 @@
 ##-*- org -*-->  Emacs .. [Tab] key + [Org] menu; C-c C-o to follow links
-* Short Term (before 1.0.0):
+* Very Short Term (before 1.0.0):
+** TODO [MM] fitCopula(<mixCopula>) should (allow to) estimate weights too.
+* Short Term (before 1.1.0 and before MM gets retired ;-)):
+** TODO [MM] Export lsum()  and lssum() ... slightly simplified versions of them have help pages now in CRAN pkg 'DPQ'.
 ** TODO [JY] Set up dispexpr (cdf, pdf) for rotExplicitCopula, mixExplicitCopula such that they and khoudrajiCopula work with each other.
 ** TODO [IK] gofPB(*, ties=TRUE) is *never* tested, *nor* documented (man/gofCopula.Rd); see FIXME, what if x has no ties?
 ** DONE [MM] warnings about `numDeriv()` to be displayed once per R session and could be suppressed.
@@ -12,7 +15,9 @@
 ** TODO [MM,MH] qK(p, method="default") is quite inaccurate.  Change default; be smart about "close to 0".
 ** TODO R/dC-dc.R : switch(class(copula)[1], "normalCopula" = , ....) does *NOT* work when class(copula) *extends*,
  e.g., setClass('nrmCopula', contains="normalCopula")  ... also in othe R/*.R files ?
-** TODO How can we extract marginal copulas from a given copula without having to first extract all information (family, parameter) and then defining a new copula? A pretty cool feature would be to simply use dim(copula, ...) <- 2 where '...' specifies (through a vector of variables) which marginal copula is extracted.
+** TODO How can we extract marginal copulas from a given copula without having to first extract all information
+ (family, parameter) and then defining a new copula? A pretty cool feature would be to simply use dim(copula, ...) <- 2
+  where '...' specifies (through a vector of variables) which marginal copula is extracted.
 ** TODO [JY] Debug/fix dCopula for khoudrajiExplicitCopula (dim > 2) when estimate.variance is TRUE
 *** DONE Use package Deriv (symbolic derivatives) to obtain pdf from cdf expression of khoudrajiExplicitCopula
 *** DONE Use algorithm expressions (deriv) instead of symbolic expressions to speed up
@@ -20,7 +25,7 @@
 ** DONE [IK/JY] Implement Khoudraji copulas (asymCopula()) for 2 'base copulas' (any dimension)
 ** DONE [IK] modify khoudrajiCopula code to allow construction from any two copulas; have tests (e.g. dCdu implemented?) as method level, not in constructor
 ** DONE [IK]: review the derivatives expression in dC-dc.R for free parameter adjustment
-** TODO Fitting high-dimensional copulas: memory explosion due to allocation of large (d*(d-1)/2) matrix for variance estimators
+** TODO Fitting high-dimensional copulas: memory explosion by allocating large (d*(d-1)/2) matrix for variance estimators
 # See also MH's email from 2016-05-01
 We frequently allocate matrices 'var.est' in ./R/fitCopula.R (potentially
 elsewhere) for the variance estimators. In larger dimensions, R can be killed by
@@ -50,8 +55,11 @@ MM: (2016-05-03):
       but has always been *FAR* from a good idea in all but small 'd'
       cases, AFAICS, lm() here is used to compute simple (or possibly weighted)
       means.
-** TODO tau()/rho()/lambda() should get 'matrix = TRUE' argument and internally call p2P() to allow to return matrices. lambda() should return a list (at least in d > 2) with two components (lower/upper tail dependence parameters or their matrices). The examples on the help files (e.g. ?tau, ?lambda) should be improved and also address d > 2.
-** TODO Improve error message: tCopula(c(rep(0.5, 3), 4), dim = 3, dispstr = "un", df = 4) => should rather say that the *length* of 'param' is not correct (in case one accidentally adds the d.o.f. parameter there as so often)
+** TODO tau()/rho()/lambda() should get 'matrix = TRUE' argument and internally call p2P() to allow to return matrices.
+ lambda() should return a list (at least in d > 2) with two components (lower/upper tail dependence parameters or
+ their matrices). The examples on the help files (e.g. ?tau, ?lambda) should be improved and also address d > 2.
+** TODO Improve error message: tCopula(c(rep(0.5, 3), 4), dim = 3, dispstr = "un", df = 4)
+ => should rather say that the *length* of 'param' is not correct (in case one accidentally adds the d.o.f. parameter there as so often)
 ** TODO [JY]: once 'fixed' stuff added, rewrite/adapt tCopula, tevCopula (so that the 'df.fixed' stuff uses the new 'fixed' stuff) ?
 ** TODO [MM]: bug? library(copula); pCopula(0.4, copula = normalCopula(param = 0.5, dim = 3)) is *random* !??!!
 ** DONE [MM]  need a "getTheta" analogously to "setTheta"
@@ -67,17 +75,8 @@ MM: (2016-05-03):
 ** TODO Make absdPsi() work for class archmCopula() using nacopula stuff (see TODO in dC-dc.R)
 ** TODO Figure out and document somewhere how much objects of class archmCopula already use the good old nacopula stuff
 - fitCopula() -> loglikCopula() always uses the nacopula slots [all of the 5 AC families in R/fitCopula.R]
-** TODO Make more archmCopula stuff use acopula stuff (like pK() doesn't work for archmCopulas!! => we should really have all functionality of acopulas used by archmCopulas! so much 'overhead')
-*** TODO rCopula() for archmCopula's should allow to use MH's racopula()
-*but* for back compatibility allow *global* options(....) to still get old
-random numbers.
-*** TODO The NAC Archimedean families are partly 'better' and partly "worse" than archmCop: need 'uscore'
-*** TODO JY: For score & uscore (see [[file:feature-table.org][Feature table]]); write testing code
-based on IJ-"papers" that compares the two classes numerically.
-*** TODO d=2 is special: allows negative tau, MH-code now does partly.
- done for Clayton, Frank, AMH.  BUT not for the R/cop_objects.R slots
-*** DONE MM: pCopula(<archm>) and dCopula(<archm>)
-use the the numerically good formulae rather than the "exprDist".
+** TODO Make more archmCopula stuff use acopula stuff (e.g., pK() doesn't work for archmCopulas!
+ => should really have all functionality of acopulas used by archmCopulas! so much 'overhead')
 ** TODO [MM + MH] implement fitting of NACs with fixed structure (how is it done in the R package 'HAC'?)
 ** TODO [MM + MH] function(outer_nacopula) -> matrix of 'comp' (in {1:d})
 which corresponds to the different sectors.
@@ -136,7 +135,7 @@ works but
 doesn't.  Note the 2nd  "clayton", i.e. as arg to archmCopula(.) it _does_ work.
  => essentially, we always want to use the capitalized versions, but it might
     still be a bug that it doesn't work otherwise
-** TODO [all 4] Renaming of current "base" functions see [[file:feature-table.org][Feature table]] and [[file:do-now.org][do-now table]]
+** DONE Package established: no longer renaming: Renaming of current "base" functions see [[file:feature-table.org][Feature table]] and [[file:do-now.org][do-now table]]
     remaining: lambdaL/U and inverse ("iLambda").
 ** TODO Deprecation of Old Stuff / towards more consistency / Cleanup
 - with warning
@@ -147,7 +146,7 @@ doesn't.  Note the 2nd  "clayton", i.e. as arg to archmCopula(.) it _does_ work.
 *** TODO nparam() "wrapper" for  length(.@parameters)
 *** no longer TODO: dTau() = tau'(), rho() and dRho() = rho'() -- to get std.err. for  "itau" and "irho"
 **** these are *one* of the things where IJ-archmCopula' are better
-*** TODO loglikCopula() --- try(), hidemessages should "go" eventually
+*** DONE loglikCopula() --- try(), hidemessages should "go" eventually
 *** TODO varPL(): TODO's there
 *** TODO dTau() = tau'() and dRho() = rho'() -- to get S.Err. for  "itau" and "irho"
 these are *one* of the things where IJ-archmCopula' are better
@@ -160,7 +159,7 @@ But people have asked for it.
 *** Also, look at ./man/copula-internal.Rd :
 *** no longer TODO: schlatherCopula:  JY: The implementation of schlatherCopula is not ready for release.
 More ev copulas will come from max-stable processes.
-** TODO why not make fitCopula more work like a 'method' (adapt to the copula class in an easier way)
+** No longer: why not make fitCopula more work like a 'method' (adapt to the copula class in an easier way)
 ** TODO fitCopula() should encompass all methods of enacopula() (similar to fitCopula.itau.mpl)
 ** DONE [MM] data(rdj) should have a "Date" in column 1, not a factor !
 ** TODO [MM + MH] implement estimation of standard error for fitCopula.itau.mpl

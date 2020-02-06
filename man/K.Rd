@@ -119,7 +119,7 @@ rK(n, copula, d) # random number generation
   Hofert, M., \enc{Mächler}{Maechler}, M., and McNeil, A. J. (2012).
   Likelihood inference for Archimedean copulas in high dimensions
   under known margins. \emph{Journal of Multivariate Analysis}
-  \bold{110}, 133--150.
+  \bold{110}, 133--150. \doi{10.1016/j.jmva.2012.02.019}
 
   Genest, C. and Rivest, L.-P. (1993). Statistical inference procedures
   for bivariate Archimedean copulas.

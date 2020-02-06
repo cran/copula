@@ -34,9 +34,10 @@ fitLambda(u, method = c("Schmid.Schmidt", "t"), p = min(100/nrow(u), 0.1),
 }
 \value{
   The matrix of pairwise coefficients of tail dependence; for
-  \code{method = "t"} a list additional containing the matrix
-  of pairwise estimated correlation coefficients and the matrix of
-  pairwise estimated degrees of freedom.
+  \code{method = "t"} a \code{\link{list}} with components
+  \code{Lambda},
+  the matrix of pairwise estimated correlation coefficients \code{P}
+  and the matrix of pairwise estimated degrees of freedom \code{Nu}.
 }
 \details{
   As seen in the examples, be careful using nonparametric estimators,
@@ -45,6 +46,9 @@ fitLambda(u, method = c("Schmid.Schmidt", "t"), p = min(100/nrow(u), 0.1),
   finite sample sizes might not be able to capture well.
 }
 %\author{Marius Hofert}
+\seealso{\code{\link{lambda}()} computes the true (lower and upper) tail
+  coefficients for a given copula.
+}
 \references{
   Jaworski, P., Durante, F., \enc{Härdle}{Haerdle}, W. K., Rychlik, T. (2010).
   \emph{Copula Theory and Its Applications}

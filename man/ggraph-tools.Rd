@@ -62,9 +62,8 @@ gpviTest(pvalues, method=p.adjust.methods, globalFun=min)
 }
 \note{
   If \code{u} are distributed according to or \dQuote{perfectly} sampled
-  from a copula, )Note that
-  (typically)
-    pseudo-observations or perfectly simulated
+  from a copula, p-values on GOF tests for that copula should be uniformly
+  distributed in \eqn{[0,1]}.
 }
 \value{
   \describe{
@@ -81,7 +80,7 @@ gpviTest(pvalues, method=p.adjust.methods, globalFun=min)
 }
 %\author{Marius Hofert and Martin Maechler}
 \references{
-  Hofert and \enc{Mächler}{Maechler} (2013),
+  Hofert and \enc{Mächler}{Maechler} (2014),
   see \code{\link{pairsRosenblatt}}.% -> ./pairsRosenblatt.Rd
 }
 \seealso{

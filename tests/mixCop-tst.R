@@ -40,7 +40,7 @@ stopifnot(dim(mGG) == 2, inherits(mGG, "mixCopula"),
 )
 mGG # 4 parameters
 
-suppressWarnings(RNGversion("3.5.0"))
+RNGversion("3.5.0") # for sample() -- "biased" --> warning ---> *remove* in future!
 set.seed(17)
 uM  <- rCopula( 600, mC)
 uGG <- rCopula(1000, mGG)
