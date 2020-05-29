@@ -409,7 +409,7 @@ pairsColList <- function(P, pdiv=c(1e-4, 1e-3, 1e-2, 0.05, 0.1, 0.5),
 {
     ## 0) Checks
     stopifnot(is.na(P) | (0 <= P & P <= 1), is.matrix(P), (d <- ncol(P))==nrow(P),
-	      (lp <- length(pdiv)) >= 1, 0 < pdiv, pdiv < 1, diff(pdiv) > 0,
+	      (lp <- length(pdiv)) >= 1, 0 < pdiv, pdiv < 1, all(diff(pdiv) > 0),
 	      length(signif.P)==1, any(is.Pv <- (signif.P == pdiv)),
 	      length(pmin0)==1, 0 <= pmin0, pmin0 <= 1,
 	      0 <= bg.ncol.gap, bg.ncol.gap < lp)

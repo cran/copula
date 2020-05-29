@@ -120,8 +120,8 @@ setMethod("dCopula", signature("matrix", "normalCopula"), dnormalCopula)
 ## setMethod("dCopula", signature("numeric", "normalCopula"),dnormalCopula)
 
 ## rho := copula@parameters
-setMethod("tau", "normalCopula", function(copula) 2 * asin(copula@parameters) /pi)
-setMethod("rho", "normalCopula", function(copula) asin(copula@parameters / 2) * 6 / pi)
+setMethod("tau", "normalCopula", function(copula, ...) 2 * asin(copula@parameters) /pi)
+setMethod("rho", "normalCopula", function(copula, ...) asin(copula@parameters / 2) * 6 / pi)
 setMethod("lambda", signature("normalCopula"), lambdaNormalCopula)
 
 setMethod("iRho", "normalCopula", function(copula, rho) sinpi(rho / 6) * 2)

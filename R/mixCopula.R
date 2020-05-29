@@ -1,9 +1,9 @@
-##' A list of parCopula's
+##' A list of parCopula's : "parC(opula)-list"
 setClass("parClist",  contains = "list",
 	 validity = function(object) {
 	     if(!length(object))
 		 return("empty parCopula lists are not valid")
-	     if(!all(lengths(cls <- lapply(object, class)) == 1L))
+	     if(!all(lengths(cls <- lapply(object, class)) == 1L)) # S4 : length(class(.)) == 1
 		 return("parCopula list must have parCopula components")
 	     is.pC <- vapply(unlist(cls), extends, NA, class2 = "parCopula")
 	     if(!all(is.pC))
@@ -234,11 +234,11 @@ setMethod("setTheta", "mixCopula",
     nj <- vapply(cops, nParam, 1, freeOnly=freeOnly)
     ## FIXME re-parametrize a la nor1mix::nM2par / .par2nM
     ## ----- i.e. value would only contain  qlogis(w[-1])  !!
-    nw <- length(iF.w <- isFreeP(w <- x@w))
+    nw <- sum(iF.w <- isFreeP(w <- x@w))
     if (sum(nj) + nw != length(value))
         stop(sprintf(
-            "length(value) = %d  !=  %d, the number of free parameters",
-            length(value), sum(nj) + nw))
+            "length(value) = %d  !=  %d (= %d + %d = sum(nj) + nw), the number of free parameters",
+            length(value), sum(nj) + nw, sum(nj), nw))
     n. <- 0L
     for(j in seq_len(m))
         if ((n.j <- nj[j])) {
@@ -271,29 +271,28 @@ setMethod("setTheta", "mixCopula",
 setMethod("fixedParam<-", signature("mixCopula", "logical"),
 function(copula, value) {
     stopifnot(length(value) %in% c(1L, nParam(copula)))
-    if (anyNA(getTheta(copula, freeOnly = FALSE)[value])) stop("Fixed parameters cannot be NA.")
+    if (anyNA(getTheta(copula, freeOnly = FALSE)[value])) stop("Fixed parameters cannot be NA")
     cops <- copula@cops
     ic <- seq_along(cops) # "1:m"
     nj <- vapply(cops, nParam, 1, freeOnly=FALSE)
-    if (identical(value, FALSE) || !any(value)) {
-        for(j in ic)
-            if (nj[j] > 0L) fixedParam(copula@cops[[j]]) <- FALSE
-        attr(copula@w, "fixed") <- NULL
-    } else if (identical(value, TRUE) || all(value)) {
-        for(j in ic)
-            if (nj[j] > 0L) fixedParam(copula@cops[[j]]) <- TRUE
-        attr(copula@w, "fixed") <- TRUE
-    } else { # "typically", some fixed, some free:
-        n. <- 0L
-        for (j in ic) {
-            n.j <- nj[j]
-            if (n.j > 0L) fixedParam(copula@cops[[j]]) <- value[n. + seq_len(n.j)]
-            n. <- n. + n.j
+    attr(copula@w, "fixed") <-
+        if (isFALSE(value) || !any(value)) {
+            for(j in ic)
+                if (nj[j] > 0L) fixedParam(copula@cops[[j]]) <- FALSE
+            NULL
+        } else if (isTRUE(value) || all(value)) {
+            for(j in ic)
+                if (nj[j] > 0L) fixedParam(copula@cops[[j]]) <- TRUE
+            TRUE
+        } else { # "typically", some fixed, some free:
+            n. <- 0L
+            for (j in ic) {
+                n.j <- nj[j]
+                if (n.j > 0L) fixedParam(copula@cops[[j]]) <- value[n. + seq_len(n.j)]
+                n. <- n. + n.j
+            }
+            if (!any(vw <- value[n. + ic])) NULL else if (all(vw)) TRUE else vw
         }
-        attr(copula@w, "fixed") <-
-            if (!any(vw <- value[n. + ic])) NULL
-            else if (all(vw)) TRUE else vw
-    }
     copula
 })
 
@@ -311,7 +310,7 @@ setMethod(describeCop, c("mixCopula", "character"), function(x, kind, prefix="",
 	   "  with weights:\n", dputNamed(x@w))
 })
 
-## The copula
+## The copula function C(.) :
 pMixCopula <- function(u, copula, ...) {
     as.vector(
 	vapply(copula@cops, pCopula, FUN.VALUE=numeric(nrow(u)), u=u, ...)
@@ -355,5 +354,52 @@ setMethod("lambda", "mixCopula", function(copula, ...)
 setMethod("rho", "mixCopula", function(copula, ...) # note: Kendall's tau non-trivial
     c(vapply(copula@cops, rho, 1.1) %*% copula@w))
 
+setMethod("getIniParam", "mixCopula", function(copula, data, default=NULL, named=TRUE, ...) {
+    clc <- class(copula)
+    if(is.null(default)) default <- rep(NA_real_, nParam(copula, freeOnly=TRUE))
+    ## weights:  equal weights for all components
+    ccops <- copula@cops@.Data # (or w/o '@.Data')
+    nPcops <- vapply(ccops, nParam, 0L, freeOnly=TRUE)# nParam(., freeOnly=T) of each component copula
+    m <- length(nPcops) # number of mixture components
+    cnP <- cumsum(c(1L, nPcops))
+    ## get init.param for each cop. (as if it was fit alone to data (sub optimal!)):
+    copsIni <- lapply(1:m, function(k)
+        getIniParam(ccops[[k]], data=data,
+                    default = default[seq.int(cnP[k], length.out = nPcops[k])]))
+    ## (TODO: fix NA's in the above)
+    ## weight parameters: use *equal* free weights
+    w.f <- isFreeP(w <- copula@w)
+    s.f <- 1 - sum(w[!w.f]) # the sum of the free weights
+    nfree <- sum(w.f) ## w[w.f] <- s.f/nfree
+    ## (free copula parameters, free weights) :
+    c(unlist(copsIni), rep(s.f/nfree, nfree))
+})
 
+
+###----- Parameter transformation  Simplex_m  <-->  R^{m-1} --- Important for optimization, i.e. estimation ---------------
+
+##' centered log ratio transformation;  no 's := sum(w)' needed as argument: just  use  clr1(w / s)
+clr1 <- function(w) {
+    stopifnot(length(w) >= 1, w >= 0, all.equal(sum(w), 1))
+    ## calculate clr1
+    ln <- log(w)
+    ## log(0) == -Inf "kills"  mean(ln) etc:
+    if(any(w0 <- !w)) ln[w0] <- -709 # < log(.Machine$double.xmin) = -708.3964
+    ## return:
+    ln[-1L] - mean(ln)
+}
+
+.logMax <- log(2) * .Machine$double.max.exp # = 709.7827 = log(.Machine$double.xmax)
+##' inverse clr1() transformation:  no 's := sum(w)' needed: just use  s * clr1inv(.)
+clr1inv <- function(lp) {
+    if(!length(lp)) return(1)
+    ## calc weights
+    lp <- c(-sum(lp), lp) # = (lp_1,..., lp_m)
+    if((mlp <- max(lp))*length(lp) < .logMax) { ## normal case
+        p1 <- exp(lp)
+    } else { ## mlp = max(lp) >= .logMax, where exp(lp) would overflow
+        p1 <- exp(lp - mlp)
+    }
+    p1/sum(p1)
+}
 

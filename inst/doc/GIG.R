@@ -1,16 +1,4 @@
----
-title: Generalized Inverse Gaussian Archimedean Copulas
-author: Marius Hofert
-date: '`r Sys.Date()`'
-output:
-  html_vignette:
-    css: style.css
-    keep_md: TRUE
-vignette: >
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Generalized Inverse Gaussian Archimedean Copulas}
----
-```{r, message=FALSE}
+## ---- message=FALSE-----------------------------------------------------------
 source(system.file("Rsource", "GIG.R", package="copula"))## ../inst/Rsource/GIG.R
 require(copula)
 require(bbmle)
@@ -18,11 +6,8 @@ require(lattice)
 require(grid)
 source(system.file("Rsource", "utils.R", package="copula", mustWork=TRUE))##-> showProc.time() ..
 doPDF <- FALSE ## set 'do.profile' below -- *visibly*
-```
 
-## 1 Auxiliary functions
-
-```{r}
+## -----------------------------------------------------------------------------
 ##' Initial interval for GIG
 ##' @title Initial interval for GIG
 ##' @param U (n x d)-matrix of simulated data
@@ -63,9 +48,8 @@ ii.GIG <- function(U, h, method=c("etau","dmle.G")){
     ## result
     I
 }
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 ##' -log-likelihood
 ##' @title -log-likelihood
 ##' @param nu parameter of the generator/copula
@@ -79,15 +63,8 @@ nlogl.GIG <- function(nu, theta, u){
     -sum(dacopula.GIG(u, theta=c(nu, theta), n.MC=0, log=TRUE))
 }
 nlogl.GIG. <- function(theta, u) nlogl.GIG(theta[1], theta=theta[2], u=u) # vectorized version
-```
 
-## 2 Setup
-
-Note: The GIG family is *two*-parametric.
-
-### Plot Kendall's tau as a function in $\theta$ for different $\nu$
-
-```{r, fig.align="center", fig.width=7.5, fig.height=6}
+## ---- fig.align="center", fig.width=7.5, fig.height=6-------------------------
 th1 <- c(0, 0.1, 0.5, 1, 5, 10)
 cols <- colorRampPalette(c("red", "orange", "darkgreen", "turquoise", "blue"),
                          space="Lab")(length(th1))
@@ -99,35 +76,23 @@ for(i in seq_along(th1))
           lwd=1.4, col=cols[i])
 label <- as.expression(lapply(1:length(th1), function(i) substitute(nu==nu., list(nu.=th1[i]))))
 legend("topright", label, bty="n", lwd=1.4, col=cols)
-```
 
-### Parameter specification
-
-Let's specify some parameters.
-```{r}
+## -----------------------------------------------------------------------------
 n <- 100 # sample size
 d <- 10 # dimension
 nu <- 0.2 # fix nu
 tau <- 0.5 # => psi(t)=(1+t)^(-nu/2)besselK(theta*sqrt(1+t), nu=nu)/besselK(theta, nu=nu) with (nu, theta)=(0.2, 0.0838)
 h <- c(0.15, 0.15) # h_-, h_+ (for initial value)
-```
 
-## 3 Sampling and estimation
-
-### Sampling
-
-```{r, fig.align="center", fig.width=7.5, fig.height=6, fig.show="hide"}
+## ---- fig.align="center", fig.width=7.5, fig.height=6, fig.show="hide"--------
 theta <- iTau.GIG(tau, c(nu, NA)) # determine theta such that tau is matched (for given nu)
 set.seed(1000)
 U <- rnacopula.GIG(n, d, theta)
 par(pty="s")
 splom2(U, cex=0.4, pscales=0, main=paste("Sample of size",n,
                               "from a GIG copula"))
-```
 
-### Estimation
-
-```{r}
+## -----------------------------------------------------------------------------
 I <- ii.GIG(U, h)
 start <- colMeans(I) # initial interval
 
@@ -153,13 +118,8 @@ system.time(ml2 <- mle2(nlogl.GIG, data=list(u=U), method="L-BFGS-B",
                         upper=c(nu=I[2,1], theta=I[2,2])))
 summary(ml2)
 str(ml2@details)
-```
 
-## 4 Plots
-
-### Profile likelihood plots
-
-```{r, fig.align="center", fig.width=7.5, fig.height=6}
+## ---- fig.align="center", fig.width=7.5, fig.height=6-------------------------
 do.profile <- FALSE # set this to TRUE to compute profile-likelihood plots (time-consuming)
 if(do.profile){
     system.time(prof <- profile(ml))
@@ -174,11 +134,8 @@ if(do.profile){
     plot(prof2) # => for adjusting stepsize etc., see ?profile.mle2
 }
 showProc.time()
-```
 
-### -log-likelihood plot
-
-```{r}
+## -----------------------------------------------------------------------------
 ## Build grid
 m <- 20 # number of grid points = number of intervals + 1
 th   <- seq(I[1,1], I[2,1], length.out=m) # grid points for nu
@@ -199,11 +156,8 @@ if(nzchar(saveF) && file.exists(saveF)) { # save time, also on CRAN
     cat("saved to saveFile = ", dQuote(saveF), "\n")
 }
 showProc.time()
-```
 
-### Wireframe
-
-```{r, fig.align="center", fig.width=7.5, fig.height=6}
+## ---- fig.align="center", fig.width=7.5, fig.height=6-------------------------
 true.theta <- theta
 true.val <- c(true.theta, nlogl.GIG.(true.theta, u=U)) # theoretical optimum
 opt <- ml@coef # optimizer-optimum
@@ -236,11 +190,8 @@ wireframe(val.grid ~ grid[,1] * grid[,2], screen=list(z=70, x=-55), zoom=0.95,
                      points = list(pch=c(3,4), col=c("red","blue"), lwd=2, cex=1.4),
                      text = list(c("True value", "Optimum of optimizer")), padding.text=3,
                      cex=1, align=TRUE, transparent=TRUE))
-```
 
-### Levelplot
-
-```{r, fig.align="center", fig.width=7.5, fig.height=6}
+## ---- fig.align="center", fig.width=7.5, fig.height=6-------------------------
 xlim. <- c(min(grid[,1]),max(grid[,1]))
 ylim. <- c(min(grid[,2]),max(grid[,2]))
 xeps <- (xlim.[2] - xlim.[1]) * 0.04
@@ -267,4 +218,4 @@ levelplot(val.grid ~ grid[,1] * grid[,2],
                      columns=2, text = list(c("True value", "Optimum of optimizer")),
                      align=TRUE, transparent=TRUE))
 showProc.time()
-```
+

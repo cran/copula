@@ -1,14 +1,16 @@
 Package: copula
-Version: 0.999-20
-VersionNote: Last CRAN: 0.999-19 on 2018-12-19
-Date: 2020-02-03
+Version: 1.0-0
+VersionNote: Last CRAN: 0.999-20 on 2020-02-04
+Date: 2020-05-19
 Title: Multivariate Dependence with Copulas
 Authors@R: c(person("Marius", "Hofert", role = "aut", email = "marius.hofert@uwaterloo.ca",       comment = c(ORCID = "0000-0001-8009-4665"))
 	   , person("Ivan", "Kojadinovic", role = "aut", email = "ivan.kojadinovic@univ-pau.fr",  comment = c(ORCID = "0000-0002-2903-1543"))
 	   , person("Martin","Maechler", role=c("aut","cre"), email="maechler@stat.math.ethz.ch", comment = c(ORCID = "0000-0002-8685-9910"))
 	   , person("Jun", "Yan", rol = "aut", email = "jun.yan@uconn.edu",                       comment = c(ORCID = "0000-0003-4401-7296"))
-	   , person(c("Johanna", "G."), "Nešlehová", role = "ctb", comment = c("evTestK()", ORCID = "0000-0001-9634-4796")))
-Depends: R (>= 3.2.0)
+	   , person(c("Johanna", "G."), "Nešlehová", role = "ctb", comment = c("evTestK()", ORCID = "0000-0001-9634-4796"))
+	   , person("Rebecca", "Morger", role = "ctb", comment = "fitCopula.ml(): code for free mixCopula weight parameters")
+	   )
+Depends: R (>= 3.5.0)
 Imports: stats, graphics, methods, stats4, Matrix, lattice, colorspace,
         gsl, ADGofTest, stabledist (>= 0.6-4), mvtnorm, pcaPP, pspline,
         numDeriv
@@ -53,14 +55,19 @@ Collate: AllClass.R Classes.R AllGeneric.R Auxiliaries.R aux-acopula.R
         wrapper.R xvCopula.R zzz.R
 Encoding: UTF-8
 URL: http://copula.r-forge.r-project.org/
-NeedsCompilation: yes
-Packaged: 2020-02-04 16:31:00 UTC; maechler
 Author: Marius Hofert [aut] (<https://orcid.org/0000-0001-8009-4665>),
   Ivan Kojadinovic [aut] (<https://orcid.org/0000-0002-2903-1543>),
   Martin Maechler [aut, cre] (<https://orcid.org/0000-0002-8685-9910>),
   Jun Yan [aut] (<https://orcid.org/0000-0003-4401-7296>),
   Johanna G. Nešlehová [ctb] (evTestK(),
-    <https://orcid.org/0000-0001-9634-4796>)
+    <https://orcid.org/0000-0001-9634-4796>),
+  Rebecca Morger [ctb] (fitCopula.ml(): code for free mixCopula weight
+    parameters)
 Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
 Repository: CRAN
-Date/Publication: 2020-02-06 06:20:20 UTC
+Repository/R-Forge/Project: copula
+Repository/R-Forge/Revision: 1840
+Repository/R-Forge/DateTimeStamp: 2020-05-19 20:57:29
+Date/Publication: 2020-05-29 12:40:07 UTC
+NeedsCompilation: yes
+Packaged: 2020-05-28 08:59:39 UTC; rforge

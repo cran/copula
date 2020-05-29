@@ -24,7 +24,7 @@ source(system.file("Rsource", "utils.R",     package="copula", mustWork=TRUE))
 
 uu <- array(c(9, 7, 8, 3, 2,   4, 1, 5, 6, 10,
               6, 9, 1, 7, 3,   2, 5, 8, 4, 10), dim = c(10L, 2L)) / 11
-suppressWarnings(RNGversion("3.5.0"))
+suppressWarnings(RNGversion("3.5.0")) ## << FIXME: eliminate - adapting where needed below !
 set.seed(7)
 u3 <- cbind(uu, round(runif(10),2))
 
@@ -156,7 +156,7 @@ mvt.2.ne <- mvdc(copula = ct.2, margins = c("norm", "exp"),
                  paramMargins = list(list(mean = 0, sd = 2), list(rate = 2)))
 mvt.2.ne ## --> four free parameters in total: rho, mean, sd, and rate:
 
-copula:::getTheta(mvt.2.ne, attr = TRUE) # - shows only the copula parameter -- FIXME !
+getTheta(mvt.2.ne, attr = TRUE) # - shows only the copula parameter -- FIXME !
 
 ## simulate data and fit:
 set.seed(17); x.samp <- rMvdc(250, mvt.2.ne)
@@ -214,7 +214,7 @@ stopifnot(nrow(R <- rMvdc(3, mv1)) == 3, ncol(R) == 2)
 ## a wrong way:
 assertError(
   mvW <- mvdc(gumbelC, c("gamma","Foo"), param= list(list(3,1), list(NULL)))
-)
+, verbose=TRUE)
 ## must not valid: stopifnot(!isTRUE(validObject(mvW, test=TRUE)))
 
 showProc.time()
@@ -328,7 +328,7 @@ stopifnot(all.equal(xvR, 21.050569, tolerance = 1e-6))
 ## Now 'copula2 = indepCopula(..) gets 'dim = 3' from the first:
 kh.C <- khoudrajiCopula(claytonCopula(2.5, dim=3), shapes = (1:3)/4)
 kh.C
-copula:::getTheta(kh.C, attr=TRUE) # bounds look good
+getTheta(kh.C, attr=TRUE) # bounds look good
 x3 <- cbind(x, x[,1]^2 + runif(nrow(x)))
 u3 <- pobs(x3)
 if(FALSE) # Error:  "non-finite finite-difference [3]"
@@ -342,12 +342,14 @@ plot(p1, l1, type = "b") # nice maximum at around 6.xx
 
 ## works two:
 fixedParam(kh.C) <- c(FALSE, FALSE, TRUE,TRUE)
-summary(fK12 <- fitCopula(kh.C, u3))
+getTheta(kh.C)
+summary(fK12 <- fitCopula(kh.C, u3)) # <== now (2020-04-28) suddenly gives error
 fixedParam(kh.C) <- FALSE # all free now
 fK4 <- fitCopula(kh.C, u3, start = c(coef(fK12), 0.3, 0.5),
                  optim.method = "L-BFGS-B")
 summary(fK4)
 ## -> shape1 ~= shape2 ~= 0
+
 
 if(FALSE) ## FIXME !! --
 kh.r.C <- khoudrajiCopula(rotCopula(claytonCopula()), shapes = c(1,3)/4)
@@ -388,13 +390,20 @@ set.seed(1); str(x <- rCopula(1000, tevc))
 plot(x, main = "1000 samples of tevCopula(iTau(tevCopula(), 0.75))")
 fitCopula(tevCopula(),		    x, method="irho")# warning
 fitCopula(tevCopula(df.fixed=TRUE), x, method="itau")# fine
+showProc.time()# this takes l..o..n..g :
 fitCopula(tevCopula(df.fixed=TRUE), x)# two warnings ==> do not estimate.var:
+showProc.time()# this takes l..o..n..g :
 fitCopula(tevCopula(df.fixed=TRUE), x, estimate.variance=FALSE)
+showProc.time()# this takes l..o..n..g :
 fitCopula(tevCopula(df.fixed=TRUE), x, method="ml")
+showProc.time()
 ## 'df' is not estimated, but it should
 fitCopula(tevCopula(),		    x)# df as parameter, but "kept at df := 4" (FIXME?)
+showProc.time()
 fitCopula(tevCopula(), 		    x, estimate.variance=FALSE)
+showProc.time()
 fitCopula(tevCopula(), 		    x, method="ml")# currently ~= the one above
+showProc.time()
 
 set.seed(7)
 try(# now works .. slowly!

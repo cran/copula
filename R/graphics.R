@@ -551,7 +551,7 @@ setMethod("contourplot2", signature(x = "mvdc"),       contourplot2Mvdc)
 ### 3.2 wireframe() methods ####################################################
 
 ##' @title Wireframe Plot Method for Classes "matrix" (and "data.frame")
-##' @param x A numeric matrix or as.matrix(.)able
+##' @param x A numeric 3-column matrix or as.matrix(.)able
 ##' @param xlim, ylim, zlim  The x-, y-, and z-axis limits
 ##' @param xlab, ylab, zlab  The x-, y-, and z-axis label
 ##' @param alpha.regions See ?wireframe

@@ -18,7 +18,7 @@
 
 library(copula)
 isExplicit <- copula:::isExplicit
-(doExtras <- copula:::doExtras())
+(doExtras <- copula:::doExtras() && getRversion() >= "3.4") # so have withAutoprint(.)
 
 is32 <- .Machine$sizeof.pointer == 4 ## <- should work for Linux/MacOS/Windows
 isMac <- Sys.info()[["sysname"]] == "Darwin"
@@ -62,40 +62,87 @@ stopifnot(
               tol = if(isSun || isMac || is32) 0.05 else 7e-7)
 )
 
-## "free" weights --- estimation == FIXME: will change after re-parametrization
+## "free" weights -------------
+
 optCtrl <- list(maxit = 1000, trace = TRUE)
-if (doExtras) { # slowish
+## The real proof: using "arbitrary"  initial parameters (not very close to truth):
+mC. <- setTheta(mC, c(1, 0.5, rho=0, df=7,   w = c(1,1,1)/3))
+
+if(doExtras) withAutoprint({
     st0 <- system.time(
-        f. <- fitCopula(mC, uM, optim.method = "BFGS", optim.control=optCtrl, traceOpt=TRUE))
+        f. <- fitCopula(mC, uM, optim.method = "BFGS", optim.control=list(maxit=999), traceOpt=TRUE))
     ## converges, .. no var-cov
     ## (which would fail with Error in  solve.default(Sigma.n, t(dlogcdtheta(copula, u) - S)) :
     ##            system is computationally singular: reciprocal condition number = 3.88557e-17
-    print(st0) #
-    print(lf. <- logLik(f.))
-    print(summary(f.))
-}
+    st0 # was 4.4, now 9.3 sec (nb-mm4)
+    coef(f.) ; logLik(f.)
+    summary(f.)
+    stopifnot(exprs = {
+        all.equal(logLik(f.), structure(536.93419, nobs = 600L, df = 7L, class = "logLik"),
+                  tol = 8e-10) # 7.206e-11)
+        })
+    ## using 'mC.' which "does not know" the true parameters (for 'start');
+    ## now works thanks to new getInitParam() "mixCopula" method :
+    system.time(
+        f.w <- fitCopula(mC., uM, optim.method = "BFGS", optim.control=list(maxit=999), traceOpt=TRUE))
+     ## param= 1.0, 0.5, 0.0, 7.0, 0.0, 0.0 => logL=   152.18517
+     ## param= 1.001, 0.500, 0.000, 7.000, 0.000, 0.000 => logL=   153.21439
+     ## param= 0.999, 0.500, 0.000, 7.000, 0.000, 0.000 => logL=        -Inf
+     ## Error in optim(start, logL, lower = lower, upper = upper, method = optim.method,  :
+     ##   non-finite finite-difference value [1]
+     ## Calls: system.time ... fitCopula -> .local -> <Anonymous> -> fitCopula.ml -> optim
+
+   ## MM: Note that 0.999 is not legal for a gumbelCopula (-> gives Error --> -Inf )
+    coef(f.w); logLik(f.w)
+    print(summary(f.w))
+    stopifnot(exprs = {
+        all.equal(  coef(f.),   coef(f.w), tol=0.0006) # seen 0.000187
+        all.equal(logLik(f.), logLik(f.w), tol= 4e-8)  # seen 1.89e-9
+    })
+})
 
 
-if (doExtras) { # slowish
+if(doExtras) withAutoprint({ # slowish
     st1 <- system.time(
         ff <- fitCopula(mC, uM, optim.method = "Nelder-Mead", optim.control=optCtrl))
     ## converges (vcov : Error in solve(..)... (rec.cond.number 4.783e-17)
-    print(st1) # 11 sec
-    print(lff <- logLik(ff))
-    print(summary(ff))
-}
+    st1 # 11 sec
+    logLik(ff)
+    summary(ff)
+    ## now using 'mC.' : -----
+    system.time(
+        ff.w <- fitCopula(mC., uM, optim.method = "Nelder-Mead", optim.control=optCtrl))
+    coef(ff.w) ; logLik(ff.w)
+    summary(ff.w)
+    stopifnot(exprs = {
+        all.equal(  coef(ff),   coef(ff.w), tol=0.008) # seen 0.00186
+        all.equal(logLik(ff), logLik(ff.w), tol= 4e-8)  # seen 7.9e-9
+        })
+})
 
 
-if (doExtras) { # slowish
-    st2 <- system.time(
+if(doExtras) withAutoprint({ # slowish
+    system.time( # 28 sec
         f2 <- fitCopula(mC, uM, optim.method = "L-BFGS-B",    optim.control=optCtrl))
     ## converges (vcov: Error in solve(..)... (rec.cond.number 3.691e-17)
-    print(st2) # 28 sec
-    print(lf2 <- logLik(f2))
-    print(summary(f2))
-}
+    coef(f2) ; logLik(f2)
+    summary(f2)
 
-## partially fixed
+    ## now using 'mC.' : -----
+    system.time(
+        f2.w <- fitCopula(mC., uM, optim.method = "Nelder-Mead", optim.control=optCtrl))
+    coef(f2.w) ; logLik(f2.w)
+    summary(f2.w)
+    stopifnot(exprs = { ## quite different, f2 was "poor" :
+        all.equal(  coef(f2),   coef(f2.w), tol=0.07) # seen 0.0389
+        all.equal(logLik(f2), logLik(f2.w), tol=0.002)# seen 0.000747
+    })
+})
+
+
+## === Partially fixed parameters -- the hard cases  ===================================
+
+RNGversion("4.0.0") # back to normal
 
 (tX4 <- tCopula( 0.2, df = 5, df.fixed=TRUE))
 (tn3 <- tCopula(-0.5, df = 3))
@@ -103,15 +150,69 @@ getTheta(tX4, attr = TRUE) # freeOnly = TRUE is default
 ## --> *not* showing df=5 as it is fixed
 (m3 <- mixCopula(list(normalCopula(0.4), tX4, tn3), w = (1:3)/6))
                                         # -> shows 'm2.df := 5' as fixed !
-th. <- getTheta(m3, attr = TRUE)# ditto
-(th <- getTheta(m3, named= TRUE))
+(th. <- getTheta(m3, attr = TRUE))# ditto
+(th  <- getTheta(m3, named= TRUE))
+##' an inverse function of which(.) :
+##' an inverse function of which(.) :
 trueAt <- function(i, n) { r <- logical(n); r[i] <- TRUE; r }
-stopifnot(
-    identical(th, structure(th., param.lowbnd=NULL, param.upbnd=NULL)),
+## Functionality check of trueAt() :
+set.seed(17); summary(Ns <- rpois(1000,3))
+table(Ns) ; M <- max(Ns)
+for(n in Ns) {
+    i <- sort(sample.int(M, n))
+    stopifnot(identical(i, which(trueAt(i, M))))
+}# takes ~ 0.05 sec
+
+stopifnot(exprs = {
+    identical(th, structure(th., param.lowbnd=NULL, param.upbnd=NULL))
     identical(names(th), c("m1.rho.1", "m2.rho.1", "m3.rho.1", "m3.df",
                            paste0("w", 1:3)))
-    ,
-    identical(isFree(m3), !trueAt(3, n=8))# free every but at [3]
-)
+    identical(isFree(m3), !trueAt(3, n=8))# free everywhere but at [3]
+})
 
+set.seed(47)
+Ut <- rCopula(2^12, m3)
+##
 fixedParam(m3) <- trueAt(c(3, 8), n=8)
+stopifnot(exprs = {
+    nParam(m3, freeOnly =FALSE) == 8
+    nParam(m3, freeOnly = TRUE) == 6
+    length(print( getTheta(m3, freeOnly=FALSE, named=TRUE))) == 8
+    length(print( getTheta(m3, freeOnly=TRUE,  named=TRUE))) == 6
+})
+(iniP <- getIniParam(m3, Ut, default=NA)) # matching the freeOnly case:
+stopifnot(exprs = {
+    identical(iniP, getIniParam(m3, Ut))
+    length(iniP) == 6
+    iniP == c(rep(iniP[1], 3), 3, 1/4, 1/4)
+})
+## does the inital value possibly "work" ?
+(llIni <- loglikCopula(u=Ut, copula=setTheta(m3, iniP, na.ok=FALSE))) # 205.0475; yes, good, ...
+if(doExtras) withAutoprint({ ## try with the true parameters of 'm3'
+    system.time( # 28 sec
+        f38 <- fitCopula(m3, Ut, traceOpt=TRUE) )
+    coef(f38) ; logLik(f38)
+    summary(f38)
+
+    ## More realistically, starting from our simple iniP[]  (instead from the true \theta !!)
+    system.time(
+    ffI <- fitCopula(m3, Ut, start = iniP, optim.method = "BFGS",
+                     optim.control=list(maxit=999), traceOpt=TRUE) )
+    coef(ffI) ; logLik(ffI)
+    summary(ffI)
+})
+
+
+fixedParam(m3) <- trueAt(c(3, 7), n=8) # (fixed wgt in the middle)
+## works with fixed at c(3,6) ...
+(iniP37 <- getIniParam(m3, Ut))
+if(doExtras) withAutoprint({ # *much* slower  (less parameters, why ??)
+    system.time( # 28 sec
+        f37 <- fitCopula(m3, Ut, start=iniP37, traceOpt=TRUE) )
+    coef(f37) ; logLik(f37)
+    summary(f37)
+})
+
+## setting "arbitrary" (pretty wrong) initial values :
+mm <- setTheta(m3, c(0, 0, 0, df=13, w1 = .6, w2 = .4))
+## (not yet ... getIniParam() is more relevant !)

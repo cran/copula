@@ -5,6 +5,7 @@
 ** TODO [MM] Export lsum()  and lssum() ... slightly simplified versions of them have help pages now in CRAN pkg 'DPQ'.
 ** TODO [JY] Set up dispexpr (cdf, pdf) for rotExplicitCopula, mixExplicitCopula such that they and khoudrajiCopula work with each other.
 ** TODO [IK] gofPB(*, ties=TRUE) is *never* tested, *nor* documented (man/gofCopula.Rd); see FIXME, what if x has no ties?
+** TODO [MM] Export & document "mixWeights" and "parClist" classes (are visible to user anyway from n.s.): R/mixCopula.R
 ** DONE [MM] warnings about `numDeriv()` to be displayed once per R session and could be suppressed.
 ** DONE [MM] copula@fullname: *abolish*, i.e., for now *deprecate* and replace by function _describeCop()_ generic & methods
 *** DONE [MM] copula@fullname: is used in print() method; Want also use for plotting -- hence urgent for book!

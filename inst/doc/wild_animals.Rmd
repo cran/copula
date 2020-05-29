@@ -5,6 +5,7 @@ date: '`r Sys.Date()`'
 output:
   html_vignette:
     css: style.css
+    keep_md: TRUE
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Wild Animals: Examples of Nonstandard Copulas}
@@ -29,8 +30,8 @@ M1Inv <- function(t) t/0.01
 
 M2 <- function(t) {
     f <- function(t.) {
-      	ct <- ceiling(t.)
-	if(ct %% 2) t. - (ct-1)/2 else ct/2
+        ct <- ceiling(t.)
+        if(ct %% 2) t. - (ct-1)/2 else ct/2
     }
     unlist(lapply(t, f))
 }

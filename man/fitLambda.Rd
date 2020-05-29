@@ -43,7 +43,7 @@ fitLambda(u, method = c("Schmid.Schmidt", "t"), p = min(100/nrow(u), 0.1),
   As seen in the examples, be careful using nonparametric estimators,
   they might not perform too well (depending on \code{p} and in
   general). After all, the notion of tail dependence is a limit,
-  finite sample sizes might not be able to capture well.
+  finite sample sizes may not be able to capture limits well.
 }
 %\author{Marius Hofert}
 \seealso{\code{\link{lambda}()} computes the true (lower and upper) tail

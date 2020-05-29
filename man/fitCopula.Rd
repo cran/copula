@@ -12,7 +12,8 @@
   multivariate (possibly \dQuote{pseudo}) observations.
 }
 \usage{
-loglikCopula(param, u, copula)
+loglikCopula(param = getTheta(copula), u, copula,
+             error = c("-Inf", "warn-Inf", "let-it-be"))
 
 ## Generic [and "rotCopula" method] :
 fitCopula(copula, data, \dots)
@@ -27,7 +28,8 @@ fitCopula(copula, data, \dots)
 optimMeth(copula, method, dim)
 }
 \arguments{
-  \item{param}{vector of parameter values.}
+  \item{param}{vector of \emph{free} (see \code{\link{isFree}()} and
+    \code{\link{getTheta}()}) parameter values.}
   \item{u}{\eqn{n\times d}{n x d}-matrix of (pseudo-)observations in
     \eqn{[0,1]^d} for computing the copula log-likelihood, where \eqn{n} denotes
     the sample size and \eqn{d} the dimension.  Consider applying the function
@@ -38,6 +40,19 @@ optimMeth(copula, method, dim)
     \code{"itau"} or \code{"irho"}, it can either be data in \eqn{[0,1]^d}
     or in the whole \eqn{d}-dimensional space.}
   \item{copula}{a \code{"\linkS4class{copula}"} object.}
+  \item{error}{(for \code{loglikCopula()}:) a \code{\link{character}}
+    string specifying how errors in the underlying \code{\link{dCopula}()}
+    calls should be handled:
+    \describe{
+      \item{\code{"-Inf"}:}{the value of the log likelihood should silently be set
+	to \code{-Inf}.}
+
+      \item{\code{"warn-Inf"}:}{signal a \code{\link{warning}} about the error and
+	set the value to \code{-Inf}.}
+      \item{\code{"let-it-be"}:}{the error is signalled and hence the likelihood
+	computation fails.}
+    }
+  }
   \item{method}{a \code{\link{character}} string specifying the copula
     parameter estimator used.  This can be one of:
     \describe{
@@ -95,10 +110,10 @@ optimMeth(copula, method, dim)
     likelihood maximization (typically when the likelihood is
     evaluated at invalid parameter values).}
   \item{\dots}{additional arguments passed to \code{method} specific auxiliary
-    functions, e.g., \code{traceOpt = TRUE} for tracing
-    \code{\link{optimize}} for method \code{"itau.mpl"}, and for
-    \dQuote{"manual"} tracing with method \code{"ml"} or \code{"mpl"}
-    (notably for \code{optim.method="Brent"}).}
+    functions, e.g., \code{traceOpt = TRUE} (or \code{traceOpt = 10}) for tracing
+    \code{\link{optimize}} (every 10-th function evaluation) for method
+    \code{"itau.mpl"}, and for \dQuote{"manual"} tracing with method
+    \code{"ml"} or \code{"mpl"} (notably for \code{optim.method="Brent"}).}
 }
 \value{
   \code{loglikCopula()} returns the copula log-likelihood evaluated at the
@@ -282,7 +297,7 @@ summary(fit.mpl)
 coef(fit.mpl) # named vector
 coef(fit.mpl, SE = TRUE) # the matrix, with SE
 ## Maximum likelihood (use 'x', not 'u' !)
-fit.ml <- fitCopula(normalCopula(dim=3, dispstr="un"), x, method="ml")
+fit.ml <- fitCopula(normalCopula(dim=3, dispstr="un"), x, method="ml", traceOpt=TRUE)
 summary(fit.ml)
 confint(fit.ml)
 confint(fit.ml, level = 0.999) # clearly non-0
@@ -292,7 +307,8 @@ param <- c(.6, .3, NA_real_)
 attr(param, "fixed") <- c(TRUE, FALSE, FALSE)
 ncp <- normalCopula(param = param, dim = 3, dispstr = "un")
 fixedParam(ncp) <- c(TRUE, TRUE, FALSE)
-summary(Fxf.mpl <- fitCopula(ncp, u, method = "mpl"))
+## 'traceOpt = 5': showing every 5-th log likelihood evaluation:
+summary(Fxf.mpl <- fitCopula(ncp, u, method = "mpl", traceOpt = 5))
 Fxf.mpl@copula # reminding of the fixed param. values
 
 ## With dispstr = "toep" :

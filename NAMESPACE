@@ -47,6 +47,7 @@ importMethodsFrom("methods", ## those for which we export new methods:
 importFrom("methods", as, is, extends, new
          , callGeneric, existsFunction, hasArg, hasMethod, callNextMethod
          , getClass, getClassDef
+         , selectMethod
          , setClass, setClassUnion, setMethod, setOldClass
          , setValidity, validObject, slot, "slot<-", slotNames, .hasSlot
          , signature, representation, prototype)
@@ -119,6 +120,7 @@ exportMethods(## for "other" (i.e. non copula-package !) generics:
 ## Part I: Mainly former copula ----------------------------------------
 
 exportClasses(mvdc)
+#
 exportClasses(Copula, parCopula, xcopula, copula, # virtual classes
 	      ellipCopula, archmCopula, evCopula, fhCopula)
 exportClasses(normalCopula, tCopula)
@@ -129,6 +131,10 @@ exportClasses(moCopula)
 exportClasses(indepCopula)
 exportClasses(lowfhCopula, upfhCopula)
 exportClasses(empCopula)
+# TODO
+# exportClasses(parClist, mixWeights) # <--> R/mixCopula.R
+
+## Export Functions  (if they are generic, *also* exports the Methods):
 
 export(mvdc)
 export(ellipCopula, archmCopula, evCopula, fhCopula)
@@ -140,6 +146,8 @@ export(moCopula)
 export(indepCopula)
 export(lowfhCopula, upfhCopula)
 export(empCopula)
+#
+export(getIniParam)
 
 export(dCopula, pCopula, rCopula)
 export(cCopula)

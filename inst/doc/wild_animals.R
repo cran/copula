@@ -1,30 +1,8 @@
----
-title: Examples of Nonstandard Copulas -- "Wild Animals"
-author: Marius Hofert and Martin Mächler
-date: '`r Sys.Date()`'
-output:
-  html_vignette:
-    css: style.css
-    keep_md: TRUE
-vignette: >
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Wild Animals: Examples of Nonstandard Copulas}
-  %\VignetteEncoding{UTF-8}
----
-## 1 Swiss Alps copulas of Hofert, Vrins (2013) ################################
-
-This example implements the Swiss Alps copulas of Hofert, Vrins (2013, "Sibuya
-copulas").
-
-### Lambda and its inverse
-```{r}
+## -----------------------------------------------------------------------------
 Lambda <- function(t) pmax(log(t), 0)
 LambdaInv <- function(t) (t != 0)*exp(t) ## <=>  ifelse(t == 0, 0, exp(t))
-```
 
-### M and its inverse (for $M_i, i=1,2$):
-<!--- MM FIXME: M2, M2Inv(): use `Vectorize()` - more elegant and faster! -->
-```{r}
+## -----------------------------------------------------------------------------
 M1 <- function(t) 0.01*t
 M1Inv <- function(t) t/0.01
 
@@ -42,31 +20,24 @@ M2Inv <- function(t) {
     }
     unlist(lapply(t, f))
 }
-```
 
-### S and its inverse (for $S_i, i=1,2$)
-```{r}
+## -----------------------------------------------------------------------------
 S1 <- function(t, H) exp(-(M1(t) + Lambda(t)*(1-exp(-H))))
 S1Inv <- function(u, H, upper=1e6) unlist(lapply(u, function(u.)
     uniroot(function(x) S1(x,H=H)-u., interval=c(0, upper))$root))
 S2 <- function(t, H) exp(-(M2(t) + Lambda(t)*(1-exp(-H))))
 S2Inv <- function(u, H, upper=1e6) unlist(lapply(u, function(u.)
     uniroot(function(x) S2(x,H=H)-u., interval=c(0, upper))$root))
-```
 
-### Wrappers for $p_1$ and $p_2$ and their inverses:
-p and its inverse (for $p_i(t_k-)$ and $p_i(t_k), i = 1,2$):
-```{r, p1-p2}
+## ---- p1-p2-------------------------------------------------------------------
 p1 <- function(t, k, H) exp(-M1(t)-H*k)
 p1Inv <- function(u, k, H, upper=1e6) unlist(lapply(u, function(u.)
     uniroot(function(x) p1(x,k=k,H=H)-u., interval=c(0, upper))$root))
 p2 <- function(t, k, H) exp(-M2(t)-H*k)
 p2Inv <- function(u, k, H, upper=1e6) unlist(lapply(u, function(u.)
     uniroot(function(x) p2(x,k=k,H=H)-u., interval=c(0, upper))$root))
-```
 
-and the wrappers, which work with `p1(), p2(), p1Inv(), p2Inv()` as arguments:
-```{r, p-pinv}
+## ---- p-pinv------------------------------------------------------------------
 p <- function(t, k, H, I, p1, p2){
     if((lI <- length(I)) == 0){
         stop("error in p")
@@ -85,26 +56,19 @@ pInv <- function(u, k, H, I, p1Inv, p2Inv){
         c(p1Inv(u[1], k=k, H=H), p2Inv(u[2], k=k, H=H))
     }
 }
-```
 
-### Define the copula $C$
-```{r}
+## -----------------------------------------------------------------------------
 C <- function(u, H, Lambda, S1Inv, S2Inv) {
     if(all(u == 0)) 0 else
     u[1]*u[2] * exp(expm1(-H)^2 * Lambda(min(S1Inv(u[1],H), S2Inv(u[2],H))))
 }
-```
-Compute the singular component (given $u_1=$ `u1`, find $u_2=$ `u2` on the singular component)
-$u_2 = S2(S1^{-1}(u_1))$:
-```{r}
+
+## -----------------------------------------------------------------------------
 s.comp <- function(u1, H, S1Inv, S2){
     if(u1 == 0) 0 else S2 (S1Inv(u1,H), H)
 }
-```
 
-Generate one bivariate random vector from `C`:
-<!-- MM: FIXME make faster: no need to grow  't_h', 'I_' all the time -->
-```{r, rC1}
+## ---- rC1---------------------------------------------------------------------
 rC1 <- function(H, LambdaInv, S1, S2, p1, p2, p1Inv, p2Inv) {
     d <- 2 # dim = 2
     ## (1)
@@ -143,10 +107,8 @@ rC1 <- function(H, LambdaInv, S1, S2, p1, p2, p1Inv, p2Inv) {
     ## (14)
     c(S1(tau[1], H=H), S2(tau[2], H=H))
 }
-```
 
-### Draw n vectors of random variates from $C$
-```{r, fig.align="center", fig.width=6, fig.height=6}
+## ---- fig.align="center", fig.width=6, fig.height=6---------------------------
 rC <- function(n, H, LambdaInv, S1, S2, p1, p2, p1Inv, p2Inv){
     mat <- t(sapply(rep(H, n), rC1, LambdaInv=LambdaInv, S1=S1, S2=S2,
                     p1=p1, p2=p2, p1Inv=p1Inv, p2Inv=p2Inv))
@@ -170,10 +132,8 @@ hist(U[,2], probability=TRUE, main="Histogram of the second component",
 ## Plot U (copula sample)
 plot(U, cex=0.2, xlab=expression(italic(U[1])%~%~"U[0,1]"),
                  ylab=expression(italic(U[2])%~%~"U[0,1]"))
-```
 
-Wireframe plot to incorporate singular component :
-```{r, fig.align="center", fig.width=6, fig.height=6}
+## ---- fig.align="center", fig.width=6, fig.height=6---------------------------
 require(lattice)
 wf.plot <- function(grid, val.grid, s.comp, val.s.comp, Lambda, S1Inv, S2Inv){
     wireframe(val.grid ~ grid[,1]*grid[,2], xlim=c(0,1), ylim=c(0,1), zlim=c(0,1),
@@ -206,20 +166,8 @@ s.comp <- cbind(u, sapply(u, s.comp, H=H, S1Inv=S1Inv, S2=S2)) # pairs (u1, u2) 
 val.s.comp <- apply(s.comp, 1, C, H=H, Lambda=Lambda, S1Inv=S1Inv, S2Inv=S2Inv) # corresponding z-values
 wf.plot(grid=grid, val.grid=val.grid, s.comp=s.comp, val.s.comp=val.s.comp,
         Lambda=Lambda, S1Inv=S1Inv, S2Inv=S2Inv)
-```
 
-
-## 2 An example from Wolfgang Trutschnig and Manuela Schreyer ##################
-
-For more details, see
-Trutschnig, Fernandez Sanchez (2014)
-"Copulas with continuous, strictly increasing singular conditional distribution functions"
-
-Roughly, one defines an *Iterated Function System* whose attractor is the word
-"Copula" and starts the chaos game.
-
-### Define the Iterated Function System
-```{r, ifs-def}
+## ---- ifs-def-----------------------------------------------------------------
 IFS <- local({ ## Using `local`, so `n` is part of IFS
     n <- 23
     list(function(x) c(3*x[1]/n,      x[2]/4),
@@ -243,10 +191,8 @@ IFS <- local({ ## Using `local`, so `n` is part of IFS
          function(x) c((x[1]+21)/n,   x[2]/4+1/4+1/8),
          function(x) c(-(x[2]-23)/n,  3*x[1]/4))
 })
-```
 
-#### Run chaos game B times
-```{r, run.chaos}
+## ---- run.chaos---------------------------------------------------------------
 B <- 20 # replications
 n.steps <- 20000 # number of steps
 AA <- vector("list", length=B)
@@ -265,56 +211,37 @@ for(i in 1:B) {
 A <- do.call(rbind, AA) # rbind (n.steps+1, 2)-matrices
 n <- nrow(A)
 stopifnot(ncol(A) == 2, n == B*(n.steps+1)) # sanity check
-```
 
-<!-- ^{o}: \degrees in some LaTeX package ? -->
-$X :=$  Rotate $A$ by $-45^{o} = -\pi/4$ :
-```{r, rotate}
+## ---- rotate------------------------------------------------------------------
 phi <- -pi/4
 X <- cbind(cos(phi)*A[,1] - sin(phi)*A[,2]/3,
            sin(phi)*A[,1] + cos(phi)*A[,2]/3)
 stopifnot(identical(dim(X), dim(A)))
-```
 
-Now transform the margings by their marginal ECDF's so we get **uniform** margins.
-Note that, it is equivalent but faster to use `rank(*, ties.method="max")`:
-```{r, transform}
+## ---- transform---------------------------------------------------------------
 U <- apply(X, 2, function(x) ecdf(x)(x))
 ## Prove equivalence:
 stopifnot(all.equal(U,
                     apply(X, 2, rank, ties.method="max") / n,
                     tolerance = 1e-14))
-```
 
-Now, visually check the margins of `U`; they are *perfectly* uniform:
-```{r, plot.margins, fig.align="center", fig.width=6, fig.height=6}
+## ---- plot.margins, fig.align="center", fig.width=6, fig.height=6-------------
 par(pty="s")
 sfsmisc::mult.fig(mfcol = c(1,2), main = "Margins are uniform")
 hist(U[,1], probability=TRUE, main="Histogram of U[,1]", xlab=quote(italic(U[1])))
 hist(U[,2], probability=TRUE, main="Histogram of U[,2]", xlab=quote(italic(U[2])))
-```
 
-whereas `U`, the copula sample, indeed is peculiar and contains the word
-"COPULA" many times if you look closely (well, the "L" is defect ...):
-```{r, plot.U, fig.align="center", fig.width=6, fig.height=6}
+## ---- plot.U, fig.align="center", fig.width=6, fig.height=6-------------------
 par(pty="s")
 plot(U, pch=".", xlab = quote(italic(U[1]) %~% ~ "U[0,1]"),
      asp = 1,    ylab = quote(italic(U[2]) %~% ~ "U[0,1]"))
-```
 
-## 3 Sierpinski tetrahedron ####################################################
-
-This is an implementation of Example 2.3 in
-[https://arxiv.org/pdf/0906.4853.pdf](https://arxiv.org/pdf/0906.4853.pdf)
-
-```{r}
+## -----------------------------------------------------------------------------
 library(abind) # for merging arrays via abind()
 library(lattice) # for cloud()
 library(sfsmisc) # for polyn.eval()
-```
 
-Implement the random number generator:
-```{r}
+## -----------------------------------------------------------------------------
 ##' @title Generate samples from the Sierpinski tetrahedron
 ##' @param n sample size
 ##' @param N digits in the base-2 expansion
@@ -334,31 +261,23 @@ rSierpinskyTetrahedron <- function(n, N)
     t(apply(Ucoeff, 1:2, function(x)
         polyn.eval(coef = rev(x), x = 2))/2^N) # see sfsmisc::bi2int
 }
-```
 
-Draw vectors of random numbers following a "Sierpinski tetrahedron copula":
-```{r}
+## -----------------------------------------------------------------------------
 set.seed(271)
 U <- rSierpinskyTetrahedron(1e4, N = 6)
-```
 
-Use a scatterplot matrix to check all bivariate margins:
-```{r, splom.U, fig.align="center", fig.width=6, fig.height=6}
+## ---- splom.U, fig.align="center", fig.width=6, fig.height=6------------------
 pairs(U, gap = 0, cex = 0.25, col = "black",
       labels = as.expression( sapply(1:3, function(j) bquote(U[.(j)])) ))
-```
 
-All pairs "look" independent but, of course, they aren't:
-```{r, cloud.U, fig.align="center", fig.width=6, fig.height=6}
+## ---- cloud.U, fig.align="center", fig.width=6, fig.height=6------------------
 cloud(U[,3] ~ U[,1] * U[,2], cex = 0.25, col = "black", zoom = 1,
       scales = list(arrows = FALSE, col = "black"), # ticks instead of arrows
       par.settings = list(axis.line = list(col = "transparent"), # to remove box
                           clip = list(panel = "off"),
                           standard.theme(color = FALSE)),
       xlab = expression(U[1]), ylab = expression(U[2]), zlab = expression(U[3]))
-```
 
-### Session information
-```{r, echo=FALSE}
+## ---- echo=FALSE--------------------------------------------------------------
 print(sessionInfo(), locale=FALSE)
-```
+

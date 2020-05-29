@@ -4,7 +4,34 @@
 \title{News for \R Package \pkg{copula}}% MM: look into ../svn-log-from.all
 \newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
-\section{Changes in version 0.999-20 (2020-02-03, svn r1832)}{
+\section{Changes in version 1.0-0 (2020-05-19, svn r1839)}{
+  \subsection{New Features}{
+    \itemize{
+      \item \code{mixCopula()} objects can now be fit (by
+      \code{fitCopula()}) more generally, as the weights no longer need to
+      be kept fixed, thanks to Maechler's \code{clr1()} parametrization,
+      and Rebecca Morger's B.Sc thesis. % -> % norMmix pkg
+
+      \item When no \code{start} parameter vector is specified in
+      \code{fitCopula()}, the new (generic) function \code{getIniParam()} is
+      used now; it notably has a method for \code{"mixCopula"} copulas.
+
+      \item In the \code{fitCopula*()} functions, the \code{traceOpt}
+      option now can be a positive integer (instead of just \code{TRUE} and
+      \code{FALSE}) to print trace info only every \code{traceOpt}
+      objective function evaluation.
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item corrected thinko in \code{`freeParam<-`(<mixcopula>, v)}.
+
+      \item more tweaks on fixed / free parameter settings for "mixCopula".
+    }
+  }
+}
+
+\section{Changes in version 0.999-20 (2020-02-03, svn r1833)}{
   \subsection{New Features}{
     \itemize{
       \item \code{evTestA()} got new options \code{trace.lev} and

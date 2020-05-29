@@ -5,6 +5,7 @@ date: '`r Sys.Date()`'
 output:
   html_vignette:
     css: style.css
+    keep_md: TRUE
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Quasi-Random Numbers for Copula Models}
@@ -410,8 +411,11 @@ pronounced for larger sample sizes; see also Cambou et al. (2016, "Quasi-random
 numbers for copula models").
 ```{r, fig.align="center", fig.width=6, fig.height=6}
 plot(n, res[,"CDM","runif"], xlab = "n", type = "b", log = "xy", ylim = range(res, y.p, y.q),
-     ylab = substitute("Standard deviation estimates of"~ES[a]~"for"~d==d.~"and"~tau==tau.,
-                     list(a = alpha, d. = d, tau. = tau)), lty = 2, col = "maroon3") # CDM & runif()
+     axes=FALSE, frame.plot=TRUE,
+     main = substitute("Standard deviation estimates of "~ES[a]~~"for"~d==d.~"and"~tau==tau.,
+                       list(a = alpha, d. = d, tau. = tau)), lty = 2, col = "maroon3") # CDM & runif()
+sfsmisc::eaxis(1, sub10=4)
+sfsmisc::eaxis(2, sub10=c(-1,2))
 lines(n, res[,"CDM","ghalton"], type = "b", lty = 2, col = "royalblue3") # CDM & ghalton()
 lines(n, res[,"MO","runif"], type = "b", lty = 1, col = "maroon3") # MO & runif()
 lines(n, res[,"MO","ghalton"], type = "b", lty = 1, col = "royalblue3") # MO & ghalton()
@@ -425,4 +429,3 @@ legend("bottomleft", bty = "n", lty = c(1,2,1,2,3,4), pch = c(1,1,1,1,NA,NA),
                               substitute(cn^{-alpha}~"for"~c==c.*","~alpha==a.,
                                          list(c. = round(c.q, 1), a. = abs(round(a.q, 1)))))))
 ```
-

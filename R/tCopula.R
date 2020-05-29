@@ -181,6 +181,6 @@ setMethod("dCopula", signature("matrix", "tCopula"), dtCopula)
 
 
 setMethod("tau", "tCopula",
-          function(copula) 2 * asin(copula@getRho(copula)) / pi)
+          function(copula, ...) 2 * asin(copula@getRho(copula)) / pi)
 
 setMethod("lambda", signature("tCopula"), lambdaTCopula)

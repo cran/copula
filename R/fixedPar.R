@@ -45,8 +45,10 @@ isFreeP <- function(param) {
 ##' @title Number of Free Parameters of a Vector
 ##' @param x A numeric parameter vector with possible attribute "fixed"
 ##' @return Length of free parameter
-##' @author Jun Yan
-nFree <- function(param) length(param[isFreeP(param)])
+##' @author Jun Yan and Martin Maechler
+nFree <- function(param) ## slower, but equivalent : length(param[isFreeP(param)])
+    if(isTRUE(fxd <- attr(param, "fixed"))) 0L else length(param) - sum(fxd)
+
 
 
 ### get and set free/fixed parameters, needed in fitCopula #####################

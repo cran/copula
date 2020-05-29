@@ -56,6 +56,7 @@ lambda(mGG)# both lower and upper tail dependency
 
 loglikCopula(c(2.5, pi, rho.1=0.7, df = 4, w = c(2,2,4)/8),
                     u = uM, copula = mC)
+## define (profiled) log-likelihood function of two arguments (df, rho) :
 ll.df <- Vectorize(function(df, rho)
                    loglikCopula(c(2.5, pi, rho.1=rho, df=df, w = c(2,2,4)/8),
                                 uM, mC))
@@ -65,14 +66,14 @@ ll. <- ll.df(df., rho = (rh1 <- 0.7))
 plot(df., ll., type = "b", main = "loglikCopula((.,.,rho = 0.7, df, ..), u, <mixCopula>)")
 
 if(!exists("Xtras")) Xtras <- copula:::doExtras() ; cat("Xtras: ", Xtras,"\n")
-if (Xtras) {
+if (Xtras) withAutoprint({
   Rhos <- seq(0.55, 0.70, by = 0.01)
   ll.m <- matrix(NA, nrow=length(df.), ncol=length(Rhos))
   for(k in seq_along(Rhos)) ll.m[,k] <- ll.df(df., rho = Rhos[k])
   tit <- "loglikelihood(<tCop>, true param. for rest)"
   persp         (df., Rhos, ll.m, phi=30, theta = 50, ticktype="detailed", main = tit)
   filled.contour(df., Rhos, ll.m, xlab="df", ylab = "rho", main = tit)
-}
+})
 
 ## fitCopula() example with "fixed weights" -- (only these are "ok" !!) -------------
 
@@ -82,17 +83,17 @@ set.seed(1452) ; U <- pobs(rCopula(1000, mNt))
 
 getTheta(m1, freeOnly = TRUE, attr = TRUE)
 getTheta(m1, named=TRUE)
-copula:::isFree(m1)
+copula:::isFree(m1) # all of them; --> now fix the weights :
 fixedParam(m1) <- fx <- c(FALSE, FALSE, FALSE, TRUE, TRUE)
 stopifnot(identical(copula:::isFree(m1), !fx))
 
-if (Xtras) { ## time
-  print(system.time(
-    fit <- fitCopula(m1, start = c(0, 0, 10), data = U)))
-  ## 16 sec (nb-mm4)
-  print( fit )
-  print( summary(fit) )#-> incl  'Std.Error' (which seems small for rho1 !)
-} #{Xtras}
+if(Xtras) withAutoprint({ ## time
+  system.time( # ~ 16 sec (nb-mm4) :
+    fit <- fitCopula(m1, start = c(0, 0, 10), data = U)
+  )
+  fit
+  summary(fit) #-> incl  'Std.Error' (which seems small for rho1 !)
+})
 
 }% {examples}
 \keyword{distribution}

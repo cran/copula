@@ -1,35 +1,12 @@
----
-title: Quasi-Random Numbers for Copula Models
-author: Marius Hofert
-date: '`r Sys.Date()`'
-output:
-  html_vignette:
-    css: style.css
-    keep_md: TRUE
-vignette: >
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Quasi-Random Numbers for Copula Models}
----
-In this vignette, we present some findings around quasi-random numbers for
-copula models; see also Cambou et al. (2016, "Quasi-random numbers for copula models").
-Note that not all plots are displayed (to keep the tarball small).
-
-```{r, message=FALSE}
+## ---- message=FALSE-----------------------------------------------------------
 library(lattice)
 library(copula)
 library(VGAM)
 library(gridExtra)
 library(qrng)
 library(randtoolbox)
-```
 
-## 1 Quasi-random numbers for copula models via conditional distribution method
-
-### Independence copula
-
-Let's start with something known, the independence case.
-
-```{r, fig.align="center", fig.width=12, fig.height=6, fig.show="hide"}
+## ---- fig.align="center", fig.width=12, fig.height=6, fig.show="hide"---------
 n <- 1000 # sample size
 set.seed(271) # set the seed (for reproducibility)
 U <- matrix(runif(n*2), ncol = 2) # pseudo-random numbers
@@ -37,63 +14,39 @@ U. <- halton(n, dim = 2) # quasi-random numbers
 par(pty = "s", mfrow = 1:2)
 plot(U,  xlab = expression(italic(U)[1]*"'"), ylab = expression(italic(U)[2]*"'"))
 plot(U., xlab = expression(italic(U)[1]*"'"), ylab = expression(italic(U)[2]*"'"))
-```
 
-Let's check if the more equally spaced points (less gaps, less clusters)
-are preserved in the copula world when determined with one-to-one
-transformations (such as the conditional distribution method (CDM); this can be
-obtained via `cCopula(, inverse=TRUE)`).
-
-### Clayton copula
-
-Consider a Clayton copula.
-
-```{r}
+## -----------------------------------------------------------------------------
 family <- "Clayton"
 tau <- 0.5
 th <- iTau(getAcop(family), tau)
 cop <- onacopulaL(family, nacList = list(th, 1:2))
-```
 
-```{r, fig.align="center", fig.width=12, fig.height=6}
+## ---- fig.align="center", fig.width=12, fig.height=6--------------------------
 U.C  <- cCopula(U,  copula = cop, inverse = TRUE) # via PRNG
 U.C. <- cCopula(U., copula = cop, inverse = TRUE) # via QRNG
 par(pty = "s", mfrow = 1:2)
 plot(U.C,  xlab = expression(italic(U)[1]), ylab = expression(italic(U)[2]), cex = 0.4)
 plot(U.C., xlab = expression(italic(U)[1]), ylab = expression(italic(U)[2]), cex = 0.4)
-```
 
-### $t$ copula with three degrees of freedom
-
-Consider a $t$ copula with three degrees of freedom.
-
-```{r}
+## -----------------------------------------------------------------------------
 family <- "t"
 nu <- 3 # degrees of freedom
 tau <- 0.5 # Kendall's tau (determines the copula parameter rho)
 th <- iTau(ellipCopula(family, df = nu), tau)
 cop <- ellipCopula(family, param = th, df = nu)
-```
 
-```{r, fig.align="center", fig.width=12, fig.height=6}
+## ---- fig.align="center", fig.width=12, fig.height=6--------------------------
 U.t  <- cCopula(U,  copula = cop, inverse = TRUE) # via PRNG
 U.t. <- cCopula(U., copula = cop, inverse = TRUE) # via QRNG
 par(pty = "s", mfrow = 1:2)
 plot(U.t,  xlab = expression(italic(U)[1]), ylab = expression(italic(U)[2]), cex = 0.4)
 plot(U.t., xlab = expression(italic(U)[1]), ylab = expression(italic(U)[2]), cex = 0.4)
-```
 
-
-### Marshall--Olkin copula
-
-Now something more fancy, a Marshall--Olkin copula.
-
-```{r}
+## -----------------------------------------------------------------------------
 alpha <- c(0.25, 0.75)
 tau <- (alpha[1]*alpha[2]) / (alpha[1]+alpha[2]-alpha[1]*alpha[2])
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 ##' @title Inverse of the bivariate conditional Marshall--Olkin copula
 ##' @param u (n,2) matrix of U[0,1] random numbers to be transformed to
 ##'        (u[,1], C^-(u[,2]|u[,1]))
@@ -112,52 +65,36 @@ inv_cond_cop_MO <- function(u, alpha)
     u2[i3] <- u[i3,2]^(1/(1-alpha[2]))
     cbind(u[,1], u2)
 }
-```
 
-```{r, fig.align="center", fig.width=12, fig.height=6}
+## ---- fig.align="center", fig.width=12, fig.height=6--------------------------
 U.MO  <- inv_cond_cop_MO(U,  alpha = alpha)
 U.MO. <- inv_cond_cop_MO(U., alpha = alpha)
 par(pty = "s", mfrow = 1:2)
 plot(U.MO,  xlab = expression(italic(U)[1]), ylab = expression(italic(U)[2]), cex = 0.4)
 plot(U.MO., xlab = expression(italic(U)[1]), ylab = expression(italic(U)[2]), cex = 0.4)
-```
 
-
-### 3d $t$ copula with three degrees of freedom
-
-Let's consider a three-dimensional $t$ copula with three degrees of freedom.
-```{r}
+## -----------------------------------------------------------------------------
 family <- "t"
 nu <- 3 # degrees of freedom
 tau <- 0.5 # Kendall's tau (determines the copula parameter rho)
 th <- iTau(ellipCopula(family, df = nu), tau)
 cop <- ellipCopula(family, param = th, dim = 3, df = nu)
-```
 
-First the pseudo-random version.
-```{r, fig.align="center", fig.width=6, fig.height=6, fig.show="hide"}
+## ---- fig.align="center", fig.width=6, fig.height=6, fig.show="hide"----------
 U.3d <- matrix(runif(n*3), ncol = 3)
 U.t.3d <- cCopula(U.3d, copula = cop, inverse = TRUE)
 par(pty = "s")
 pairs(U.t.3d, gap = 0,
       labels = as.expression(sapply(1:3, function(j) bquote(italic(U[.(j)])))))
-```
 
-Now the quasi-random version.
-```{r, fig.align="center", fig.width=6, fig.height=6, fig.show="hide"}
+## ---- fig.align="center", fig.width=6, fig.height=6, fig.show="hide"----------
 U.3d. <- halton(n, dim = 3)
 U.t.3d. <- cCopula(U.3d., copula = cop, inverse = TRUE)
 par(pty = "s")
 pairs(U.t.3d., gap = 0,
       labels = as.expression(sapply(1:3, function(j) bquote(italic(U[.(j)])))))
-```
-Note that projections (here: to pairs) can appear not to be
-`quasi-random' (or appear not to possess a lower discrepancy), but see Section
-2.2 below! Visualization in more than two dimensions seems difficult; we have just
-seen bivariate projections and 'quasi-randomness' is also not easily visible
-from a 3d cloud plot.
 
-```{r, fig.align="center", fig.width=12, fig.height=6, results="hide", fig.show="hide"}
+## ---- fig.align="center", fig.width=12, fig.height=6, results="hide", fig.show="hide"----
 p1 <- cloud(U.t.3d[,3]~U.t.3d[,1]+U.t.3d[,2], scales = list(col = 1, arrows = FALSE),
             col = 1, xlab = expression(italic(U)[1]), ylab = expression(italic(U)[2]),
             zlab = expression(italic(U[3])),
@@ -171,20 +108,8 @@ p2 <- cloud(U.t.3d.[,3]~U.t.3d.[,1]+U.t.3d.[,2], scales = list(col = 1, arrows =
                                 axis.line = list(col = "transparent"),
                                 clip = list(panel = "off")))
 grid.arrange(p1, p2, ncol = 2)
-```
 
-### 3d R-Vine copula
-As another example, consider a three-dimensional R-vine copula. Note that this
-is not run here to avoid a cyclic dependency (since VineCopula imports copula).
-<!-- Note: RVineSim() [in RVineSim.R] -> SimulateRVine() [in rvine.c] -> Hinv1() [in hfunc.c] -> Hinv() -->
-<!--       0: Pi (fine) -->
-<!--       1: Ga (uses pnorm/qnorm -- should be fine, too) -->
-<!--       2: t  (should be fine, too) -->
-<!--       3: C  (fine) -->
-<!--       4: G  (numerical inversion!) -->
-<!--       5: F  (should be fine) -->
-<!--       6: J  (numerical inversion!) -->
-```{r, fig.align="center", fig.width=6, fig.height=6, fig.show="hide"}
+## ---- fig.align="center", fig.width=6, fig.height=6, fig.show="hide"----------
 if(FALSE) {
     library(VineCopula)
     M <- matrix(c(3, 1, 2,
@@ -211,34 +136,15 @@ if(FALSE) {
     ## Similarly to the 3d *t* copula case (because of the projections to pairs),
     ## not all pairs appear to be 'quasi-random'.
 }
-```
 
-
-## 2 Quasi-random numbers for copula models via stochastic representations
-
-For many copula families, it is rarely efficient to sample them via the CDM (or
-other one-to-one transformations), one typically uses stochastic representations
-based on simple, easy-to-sample distributions as building blocks. Although,
-again, not directly visible, quasi-random numbers can also improve the
-low-discrepancy of the resulting random numbers and thus be used for variance
-reduction in the context of dependence.
-
-### 2.1 Colorized scatter plot
-
-To explore this, we sample from a Clayton copula via the CDM (so via a
-one-to-one transformation) and via the Marshall--Olkin algorithm (so via a
-stochastic representation in terms of the Gamma frailty distribution and two
-standard exponentials) based on a three-dimensional Halton sequence.
-
-```{r}
+## -----------------------------------------------------------------------------
 n <- 1000
 family <- "Clayton"
 tau <- 0.5
 th <- iTau(getAcop(family), tau)
 cop <- onacopulaL(family, nacList = list(th, 1:2))
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 ## Generate dependent samples
 U <- halton(n, 3)
 U_CDM <- cCopula(U[,1:2], copula = cop, inverse = TRUE) # via CDM
@@ -253,38 +159,22 @@ col[U[,1] >= 0.5 & U[,2] >= 0.5] <- "royalblue3"
 col. <- rep("black", n)
 col.[apply(U <= 0.5, 1, all)] <- "maroon3"
 col.[apply(U >= 0.5, 1, all)] <- "royalblue3"
-```
 
-#### Colorized scatter plot (quasi-random numbers and CDM)
-```{r, fig.align="center", fig.width=12, fig.height=6}
+## ---- fig.align="center", fig.width=12, fig.height=6--------------------------
 par(pty = "s", mfrow = 1:2)
 plot(U[,1:2], xlab = expression(italic(U)[1]*"'"), ylab = expression(italic(U)[2]*"'"),
      col = col, cex = 0.4)
 plot(U_CDM,   xlab = expression(italic(U)[1]), ylab = expression(italic(U)[2]),
      col = col, cex = 0.4)
-```
 
-#### Colorized scatter plots (quasi-random numbers and MO)
-```{r, fig.align="center", fig.width=12, fig.height=6}
+## ---- fig.align="center", fig.width=12, fig.height=6--------------------------
 par(pty = "s", mfrow = 1:2)
 plot(U[,2:3], xlab = expression(italic(U)[2]*"'"), ylab = expression(italic(U)[3]*"'"),
      col = col., cex = 0.4)
 plot(U_MO, xlab = expression(italic(U)[1]), ylab = expression(italic(U)[2]),
      col = col., cex = 0.4)
-```
 
-### 2.2 A variance-reduction example
-
-In this example, we would like to investigate the standard deviation when
-estimating expected shortfall at $\alpha=99\%$ confidence level via Monte Carlo
-simulation based on a Clayton copula with Pareto margins. To this end we
-consider pseudo-random numbers and quasi-random numbers, as well as two
-different sampling methods for the Clayton copula (the conditional distribution
-method and the Marshall--Olkin method (based on a well-known stochastic
-representation)), hence four different sampling methods.
-
-Here is our setup.
-```{r}
+## -----------------------------------------------------------------------------
 n <- round(2^seq(12, 16, by = 0.5)) # sample sizes
 B <- 25 # number of replications
 d <- 5 # dimension
@@ -294,11 +184,8 @@ qPar <- function(p, theta = 3) (1-p)^(-1/theta)-1 # marginal Pareto quantile fun
 rng.methods <- c("runif", "ghalton") # random number generation methods
 cop.methods <- c("CDM", "MO") # copula sampling methods (conditional distribution method and Marshall--Olkin)
 alpha <- 0.99 # confidence level
-```
 
-Next, let's implement a function which can sample the Clayton copula with one of
-the four approaches.
-```{r}
+## -----------------------------------------------------------------------------
 ##' @title Pseudo-/quasi-random number generation for (survival) Clayton copulas
 ##' @param n Sample size
 ##' @param d Dimension
@@ -347,19 +234,11 @@ rng_Clayton <- function(n, d, B, theta, survival = FALSE,
     ## Return
     if(survival) 1-U else U # B-list of (n, d)-matrices
 }
-```
 
-We also need an estimator of expected shortfall; we use the empirical estimator here.
-```{r}
+## -----------------------------------------------------------------------------
 ES <- function(x, alpha) mean(x[x > quantile(x, probs = alpha, type = 1)])
-```
 
-For each of the four methods, each of the chosen sample sizes and the number $B$
-of (bootstrap) replications considered here, generated the samples, aggregate
-them and compute expected shortfall at the 99\% confidence level. To reduce
-increase comparability, note that samples with smaller sample size are subsets
-of samples with larger sample size.
-```{r}
+## -----------------------------------------------------------------------------
 set.seed(271)
 res.ES <- array(, dim = c(length(n), length(cop.methods), length(rng.methods), B),
                 dimnames = list(n = n, cop.meth = cop.methods, rng.meth = rng.methods, B = 1:B))
@@ -380,11 +259,8 @@ for(cmeth in cop.methods) {
         }
     }
 }
-```
 
-Now we can compute the standard deviations, including estimated power curves based on all
-data stemming from pseudo-random numbers and all data stemming from quasi-random numbers.
-```{r}
+## -----------------------------------------------------------------------------
 ## Compute standard deviations
 res <- apply(res.ES, 1:3, sd) # (n, cop.methods, rng.methods)
 ## Fit linear models to the curves
@@ -400,16 +276,8 @@ lm.q <- lm(log(sd)~log(n), data = res.q)
 c.q <- exp(lm.q$coefficients[[1]])
 a.q <- lm.q$coefficients[[2]]
 y.q <- c.q * n^a.q
-```
 
-And now the results. In a nutshell, in comparison to pseudo-random numbers,
-quasi-random numbers for copula models can reduce the standard deviations (or
-variances), and this holds not only for one-to-one transformations such as the
-conditional distribution method but also for well-known stochastic
-representations such as Marshall--Olkin's. Note that the results are more
-pronounced for larger sample sizes; see also Cambou et al. (2016, "Quasi-random
-numbers for copula models").
-```{r, fig.align="center", fig.width=6, fig.height=6}
+## ---- fig.align="center", fig.width=6, fig.height=6---------------------------
 plot(n, res[,"CDM","runif"], xlab = "n", type = "b", log = "xy", ylim = range(res, y.p, y.q),
      axes=FALSE, frame.plot=TRUE,
      main = substitute("Standard deviation estimates of "~ES[a]~~"for"~d==d.~"and"~tau==tau.,
@@ -428,4 +296,4 @@ legend("bottomleft", bty = "n", lty = c(1,2,1,2,3,4), pch = c(1,1,1,1,NA,NA),
                                          list(c. = round(c.p, 1), a. = abs(round(a.p, 1)))),
                               substitute(cn^{-alpha}~"for"~c==c.*","~alpha==a.,
                                          list(c. = round(c.q, 1), a. = abs(round(a.q, 1)))))))
-```
+

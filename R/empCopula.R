@@ -225,21 +225,22 @@ setMethod("dCopula", signature("matrix", "empCopula"),
         ## })
         if(log) {
             vapply(seq_len(m), function(k) { # iterate over rows k of u
-                lsum( # lsum() over i
-                    vapply(seq_len(n), function(i) {
-                        ## k and i are fixed now
-                        lx.k.i <- sum( dbeta(u[k,], shape1 = R[i,], shape2 = n + 1 - R[i,], log = TRUE) ) # log(prod()) = sum(log()) over j for fixed k and i
-                    },
-                    NA_real_)) - log(n + offset)
-            }, NA_real_)
+                    lsum( # lsum() over i
+                        vapply(seq_len(n), function(i)
+                            ## k and i are fixed now
+                            sum(dbeta(u[k,], shape1 = R[i,], shape2 = n + 1 - R[i,], log = TRUE)),
+                                        # log(prod()) = sum(log()) over j for fixed k and i
+                            NA_real_))
+                    }, NA_real_) - log(n + offset)
         } else { # as for df based on pbeta(), just with dbeta()
             vapply(seq_len(m), function(k) { # iterate over rows k of u
-                sum( # sum() over i
-                    vapply(seq_len(n), function(i)
-                        prod( dbeta(u[k,], shape1 = R[i,], shape2 = n + 1 - R[i,]) ), # prod() over j
-                        NA_real_)) / (n + offset)
-            }, NA_real_)
+                    sum( # sum() over i
+                        vapply(seq_len(n), function(i)
+                            prod( dbeta(u[k,], shape1 = R[i,], shape2 = n + 1 - R[i,]) ), # prod_j()
+                            NA_real_))
+            }, NA_real_) / (n + offset)
         }
+
     } else stop("Empirical copula only has a density for smoothing = 'beta'")
 })
 
