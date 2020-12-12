@@ -54,7 +54,7 @@ exchTest(x, N = 1000, ties = NA,
 
   Kojadinovic, I. (2017). Some copula inference procedures adapted to
   the presence of ties. \emph{Computational Statistics and Data
-    Analysis} \bold{112}, 24--41, \url{http://arxiv.org/abs/1609.05519}.
+    Analysis} \bold{112}, 24--41, \url{https://arxiv.org/abs/1609.05519}.
 }
 \seealso{ \code{\link{radSymTest}}, \code{\link{exchEVTest}}, \code{\link{gofCopula}}. }
 \examples{

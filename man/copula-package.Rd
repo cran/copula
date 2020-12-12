@@ -79,18 +79,18 @@
   Yan, J. (2007)
   Enjoy the Joy of Copulas: With a Package \pkg{copula}.
   \emph{Journal of Statistical Software} \bold{21}(4), 1--21.
-  \url{http://www.jstatsoft.org/v21/i04/}.
+  \url{https://www.jstatsoft.org/v21/i04/}.
 
   Kojadinovic, I. and Yan, J. (2010).
   Modeling Multivariate Distributions with Continuous Margins Using the
   copula R Package.
   \emph{Journal of Statistical Software} \bold{34}(9), 1--20.
-  \url{http://www.jstatsoft.org/v34/i09/}.
+  \url{https://www.jstatsoft.org/v34/i09/}.
 
   Hofert, M. and \enc{Mächler}{Maechler}, M. (2011),
   Nested Archimedean Copulas Meet R: The nacopula Package.,
   \emph{Journal of Statistical Software} \bold{39}(9), 1--20.
-  \url{http://www.jstatsoft.org/v39/i09/}.
+  \url{https://www.jstatsoft.org/v39/i09/}.
 
   Nelsen, R. B. (2006)
   \emph{An introduction to Copulas}. Springer, New York.

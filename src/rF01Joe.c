@@ -56,11 +56,11 @@ double rF01Joe(double V0, double alpha, double gamma_1_a /**< == Gamma(1 - alpha
  * @return none
  * @author Marius Hofert
  */
-void rF01Joe_vec(double* V01, const double *V0, int n, double alpha, double approx){
+void rF01Joe_vec(double* V01, const double *V0, R_xlen_t n, double alpha, double approx){
     double gamma_1_a = gammafn(1. - alpha);
     GetRNGstate();
 
-    for(int i=0; i < n; i++)
+    for(R_xlen_t i=0; i < n; i++)
 	V01[i] = rF01Joe(V0[i], alpha, gamma_1_a, approx);
 
     PutRNGstate();
@@ -81,7 +81,7 @@ void rF01Joe_vec(double* V01, const double *V0, int n, double alpha, double appr
  */
 SEXP rF01Joe_vec_c(SEXP V0_, SEXP alpha_, SEXP approx_){
     double *V0 = REAL(V0_);
-    int n = length(V0_);
+    R_xlen_t n = xlength(V0_);
     double alpha = asReal(alpha_), approx = asReal(approx_);
     SEXP res = PROTECT(allocVector(REALSXP, n));
     if(n >= 1) rF01Joe_vec(REAL(res), V0, n, alpha, approx);

@@ -30,8 +30,10 @@
     \item{\code{fitting.stats}:}{a \code{\link{list}}, currently
       containing the numeric \code{convergence} code from
       \code{\link{optim}}, the \code{counts}, \code{message}, and all
-      the \code{control} arguments explicitly passed to
-      \code{\link{optim}}.}
+      the \code{control} arguments explicitly passed to \code{\link{optim}()}.
+      Since \pkg{copula} version 1.0-1 also keeps information about
+      parameter transformations, currently needed only for
+      \code{\link{mixCopula}} fits with free weights.}
   }
   In addition, the \code{"fitCopula"} class has a slot
   \describe{

@@ -69,11 +69,11 @@ double rstable(double alpha){
  * @return none
  * @author Marius Hofert, Martin Maechler
  */
-void rstable_vec(double S[], const int n, const double alpha){
+void rstable_vec(double S[], const R_xlen_t n, const double alpha){
     if(n >= 1) {
 	double cf = pow(cos(M_PI_2*alpha), -1./alpha);
 	GetRNGstate();
-	for(int i=0; i < n; i++)
+	for(R_xlen_t i=0; i < n; i++)
 	    S[i] = cf * rstable0(alpha);
 	PutRNGstate();
     }
@@ -116,20 +116,20 @@ SEXP rstable_c(SEXP n, SEXP alpha)
  * @return none
  * @author Marius Hofert, Martin Maechler
  */
-void retstable_MH(double *St, const double V0[], double h, double alpha, int n){
+void retstable_MH(double *St, const double V0[], double h, double alpha, R_xlen_t n){
     /**
      * alpha == 1 => St corresponds to a point mass at V0 with Laplace-Stieltjes
      * transform exp(-V0*t)
     */
     if(alpha == 1.) {
-	for(int i = 0; i < n; i++)
+	for(R_xlen_t i = 0; i < n; i++)
 	    St[i] = V0[i];
 	return;
     }
 
     GetRNGstate();
 
-    for(int i = 0; i < n; i++) { /**< for each of the n required variates */
+    for(R_xlen_t i = 0; i < n; i++) { /**< for each of the n required variates */
 
 	/**< find m := optimal number of summands, using asymptotic formula */
 	int m;
@@ -191,14 +191,14 @@ double sinc_MM(double x) {
     return sin(x)/x;
 }
 
-/**< to be called from R */
+/** to be called from R */
 SEXP sinc_c(SEXP x_) {
-    int n = LENGTH(PROTECT(x_ = isReal(x_) ?
-			   Rf_duplicate(x_) : coerceVector(x_, REALSXP)));
+    R_xlen_t n = XLENGTH(PROTECT(x_ = isReal(x_) ?
+				 Rf_duplicate(x_) : coerceVector(x_, REALSXP)));
     SEXP r_ = allocVector(REALSXP, n); // the result
     double *x = REAL(x_), *r = REAL(r_);
 
-    for(int i=0; i < n; i++)
+    for(R_xlen_t i=0; i < n; i++)
 	r[i] = sinc_MM(x[i]);
 
     UNPROTECT(1);
@@ -224,17 +224,17 @@ double A_(double x, double alpha) {
   return _A_3(x, alpha, Ialpha);
 }
 
-/**< to be called from R---see experiments in ../tests/retstable-ex.R */
+/** to be called from R---see experiments in ../tests/retstable-ex.R */
 SEXP A__c(SEXP x_, SEXP alpha, SEXP I_alpha) {
-    int n = LENGTH(PROTECT(x_ = isReal(x_) ?
-			   Rf_duplicate(x_) : coerceVector(x_, REALSXP)));
+    R_xlen_t n = XLENGTH(PROTECT(x_ = isReal(x_) ?
+				 Rf_duplicate(x_) : coerceVector(x_, REALSXP)));
     double alp = asReal(alpha), I_alp = asReal(I_alpha);
     if(fabs(alp + I_alp - 1.) > 1e-12)
 	error("'I_alpha' must be == 1 - alpha more accurately");
     SEXP r_ = allocVector(REALSXP, n); /**< the result */
     double *x = REAL(x_), *r = REAL(r_);
 
-    for(int i=0; i < n; i++)
+    for(R_xlen_t i=0; i < n; i++)
 	r[i] = _A_3(x[i], alp, I_alp);
 
     UNPROTECT(1);
@@ -270,14 +270,14 @@ double BdB0(double x,double alpha) {
  * @return none
  * @author Marius Hofert, Martin Maechler
  */
-void retstable_LD(double *St, const double V0[], double h, double alpha, int n)
+void retstable_LD(double *St, const double V0[], double h, double alpha, R_xlen_t n)
 {
    /**
      * alpha == 1 => St corresponds to a point mass at V0 with Laplace-Stieltjes
      * transform exp(-V0*t)
    */
    if(alpha == 1.) {
-       for(int i = 0; i < n; i++)
+       for(R_xlen_t i = 0; i < n; i++)
 	   St[i] = V0[i];
        return;
    }
@@ -289,7 +289,7 @@ void retstable_LD(double *St, const double V0[], double h, double alpha, int n)
        b = Ialpha/alpha,
        h_a = pow(h, alpha);
 
-   for(int i = 0; i < n; i++) { /**< for each of the n required variates */
+   for(R_xlen_t i = 0; i < n; i++) { // for each of the n required variates
 
 	/**< set lambda for our parameterization */
        double lambda_alpha = h_a*V0[i]; // < Marius Hofert: work directly with lambda^alpha (numerically more stable for small alpha)
@@ -393,8 +393,8 @@ void retstable_LD(double *St, const double V0[], double h, double alpha, int n)
  */
 SEXP retstable_c(SEXP V0_, SEXP h, SEXP alpha, SEXP method)
 {
-    int n = LENGTH(PROTECT(V0_ = isReal(V0_) ?
-			   Rf_duplicate(V0_) : coerceVector(V0_, REALSXP)));
+    R_xlen_t n = LENGTH(PROTECT(V0_ = isReal(V0_) ?
+				Rf_duplicate(V0_) : coerceVector(V0_, REALSXP)));
     const char* meth_ch = CHAR(STRING_ELT(method, 0));
     enum method_kind { MH, LD
     } meth_typ = ((!strcmp(meth_ch, "MH")) ? MH :

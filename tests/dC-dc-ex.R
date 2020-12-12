@@ -38,7 +38,8 @@ cDer <- rbind(
     tC.fixed= comparederiv(tCopula       (iTau(tCopula(), tau), df.fixed = TRUE), u))
 cDer
 stopifnot(cDer[,"dCdu"      ] <= 0.004, # max: normal   = 0.002166
-          cDer[,"dCdtheta"  ] <= 11e-14,# max: tC.fixed = 5.537e-14
+          #cDer[,"dCdtheta"  ] <= 11e-14,# max: tC.fixed = 5.537e-14
+          cDer[,"dCdtheta"  ] <= 1e-8,  # max: normal   = 4.86e-9
           cDer[,"dlogcdu"   ] <= 15e-8, # max: normal   = 7.51e-8
           cDer[,"dlogcdtheta"]<= 6e-9)  # max: normal   = 2.92e-9
 showProc.time()

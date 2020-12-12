@@ -20,9 +20,9 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
         lower = -Inf, upper = Inf,
         estimate.variance = fit$convergence == 0, hideWarnings = TRUE)
 
-\S3method{coef}{fittedMV}(object, SE = FALSE, \dots)
+\S3method{coef}{fittedMV}(object, SE = FALSE, orig = TRUE, \dots)
 \S3method{logLik}{fittedMV}(object, \dots)
-\S3method{vcov}{fittedMV}(object, \dots)
+\S3method{vcov}{fittedMV}(object, orig = TRUE, \dots)
 }
 \arguments{
   \item{param}{a vector of parameter values.  When specifying parameters for
@@ -51,6 +51,10 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
     standard errors should be returned in addition to the estimated
     parameters (in a \code{\link{matrix}}).  This is equivalent, but
     more efficient than, e.g., \code{coef(summary(object))}.}
+  \item{orig}{\code{\link{logical}}, relevant currently only for
+    \code{\link{mixCopula}} fits with free weights.  \code{orig} indicates
+    if the weights should be shown in original scale (\code{orig=TRUE}) or
+    in the transformed log- aka lambda-space.}
   \item{\dots}{potentially further arguments to methods.}
 }
 \value{

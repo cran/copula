@@ -4,6 +4,53 @@
 \title{News for \R Package \pkg{copula}}% MM: look into ../svn-log-from.all
 \newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
+\section{Changes in version 1.0-1 (2020-12-07, svn r1850)}{
+  \subsection{New Features}{
+    \itemize{
+      \item The \code{pCopula()} methods for normal- and t-copulas now
+      allow to pass \code{algorithm = .} to pkg \CRANpkg{mvtnorm}'s
+      functions.  For lower dimensions, notably dimension
+      \eqn{d \le 3}{d <= 3}, the default is now to typically use a
+      \emph{non}-random algorithm.
+
+      Such a default algorithm is also used in the (internal) derivative
+      for normal- and t-copulas, (\code{dCdu()} calling \code{dCduEllipCopula()}).
+
+      \item invisible improvement in internal \code{Jscore()}
+      for internal \code{var.mpl()} computations.
+
+      \item For \code{mixCopula}s, the default \code{optimMethod()} for
+      \code{fitCopula()} is now \code{"L-BFGS-B"}.
+
+      \item When \code{fitCopula(*, estimate.variance=TRUE)} fails during
+      \code{optim(*, hessian=TRUE)}, a \code{warning()} is signalled, and
+      kept as attribute of the \code{NA}-valued vcov matrix.
+
+      Similarly when the hessian inversion fails, the warning message is
+      now returned with the \code{NA}-valued vcov matrix.
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{fitCopula(*, estimate.variance=FALSE)} now returns a
+      \eqn{0 x 0} matrix as slot \code{@ var.est} in all cases.
+
+      \item tweaks some of the regression tests.
+
+      \item For mixture copulas (\code{mixCopula(.)}) estimation by
+      \code{fm <- fitCopula(*, estimate.variance=TRUE)} now is more reasonable:
+      \code{summary(fm)} and \code{vcov(fm)} still stay in the w-space and
+      currently return a warning about not-yet implemented Jacobian
+      delta-method.
+      \code{coef()}, \code{vcov()}, and \code{summary(fm)} now all have an
+      optional argument \code{orig = TRUE}, which when set to false will
+      provide results on the \sQuote{l-scale} aka \sQuote{lambda-scale}
+      (instead of the original \sQuote{w-scale}) for the weights, such that
+      inference on the \sQuote{l-scale} is available.
+    }
+  }
+}
+
 \section{Changes in version 1.0-0 (2020-05-19, svn r1839)}{
   \subsection{New Features}{
     \itemize{

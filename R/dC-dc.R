@@ -154,7 +154,7 @@ setMethod("dCdu", signature("mixExplicitCopula"),       dCduExplicit)
 setMethod("dCdu", signature("rotExplicitCopula"),       dCduExplicit)
 
 ## For ellipCopula objects
-dCduEllipCopula <- function(copula, u, ...) {
+dCduEllipCopula <- function(copula, u, algorithm=NULL, ...) {
     dim <- copula@dimension
     sigma <- getSigma(copula)
 
@@ -180,10 +180,13 @@ dCduEllipCopula <- function(copula, u, ...) {
 			   mat[,j] <- pnorm(v[,-j], rho * v[,j], sqrt(1 - rho^2))
 		       }
 		       else
-			   for (i in 1:n)
-			       mat[i,j] <- pmvnorm(lower = rep(-Inf, dim - 1), upper = v[i,-j],
+			   for (i in 1:n) {
+			       x <- v[i,-j]
+			       if(is.null(algorithm)) algorithm <- pmvnormAlgo(dim, x)
+			       mat[i,j] <- pmvnorm(lower = rep(-Inf, dim - 1), upper = x,
 						   mean = v[i,j] * sigma[-j,j],
-						   sigma = drop(s))
+						   sigma = drop(s), algorithm=algorithm)
+			   }
 		   },
 	       "tCopula" =
 		   {
@@ -195,13 +198,13 @@ dCduEllipCopula <- function(copula, u, ...) {
 		       else {
 			   if(df != as.integer(df))
 			       stop("'df' is not integer; therefore, dCdu() cannot be computed yet")
-			   for (i in 1:n)
-			       mat[i,j] <- pmvt(lower = rep(-Inf, dim - 1),
-						upper = drop(sqrt((df+1)/(df+v[i,j]^2)) *
-							     (v[i,-j] - v[i,j] * sigma[-j,j])),
-						sigma = s, df = df + 1)
+			   for (i in 1:n) {
+			       x <- drop(sqrt((df+1)/(df+v[i,j]^2)) * (v[i,-j] - v[i,j] * sigma[-j,j]))
+			       if(is.null(algorithm)) algorithm <- pmvtAlgo(dim, x)
+			       mat[i,j] <- pmvt(lower = rep(-Inf, dim - 1), upper = x,
+						sigma = s, df = df + 1, algorithm=algorithm)
+			   }
 		       }
-
 		   })
     }
     mat

@@ -1,9 +1,13 @@
 ### R code from vignette source 'nacopula-pkg.Rnw'
-### Encoding: UTF-8
 
 ###################################################
 ### code chunk number 1: preliminaries
 ###################################################
+pdfDB <- function(name, width, height, ...)
+{
+    grDevices::pdf(paste0(name, ".pdf"), ## "DB":             vvvvvvvvvvvvvvvv
+                   width=width, height=height, onefile=FALSE, useDingbats=TRUE)
+}
 op.orig <-
 options(width = 70,
         ## SweaveHooks= list(fig=function() par(mar=c(5.1, 4.1, 1.1, 2.1))),

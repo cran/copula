@@ -70,12 +70,13 @@ if(FALSE) { ##--- This worked up to mid 2012, but no longer ---
  SMI.12 <- as.matrix(SMI.12)
 }##----       --- original download
 
-if(require(zoo)) {
+zoo.there <- "package:zoo" \%in\% search()
+if(zoo.there || require("zoo")) {
   stopifnot(identical(SMI.12,
      local({ S <- as.matrix(na.fill(do.call(cbind, lSMI), "extend"))
              colnames(S) <- sub("\\\\.VX", "", colnames(S)); S })))
+  if(!zoo.there) detach("package:zoo")
 }
-%% and detach zoo again .. if it was not attached .. {FIXME}
 
 }
 \keyword{datasets}

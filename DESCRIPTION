@@ -1,7 +1,7 @@
 Package: copula
-Version: 1.0-0
-VersionNote: Last CRAN: 0.999-20 on 2020-02-04
-Date: 2020-05-19
+Version: 1.0-1
+VersionNote: Last CRAN: 1.0-0 on 2020-05-19
+Date: 2020-12-07
 Title: Multivariate Dependence with Copulas
 Authors@R: c(person("Marius", "Hofert", role = "aut", email = "marius.hofert@uwaterloo.ca",       comment = c(ORCID = "0000-0001-8009-4665"))
 	   , person("Ivan", "Kojadinovic", role = "aut", email = "ivan.kojadinovic@univ-pau.fr",  comment = c(ORCID = "0000-0002-2903-1543"))
@@ -15,13 +15,15 @@ Imports: stats, graphics, methods, stats4, Matrix, lattice, colorspace,
         gsl, ADGofTest, stabledist (>= 0.6-4), mvtnorm, pcaPP, pspline,
         numDeriv
 Suggests: MASS, KernSmooth, sfsmisc, scatterplot3d, Rmpfr, bbmle,
-        knitr, abind, crop, gridExtra, lcopula, mev, mvnormtest,
-        parallel, partitions, polynom, qrng, randtoolbox, rugarch,
-        Runuran, tseries, VGAM, VineCopula, zoo
+        knitr, rmarkdown, abind, crop, gridExtra, lcopula, mev,
+        mvnormtest, parallel, partitions, polynom, qrng, randtoolbox,
+        rugarch, Runuran, tseries, VGAM, VineCopula, zoo
 SuggestsNote: packages {abind, ..., zoo} (last lines above) are only
         used in vignettes, demos and a few tests.
 VignetteBuilder: knitr
 Enhances: nor1mix, copulaData
+SystemRequirements: pdfcrop (part of TexLive) is required to rebuild
+        the vignettes.
 Description: Classes (S4) of commonly used elliptical, Archimedean,
  extreme-value and other copula families, as well as their rotations,
  mixtures and asymmetrizations. Nested Archimedean copulas, related
@@ -66,8 +68,8 @@ Author: Marius Hofert [aut] (<https://orcid.org/0000-0001-8009-4665>),
 Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
 Repository: CRAN
 Repository/R-Forge/Project: copula
-Repository/R-Forge/Revision: 1840
-Repository/R-Forge/DateTimeStamp: 2020-05-19 20:57:29
-Date/Publication: 2020-05-29 12:40:07 UTC
+Repository/R-Forge/Revision: 1850
+Repository/R-Forge/DateTimeStamp: 2020-12-11 15:17:41
+Date/Publication: 2020-12-12 15:30:26 UTC
 NeedsCompilation: yes
-Packaged: 2020-05-28 08:59:39 UTC; rforge
+Packaged: 2020-12-11 15:33:19 UTC; rforge

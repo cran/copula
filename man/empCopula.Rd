@@ -154,7 +154,7 @@ toEmpMargins(U, x, ...)
 
   Segers, J., Sibuya, M. and Tsukahara, H. (2017). The Empirical Beta
   Copula. \emph{Journal of Multivariate Analysis}, 155, pages 35--51,
-  \url{http://arxiv.org/abs/1607.04430}.
+  \url{https://arxiv.org/abs/1607.04430}.
 
   %% Genest, C., G. \enc{Nešlehová}{Neslehova}, J., and Quessy, J.-F. (2012).
   %% Tests of symmetry for bivariate copulas,

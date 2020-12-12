@@ -197,11 +197,11 @@ gofMB(copula, x, N, method = c("Sn", "Rn"),
   Modeling Multivariate Distributions with Continuous Margins Using the
   copula R Package.
   \emph{Journal of Statistical Software} \bold{34}(9), 1--20,
-  \url{http://www.jstatsoft.org/v34/i09/}.
+  \url{https://www.jstatsoft.org/v34/i09/}.
 
   Kojadinovic, I. (2017). Some copula inference procedures adapted to
   the presence of ties. \emph{Computational Statistics and Data
-  Analysis} \bold{112}, 24--41, \url{http://arxiv.org/abs/1609.05519}.
+  Analysis} \bold{112}, 24--41, \url{https://arxiv.org/abs/1609.05519}.
 
   Pesarin, F. (2001).
   \emph{Multivariate Permutation Tests: With Applications in Biostatistics}.

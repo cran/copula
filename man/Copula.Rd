@@ -32,38 +32,16 @@
 \alias{dCopula,matrix,mixCopula-method}
 %\alias{dCopula,matrix,nacopula-method}-> ./dnacopula.Rd
 %
-\alias{dCopula,numeric,claytonCopula-method}
-\alias{dCopula,numeric,frankCopula-method}
-\alias{dCopula,numeric,gumbelCopula-method}
-\alias{dCopula,numeric,normalCopula-method}
-\alias{dCopula,numeric,tCopula-method}
-\alias{dCopula,numeric,galambosCopula-method}
-\alias{dCopula,numeric,amhCopula-method}
-\alias{dCopula,numeric,joeCopula-method}
-\alias{dCopula,numeric,huslerReissCopula-method}
-\alias{dCopula,numeric,tawnCopula-method}
-\alias{dCopula,numeric,tevCopula-method}
-\alias{dCopula,numeric,plackettCopula-method}
-\alias{dCopula,numeric,fgmCopula-method}
-\alias{dCopula,numeric,moCopula-method}
-\alias{dCopula,numeric,indepCopula-method}
-\alias{dCopula,numeric,fhCopula-method}
-\alias{dCopula,numeric,empCopula-method}
-\alias{dCopula,numeric,khoudrajiBivCopula-method}
-\alias{dCopula,numeric,khoudrajiExplicitCopula-method}
-\alias{dCopula,numeric,rotCopula-method}
-\alias{dCopula,numeric,mixCopula-method}
-%\alias{dCopula,numeric,nacopula-method}-> ./dnacopula.Rd
-% pCopula
+% pCopula ====
 \alias{pCopula,matrix,claytonCopula-method}
 \alias{pCopula,matrix,frankCopula-method}
 \alias{pCopula,matrix,gumbelCopula-method}
-\alias{pCopula,matrix,normalCopula-method}
-\alias{pCopula,matrix,tCopula-method}
 \alias{pCopula,matrix,galambosCopula-method}
 \alias{pCopula,matrix,amhCopula-method}
 \alias{pCopula,matrix,joeCopula-method}
 \alias{pCopula,matrix,huslerReissCopula-method}
+%\alias{pCopula,matrix,normalCopula-method}% -> ./ellipCopula.Rd
+%\alias{pCopula,matrix,tCopula-method}     % ->     (ditto)
 \alias{pCopula,matrix,tawnCopula-method}
 \alias{pCopula,matrix,tevCopula-method}
 \alias{pCopula,matrix,plackettCopula-method}
@@ -76,32 +54,10 @@
 \alias{pCopula,matrix,khoudrajiCopula-method}
 \alias{pCopula,matrix,rotCopula-method}
 \alias{pCopula,matrix,rotExplicitCopula-method}
-\alias{pCopula,matrix,mixCopula-method}
 %\alias{pCopula,matrix,nacopula-method}-> ./pnacopula.Rd
+\alias{pCopula,matrix,mixCopula-method}
 %
-\alias{pCopula,numeric,claytonCopula-method}
-\alias{pCopula,numeric,frankCopula-method}
-\alias{pCopula,numeric,gumbelCopula-method}
-\alias{pCopula,numeric,normalCopula-method}
-\alias{pCopula,numeric,tCopula-method}
-\alias{pCopula,numeric,galambosCopula-method}
-\alias{pCopula,numeric,amhCopula-method}
-\alias{pCopula,numeric,joeCopula-method}
-\alias{pCopula,numeric,huslerReissCopula-method}
-\alias{pCopula,numeric,tawnCopula-method}
-\alias{pCopula,numeric,tevCopula-method}
-\alias{pCopula,numeric,plackettCopula-method}
-\alias{pCopula,numeric,fgmCopula-method}
-\alias{pCopula,numeric,moCopula-method}
-\alias{pCopula,numeric,indepCopula-method}
-\alias{pCopula,numeric,lowfhCopula-method}
-\alias{pCopula,numeric,upfhCopula-method}
-\alias{pCopula,numeric,empCopula-method}
-\alias{pCopula,numeric,khoudrajiCopula-method}
-\alias{pCopula,numeric,rotCopula-method}
-\alias{pCopula,numeric,mixCopula-method}
-%\alias{pCopula,numeric,nacopula-method}-> ./pnacopula.Rd
-% rCopula
+% rCopula ====
 \alias{rCopula,numeric,claytonCopula-method}
 \alias{rCopula,numeric,frankCopula-method}
 \alias{rCopula,numeric,gumbelCopula-method}

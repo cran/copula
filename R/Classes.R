@@ -343,27 +343,76 @@ setClass("fittedMV",
                    nsample = "integer",
                    method = "character",
                    call = "call",
-                   ## convergence = "integer",
                    fitting.stats = "list"))
 
-coef.fittedMV <- function(object, SE = FALSE, ...) {
+coef.fittedMV <- function(object, SE = FALSE, orig = TRUE, ...) {
     pNms <- paramNames(object)
+    cf <- object@estimate
+    pT <- object@fitting.stats$paramTrafo
+    if(length(pT)) {
+        switch(pT$kind,
+         "mixCop-clr1" = {
+             if(orig) { ## original space 'w' (w1, w2, .., w<m>)
+                 ## cf[] & pNms  are fine
+                 if(SE && length(V <- object@var.est)) { # V in l-space: transform to w-space
+                     ## J  :=  Jacobi-matrix  (m-1) x m  matrix of partial derivatives dl_i / dw_j
+                     ## J_ := 2 x 2 block matrix  [I  0  ;  0  J]
+                     ## V <- J_ %*% V %*% t(J_)
+                     warning("cheating for 'w<j>', not yet Jacobi-matrix multivariate delta-method")
+                     V <- rbind(cbind(V, NA, deparse.level=0L), NA, deparse.level=0L)
+                 }
+             } else { ## transformed "optim()" space : (l1, l2, .. l<m-1>)
+                 cf[i1 <- pT$in1] <- clr1(cf[pT$in2] / pT$sumfreew)
+                 length(cf) <- length(cf) - 1L # cutoff last one
+                 ## and fix up names:
+                 pNms <- pNms[-length(pNms)]
+                 pNms[i1] <- sub("^w", "l", pNms[i1])
+                 if(SE) V <- object@var.est # and V is in correct space
+             }
+         },
+         stop("not yet supported  'paramTrafo$kind': ", pT$kind))
+    } else if(SE)
+        V <- object@var.est
     if(SE)
-	structure(cbind(object@estimate,
-			if(length(V <- object@var.est)) sqrt(diag(V))
-			else rep(NA_real_, length(pNms)),
+	structure(cbind(cf,
+			if(length(V)) sqrt(diag(V)) else rep(NA_real_, length(cf)),
 			deparse.level=0L),
 		  dimnames = list(pNms, c("Estimate", "Std. Error")))
     else
-	setNames(object@estimate, pNms)
+	setNames(cf, pNms)
 }
 
 nobs.fittedMV <- function(object, ...) object@nsample
 
-vcov.fittedMV <- function(object, ...) {
+vcov.fittedMV <- function(object, orig=TRUE, ...) {
     pNms <- paramNames(object)
-    structure(if(length(V <- object@var.est)) V
-              else matrix(NA, length(pNms), length(pNms)),
+    cf <- object@estimate
+    pT <- object@fitting.stats$paramTrafo
+    if(length(pT)) {
+        switch(pT$kind,
+          "mixCop-clr1" = {
+              if(orig) { ## original space 'w' (w1, w2, .., w<m>)
+                  ## pNms  are fine
+                  if(length(V <- object@var.est)) { # V in l-space: transform to w-space
+                      ## J  :=  Jacobi-matrix  (m-1) x m  matrix of partial derivatives dl_i / dw_j
+                      ## J_ := 2 x 2 block matrix  [I  0  ;  0  J]
+                      ## V <- J_ %*% V %*% t(J_)
+                      warning("cheating for 'w<j>', not yet Jacobi-matrix multivariate delta-method")
+                      V <- rbind(cbind(V, NA, deparse.level=0L), NA, deparse.level=0L)
+                  }
+              } else { ## transformed "optim()" space : (l1, l2, .. l<m-1>)
+                  pNms <- pNms[-length(pNms)]
+                  i1 <- pT$in1
+                  pNms[i1] <- sub("^w", "l", pNms[i1])
+                  V <- object@var.est # and V is in correct space
+              }
+          },
+          stop("not yet supported  'paramTrafo$kind': ", pT$kind))
+    }
+    else
+        V <- object@var.est
+
+    structure(if(length(V)) V else matrix(NA, length(pNms), length(pNms)),
               dimnames = list(pNms, pNms))
 }
 

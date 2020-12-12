@@ -46,22 +46,23 @@ double sinc_MM(double x);
 double A_(double x, double alpha);
 double BdB0(double x, double alpha);
 
+// retstable.c :
 double rstable0(double alpha);
 double rstable (double alpha);
-void rstable_vec(double S[], const int n, const double alpha);
-void retstable_MH(double *St, const double V0[], double h, double alpha, int n);
-void retstable_LD(double *St, const double V0[], double h, double alpha, int n);
+void rstable_vec(double S[], const R_xlen_t n, const double alpha);
+void retstable_MH(double *St, const double V0[], double h, double alpha, R_xlen_t n);
+void retstable_LD(double *St, const double V0[], double h, double alpha, R_xlen_t n);
 
 double rLog(double p, double Ip);
 double rSibuya(double alpha, double gamma_1_a /**< == Gamma(1 - alpha) */);
-double rSibuya_sum(int n, double alpha, double gamma_1_a /**< == Gamma(1 - alpha) */);
-void rSibuya_vec(double* V, int n, double alpha);
+double rSibuya_sum(R_xlen_t n, double alpha, double gamma_1_a /**< == Gamma(1 - alpha) */);
+void rSibuya_vec(double* V, R_xlen_t n, double alpha);
 double rF01Frank(double V0, double theta0, double theta1, double p0, double p1,
 	double gamma_1_a, double rej, int approx);
-void rF01Frank_vec(double *V01, const double *V0, int n, double theta_0,
+void rF01Frank_vec(double *V01, const double *V0, R_xlen_t n, double theta_0,
 	double theta_1, double rej, int approx);
 double rF01Joe(double V0, double alpha, double gamma_1_a /**< == Gamma(1 - alpha) */,
 	int approx);
-void rF01Joe_vec(double* V01, const double *V0, int n, double alpha, double approx);
+void rF01Joe_vec(double* V01, const double *V0, R_xlen_t n, double alpha, double approx);
 
 #endif

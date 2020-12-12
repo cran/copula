@@ -75,7 +75,9 @@ if (Xtras) withAutoprint({
   filled.contour(df., Rhos, ll.m, xlab="df", ylab = "rho", main = tit)
 })
 
-## fitCopula() example with "fixed weights" -- (only these are "ok" !!) -------------
+## fitCopula() example -----------------------------------------------------
+
+## 1) with "fixed" weights :
 
 (mNt <- mixCopula(list(normalCopula(0.95), tCopula(-0.7)), w = c(1, 2) / 3))
 set.seed(1452) ; U <- pobs(rCopula(1000, mNt))
@@ -83,9 +85,9 @@ set.seed(1452) ; U <- pobs(rCopula(1000, mNt))
 
 getTheta(m1, freeOnly = TRUE, attr = TRUE)
 getTheta(m1, named=TRUE)
-copula:::isFree(m1) # all of them; --> now fix the weights :
+isFree(m1) # all of them; --> now fix the weights :
 fixedParam(m1) <- fx <- c(FALSE, FALSE, FALSE, TRUE, TRUE)
-stopifnot(identical(copula:::isFree(m1), !fx))
+stopifnot(identical(isFree(m1), !fx))
 
 if(Xtras) withAutoprint({ ## time
   system.time( # ~ 16 sec (nb-mm4) :
@@ -94,6 +96,22 @@ if(Xtras) withAutoprint({ ## time
   fit
   summary(fit) #-> incl  'Std.Error' (which seems small for rho1 !)
 })
+
+## 2) with "free" weights (possible since copula 1.0-0):
+
+(mNt2 <- mixCopula(list(normalCopula(0.9), tCopula(-0.8)), w = c(1, 3) / 4))
+set.seed(1959) ; U2 <- pobs(rCopula(2000, mNt2))
+if(Xtras) withAutoprint({ ## time
+  m2 <- mixCopula(list(normalCopula(), tCopula()), w = mNt@w)
+  system.time( # ~ 13.5 sec (lynne) :
+    f2 <- fitCopula(m2, start = c(0, 0, 10, c(1/2, 1/2)), data = U2)
+  )
+  f2
+  summary(f2) # NA for 'Std. Error' as did *not* estimate.variance
+  summary(f2, orig=FALSE) # default 'orig=TRUE': w-scale;  whereas
+     coef(f2, orig=FALSE) # 'orig=FALSE' => shows 'l-scale' instead
+})
+
 
 }% {examples}
 \keyword{distribution}

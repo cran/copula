@@ -40,7 +40,8 @@ xvCopula <- function(copula, x, k=NULL, verbose = interactive(),
     }
     stopifnot(is.numeric(x), (d <- ncol(x)) > 1, (n <- nrow(x)) > 0, dim(copula) == d)
     k <- if (is.null(k)) n else as.integer(k)
-    stopifnot(k >= 2L, n %/% k >= 1)
+    stopifnot(k >= 2L, 
+              (p <- n %/% k) >= 1L) # ideal size of blocks; blocks of size p+1 may exist
 
     if(k < n) ## shuffle lines of x  if 2 <= k < n
 	x <- x[sample.int(n), ]
@@ -53,11 +54,10 @@ xvCopula <- function(copula, x, k=NULL, verbose = interactive(),
 
     ## cross-validation
     xv <- 0
-    p <- n %/% k # ideal size of blocks; blocks of size p+1 may exist
     m <- rep(p, k) # sizes of blocks initialised at p
     r <- n - k * p # remaining number of lines
-    if (r > 0) m[seq_len(r)] <- p + 1 # size of first r blocks incremented if r > 0
-    b <- c(0, cumsum(m)) # 0 + ending line of each block
+    if (r > 0) m[seq_len(r)] <- p + 1L # size of first r blocks incremented if r > 0
+    b <- c(0L, cumsum(m)) # 0 + ending line of each block
     v <- matrix(NA, p + 1, d) # points where copula density will be evaluated
 
     ## for each block

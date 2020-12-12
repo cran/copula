@@ -62,7 +62,7 @@ debye2(x)
 }
 \details{
   Almost entirely taken from
-  \url{http://en.wikipedia.org/wiki/Polylogarithm}:
+  \url{https://en.wikipedia.org/wiki/Polylogarithm}:
 
 For integer values of the polylogarithm order, the following
 explicit expressions are obtained by repeated application of
@@ -119,15 +119,15 @@ Eulerian numbers; see also \code{\link{Eulerian}}.
 %\author{Martin Maechler}
 \references{
   Wikipedia (2011) \emph{Polylogarithm},
-  \url{http://en.wikipedia.org/wiki/Polylogarithm}.
+  \url{https://en.wikipedia.org/wiki/Polylogarithm}.
 
   Wood, D. C. (June 1992).
   The Computation of Polylogarithms.  Technical Report 15-92.
   Canterbury, UK: University of Kent Computing Laboratory.
-  \url{http://www.cs.kent.ac.uk/pubs/1992/110}.% Retrieved 2005-11-01.
+  \url{https://www.cs.kent.ac.uk/pubs/1992/110/}.% Retrieved 2020-11-16.
 
   Apostol, T. M. (2010), \emph{"Polylogarithm"}, in the
-  NIST Handbook of Mathematical Functions, \url{http://dlmf.nist.gov/25.12}
+  NIST Handbook of Mathematical Functions, \url{https://dlmf.nist.gov/25.12}
 
   Lewin, L. (1981).
   \emph{Polylogarithms and Associated Functions}.
@@ -135,7 +135,7 @@ Eulerian numbers; see also \code{\link{Eulerian}}.
 
   For Debye functions:  Levin (1981) above, and \cr
   Wikipedia (2014) \emph{Debye function},
-  \url{http://en.wikipedia.org/wiki/Debye_function}.
+  \url{https://en.wikipedia.org/wiki/Debye_function}.
 }
 \seealso{
   The polylogarithm is used in MLE for some Archimedean copulas; see

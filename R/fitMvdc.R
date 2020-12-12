@@ -169,7 +169,7 @@ fitMvdc <- function(data, mvdc, start,
     loglik <- fit$val
     param <- fit$par
 
-    varNA <- matrix(NA_real_, q, q)
+    varNA <- matrix(numeric(), 0, 0) # matrix(NA_real_, q, q)
     var.est <- if (estimate.variance) {
 	fit.last <- optim(param, loglikMvdc,
 			  ## loglikMvdc args :

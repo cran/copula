@@ -19,9 +19,9 @@
 setClass("fitCopula", contains = c("xcopula", "fittedMV")) #-> ./Classes.R
 ##-> coef(), nobs(), vcov() and logLik() methods for 'fittedMV' there
 
-## FIXME: This has much in commong with print.fitMvdc [ ./fitMvdc.R ]
+## FIXME: This has much in common with print.fitMvdc [ ./fitMvdc.R ]
 ## -----  For consistency, use common "helper" functions (instead of now: manually sync'ing)
-print.fitCopula <- function(x, digits = max(3, getOption("digits") - 3),
+print.fitCopula <- function(x, digits = max(3, getOption("digits") - 3), coefs = NULL,
                             signif.stars = getOption("show.signif.stars"), ...,
                             showMore = FALSE)
 {
@@ -35,11 +35,11 @@ print.fitCopula <- function(x, digits = max(3, getOption("digits") - 3),
     cat(if(showMore) describeCop(cop, "short") # as 'parameters' are separate
 	else paste("Copula:", class(cop)), "\n")
     if(showMore) {
-	coefs <- coef.fittedMV(x, SE = TRUE)
+	if(is.null(coefs)) coefs <- coef.fittedMV(x, SE = TRUE)
 	printCoefmat(coefs, digits=digits, signif.stars=signif.stars,
 		     na.print = "NA", ...)
     } else { # !showMore, default print() etc
-	coefs <- coef.fittedMV(x) # vector of "hat(theta)"
+	if(is.null(coefs)) coefs <- coef.fittedMV(x) # vector of "hat(theta)"
 	print(coefs, digits=digits, ...)
     }
     if (!is.na(ll <- x@loglik))
@@ -58,22 +58,22 @@ print.fitCopula <- function(x, digits = max(3, getOption("digits") - 3),
     invisible(x)
 }
 
-## NB: coef.fittedMV() does apply to <fitCopula>
+## NB: coef.fittedMV() does apply to <fitCopula>  --> ./Classes.R
 
 ## Keeping this back compatible... --> must return list(method=, loglik= ..):
-summary.fitCopula <- function(object, ...) {
+summary.fitCopula <- function(object, orig=TRUE, ...) {
     structure(class = "summary.fitCopula",
               list(fitC = object,
                    method = object@method,
                    loglik = object@loglik,
                    convergence = object@fitting.stats[["convergence"]],
-                   coefficients = coef.fittedMV(object, SE = TRUE)))
+                   coefficients = coef.fittedMV(object, SE = TRUE, orig=orig)))
 }
 
 ## Used both "as"  'print.summary.fitCopula()' and 'print.summary.fitMvdc()'
 ## Now print(summary(<fitCopula>)) *does* show a bit more than print(<fitCopula>)
 printSummary.fittedMV <- function(x, ...) {
-    print(x$fitC, ..., showMore = TRUE)
+    print(x$fitC, coefs = x$coefficients, orig=x$orig, ..., showMore = TRUE)
     invisible(x)
 }
 
@@ -348,7 +348,7 @@ var.icor <- function(cop, u, method=c("itau", "irho"))
                        "irho" = "dRho")
         if (!hasMethod(dCor, class(cop))) {
             warning("The variance estimate cannot be computed for a copula of class ", class(cop))
-	    return(matrix(NA_real_, 0, 0)) # instead of potentiall large (n x dd)
+	    return(matrix(numeric(), 0, 0)) # instead of potentiall large (n x dd)
         }
 
         dCor <- if(method=="itau") dTau else dRho
@@ -382,16 +382,23 @@ var.mpl <- function(cop, u)
 	msg <- c(msg, gettext(" Or rather  emle(u, oCop)  instead; where",
                               sprintf(" oCop <- onacopula(%s, C(NA, 1:%d))", fam, dim)))
     }
-    if (!isEll && !hasMethod("dlogcdu", clc)) {
+    if (!isEll && !hasMethod(dlogcdu, clc)) {
 	warning(msg); return(ans)
     }
 
     ## If df.fixed = FALSE, Jscore() cannot be computed
     if(has.par.df(cop, ccl, isEll)) {
         cop <- as.df.fixed(cop, classDef = ccl)
-        warning("the covariance matrix of the parameter estimates is computed as if 'df.fixed = TRUE' with df = ",getdf(cop))
+        warning(
+     "the covariance matrix of the parameter estimates is computed as if 'df.fixed = TRUE' with df = ",
+                getdf(cop))
         ans[-p, -p] <- var(t(Jscore(cop, u, method = "mpl")))
         ans
+    }
+    else if(is(cop, "mixCopula") && any(isFreeP(cop@w))) {
+                                        # mixCopula with estimated weights
+        ans[-p, -p] <- var(t(Jscore(cop, u, method = "mpl")))
+        ans[p, ] <- ans[,p] <- 0.
     } else
         var(t(Jscore(cop, u, method = "mpl")))
 }
@@ -446,7 +453,7 @@ fitCopula.icor <- function(copula, x, estimate.variance, method=c("itau", "irho"
     freeParam(copula) <- estimate
     var.est <- if (is.na(estimate.variance) || estimate.variance) {
         var.icor(copula, x, method=method)/nrow(x)
-    } else matrix(NA_real_, 0, 0)
+    } else matrix(numeric(), 0, 0)
     new("fitCopula",
         estimate = estimate,
         var.est = var.est,
@@ -539,7 +546,7 @@ fitCopula.itau.mpl <- function(copula, u, posDef=TRUE, lower=NULL, upper=NULL,
         ## TODO: if (d <= 20) or so ... or  if( q < n / 5 ) then
         ## use one/zero step of fitCopula.ml(*...., method="mpl", maxit=0) to get full vcov()
         stop("Cannot estimate var-cov matrix currently for method \"itau.mpl\"")
-    var.est <- matrix(NA_real_, 0, 0) # length 0  <==> not-estimated / not-available
+    var.est <- matrix(numeric(), 0, 0) # length 0  <==> not-estimated / not-available
 
     ## Return
     new("fitCopula",
@@ -586,8 +593,8 @@ fitCopula.ml <- function(copula, u, method=c("mpl", "ml"), start, lower, upper,
 {
     q <- nParam(copula, freeOnly=TRUE)
     stopifnot(q > 0L,
-	      is.list(optim.control) || is.null(optim.control),
-	      is.character(optim.method), length(optim.method) == 1,
+              is.list(optim.control) || is.null(optim.control),
+              is.character(optim.method), length(optim.method) == 1,
               is.finite(finiteLARGE), length(finiteLARGE) == 1, finiteLARGE > 0)
     chk.s(...) # 'check dots'
     if(any(u < 0) || any(u > 1))
@@ -606,14 +613,28 @@ fitCopula.ml <- function(copula, u, method=c("mpl", "ml"), start, lower, upper,
         if(nfree.w == 1) {
             warning("only one mixture weight is free; this is illogical, setting all to fixed")
             attr(copula@w, "fixed") <- TRUE
-            nfree.w <- 0
+            nfree.w <- sum(is.freeW <- isFreeP(copula@w)) ## = 0; also update 'is.freeW'
         }
+        ## ------ (keep these checks for now, but they never triggered  ---------
+        i.free.w <- which(is.freeW)
+        if(nfree.w != length(i.free.w))
+            stop(gettextf("fitCopula.ml(<mixCopula>): nfree.w = %d != length(i.free.w) = %d",
+                          nfree.w, length(i.free.w)), domain=NA)
+        ## number of free copula parameters
+        ## nfreecop <- sum(c(unlist(lapply(copula@cops, isFree))))
+        ## nfreecop <- sum(vapply(copula@cops, function(C) nFree(C@parameters), 0L))
+        ## nfreecop <- sum(vapply(copula@cops, nFree, 0L))
+        ## if(nfreecop+nfree.w != q) ## no longer true
+        ##     stop(gettextf("fitCopula.ml(<mixCopula>): (nfreecop+nfree.w) = %d != q = %d",
+        ##                   nfreecop+nfree.w, q), domain=NA)
+        ## ------
         ## when there are no free weights, don't need transformations:
         ismixC <- nfree.w > 0 # and it is  >= 2
     }   ##====
 
     if(q != length(start)) ## in the "simple" (non-mixture) case:
-        stop(gettextf("The lengths of 'start' (= %d) and the number of free copula parameters (=%d) differ",
+        stop(gettextf(
+	"The lengths of 'start' (= %d) and the number of free copula parameters (=%d) differ",
                       length(start), q), domain=NA)
 
     method <- match.arg(method)
@@ -624,36 +645,37 @@ fitCopula.ml <- function(copula, u, method=c("mpl", "ml"), start, lower, upper,
     ## control <- control[!vapply(control, is.null, NA)]
     meth.has.bounds <- optim.method %in% c("Brent","L-BFGS-B")
     if(meth.has.bounds || need.finite)
-	asFinite <- function(x) { # as finite - vectorized in 'x';  NA/NaN basically unchanged
-	    if(any(nifi <- !is.finite(x)))
-		x[nifi] <- sign(x[nifi]) * finiteLARGE
-	    x
-	}
+        asFinite <- function(x) { # as finite - vectorized in 'x';  NA/NaN basically unchanged
+            if(any(nifi <- !is.finite(x)))
+                x[nifi] <- sign(x[nifi]) * finiteLARGE
+            x
+        }
 
     if(meth.has.bounds) {
         cop.param <- getTheta(copula, freeOnly = TRUE, attr = TRUE)
         p.lowbnd <- attr(cop.param, "param.lowbnd")
         p.upbnd  <- attr(cop.param, "param.upbnd")
+        ## _Correct_bounds_  >>>> not-yet__see_*more*_problems__gofCopula(normalCopula()..)
+        ## if (is.null(lower)) {
+        ##     notI <- !is.infinite(p.lowbnd)
+        ##     p.lowbnd[notI] <- p.lowbnd[notI] + bound.eps*abs(p.lowbnd[notI])
+        ## }
+        ## if (is.null(upper)) {
+        ##     notI <- !is.infinite(p.upbnd)
+        ##     p.upbnd [notI] <- p.upbnd [notI] - bound.eps*abs(p.upbnd [notI])
+        ## }
     }
     if (is.null(lower))
-	lower <- if(meth.has.bounds) asFinite(p.lowbnd + bound.eps*abs(p.lowbnd)) else -Inf
+        ## _Correct_bounds_ lower <- if(meth.has.bounds) asFinite(p.lowbnd) else -Inf
+        lower <- if(meth.has.bounds) asFinite(p.lowbnd + bound.eps*abs(p.lowbnd)) else -Inf
+
     if (is.null(upper))
-	upper <- if(meth.has.bounds) asFinite(p.upbnd  - bound.eps*abs(p.upbnd )) else Inf
+        ## _Correct_bounds_ upper <- if(meth.has.bounds) asFinite(p.upbnd ) else Inf
+        upper <- if(meth.has.bounds) asFinite(p.upbnd  - bound.eps*abs(p.upbnd )) else Inf
 
     if(ismixC) {
         ## m <- length(is.freeW) # == length(copula@w)
         sumfreew <- 1 - sum(copula@w[!is.freeW]) ## sum of free weights
-        ## ------ (keep these checks for now, but they never triggered  ---------
-        i.free.w <- which(is.freeW)
-        if(nfree.w != length(i.free.w))
-            stop(gettextf("fitCopula.ml(<mixCopula>): nfree.w = %d != length(i.free.w) = %d",
-                          nfree.w, length(i.free.w)), domain=NA)
-        ## number of free copula parameters
-        ## nfreecop <- sum(c(unlist(lapply(copula@cops, isFree))))
-        nfreecop <- sum(vapply(copula@cops, function(C) nFree(C@parameters), 0L))
-        if(nfreecop+nfree.w != q)
-            stop(gettextf("fitCopula.ml(<mixCopula>): have   (nfreecop+nfree.w) = %d != q = %d",
-                          nfreecop+nfree.w, q), domain=NA)
 
         ## NB: start *now* contains m weights in the original m-simplex (if all 'w' are free),
         ##     respectively  nfree.w  weights in the nfree.w-simplex (with sum 'sumfreew')
@@ -661,27 +683,39 @@ fitCopula.ml <- function(copula, u, method=c("mpl", "ml"), start, lower, upper,
         ## Go to the (m-1) - dimensional transformed ("lambda") space for logL() & optim(.),
         ## see also loglikMixCop() :
         ## q == length(start)
-        l  <- q - 1
-        i1 <- q - (nfree.w-1)
-        start[i1:l] <- clr1(start[i1:q] / sumfreew)
+        l  <- q - 1L
+        i1 <- q - (nfree.w - 1L)
+        in1 <- i1:l
+        in2 <- i1:q
+        start[in1] <- clr1(start[in2] / sumfreew)
         length(start) <- l # cutoff last one
+        ## similarly transform lower[], upper[] for the 'w' -> 'l' transformation:
+        if(meth.has.bounds) {
+            ## --- fails --- as "weights don't add to 1" ---
+            ## lower[in1] <- clr1(lower[in2] / sumfreew); length(lower) <- l
+            ## upper[in1] <- clr1(upper[in2] / sumfreew); length(upper) <- l
+            lower[in1] <- -Inf; length(lower) <- l
+            upper[in1] <- +Inf; length(upper) <- l
+        }
+        ##
+        rm(l, i1, q) # not used below, whereas (in1, in2, sumfreew) *are* needed
 
         ## the last nfree.w   elements of the vector 'start' correspond to the
         ##          nfree.w-1 transformed weights '\lambda's
         ## transform them back to the nfree.w 'w's:
-        loglikMixCop <- function(param, u, copula) { # + (sumfreew, i1, l, q)  "global"s
+        loglikMixCop <- function(param, u, copula) { # + (sumfreew, in1, in2)  "global"s
             ## extend 'param' length by 1 with weights of length 'nfree.w' :
-            param[i1:q] <- clr1inv(param[i1:l]) * sumfreew
+            param[in2] <- clr1inv(param[in1]) * sumfreew
             loglikCopula(param, u, copula)
         }
     } # if(ismixC)
 
     logL <-
-	if(traceOpt) {
+        if(traceOpt) {
             numTrace <- (is.numeric(traceOpt) && (traceOpt <- as.integer(traceOpt)) > 0)
             ## if(numTrace) "print every traceOpt iteration"
-	    LL <- function(param, u, copula) {
-		r <- if(ismixC)
+            LL <- function(param, u, copula) {
+                r <- if(ismixC)
                           loglikMixCop(param, u, copula)
                      else loglikCopula(param, u, copula)
                 if(numTrace) iTr <<- iTr+1L
@@ -693,8 +727,8 @@ fitCopula.ml <- function(copula, u, method=c("mpl", "ml"), start, lower, upper,
                         cat(sprintf("%s param= %s => logL=%12.8g\n", chTr,
                                     paste(format(param, digits=9), collapse=", "), r))
                 }
-		r
-	    }
+                r
+            }
             if(need.finite) {
                 nb <- length(body(LL))
                 body(LL)[[nb]] <- do.call(substitute,
@@ -702,7 +736,7 @@ fitCopula.ml <- function(copula, u, method=c("mpl", "ml"), start, lower, upper,
                                                list(r = quote(asFinite(r)))))
             }
             LL
-	} else if(need.finite) {
+        } else if(need.finite) {
             if(ismixC)
                  function(param, u, copula) asFinite(loglikMixCop(param, u, copula))
             else function(param, u, copula) asFinite(loglikCopula(param, u, copula))
@@ -710,7 +744,7 @@ fitCopula.ml <- function(copula, u, method=c("mpl", "ml"), start, lower, upper,
             ## loglikCopula with inverse transformed lambdas, i.e., the original 'w's:
             loglikMixCop
         } else
-	    loglikCopula
+            loglikCopula
 
     if(traceOpt && numTrace) iTr <- 0L
     ## Maximize the (log) likelihood
@@ -718,55 +752,74 @@ fitCopula.ml <- function(copula, u, method=c("mpl", "ml"), start, lower, upper,
                  method = optim.method, control=control,
                  copula = copula, u = u)
 
+    fitpar <- fitp0 <- fit$par
     if(ismixC) { ## Transform the optimized '\lambda's back
-        ## defined (m, q, l, i1)  above
-        fit$par[i1:q] <- clr1inv(fit$par[i1:l]) * sumfreew
+        ## defined (in1, in2)  above
+        fitpar[in2] <- clr1inv(fitp0[in1]) * sumfreew
     }
 
-    freeParam(copula) <- fit$par
+    freeParam(copula) <- fitpar
     ## Check convergence of the fitting procedure
     loglik <- fit$val
     has.conv <- fit[["convergence"]] == 0
     if (is.na(estimate.variance))
         estimate.variance <- has.conv && ## for now:
-	    (if(ismixC)
+            (if(ismixC)
                  !is.null(wf <- attr(copula@w, "fixed")) && all(wf) else TRUE)
     if(!has.conv)
         warning("possible convergence problem: optim() gave code=",
                 fit$convergence)
 
     ## Estimate the variance of the estimator
-    var.est <- switch(method,
-    "mpl" = {
-        if(estimate.variance)
-            var.mpl(copula, u) / nrow(u)
-        else
-            matrix(NA_real_, 0, 0) #matrix(NA_real_, q, q)
-    },
-    "ml" = {
-        ## MM{FIXME}: This should be done only by 'vcov()' and summary() !
-        if(estimate.variance) {
-            fit.last <- optim(fit$par, # == freeParam(copula)
-                              logL, lower=lower, upper=upper,
-                              method=optim.method, copula=copula, u=u,
-                              control=c(control, maxit=0), hessian=TRUE)
-            vcov <- tryCatch(solve(-fit.last$hessian), error = function(e) e)
-            if(is(vcov, "error")) {
-                warning("Hessian matrix not invertible: ", vcov$message)
-                matrix(NA_real_, 0, 0) #matrix(NA_real_, q, q)
-            } else vcov ## ok
-        } else matrix(NA_real_, 0, 0) #matrix(NA_real_, q, q)
-    },
-    stop("Wrong 'method'"))
-
+    Var0  <- matrix(numeric(), 0, 0)
+    VarNA <- matrix(NA_real_, length(start), length(start))
+    var.est <- switch(
+        method,
+        "mpl" = {
+            if(estimate.variance) ## FIXME?  use tryCatch() as in "ml" case ??
+                var.mpl(copula, u) / nrow(u)
+            else
+                Var0
+        },
+        "ml" = {
+            ## FIXME: should be done additionally / only by 'vcov()' and summary()
+            if(estimate.variance) {
+                if(traceOpt)
+                    cat("--- estimate.variance=TRUE ==> optim(*, hessian=TRUE) iterations ---\n")
+                fit.last <- tryCatch(
+                    optim(fitp0, # typically == freeParam(copula)
+                          logL, lower=lower, upper=upper,
+                          method=optim.method, copula=copula, u=u,
+                          control=c(control, maxit=0), hessian=TRUE),
+                    error = function(e) e)
+                if(inherits(fit.last, "error")) {
+                    msg <- .makeMessage("optim(*, hessian=TRUE) failed: ", fit.last$message)
+                    warning(msg)
+                    structure(VarNA, msg = msg)
+                } else {
+                    vcov <- tryCatch(solve(-fit.last$hessian), error = function(e) e)
+                    if(inherits(vcov, "error")) {
+                        msg <- .makeMessage("Hessian matrix not invertible: ", vcov$message)
+                        warning(msg)
+                        structure(VarNA, msg = msg)
+                    } else vcov ## ok
+                }
+            } else Var0
+        },
+        stop("Wrong 'method'"))
     ## Return the fitted copula object
     new("fitCopula",
-        estimate = fit$par,
+        estimate = fitpar,
         var.est = var.est,
         method = if(method=="mpl") "maximum pseudo-likelihood" else "maximum likelihood",
         loglik = loglik,
         fitting.stats = c(list(method=optim.method),
-                          fit[c("convergence", "counts", "message")], control),
+                          fit[c("convergence", "counts", "message")],
+                          control,
+                          if(ismixC)
+                              list(paramTrafo =
+                                       list(kind = "mixCop-clr1",
+                                            sumfreew=sumfreew, in1=in1, in2=in2))),
         nsample = nrow(u), call = call,
         copula = copula)
 }
@@ -847,7 +900,7 @@ optimMeth <- function(copula, method, dim) {
     ellip <- extends(cld, "ellipCopula")
     if(ellip && copula@dispstr %in% c("ex", "ar1"))
         "L-BFGS-B"
-    else if(extends(cld, "archmCopula")) {
+    else if(extends(cld, "archmCopula") || extends(cld, "mixCopula") ) {
 	## if(nParam(copula, freeOnly=TRUE) == 1) # all 5 of our own families
 	##     "Brent"
         ## "Brent" with "finite" bounds (almost Inf) --> quickly goes berserk

@@ -40,7 +40,7 @@ evTestK(x, method = c("fsample","asymptotic","jackknife"), ties = NA, N = 100)
 
   Kojadinovic, I. (2017). Some copula inference procedures adapted to
   the presence of ties. \emph{Computational Statistics and Data
-  Analysis} \bold{112}, 24--41, \url{http://arxiv.org/abs/1609.05519}.
+  Analysis} \bold{112}, 24--41, \url{https://arxiv.org/abs/1609.05519}.
 }
 \seealso{ \code{\link{evTestC}}, \code{\link{evTestA}}, \code{\link{evCopula}},
   \code{\link{gofEVCopula}}, \code{\link{An}}.

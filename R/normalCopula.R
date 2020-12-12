@@ -34,14 +34,29 @@ normalCopula <- function(param = NA_real_, dim = 2L, dispstr = "ex") {
 rnormalCopula <- function(n, copula)
     pnorm(rmvnorm(n, sigma = getSigma(copula)))
 
+pmvnormAlgo <- function(dim, x, ...) {
+    if(dim <= 3 && !anyNA(x) && (!any(xI <- x == Inf) || all(xI)))
+        TVPACK(...)
+    else if(dim <= 5)
+        Miwa(...)
+    else
+        GenzBretz(...)
+}
 
-pnormalCopula <- function(u, copula, ...) {
+pnormalCopula <- function(u, copula, algorithm = NULL, ...)
+{
   dim <- copula@dimension
   ## stopifnot(is.matrix(u), ncol(u) == dim) # <- as called from pCopula()
   i.lower <- rep.int(-Inf, dim)
   sigma <- getSigma(copula)
-  apply(qnorm(u), 1, function(x) if(anyNA(x)) NA_real_ else
-        pmvnorm(lower = i.lower, upper = x, sigma = sigma, ...))
+  apply(qnorm(u), 1, function(x)
+      if(anyNA(x)) NA_real_
+      else { # algorithm depending on 'x' ..
+          if(is.null(algorithm))
+              algorithm <- pmvnormAlgo(dim, x=x, ...)
+          pmvnorm(lower = i.lower, upper = x,
+                  sigma=sigma, algorithm=algorithm, ...)
+      })
 }
 
 dnormalCopula <- function(u, copula, log=FALSE, ...) {

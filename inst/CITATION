@@ -33,7 +33,7 @@ bibentry(bibtype = "Manual",
                note, "URL", url))
 
 
-url1 <- "http://www.jstatsoft.org/v21/i04/"
+url1 <- "https://www.jstatsoft.org/v21/i04/"
 bibentry(bibtype = "Article",
          title        = "Enjoy the Joy of Copulas: With a Package {copula}",
          author       = person("Jun Yan"),
@@ -58,12 +58,12 @@ bibentry(bibtype = "Article",
   volume       = "34",
   number       = "9",
   pages        = "1--20",
-  url          = "http://www.jstatsoft.org/v34/i09/",
+  url          = "https://www.jstatsoft.org/v34/i09/",
   textVersion  =
   paste("Ivan Kojadinovic, Jun Yan (2010).",
         "Modeling Multivariate Distributions with Continuous Margins Using the copula R Package.",
         "Journal of Statistical Software, 34(9), 1-20.",
-        "URL http://www.jstatsoft.org/v34/i09/.")
+        "URL https://www.jstatsoft.org/v34/i09/.")
 )
 
 bibentry(bibtype = "Article",
@@ -75,12 +75,12 @@ bibentry(bibtype = "Article",
   volume       = "39",
   number       = "9",
   pages        = "1--20",
-  url          = "http://www.jstatsoft.org/v39/i09/",
+  url          = "https://www.jstatsoft.org/v39/i09/",
 
   textVersion  =
   paste("Marius Hofert, Martin Maechler (2011).",
         "Nested Archimedean Copulas Meet R: The nacopula Package.",
         "Journal of Statistical Software, 39(9), 1-20.",
-        "URL http://www.jstatsoft.org/v39/i09/.")
+        "URL https://www.jstatsoft.org/v39/i09/.")
 )
 

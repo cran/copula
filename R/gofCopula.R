@@ -363,14 +363,15 @@ Jscore <- function(copula, u, method)
            S <- matrix(0, n, p)
            for(j in 1:d) {
                ij <- order(u[,j], decreasing=TRUE)
+               Ij <- influ[[j]]
                ijb <- vapply(1:n, function(i) sum(t(u[,j]) <= u[i,j]), NA_real_)
 	       S <- S +
 		   rbind(rep.int(0, p),
-			 apply(influ[[j]][ij,,drop=FALSE], 2L, cumsum))[n+1-ijb,,drop=FALSE] / n -
-		   matrix(colMeans(influ[[j]]*u[,j]), n, p, byrow=TRUE)
+			 apply(Ij[ij,,drop=FALSE], 2L, cumsum))[n+1-ijb,,drop=FALSE] / n -
+		   matrix(colMeans(Ij*u[,j]), n, p, byrow=TRUE)
            }
            Sigma.n <- crossprod(influ0) / n # = A^T A / n for A = influ0
-           solve(Sigma.n, t(dlogcdtheta(copula, u) - S)) # solve(A, B) solves Ax = B => x = A^{-1}B
+           solve(Sigma.n, t(influ0 - S)) # solve(A, B) solves Ax = B => x = A^{-1}B
        },
            "ml"=
        {

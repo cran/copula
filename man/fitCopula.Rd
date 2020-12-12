@@ -113,7 +113,9 @@ optimMeth(copula, method, dim)
     functions, e.g., \code{traceOpt = TRUE} (or \code{traceOpt = 10}) for tracing
     \code{\link{optimize}} (every 10-th function evaluation) for method
     \code{"itau.mpl"}, and for \dQuote{"manual"} tracing with method
-    \code{"ml"} or \code{"mpl"} (notably for \code{optim.method="Brent"}).}
+    \code{"ml"} or \code{"mpl"} (notably for \code{optim.method="Brent"}),
+    see the extra arguments of namespace-hidden function
+    \code{fitCopula.ml()}.}
 }
 \value{
   \code{loglikCopula()} returns the copula log-likelihood evaluated at the
@@ -125,8 +127,9 @@ optimMeth(copula, method, dim)
   \describe{
     \item{estimate}{The parameter estimates.}
     \item{var.est}{The large-sample (i.e., asymptotic) variance estimate of the parameter
-      estimator; (filled with) \code{NA} if \code{estimate.variance=FALSE}.
-    }
+      estimator unless \code{estimate.variance=FALSE} where it is
+      \code{matrix(numeric(), 0,0)} (to be distinguishable from cases when the
+      covariance estimates failed partially).}
     \item{copula}{The fitted copula object.}
   }
 

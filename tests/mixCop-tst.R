@@ -33,12 +33,16 @@ stopifnot(dim(mC) == 3, inherits(mC, "mixCopula"))
 
 ## mix a Gumbel with a rotated Gumbel (with equal weights 1/2):
 mGG <- mixCopula(list(gumbelCopula(2), rotCopula(gumbelCopula(1.5))))
-stopifnot(dim(mGG) == 2, inherits(mGG, "mixCopula"),
-    all.equal(   rho(mGG), 0.57886340158, tol=1e-10) ,
+mGG # 4 parameters
+stopifnot(exprs = {
+    dim(mGG) == 2
+    inherits(mGG, "mixCopula")
+    is(mGG,"mixExplicitCopula") # ==> Jscore() works  ==> var.mpl()
+    all.equal(   rho(mGG), 0.57886340158, tol=1e-10)
     all.equal(lambda(mGG), c(lower = 0.206299474016,
                              upper = 0.292893218813), tol = 1e-10)
-)
-mGG # 4 parameters
+})
+
 
 RNGversion("3.5.0") # for sample() -- "biased" --> warning ---> *remove* in future!
 set.seed(17)
@@ -76,6 +80,7 @@ if(doExtras) withAutoprint({
     ##            system is computationally singular: reciprocal condition number = 3.88557e-17
     st0 # was 4.4, now 9.3 sec (nb-mm4)
     coef(f.) ; logLik(f.)
+    coef(f., orig=FALSE) # -> l-scale
     summary(f.)
     stopifnot(exprs = {
         all.equal(logLik(f.), structure(536.93419, nobs = 600L, df = 7L, class = "logLik"),
@@ -94,11 +99,33 @@ if(doExtras) withAutoprint({
 
    ## MM: Note that 0.999 is not legal for a gumbelCopula (-> gives Error --> -Inf )
     coef(f.w); logLik(f.w)
-    print(summary(f.w))
+    summary(f.w)
     stopifnot(exprs = {
         all.equal(  coef(f.),   coef(f.w), tol=0.0006) # seen 0.000187
         all.equal(logLik(f.), logLik(f.w), tol= 4e-8)  # seen 1.89e-9
     })
+})
+
+if(doExtras) withAutoprint({
+    stG <- system.time(
+        fGG <- fitCopula(mGG, uGG, method = "ml", estimate.variance=TRUE, traceOpt=1))
+    stG # 3.7 (lynne, 2020)
+    coef(fGG) ; logLik(fGG)
+    stopifnot(exprs = {
+        all.equal( ## dput(signif(*, 8)):
+            c(m1.alpha = 2.0551924, m2.alpha = 1.5838548, w1 = 0.50994422, w2 = 0.49005578),
+            coef(fGG), tol = 1e-7)
+        all.equal(structure(256.799629, nobs = 1000L, df = 4L, class = "logLik"),
+                  logLik(fGG), tol = 8e-8) # 9.67 e-10)
+    })
+    ## these two now work with "cheating" warning :
+    summary(fGG)
+    vcov(fGG)
+    ## these now use 'l' aka 'lambda'-space :
+    summary(fGG, orig=FALSE)
+    (vcov(fGG, orig=FALSE) -> vGG) # "l-space"
+    cov2cor(vGG)
+    coef(fGG, orig=FALSE) # "l-space"
 })
 
 
@@ -106,7 +133,7 @@ if(doExtras) withAutoprint({ # slowish
     st1 <- system.time(
         ff <- fitCopula(mC, uM, optim.method = "Nelder-Mead", optim.control=optCtrl))
     ## converges (vcov : Error in solve(..)... (rec.cond.number 4.783e-17)
-    st1 # 11 sec
+    st1 # 11 sec (then lynne, 2020: 4.8'')
     logLik(ff)
     summary(ff)
     ## now using 'mC.' : -----
@@ -125,17 +152,19 @@ if(doExtras) withAutoprint({ # slowish
     system.time( # 28 sec
         f2 <- fitCopula(mC, uM, optim.method = "L-BFGS-B",    optim.control=optCtrl))
     ## converges (vcov: Error in solve(..)... (rec.cond.number 3.691e-17)
-    coef(f2) ; logLik(f2)
+    coef(f2) ; coef(f2, orig=FALSE); logLik(f2)
     summary(f2)
 
     ## now using 'mC.' : -----
     system.time(
         f2.w <- fitCopula(mC., uM, optim.method = "Nelder-Mead", optim.control=optCtrl))
-    coef(f2.w) ; logLik(f2.w)
+    coef(f2.w) ; coef(f2.w, orig=FALSE) ; logLik(f2.w)
     summary(f2.w)
-    stopifnot(exprs = { ## quite different, f2 was "poor" :
-        all.equal(  coef(f2),   coef(f2.w), tol=0.07) # seen 0.0389
-        all.equal(logLik(f2), logLik(f2.w), tol=0.002)# seen 0.000747
+    stopifnot(exprs = { ## different, f2 was "poor" :
+        all.equal(  coef(f2),   coef(f2.w), tol=0.004) # seen 0.00159
+        all.equal(coef(f2  , orig=FALSE),
+                  coef(f2.w, orig=FALSE),   tol=0.004) # 0.001639
+        all.equal(logLik(f2), logLik(f2.w), tol=0.002) # seen 2.26e-7
     })
 })
 
@@ -152,7 +181,6 @@ getTheta(tX4, attr = TRUE) # freeOnly = TRUE is default
                                         # -> shows 'm2.df := 5' as fixed !
 (th. <- getTheta(m3, attr = TRUE))# ditto
 (th  <- getTheta(m3, named= TRUE))
-##' an inverse function of which(.) :
 ##' an inverse function of which(.) :
 trueAt <- function(i, n) { r <- logical(n); r[i] <- TRUE; r }
 ## Functionality check of trueAt() :

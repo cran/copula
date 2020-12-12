@@ -64,7 +64,7 @@ exchEVTest(x, N = 1000,  estimator = c("CFG", "Pickands"),
 
   Kojadinovic, I. (2017). Some copula inference procedures adapted to
   the presence of ties. \emph{Computational Statistics and Data
-    Analysis} \bold{112}, 24--41, \url{http://arxiv.org/abs/1609.05519}.
+    Analysis} \bold{112}, 24--41, \url{https://arxiv.org/abs/1609.05519}.
 }
 \seealso{ \code{\link{exchTest}}, \code{\link{radSymTest}}, \code{\link{gofCopula}}.
 }

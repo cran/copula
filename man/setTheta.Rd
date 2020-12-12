@@ -70,7 +70,8 @@ myF <- setTheta(copFrank, -2.5, noCheck=TRUE)
 myF@tau(myF@theta) # -0.262
 
 myT <- setTheta(tCopula(df.fixed=TRUE), 0.7)
-stopifnot(all.equal(myT, tCopula(0.7, df.fixed=TRUE), tolerance=0))
+stopifnot(all.equal(myT, tCopula(0.7, df.fixed=TRUE),
+                    check.environment=FALSE, tolerance=0))
 
 (myT2 <- setTheta(tCopula(dim=3, df.fixed=TRUE), 0.7))
 ## Setting 'rho' and 'df'  --- for default df.fixed=FALSE :

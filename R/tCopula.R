@@ -116,7 +116,16 @@ rtCopula <- function(n, copula) {
 }
 
 
-ptCopula <- function(u, copula, ...) {
+pmvtAlgo <- function(dim, x, ...) {
+    if(dim <= 3 && !anyNA(x) && (!any(xI <- x == Inf) || all(xI)))
+        TVPACK(...)
+    else
+        GenzBretz(...)
+}
+
+
+ptCopula <- function(u, copula, algorithm = NULL, ...)
+{
   dim <- copula@dimension
   i.lower <- rep.int(-Inf, dim)
   sigma <- getSigma(copula)
@@ -124,8 +133,13 @@ ptCopula <- function(u, copula, ...) {
   if(!(df==Inf || df == as.integer(df)))
       stop("'df' is not integer (or Inf); therefore, pCopula() cannot be computed yet")
   ## more checks now  pCopula() *generic*
-  apply(u, 1, function(x) if(anyNA(x)) NA_real_ else
-	pmvt(lower = i.lower, upper = qt(x, df = df), sigma = sigma, df = df, ...))
+  apply(qt(u, df = df), 1, function(x)
+      if(anyNA(x)) NA_real_
+      else { # algorithm depending on 'x' ..
+          if(is.null(algorithm))
+              algorithm <- pmvtAlgo(dim, x=x, ...)
+          pmvt(lower = i.lower, upper = x, sigma=sigma, df=df, algorithm=algorithm, ...)
+      })
 }
 
 dtCopula <- function(u, copula, log = FALSE, ...) {

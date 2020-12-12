@@ -3,6 +3,8 @@
 \alias{ellipCopula}
 \alias{normalCopula}
 \alias{tCopula}
+\alias{pCopula,matrix,normalCopula-method}
+\alias{pCopula,matrix,tCopula-method}
 \description{
   Constructs an elliptical copula class object with its corresponding
   parameters and dimension.
@@ -11,7 +13,14 @@
 ellipCopula (family, param, dim = 2, dispstr = "ex", df = 4, ...)
 
 normalCopula(param, dim = 2, dispstr = "ex")
-     tCopula(param, dim = 2, dispstr = "ex", df = 4, df.fixed = FALSE, df.min = 0.01)
+
+     tCopula(param, dim = 2, dispstr = "ex", df = 4,
+             df.fixed = FALSE, df.min = 0.01)
+
+\S4method{pCopula}{matrix,normalCopula}(u, copula, algorithm = NULL, ...)
+% --> pnormalCopula() in ../R/normalCopula.R
+\S4method{pCopula}{matrix,tCopula}(u, copula, algorithm = NULL, ...)
+% --> ptCopula() in ../R/tCopula.R
 }
 \arguments{
   \item{family}{a character string specifying the family of an
@@ -36,7 +45,41 @@ normalCopula(param, dim = 2, dispstr = "ex")
   \item{df.min}{non-negative number; the strict lower bound for
     \code{df}, mainly during fitting when \code{df.fixed=FALSE}, with
     \code{\link{fitCopula}}.}
-  \item{\dots}{ currently nothing. }
+  %% pCopula() methods:
+  \item{copula}{an \R object of class \code{"\linkS4class{Copula}"}, in our
+    case inheriting from \code{"\linkS4class{ellipCopula}"}.}
+
+  \item{u}{a vector of the copula dimension \eqn{d} or a matrix with \eqn{d}
+    columns, giving the points where the distribution function needs to be
+    evaluated.  Note that values outside of the cube \eqn{[0,1]^d} are
+    treated equivalently to those on the cube boundary.}
+  \item{algorithm}{\code{NULL} or an \code{"algorithm"} object for package
+    \CRANpkg{mvtnorm}'s \code{pmvt()} or \code{pmvnorm()} functions, see
+    \code{\link[mvtnorm]{algorithms}}.  Note that for larger dimensions,
+    the monte-carlo based \code{GenzBretz(..)} must be used, consequently
+    with slightly random results.  By default, \code{algorithm = NULL},
+    \code{algorithm} is chosen separately for each row \code{x <- u[i,]}, for
+    \describe{
+      \item{\code{normalCopula}:}{ via hidden function
+	\code{pmvnormAlgo(dim, x, ...)}
+	which currently is defined as % ../R/normalCopula.R
+	\preformatted{ pmvnormAlgo <- function(dim, x, ...) {
+    if(dim <= 3 && !anyNA(x) && (!any(xI <- x == Inf) || all(xI)))
+        TVPACK(...)
+    else if(dim <= 5)
+        Miwa(...)
+    else
+        GenzBretz(...)
+  }}
+     }
+      \item{\code{tCopula}:}{ via (hidden) \code{pmvtAlgo(dim, x, ...)}
+	which is the same as \code{pmvnormAlgo()} above, but as \code{Miwa()}
+	is not applicable, without the \code{else if(dim <= 5) Miwa(...)}
+	clause.}
+    }
+  }
+  \item{\dots}{for the \code{pCopula()} methods, optional arguments to the
+    corresponding algorithm.}
 }
 \value{
   An elliptical copula object of class \code{"\linkS4class{normalCopula}"}
@@ -70,10 +113,12 @@ norm.cop <- normalCopula(c(0.5, 0.6, 0.7), dim = 3, dispstr = "un")
 t.cop <- tCopula(c(0.5, 0.3), dim = 3, dispstr = "toep",
                  df = 2, df.fixed = TRUE)
 getSigma(t.cop) # P matrix (with diagonal = 1)
+stopifnot(all.equal(toeplitz(c(1, .5, .3)), getSigma(t.cop)))
 
 ## dispersion "AR1" :
 nC.7 <- normalCopula(0.8, dim = 7, dispstr = "ar1")
-getSigma(nC.7) ##-> toeplitz( (1  0.8  0.8^2  0.8^3  ... 0.8^6) ) matrix
+getSigma(nC.7)
+stopifnot(all.equal(toeplitz(.8^(0:6)), getSigma(nC.7)))
 
 ## from the wrapper
 norm.cop <- ellipCopula("normal", param = c(0.5, 0.6, 0.7),
@@ -98,7 +143,9 @@ if(Xtras) { ## a bit more accurately:
 
 ## For smaller copula dimension 'd', alternatives are available and
 ## non-random, see ?GenzBretz from package 'mvtnorm' :
-require("mvtnorm")# -> GenzBretz(), Miva(), and TVPACK() are available
+has_mvtn <- "package:mvtnorm" \%in\% search()
+if(!has_mvtn)
+  require("mvtnorm")# -> GenzBretz(), Miva(), and TVPACK() are available
 ## Note that Miwa() would become very slow for dimensions 5, 6, ..
 set.seed(4); pN1.M <- pCopula(uN, norm.cop, algorithm = Miwa(steps = 512))
 set.seed(5); pN2.M <- pCopula(uN, norm.cop, algorithm = Miwa(steps = 512))
@@ -106,6 +153,8 @@ stopifnot(all.equal(pN1.M, pN2.M, tol= 1e-15))# *no* randomness
 set.seed(4); pN1.T <- pCopula(uN, norm.cop, algorithm = TVPACK(abseps = 1e-10))
 set.seed(5); pN2.T <- pCopula(uN, norm.cop, algorithm = TVPACK(abseps = 1e-14))
 stopifnot(all.equal(pN1.T, pN2.T, tol= 1e-15))# *no* randomness (but no effect of 'abseps')
+if(!has_mvtn)
+   detach("package:mvtnorm")# (revert)
 
 
 ## Versions with unspecified parameters:

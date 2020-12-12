@@ -120,7 +120,7 @@ dAdu(copula, w)
   {Extreme-value copulas}. In \emph{Copula theory and its applications},
   {Jaworski, P., Durante, F., H\enc{ä}{a}rdle, W. and Rychlik, W., Eds}.
   {Springer-Verlag}, {Lecture Notes in Statistics}, {127--146},
-  \url{http://arxiv.org/abs/0911.1015}.
+  \url{https://arxiv.org/abs/0911.1015}.
 }
 \seealso{
   Nonparametric estimators for \eqn{A()} are available, see

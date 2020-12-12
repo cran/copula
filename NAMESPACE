@@ -86,7 +86,7 @@ importClassesFrom("Rmpfr",
 
 importFrom("mvtnorm",
            dmvnorm, pmvnorm, rmvnorm,
-           ## rather user should require("mvtnorm") for these: GenzBretz, Miva, TVPACK,
+           GenzBretz, Miwa, TVPACK, ## <-- import the algorithm functions, too
            dmvt, pmvt, rmvt)
 
 importFrom("pcaPP", cor.fk)# Fast Kendall's tau

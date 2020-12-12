@@ -56,9 +56,9 @@ double rSibuya(double alpha, double gamma_1_a /**< == Gamma(1 - alpha) */){
  * @return n-fold sum of i.i.d. V ~ F
  * @author Marius Hofert
  */
-double rSibuya_sum(int n, double alpha, double gamma_1_a /**< == Gamma(1 - alpha) */){
+double rSibuya_sum(R_xlen_t n, double alpha, double gamma_1_a /**< == Gamma(1 - alpha) */){
     double n_sum_V = 0.;
-    for(int i = 0; i < n; i++)
+    for(R_xlen_t i = 0; i < n; i++)
 	n_sum_V += rSibuya(alpha, gamma_1_a);
     return n_sum_V;
 }
@@ -73,12 +73,12 @@ double rSibuya_sum(int n, double alpha, double gamma_1_a /**< == Gamma(1 - alpha
  * @return none
  * @author Marius Hofert, Martin Maechler
  */
-void rSibuya_vec(double* V, int n, double alpha){
+void rSibuya_vec(double* V, R_xlen_t n, double alpha){
     if(n >= 1) {
 	double gamma_1_a = gammafn(1.-alpha);
 	GetRNGstate();
 
-	for(int i=0; i < n; i++)
+	for(R_xlen_t i=0; i < n; i++)
 	    V[i] = rSibuya(alpha, gamma_1_a);
 
 	PutRNGstate();
@@ -96,7 +96,17 @@ void rSibuya_vec(double* V, int n, double alpha){
  * @author Martin Maechler
  */
 SEXP rSibuya_vec_c(SEXP n_, SEXP alpha_){
-    int n = asInteger(n_);
+    R_xlen_t n;
+#ifdef LONG_VECTOR_SUPPORT
+    double dn = asReal(n_);
+    if (ISNAN(dn) || dn < 0 || dn > R_XLEN_T_MAX)
+	error(_("invalid 'n'"));
+    n = (R_xlen_t) dn;
+#else
+    n = asInteger(n_);
+    if (n == NA_INTEGER || n < 0)
+	error(_("invalid 'n'"));
+#endif
     double alpha = asReal(alpha_);
     SEXP res = PROTECT(allocVector(REALSXP, n));
     if(n >= 1) rSibuya_vec(REAL(res), n, alpha);

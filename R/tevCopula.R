@@ -21,8 +21,7 @@
 ##' @author Jun Yan
 ATev <- function(copula, w) {
   rho <- copula@parameters[1]
-  ## nu <- getdf(copula) ## defined in tCopula.R
-  nu <- getdf(copula)
+  nu <- getdf(copula) # defined in tCopula.R
   wnu <- (w / (1 - w))^(1 / nu)
   x <- (wnu - rho) / sqrt(1 - rho^2) * sqrt(nu + 1)
   y <- (1 / wnu - rho) / sqrt(1 - rho^2) * sqrt(nu + 1)
@@ -36,8 +35,7 @@ ATev <- function(copula, w) {
 ##' @return data frame with two coplumns: A'(w) and A''(w)
 dAduTev <- function(copula, w) {
   rho <- copula@parameters[1]
-  ## nu <- getdf(copula) ## defined in tCopula.R
-  nu <- getdf(copula)
+  nu <- getdf(copula) # defined in tCopula.R
   ## prepare dx, dy
   wnu <- (w / (1 - w))^(1 / nu)
   x <- (wnu - rho) / sqrt(1 - rho^2) * sqrt(nu + 1)

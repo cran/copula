@@ -67,7 +67,7 @@ tauJoe(theta, method = c("hybrid", "digamma", "sum"), noTerms=446)
     sum (with \code{noTerms} terms.  The more accurate or faster methods,
     use analytical summation formulas, using the \code{\link{digamma}}
     aka \eqn{\psi} function, see, e.g.,
-    \url{http://en.wikipedia.org/wiki/Digamma_function#Series_formula}.
+    \url{https://en.wikipedia.org/wiki/Digamma_function#Series_formula}.
 %% FIXME: Martin, use your notes (Aug.7, 2012; oranges Heft) to write a
 %%      small "paper" / vignette, where everything is nicely derived,
 %% notably the cases theta=2, and theta ~= 2.

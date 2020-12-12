@@ -93,13 +93,13 @@ double rF01Frank(double V0, double theta0, double theta1, double p0, double p1,
  * @return none
  * @author Marius Hofert
  */
-void rF01Frank_vec(double *V01, const double *V0, int n, double theta0,
+void rF01Frank_vec(double *V01, const double *V0, R_xlen_t n, double theta0,
 		   double theta1, double rej, int approx){
     double p0 = -expm1(-theta0), p1 = - expm1(-theta1),
 	iAlpha = (theta1 - theta0) / theta1, gamma_1_a = gammafn(iAlpha);
     GetRNGstate();
 
-    for(int i=0; i < n; i++)
+    for(R_xlen_t i=0; i < n; i++)
 	V01[i] = rF01Frank(V0[i], theta0, theta1, p0, p1, gamma_1_a, rej, approx);
 
     PutRNGstate();
@@ -122,7 +122,7 @@ void rF01Frank_vec(double *V01, const double *V0, int n, double theta0,
  */
 SEXP rF01Frank_vec_c(SEXP V0_, SEXP theta_0_, SEXP theta_1_, SEXP rej_, SEXP approx_){
     double *V0 = REAL(V0_);
-    int n = length(V0_);
+    R_xlen_t n = xlength(V0_);
     double theta_0 = asReal(theta_0_), theta_1 = asReal(theta_1_), rej = asReal(rej_);
     int approx = asInteger(approx_);
     SEXP res = PROTECT(allocVector(REALSXP, n));

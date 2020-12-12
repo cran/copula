@@ -106,7 +106,7 @@ copJoe
   Hofert, M. and \enc{Mächler}{Maechler}, M. (2011).
   Nested Archimedean Copulas Meet R: The nacopula Package.
   \emph{Journal of Statistical Software} \bold{39}(9), 1--20.
-  \url{http://www.jstatsoft.org/v39/i09/}.
+  \url{https://www.jstatsoft.org/v39/i09/}.
 }
 \examples{
 ## Print a copAMH object and its structure

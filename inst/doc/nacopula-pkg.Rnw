@@ -17,7 +17,7 @@
 %\VignetteIndexEntry{Nested Archimedean Copulas Meet R}% << shown on CRAN page!
 %\VignetteDepends{copula}
 %\VignetteDepends{lattice}
-\SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=7,height=4,strip.white=true,keep.source=TRUE}
+\SweaveOpts{engine=R,eps=FALSE, pdf=FALSE,grdevice=pdfDB,width=7,height=4,strip.white=true,keep.source=TRUE}
 
 %% an abstract and keywords
 \Abstract{
@@ -209,6 +209,11 @@
 %% Note: If there is markup in \(sub)section, then it has to be escape as above.
 %% Note: These are explained in '?RweaveLatex' :
 <<preliminaries, echo=FALSE, results=hide>>=
+pdfDB <- function(name, width, height, ...)
+{
+    grDevices::pdf(paste0(name, ".pdf"), ## "DB":             vvvvvvvvvvvvvvvv
+                   width=width, height=height, onefile=FALSE, useDingbats=TRUE)
+}
 op.orig <-
 options(width = 70,
         ## SweaveHooks= list(fig=function() par(mar=c(5.1, 4.1, 1.1, 2.1))),

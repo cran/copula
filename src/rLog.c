@@ -77,14 +77,24 @@ double rLog(double p, double Ip) {
  * @author Martin Maechler
  */
 SEXP rLog_vec_c(SEXP n_, SEXP p_, SEXP Ip_) {
-    int n = asInteger(n_);
+    R_xlen_t n;
+#ifdef LONG_VECTOR_SUPPORT
+    double dn = asReal(n_);
+    if (ISNAN(dn) || dn < 0 || dn > R_XLEN_T_MAX)
+	error(_("invalid 'n'"));
+    n = (R_xlen_t) dn;
+#else
+    n = asInteger(n_);
+    if (n == NA_INTEGER || n < 0)
+	error(_("invalid 'n'"));
+#endif
     double p = asReal(p_), Ip = asReal(Ip_);
     SEXP res = PROTECT(allocVector(REALSXP, n));
     double* X = REAL(res);
 
     GetRNGstate();
 
-    for(int i=0; i < n; i++)
+    for(R_xlen_t i=0; i < n; i++)
 	X[i] = rLog(p, Ip);
 
     PutRNGstate();
