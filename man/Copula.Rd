@@ -117,7 +117,7 @@ rCopula(n, copula, \dots)
 
   The distribution function of a \code{t} copula uses \code{pmvt} from
   package \pkg{mvtnorm}; similarly, the density (\code{dCopula}) calls
-  \code{\link[mvtnorm]{dmvt}} from \pkg{mvtnorm}.
+  \code{\link[mvtnorm]{dmvt}} from CRAN package \CRANpkg{mvtnorm}.
   The \code{normalCopula} methods use \code{dmvnorm} and \code{pmvnorm}
   from the same package.
 

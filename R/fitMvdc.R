@@ -143,7 +143,7 @@ fitMvdc <- function(data, mvdc, start,
                     estimate.variance = fit$convergence == 0, hideWarnings=TRUE)
 {
     copula <- mvdc@copula
-    if (copula@dimension != ncol(data))
+    if (dim(copula) != ncol(data))
         stop("The dimensions of the data and copula do not match.")
     cl <- match.call()
     marNpar <- lengths(mvdc@paramMargins)# or  vapply(mvdc@paramMargins, nFree, 1L)

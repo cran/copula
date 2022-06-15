@@ -18,7 +18,7 @@ polynEval(coef, x)
   The stable Horner rule is used for evaluation.
 
   Using the C code speeds up the already fast \R code available in
-  \code{\link[sfsmisc]{polyn.eval}()} in package \pkg{sfsmisc}.
+  \code{\link[sfsmisc]{polyn.eval}()} in package \CRANpkg{sfsmisc}.
 }
 \value{
   numeric vector or array, with the same dimensions as \code{x},

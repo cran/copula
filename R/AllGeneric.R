@@ -24,7 +24,7 @@ setGeneric("gofCopula", function(copula, x, ...) standardGeneric("gofCopula"))
 
 ## parameter names of _free_ parameters:
 setGeneric("paramNames", function(x) standardGeneric("paramNames"))
-setMethod("paramNames", "xcopula", function(x) paramNames(x@copula))
+setMethod("paramNames", "Xcopula", function(x) paramNames(x@copula))
 
 ##' @title Setting the parameter in a copula/Copula
 ##' @param x (general) copula
@@ -37,7 +37,7 @@ setGeneric("setTheta", function(x, value,
                                 na.ok = TRUE, noCheck = FALSE, freeOnly=TRUE, ...)
     standardGeneric("setTheta"), signature = c("x", "value"))
 
-setMethod("setTheta", "xcopula", ## set parameter for  daughter copula
+setMethod("setTheta", "Xcopula", ## set parameter for  daughter copula
 	  function(x, value, na.ok = TRUE, noCheck = FALSE, freeOnly=TRUE, ...) {
 	      x@copula <- setTheta(x@copula, value, na.ok=na.ok, noCheck=noCheck,
                                    freeOnly=freeOnly, ...)
@@ -49,7 +49,7 @@ setMethod("setTheta", "xcopula", ## set parameter for  daughter copula
 setGeneric("getTheta", function(copula, freeOnly = TRUE, attr = FALSE, named = attr)
     standardGeneric("getTheta"), signature = "copula")
 ## -- general methods --
-setMethod("getTheta", "xcopula", ## from  daughter copula
+setMethod("getTheta", "Xcopula", ## from  daughter copula
 	  function(copula, freeOnly = TRUE, attr = FALSE, named = attr)
 	      getTheta(copula@copula, freeOnly=freeOnly, attr=attr, named=named))
 ##' default methods [e.g. for khoudraj & indepCopula]: empty parameter

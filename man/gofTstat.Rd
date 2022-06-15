@@ -64,7 +64,7 @@ gofT2stat(u1, u2, useR = FALSE)
 \details{
   These functions should be used with care. The different test statistics
   were implemented (partly) for different purposes and goodness-of-fit
-  tests and should be used only with knowledge about such test (see the
+  tests and should be used only with knowledge about such tests (see the
   references for more details).
 }
 \value{

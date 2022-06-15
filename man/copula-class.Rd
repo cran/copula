@@ -6,9 +6,10 @@
 \alias{dimCopula-class}
 \alias{parCopula-class}
 \alias{xcopula-class}
+\alias{Xcopula-class}
 % methods
 \alias{dim,copula-method}
-\alias{dim,xcopula-method}
+\alias{dim,Xcopula-method}
 \alias{dim,dimCopula-method}
 \description{
   A copula is a multivariate distribution with uniform margins.
@@ -30,8 +31,11 @@
   package \pkg{copula}.  It has set of slots for (the dimension and)
   parameter vector, see below.
 
+  The virtual class \code{"Xcopula"} contains a slot \code{copula} of class
+  \code{"parCopula"}.
+
   The virtual class \code{"xcopula"} extends \code{"parCopula"} and
-  contains a slot \code{copula}; an (\dQuote{actual}) class example are
+  \code{"Xcopula"}; an (\dQuote{actual}) class example are
   the rotated copulas, \code{\linkS4class{rotCopula}}.
 }
 \section{Objects from the Class}{

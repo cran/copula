@@ -164,7 +164,6 @@
 \newcommand*{\IC}{\mathbb{C}}
 \newcommand*{\IP}{\Prob}
 \newcommand*{\IE}{\E}
-\newcommand*{\V}{\operatorname*{V}}
 \newcommand*{\abs}{\operatorname*{abs}}
 \renewcommand*{\S}{\operatorname*{S}}
 \newcommand*{\tS}{\operatorname*{\tilde{S}}}
@@ -177,20 +176,16 @@
 \newcommand*{\psiD}{\psi^\prime}
 \newcommand*{\psii}{{\psi^{-1}}}
 \newcommand*{\psiis}[1]{{\psi_{#1}^{-1}}}
-\renewcommand*{\L}{\mathcal{L}}
 \newcommand*{\Li}{\mathcal{L}^{-1}}
 \newcommand*{\LS}{\mathcal{LS}}
 \newcommand*{\LSi}{\LS^{-1}}
 \newcommand{\tr}{\ensuremath{^\mathsf{T}}}% or  ^{\intercal}
-\renewcommand*{\O}{\mathcal{O}}
+\renewcommand*{\O}{\mathcal{O}}% big O(.)
 \newcommand*{\Geo}{\operatorname*{Geo}}
 \newcommand*{\Exp}{\operatorname*{Exp}}
 \newcommand*{\Sibuya}{\operatorname*{Sibuya}}
 \newcommand*{\Log}{\operatorname*{Log}}
-\newcommand*{\U}{\operatorname*{U}}
-\newcommand*{\B}{\operatorname*{B}}
 \newcommand*{\NB}{\operatorname*{NB}}
-\newcommand*{\N}{\operatorname*{N}}
 \newcommand*{\Var}{\operatorname*{Var}}
 \newcommand*{\Cov}{\operatorname*{Cov}}
 \newcommand*{\Cor}{\operatorname*{Cor}}

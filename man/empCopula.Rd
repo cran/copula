@@ -11,7 +11,8 @@
   auxiliary tools.
 }
 \usage{
-empCopula(X, smoothing = c("none", "beta", "checkerboard"), offset = 0,
+empCopula(X, smoothing = c("none", "beta", "checkerboard",
+                           "schaake.shuffle"), offset = 0,
           ties.method = c("max", "average", "first", "last", "random", "min"))
 C.n(u, X, smoothing = c("none", "beta", "checkerboard"), offset = 0,
     ties.method = c("max", "average", "first", "last", "random", "min"))
@@ -37,12 +38,22 @@ toEmpMargins(U, x, ...)
   \item{x}{an \eqn{(m, d)}-\code{\link{matrix}} whose rows
     contain the evaluation points of the empirical distribution< function
     (if \code{smoothing = "none"}) or copula (if \code{smoothing != "none"}).}
-  \item{smoothing}{\code{\link{character}} string specifying whether
-    the empirical distribution function (for \code{F.n()}) or copula
-    (for \code{C.n()}) is computed (if \code{smoothing = "none"}),
-    or whether the empirical beta copula (\code{smoothing = "beta"})
-    or the empirical checkerboard  copula (\code{smoothing =
-      "checkerboard"}) is computed.}
+  \item{smoothing}{\code{\link{character}} string specifying the type of
+    smoothing of the empirical distribution function (for \code{F.n()})
+    or the empirical copula (for \code{C.n()}). Available are:
+    \describe{
+      \item{\code{"none"}}{the original empirical distribution function
+	or empirical copula.}
+      \item{\code{"beta"}}{the empirical beta smoothed distribution
+	function or empirical beta copula.}
+      \item{\code{"checkerboard"}}{empirical checkerboard construction.}
+      \item{\code{"schaake.shuffle"}}{in each dimension, \code{n}
+	(so \code{nrow(X)}-many) sorted standard uniforms are used
+	to construct a smooth sample, from which one draws with
+	replacement as many observations as required; only available
+	for the empirical copula and only for sampling.}
+    }
+  }
   \item{ties.method}{\code{\link{character}} string specifying how ranks should be computed if
     there are ties in any of the coordinate samples of \code{x}; passed
     to \code{\link{pobs}}.}
@@ -148,6 +159,11 @@ toEmpMargins(U, x, ...)
   Deheuvels, P. (1981).  A non parametric test for independence,
   \emph{Publ. Inst. Statist. Univ. Paris} \bold{26}, 29--50.
 
+  Clark, M., Gangopadhyay, S., Hay, L., Rajagopalan, B. and Wilby,
+  R. (2004). The Schaake Shuffle: A Method for Reconstructing Space-Time
+  Variability in Forecasted Precipitation and Temperature Fields.
+  \emph{Journal of Hydrometeorology}, pages 243-262.
+
   R\enc{é}{e}millard, B. and Scaillet, O. (2009). Testing for equality
   between two copulas. \emph{Journal of Multivariate Analysis}, 100(3),
   pages 377-386.
@@ -155,6 +171,10 @@ toEmpMargins(U, x, ...)
   Segers, J., Sibuya, M. and Tsukahara, H. (2017). The Empirical Beta
   Copula. \emph{Journal of Multivariate Analysis}, 155, pages 35--51,
   \url{https://arxiv.org/abs/1607.04430}.
+
+  Kiriliouk, A., Segers, J. and Tsukahara, H. (2020).
+  Resampling Procedures with Empirical Beta Copulas.
+  \url{https://arxiv.org/abs/1905.12466}.
 
   %% Genest, C., G. \enc{Nešlehová}{Neslehova}, J., and Quessy, J.-F. (2012).
   %% Tests of symmetry for bivariate copulas,
@@ -236,7 +256,6 @@ m <- 50
 U.orig  <-  rCopula(m, copula = ecop.orig)
 U.beta  <-  rCopula(m, copula = ecop.beta)
 U.check <-  rCopula(m, copula = ecop.check)
-## Note: They all obviously just resample from the original n = 10 observations
 
 ## Plot
 wireframe2(ecop.orig,  FUN = pCopula, draw.4.pCoplines = FALSE)

@@ -1,12 +1,12 @@
 Package: copula
-Version: 1.0-1
-VersionNote: Last CRAN: 1.0-0 on 2020-05-19
-Date: 2020-12-07
+Version: 1.1-0
+VersionNote: Last CRAN: 1.0-1 on 2020-12-07
+Date: 2022-06-14
 Title: Multivariate Dependence with Copulas
 Authors@R: c(person("Marius", "Hofert", role = "aut", email = "marius.hofert@uwaterloo.ca",       comment = c(ORCID = "0000-0001-8009-4665"))
 	   , person("Ivan", "Kojadinovic", role = "aut", email = "ivan.kojadinovic@univ-pau.fr",  comment = c(ORCID = "0000-0002-2903-1543"))
 	   , person("Martin","Maechler", role=c("aut","cre"), email="maechler@stat.math.ethz.ch", comment = c(ORCID = "0000-0002-8685-9910"))
-	   , person("Jun", "Yan", rol = "aut", email = "jun.yan@uconn.edu",                       comment = c(ORCID = "0000-0003-4401-7296"))
+	   , person("Jun", "Yan", role = "aut", email = "jun.yan@uconn.edu",                      comment = c(ORCID = "0000-0003-4401-7296"))
 	   , person(c("Johanna", "G."), "Nešlehová", role = "ctb", comment = c("evTestK()", ORCID = "0000-0001-9634-4796"))
 	   , person("Rebecca", "Morger", role = "ctb", comment = "fitCopula.ml(): code for free mixCopula weight parameters")
 	   )
@@ -37,7 +37,6 @@ Description: Classes (S4) of commonly used elliptical, Archimedean,
  cross-validation. Empirical copula, smoothed versions, and
  non-parametric estimators of the Pickands dependence function.
 License: GPL (>= 3) | file LICENCE
-ByteCompile: yes
 Collate: AllClass.R Classes.R AllGeneric.R Auxiliaries.R aux-acopula.R
         asymCopula.R mixCopula.R rotCopula.R Copula.R special-func.R
         amhCopula.R claytonCopula.R frankCopula.R cop_objects.R
@@ -51,12 +50,17 @@ Collate: AllClass.R Classes.R AllGeneric.R Auxiliaries.R aux-acopula.R
         huslerReissCopula.R huslerReissExpr.R indepCopula.R fhCopula.R
         lowfhCopula.R upfhCopula.R indepTests.R joeCopula.R K.R
         logseries.R mvdc.R margCopula.R matrix_tools.R normalCopula.R
-        opower.R plackettCopula.R plackettExpr.R moCopula.R rstable1.R
-        safeUroot.R schlatherCopula.R stable.R timing.R tCopula.R
-        tawnCopula.R tawnExpr.R tevCopula.R varianceReduction.R
-        wrapper.R xvCopula.R zzz.R
+        obs.R opower.R plackettCopula.R plackettExpr.R moCopula.R
+        rstable1.R safeUroot.R schlatherCopula.R stable.R timing.R
+        tCopula.R tawnCopula.R tawnExpr.R tevCopula.R
+        varianceReduction.R wrapper.R xvCopula.R zzz.R
 Encoding: UTF-8
-URL: http://copula.r-forge.r-project.org/
+URL: https://copula.r-forge.r-project.org/,
+        https://r-forge.r-project.org/projects/copula/,
+        https://CRAN.r-project.org/package=copula
+BugReports: https://r-forge.r-project.org/tracker/?func=add&group_id=2140&atid=5417
+NeedsCompilation: yes
+Packaged: 2022-06-14 20:15:11 UTC; maechler
 Author: Marius Hofert [aut] (<https://orcid.org/0000-0001-8009-4665>),
   Ivan Kojadinovic [aut] (<https://orcid.org/0000-0002-2903-1543>),
   Martin Maechler [aut, cre] (<https://orcid.org/0000-0002-8685-9910>),
@@ -67,9 +71,4 @@ Author: Marius Hofert [aut] (<https://orcid.org/0000-0001-8009-4665>),
     parameters)
 Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
 Repository: CRAN
-Repository/R-Forge/Project: copula
-Repository/R-Forge/Revision: 1850
-Repository/R-Forge/DateTimeStamp: 2020-12-11 15:17:41
-Date/Publication: 2020-12-12 15:30:26 UTC
-NeedsCompilation: yes
-Packaged: 2020-12-11 15:33:19 UTC; rforge
+Date/Publication: 2022-06-15 09:20:05 UTC

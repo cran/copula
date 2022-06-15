@@ -28,7 +28,7 @@ Bernoulli.all(n, method = c("A-T", "sumBin", "sumRamanujan", "asymptotic"),
     \code{"sumRamanujan"} is somewhat more efficient but not yet implemented.}
   \item{precBits}{currently only for \code{method = "A-T"} --
     \code{NULL} or a positive integer indicating the precision of the
-    initial numbrs in bits, using \pkg{"Rmpfr"}'s package multiprecision
+    initial numbers in bits, using package \CRANpkg{Rmpfr}'s multiprecision
     arithmetic.}
   \item{verbose}{(for \code{"A-T"}:) logical indicating if the
     intermediate results of the algorithm should be printed.}

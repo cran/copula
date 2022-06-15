@@ -9,7 +9,7 @@
 \docType{methods}
 \description{
   Methods for \code{contourplot2()}, a version of
-  \code{\link[lattice]{contourplot}()} from \pkg{lattice}, to draw
+  \code{\link[lattice]{contourplot}()} from \CRANpkg{lattice}, to draw
   contour plots of two dimensional distributions from package \pkg{copula}.
 }
 \usage{

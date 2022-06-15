@@ -1,4 +1,4 @@
-## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
+## Copyright (C) 2021 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
 ## This program is free software; you can redistribute it and/or modify it under
 ## the terms of the GNU General Public License as published by the Free Software
@@ -33,13 +33,13 @@ u3 <- cbind(uu, round(runif(10),2))
 ## fit1() here catches the error: "irho" not available for "tCopula":
 (f1 <- fit1(tCopula(df.fixed=TRUE), x = uu))
 stopifnot(identical(f1, fit1(tCopula(df.fixed=TRUE),
-			     x = data.frame(uu))))# *WITH* a warning
+			     x = data.frame(uu))))# *WITH* a warning; keep data.frame() working!
 ## did not work with data.frame before 2012-08-12
 
 ## for df.fixed=FALSE, have 2 parameters ==> cannot use "fit1":
 (f2.t <- fitCopula(tCopula(), uu, method="itau"))# (+ warning: ... 'df.fixed=TRUE' )
-tools::assertError( ## 14.Jan.2016: irho(<tCopula>) has been "non-sense" -> now erronous:
-    fitCopula(tCopula(), uu, method="irho"))
+assertError( ## 14.Jan.2016: irho(<tCopula>) has been "non-sense" -> now erronous:
+    fitCopula(tCopula(), uu, method="irho"), verbose=TRUE)
 showProc.time()
 if(doExtras) {
     print(f2.m <- fitCopula(tCopula(), uu, method=  "ml"))
@@ -66,11 +66,18 @@ if(FALSE) ## Error: iRho() method for class "tCopula" not yet implemented
 (f3.r  <- fitCopula(tC3, u3, method="irho"))
 showProc.time()
 
+octr <- list(trace=TRUE, REPORT=1, reltol = 1e-5)# less accurate than by default
 if(doExtras) {
-    print(f3.m <- fitCopula(tC3, u3, method=  "ml")); c.m <- coef(f3.m, SE=TRUE)
-    print(f3.M <- fitCopula(tC3, u3, method= "mpl")); c.M <- coef(f3.M, SE=TRUE)
+    fitC.m <- function(C, data, method, ...)
+        fitCopula(C, data, method=method, optim.control=octr, traceOpt=TRUE, ...)
+    print(f3.m <- fitC.m(tC3, u3, method=  "ml")); c.m <- coef(f3.m, SE=TRUE)
+    print(f3.M <- fitC.m(tC3, u3, method= "mpl")); c.M <- coef(f3.M, SE=TRUE)
     showProc.time()
-    stopifnot(all.equal(c.m[,1], c.M[,1])) # the estimates don't differ; the SE's do
+    is.matrix(print(c.m))
+    is.character(SE <- "Std. Error")
+    stopifnot(all.equal(c.m[,1], c.M[,1]), # the estimates don't differ; the SE's do:
+              c.M[-4,SE] >= c.m[-4,SE],
+              c.m[, SE]  > 0)
 }
 
 set.seed(17)
@@ -121,6 +128,7 @@ print(summary(tc.ml <-
                             start=c(0,0,0, 10))))
 print(summary(tc.ml. <-
                   fitCopula(tCopula(dim=3, dispstr="un"), x, method="ml")))# w/o 'start'
+
 ## Maximum pseudo-likelihood (the asymptotic variance cannot be estimated)
 u <- pobs(x)
 print(tc.mpl <- fitCopula(tCopula(dim=3, dispstr="un"),
@@ -147,7 +155,7 @@ print(tcF.mpl <- fitCopula(tC3u5, u, method="mpl", estimate.variance=FALSE,
                            start=c(0,0,0)))
 print(tcF.mp. <- fitCopula(tC3u5, u, method="mpl", estimate.variance=FALSE))
 assert.EQ(noC(tcF.mpl), noC(tcF.mp.), tol = 1e-5)
-} # end Xtras
+} # end Extras ----------------------------------------------------
 
 ## fitMvdc() -- first 2 D -- from Yiyun Shou's bug report: ---------------------
 
@@ -161,18 +169,17 @@ getTheta(mvt.2.ne, attr = TRUE) # - shows only the copula parameter -- FIXME !
 ## simulate data and fit:
 set.seed(17); x.samp <- rMvdc(250, mvt.2.ne)
 fit2ne <- fitMvdc(x.samp, mvt.2.ne, start= c(1,1,1, rho = 0.5),
-                  optim.control = list(trace = TRUE, maxit = 2000), hideWarnings=FALSE)
+                  optim.control = list(trace = TRUE), hideWarnings=FALSE)
 summary(fit2ne)
 (confint(fit2ne) -> ci.2ne)
-stopifnot(
+stopifnot(exprs = {
     all.equal(coef(fit2ne),
               c(m1.mean=0.061359521, m1.sd=2.0769423,
                 m2.rate=2.0437937, rho.1 = 0.15074002), tol=1e-7)# seen 1.48e-8
-   ,
     all.equal(c(ci.2ne),
               c(-0.18309, 1.9064, 1.8019, 0.012286,
                  0.30581, 2.2474, 2.2857, 0.28919), tol = 4e-4) # seen 1.65e-5
-)
+})
 
 
 
@@ -197,8 +204,11 @@ if(doExtras) {
     st <- system.time(
         fMv <- fitMvdc(X, gMvGam, start = c(1,1,1,1, 1.3),# method="BFGS",
                        optim.control= list(trace=TRUE)))
-    print(st) # ~ 59 sec. (lynne 2015)
+    print(st) # ~ 59 sec. (lynne 2015); ~ 47 sec (2020)
     print(summary(fMv))
+    cfM <- coef(fMv, SE=TRUE)
+    print(    all.equal(c(2,3, 4,1, 3), unname(cfM[,"Estimate"]))) # 0.01518
+    stopifnot(all.equal(c(2,3, 4,1, 3), unname(cfM[,"Estimate"]), tol = 0.02))
 }
 
 pFoo <- function(x, lower.tail=TRUE, log.p=FALSE)
@@ -215,7 +225,8 @@ stopifnot(nrow(R <- rMvdc(3, mv1)) == 3, ncol(R) == 2)
 assertError(
   mvW <- mvdc(gumbelC, c("gamma","Foo"), param= list(list(3,1), list(NULL)))
 , verbose=TRUE)
-## must not valid: stopifnot(!isTRUE(validObject(mvW, test=TRUE)))
+## >> invalid class “mvdc” object: 'paramMargins[[2]]' must be named properly
+
 
 showProc.time()
 
@@ -234,10 +245,20 @@ try(fgu <- fitCopula(gumbel, u, method = "ml"))
 ## In addition: Warning message:
 ## In .local(copula, tau, ...) : tau is out of the range [0, 1]
 copGumbel@paraInterval # -> [1, Inf) = exp([0, Inf))
-par <- 2^c((0:32)/16, 2+(1:10)/8)
+length(par <- 2^c((0:32)/16, 2+(1:10)/8)) # 43
+(t1 <- system.time(
 llg <- sapply(par, function(p) loglikCopula(param=p, u=u, copula=gumbel))
+))
+(t2 <- system.time(
+llg. <- loglikCopulaMany(par, u=u, copula=gumbel)
+))
+all.equal(llg, llg., tol=0)
 if(dev.interactive()) plot(par, llg, type="b", col=2)
-stopifnot(diff(llg) < 0) # so the maximum is for par = 2^0 = 1 --> at *boundary* of interval
+stopifnot(exprs = {
+    diff(llg) < 0 # so the maximum is for par = 2^0 = 1 --> at *boundary* of interval
+    all.equal(llg, llg., tol=4e-16) # see 0 diff (Lnx 64b)
+})
+
 ## FIXME -- "ml" should return the boundary case, or a much better error message
 ## These work (with a warning {which is interesting, but maybe should not be a warning}
 ## "perfectly": They give the correct boundary case:
@@ -286,11 +307,9 @@ n <- 504
 d <- 413
 d <- 50 # more realistic -- should become faster !!
 U <- matrix(runif(n*d), nrow=n, ncol=d)
-if(FALSE) ## takes ??? (> one hour)
-## try  maxiter =  / trace =  to see what's happening
+if(FALSE) ## takes ??? (> one hour); *control = octr : some trace, not too accurate
 system.time(fit <- fitCopula(ellipCopula("t", dim=d, dispstr="un"),
-                             data=U, method="mpl"))
-
+                             data=U, method="mpl", optim.control = octr))
 
 ## > Warning in makePosDef(sigma, delta = 0.001) :
 ## >   Estimate is not positive-definite. Correction applied.
@@ -322,9 +341,32 @@ fG <- fitCopula(gumbelCopula(), x)
 	xv.5   = xvCopula(gumbelCopula(), x, k = 5)))# 5-fold CV
 stopifnot(all.equal(unname(v), c(32.783677, 32.835744, 32.247463),
 		    tolerance = 1e-7))
-# now also with rotCopula:
-xvR <- xvCopula(rotCopula(claytonCopula()), x, k = 8)
+
+## now also with rotCopula: --
+## NB: upper=NA / upper=Inf is *better* for optim(*, "L-BFGS-B")  than upper= "Large" !!!
+## --- (this is a puzzle in optim() itself !)
+if(FALSE)# has been useful:
+trace(copula:::fitCopula.ml,
+      trace = quote({cat("in fitCopula.ml(): copula=\n");print(copula)})
+      )
+if(FALSE) ## explicit upper=Inf "works" (*not* finding very good value:
+    print(ff <- fitCopula(rotCopula(claytonCopula()), upper=NA, x, traceOpt=TRUE))
+if(FALSE) ## explicit upper=Inf or =NA work; upper=100 "fails" giving bad result !
+    print(f1c <- fitCopula(rotCopula(claytonCopula()), upper=100, x, traceOpt=TRUE))
+if(FALSE) ## "Brent" instead of default "L-BFGS-B" -- "works" very nicely with upper=100,
+    print(fB <- fitCopula(rotCopula(claytonCopula()), upper=100, x,
+                          optim.method="Brent",traceOpt=TRUE))
+## but *not* with upper=Inf or NA (--> error: .. must be finite..) or upper = 1e300  !!
+try( fitCopula(rotCopula(claytonCopula()), upper=Inf, x, optim.method="Brent"))
+try( fitCopula(rotCopula(claytonCopula()), upper=NA,  x, optim.method="Brent"))
+if(FALSE) ## very bad ('start' is not used with "Brent", but the upper bound is!)
+    print(fBL <- fitCopula(rotCopula(claytonCopula()), upper=1e300, x,
+                           optim.method="Brent",traceOpt=TRUE))
+
+## this "works" with 'Inf', but not with default --> upper = <large> !
+(xvR <- xvCopula(rotCopula(claytonCopula()), upper = Inf, x, k = 8, verbose=FALSE))
 stopifnot(all.equal(xvR, 21.050569, tolerance = 1e-6))
+
 ## Now 'copula2 = indepCopula(..) gets 'dim = 3' from the first:
 kh.C <- khoudrajiCopula(claytonCopula(2.5, dim=3), shapes = (1:3)/4)
 kh.C
@@ -339,31 +381,48 @@ fK <- fitCopula(kh.C, u3)
 p1 <- (1:20)/2
 l1 <- sapply(p1, function(th1) loglikCopula(c(th1, (1:3)/4), u3, kh.C))
 plot(p1, l1, type = "b") # nice maximum at around 6.xx
+showProc.time()
 
 ## works two:
 fixedParam(kh.C) <- c(FALSE, FALSE, TRUE,TRUE)
 getTheta(kh.C)
-summary(fK12 <- fitCopula(kh.C, u3)) # <== now (2020-04-28) suddenly gives error
+summary(fK12 <- fitCopula(kh.C, u3))
 fixedParam(kh.C) <- FALSE # all free now
 fK4 <- fitCopula(kh.C, u3, start = c(coef(fK12), 0.3, 0.5),
-                 optim.method = "L-BFGS-B")
+                 optim.method = "L-BFGS-B", traceOpt=TRUE)
 summary(fK4)
 ## -> shape1 ~= shape2 ~= 0
+## dput(signif(unname(coef(fK4)), 8))
+c4 <- c(4.4482535, 0, 0, 0.63730128)
+all.equal(c4, unname(coef(fK4)), tol=0)# 7.342e-9
+stopifnot(all.equal(c4, unname(coef(fK4)), tol=4e-8))
+showProc.time()
 
+kh.r.C <- khoudrajiCopula(rotCopula(claytonCopula(1.5)), shapes = c(1,3)/4)
+u.krC <- rCopula(999, kh.r.C)
+fm.krC <- fitCopula(copula = kh.r.C, data = u.krC, traceOpt=TRUE)# works (w/ warning)
+xvK.R  <- xvCopula(kh.r.C, u.krC, k = 10)
+showProc.time()
 
-if(FALSE) ## FIXME !! --
-kh.r.C <- khoudrajiCopula(rotCopula(claytonCopula()), shapes = c(1,3)/4)
-## xvK.R <- xvCopula(
-
-##                   )
 
 ## From: Ivan, 27 Jul 2016 08:58
+set.seed(123)
 u <- pobs(rCopula(300, joeCopula(4)))
 fjc <- fitCopula(joeCopula(), data = u, method = "itau")
 ## Now a warning.  Previously gave 'Error in dCor(cop) :'
 ##   dTau() method for class "joeCopula" not yet implemented
 summary(fjc)
-
+all.equal(target = c(alpha = 4),  coef(fjc))
+fjcM <- fitCopula(joeCopula(), data = u, start = coef(fjc))
+confint(fjcM)# 2.5 %   97.5 %
+##    alpha 3.077266 4.294797
+summary(fjcM)
+if(FALSE)
+ dput(signif(drop(coef(fjcM, SE=TRUE)), 4))
+stopifnot(
+    all.equal(c(Estimate = 3.686, `Std. Error` = 0.31),
+              drop(coef(fjcM, SE=TRUE)), tol = 0.0002) # seen 0.000158
+)
 
 
 if(!doExtras) q(save="no") ## so the following auto prints
@@ -377,7 +436,6 @@ if(!doExtras) q(save="no") ## so the following auto prints
 ##_FIXME_ since ca.end of 2015, this gives *different error*: iRho() not available for 'tCopula's'
 rtx <- tstFit1cop(tCopula(df.fixed=TRUE), tau.set=c(.4, .8),
                   n.set= c(10, 25), N=64)
-
 ## for df.fixed=FALSE, have 2 parameters ==> cannot use "fit1":
 ## ....
 ## .... TODO
@@ -385,32 +443,61 @@ rtx <- tstFit1cop(tCopula(df.fixed=TRUE), tau.set=c(.4, .8),
 showProc.time()
 
 ## The other example  with 'df' (fixed / free):
-(tevc <- tevCopula(iTau(tevCopula(), 0.75)))
+(tevc <- tevCopula(iTau(tevCopula(), 0.75))) ##   rho.1 = 0.9751784, df = 4
 set.seed(1); str(x <- rCopula(1000, tevc))
 plot(x, main = "1000 samples of tevCopula(iTau(tevCopula(), 0.75))")
-fitCopula(tevCopula(),		    x, method="irho")# warning
-fitCopula(tevCopula(df.fixed=TRUE), x, method="itau")# fine
-showProc.time()# this takes l..o..n..g :
-fitCopula(tevCopula(df.fixed=TRUE), x)# two warnings ==> do not estimate.var:
-showProc.time()# this takes l..o..n..g :
-fitCopula(tevCopula(df.fixed=TRUE), x, estimate.variance=FALSE)
-showProc.time()# this takes l..o..n..g :
-fitCopula(tevCopula(df.fixed=TRUE), x, method="ml")
+mirho <- fitCopula(tevCopula(),		     x, method="irho")# warning -> 'df.fixed=TRUE"
+mitau <- fitCopula(tevCopula(df.fixed=TRUE), x, method="itau")# fine
+cfR <- coef(mirho, SE=TRUE)
+cfT <- coef(mitau, SE=TRUE)
+stopifnot(
+    all.equal(0.97, cfR[[1]], tol=1e-4)# see 3.65e-5
+)
+system.time(
+fmM. <- fitCopula(tevCopula(df.fixed=TRUE), x)# two warnings ==> do not estimate.var:
+) # 23.5 sec -- the expensive part was trying get and invert the Hessian
+system.time(
+fmM <- fitCopula(tevCopula(df.fixed=TRUE), x, estimate.variance=FALSE)
+) # 0.22 sec  !!
+stopifnot( all.equal(coef(fmM), coef(fmM.), tol=1e-15)) # even tol=0
+system.time(
+fML <- fitCopula(tevCopula(df.fixed=TRUE), x, method="ml")
+)# 0.24 sec: very fast, too
 showProc.time()
 ## 'df' is not estimated, but it should
-fitCopula(tevCopula(),		    x)# df as parameter, but "kept at df := 4" (FIXME?)
+## see above:  tevCopula() is treated as tevCopula(df.fixed=TRUE))
+system.time(
+fM2  <- fitCopula(tevCopula(),		    x)# df as parameter, -- for var() kept at df = 2.53
+) # 24s
+system.time(
+fM2. <- fitCopula(tevCopula(), 		    x, estimate.variance=FALSE)
+) # 0.44 sec
+system.time(
+fMm <- fitCopula(tevCopula(), 		    x, method="ml")
+) # 0.56
 showProc.time()
-fitCopula(tevCopula(), 		    x, estimate.variance=FALSE)
-showProc.time()
-fitCopula(tevCopula(), 		    x, method="ml")# currently ~= the one above
-showProc.time()
+c2  <- coef(fM2 , SE=TRUE)
+c2. <- coef(fM2., SE=TRUE)
+cm  <- coef(fMm,  SE=TRUE) ; cm # full
+all.equal(c2[,1], c2.[,1], tol=0)
+all.equal(c2[,1], cm [,1], tol=0)
+stopifnot(exprs = {
+    ## coef : 'rho'1' are the same
+    all.equal(c2[,1], c2.[,1], tol=1e-15)
+    all.equal(c2[,1], cm [,1], tol=1e-15)
+    all.equal(c(rho.1 = 0.96206, df = 2.5306), cm[,"Estimate"], tol=5e-5) # seen 5.62e-6
+    ## Std.Error do differ: dput(signif(cm[,2], 4))
+    all.equal(c(rho.1 = 0.00663, df = 0.457), cm[,"Std. Error"], tol=0.002)# seen 0.0007
+})
 
+showProc.time()
 set.seed(7)
-try(# now works .. slowly!
+system.time(# now works .. slowly!
 rtevx <- tstFit1cop(tevCopula(, df.fixed=TRUE),
                     tau.set= c(.5, .75), n.set=c(10, 25), N=32)
-)##--> singular linear system (Lapack ...)
-## now "non-finite finite-difference {in optim()}
+)
+## gives several "non-finite finite-difference {in optim()}
+rtevx ## some NaN, NA
 
 ## for df.fixed=FALSE, have 2 parameters ==> cannot use "fit1":
 ## ....
@@ -424,10 +511,8 @@ splom2(rdj, cex=0.4, ## this gave an error for a day or so:
 dim(u <- pobs(rdj))# 1262 3
 fc <- frankCopula(dim=3)
 ffc <- fitCopula(fc, u) ## (failed in 0.999-4 {param constraints})
-ffc
-## summary(ffc) -- *not* useful -- FIXME: needs print.summary.fitCopula()
-stopifnot(all.equal(unname(coef(ffc)),
-                    2.866564929, tolerance = 1e-5))
+summary(ffc)
+stopifnot(all.equal(2.866565, unname(coef(ffc)), tolerance = 1e-5))
 
 showProc.time()
 

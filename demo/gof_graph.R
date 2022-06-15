@@ -399,10 +399,11 @@ which(pmatN < 0.05, arr.ind=TRUE) # => none (so the margins cause non-normality 
 which(pmatt < 0.05, arr.ind=TRUE) # => none (fine)
 
 ## testing *multivariate normality*
-stopifnot(require(mvnormtest))
-mshapiro.test(t(x)) ## => *not* a multivariate normal distribution
-mshapiro.test(t(qnorm(u)))
-## => also not a Gauss copula after removing marginal non-Gaussianity
+if(require("mvnormtest")) withAutoprint({
+  mshapiro.test(t(x)) ## => *not* a multivariate normal distribution
+  mshapiro.test(t(qnorm(u)))
+  ## => also not a Gauss copula after removing marginal non-Gaussianity
+})
 
 ## Well, look at the 1D margins :
 print(Pm <- apply(x, 2, function(u) shapiro.test(u)$p.value))

@@ -176,9 +176,9 @@ setMethod(describeCop, c("rotCopula", "character"), function(x, kind, prefix="",
 
 ## Internal. swicth u[,i] to 1 - u[,i] according to flip
 apply.flip <- function(u, flip) {
-    if(identical(flip, TRUE))
+    if(isTRUE(flip))
         1 - u
-    else if(identical(flip, FALSE))
+    else if(isFALSE(flip))
         u
     else {
         u[,flip] <- 1 - u[,flip]

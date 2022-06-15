@@ -62,7 +62,7 @@ importFrom("lattice", trellis.par.get, trellis.par.set,
            standard.theme, panel.fill, panel.splom, diag.panel.splom,
            panel.3dwire, ltransform3dto3d, lsegments)
 
-importFrom("Matrix", nearPD)
+importFrom("Matrix", nearPD, invPerm)
 ## NB: "Dangerous" to not also depend on Matrix; as 'methods' for Matrixclasses are not seen.
 
 importFrom("gsl", debye_1, debye_2, dilog, complex_dilog)
@@ -120,7 +120,7 @@ exportMethods(## for "other" (i.e. non copula-package !) generics:
 ## Part I: Mainly former copula ----------------------------------------
 
 exportClasses(mvdc)
-#
+# note: have virtual classes we do *not* export: e.g, dimCopula , Xcopula
 exportClasses(Copula, parCopula, xcopula, copula, # virtual classes
 	      ellipCopula, archmCopula, evCopula, fhCopula)
 exportClasses(normalCopula, tCopula)
@@ -180,12 +180,14 @@ exportClasses(mixCopula) # , parClist , mixWeights  (TODO, notably 'parClist' ??
 
 ## auxiliary functions mainly used for working with elliptical copulas:
 export(p2P, P2p, getSigma, extremePairs)
+export(dispstrToep)
 
 ## empirical copula
 export(F.n, dCn, C.n, toEmpMargins) # .Fn
 
 ## fitting copula
 export(loglikCopula, loglikMvdc)
+export(loglikCopulaMany)
 export(fitCopula, fitMvdc, optimMeth)
 exportClasses(fittedMV, fitCopula, fitMvdc)
 
@@ -265,11 +267,13 @@ exportClasses("acopula",
 export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        , .ac.shortNames, .ac.longNames, .ac.objNames, .ac.classNames
        ,"getAcop", "getAname"
-       , "dnacopula", "pnacopula", "rnacopula", "rnchild"
+       ,"dnacopula", "pnacopula", "rnacopula", "rnchild"
+       ## marginal transformations
+       ,"pobs"
        ## estimation
        ,"coeffG" ## , "polyG", "polyJ", "signFF"
        ,"initOpt"
-       ,"beta.", "betan", "pobs"
+       ,"beta.", "betan"
        ,"debye1", "debye2" # <- since we extend the gsl ones
        ,"ebeta", "etau", "emde", "dDiag", "edmle", "emle", "enacopula"
        ## goodness-of-fit

@@ -14,10 +14,19 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-if((Rv <- getRversion()) < "3.5.0") {
-  if(Rv < "3.2.0") {
-    lengths <- function (x, use.names = TRUE) vapply(x, length, 1L, USE.NAMES = use.names)
-    ## now have  Depends: R (>= 3.1.0)
+Rv <- getRversion()
+if(Rv < "4.1.0") {
+  ## not equivalent: this *forces*  '...' entries whereas true  ...names()  won't
+  ...names <- function() eval(quote(names(list(...))), sys.frame(-1L))
+  if(Rv < "4.0.0") {
+      deparse1 <- function (expr, collapse = " ", width.cutoff = 500L, ...)
+          paste(deparse(expr, width.cutoff, ...), collapse = collapse)
+      ## not equivalent ...
+      ...length <- function() eval(quote(length(list(...))), sys.frame(-1L))
+   ## now have  Depends: R (>= 3.5.0)
+   ## if(Rv < "3.5.0") {
+    ## if(Rv < "3.2.0") {
+    ##   lengths <- function (x, use.names = TRUE) vapply(x, length, 1L, USE.NAMES = use.names)
     ## if(Rv < "3.1.0") {
     ##     anyNA <- function(x) any(is.na(x))
     ##     if(Rv < "3.0.0") {
@@ -26,11 +35,13 @@ if((Rv <- getRversion()) < "3.5.0") {
     ##             paste0 <- function(...) paste(..., sep = '')
     ##     }
     ## }
-  } ## R < 3.2.0
-
-  isTRUE  <- function (x) is.logical(x) && length(x) == 1L && !is.na(x) &&  x
-  isFALSE <- function (x) is.logical(x) && length(x) == 1L && !is.na(x) && !x
-}
+    ## } ## R < 3.2.0
+   ## isTRUE  <- function (x) is.logical(x) && length(x) == 1L && !is.na(x) &&  x
+   ## isFALSE <- function (x) is.logical(x) && length(x) == 1L && !is.na(x) && !x
+   ## }
+  } ## R < 4.0.0
+} ## R < 4.1.0
+rm(Rv)
 
 #### Functions and Methods for "acopula" objects
 #### class definition in ./AllClass.R
@@ -1452,7 +1463,7 @@ setMethod(show, "acopula", function(object) printAcopula(object))
 
 ## This is now exported & has help file --> ../man/printNacopula.Rd :
 printNacopula <-
-    function(x, labelKids = NA, deltaInd = if(identical(labelKids,FALSE)) 5 else 3,
+    function(x, labelKids = NA, deltaInd = if(isFALSE(labelKids)) 5 else 3,
              indent.str="",
              digits = getOption("digits"), width = getOption("width"), ...)
 {

@@ -30,9 +30,9 @@ emle(u, cop, n.MC=0, optimizer="optimize", method,
   }
   \item{optimizer}{a string or \code{NULL}, indicating the optimizer to
     be used, where \code{NULL} means to use \code{\link{optim}} via the
-    standard \R function \code{\link[stats4]{mle}()} from package \pkg{stats4},
+    standard \R function \code{\link[stats4]{mle}()} from (base \R) package \pkg{stats4},
     whereas the default, \code{"optimize"} uses \code{\link{optimize}} via
-    the \R function \code{\link[bbmle]{mle2}()} from package \pkg{bbmle}.}
+    the \R function \code{\link[bbmle]{mle2}()} from package \CRANpkg{bbmle}.}
   \item{method}{only when \code{optimizer} is \code{NULL} or
     \code{"optim"}, the method to be used for \code{\link{optim}}.}
   \item{interval}{bivariate vector denoting the interval where

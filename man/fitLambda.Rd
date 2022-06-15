@@ -5,8 +5,8 @@
   Computing non-parametric estimators of the (matrix of) tail-dependence coefficients.
 }
 \usage{
-fitLambda(u, method = c("Schmid.Schmidt", "t"), p = min(100/nrow(u), 0.1),
-          lower.tail = TRUE, verbose = FALSE, ...)
+fitLambda(u, method = c("Schmid.Schmidt", "Schmidt.Stadtmueller", "t"),
+          p = 1/sqrt(nrow(u)), lower.tail = TRUE, verbose = FALSE, ...)
 }
 \arguments{
   \item{u}{\eqn{n\times d}{n x d}-\code{\link{matrix}} of (pseudo-)observations in
@@ -16,7 +16,12 @@ fitLambda(u, method = c("Schmid.Schmidt", "t"), p = min(100/nrow(u), 0.1),
     \describe{
       \item{\code{method = "Schmid.Schmidt"}:}{nonparametric estimator
 	of Schmid and Schmidt (2007) (see also Jaworksi et al. (2009, p. 231))
-        computed for all pairs.}
+        computed for all pairs (pairwise conditional Spearman's rho
+	for \code{u <= p}).}
+      \item{\code{method = "Schmidt.Stadtmueller"}:}{nonparametric
+        estimator of Schmidt and Stadtmueller (2006)
+        computed for all pairs (pairwise empirical tail copula
+	for \code{u <= p}).}
       \item{\code{method = "t"}:}{fits pairwise \eqn{t} copulas and
 	returns the implied tail-dependence coefficient.}
     }
@@ -25,7 +30,9 @@ fitLambda(u, method = c("Schmid.Schmidt", "t"), p = min(100/nrow(u), 0.1),
     \code{tail = "lower"}) or above (for \code{tail = "upper"}) which
     the estimation takes place.}
   \item{lower.tail}{\code{\link{logical}} indicating whether the lower
-    (the default) or upper tail-dependence coefficient is computed.}
+    (the default) or upper tail-dependence coefficient is computed; in
+    case of the latter, the lower tail dependence coefficient of
+    the flipped data \code{1-u} is computed.}
   \item{verbose}{a \code{\link{logical}} indicating whether a progress
     bar is displayed.}
   \item{\dots}{additional arguments passed to the underlying functions
@@ -58,6 +65,11 @@ fitLambda(u, method = c("Schmid.Schmidt", "t"), p = min(100/nrow(u), 0.1),
   Spearman's rho and related measures of tail dependence.
   \emph{Journal of Multivariate Analysis} \bold{98}, 1123--1140.
   \doi{10.1016/j.jmva.2006.05.005}
+
+  Schmidt, R., Stadtmueller, U. (2006). Non-parametric Estimation of
+  Tail Dependence.
+  \emph{Scandinavian Journal of Statistics} \bold{33}(2), 307--335.
+  \doi{10.1111/j.1467-9469.2005.00483.x}
 }
 \examples{
 n <- 10000 # sample size

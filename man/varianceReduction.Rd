@@ -30,9 +30,10 @@ rLatinHypercube(u, ...)
   can be used for the variance-reduction method of (componentwise)
   antithetic variates.
 
-  \code{rLatinHypercube()} takes any copula sample, componentwise
-  randomizes its ranks minus 1 and then divides by the sample size in
-  order to obtain a Latin hypercubed sample.
+  \code{rLatinHypercube()} takes any copula sample,
+  shifts its marginal ranks minus 1 by standard uniforms and then
+  divides by the sample size in order to obtain a Latin hypercubed
+  sample.
 }
 %\author{Marius Hofert}
 %% \seealso{

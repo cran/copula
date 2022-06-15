@@ -31,22 +31,22 @@ normalCopula <- function(param = NA_real_, dim = 2L, dispstr = "ex") {
 }
 
 
-rnormalCopula <- function(n, copula)
+rnormalCopula <- function(n, copula, ...)
     pnorm(rmvnorm(n, sigma = getSigma(copula)))
 
-pmvnormAlgo <- function(dim, x, ...) {
+pmvnormAlgo <- function(dim, x, checkCorr = FALSE, ...) {
     if(dim <= 3 && !anyNA(x) && (!any(xI <- x == Inf) || all(xI)))
         TVPACK(...)
     else if(dim <= 5)
-        Miwa(...)
+        Miwa(checkCorr=checkCorr, ...)
     else
         GenzBretz(...)
 }
 
-pnormalCopula <- function(u, copula, algorithm = NULL, ...)
+pnormalCopula <- function(u, copula, algorithm = NULL, keepAttr=FALSE, ...)
 {
   dim <- copula@dimension
-  ## stopifnot(is.matrix(u), ncol(u) == dim) # <- as called from pCopula()
+  ## stopifnot(is.matrix(u), ncol(u) == dim) # not needed, as called from pCopula()
   i.lower <- rep.int(-Inf, dim)
   sigma <- getSigma(copula)
   apply(qnorm(u), 1, function(x)
@@ -55,7 +55,7 @@ pnormalCopula <- function(u, copula, algorithm = NULL, ...)
           if(is.null(algorithm))
               algorithm <- pmvnormAlgo(dim, x=x, ...)
           pmvnorm(lower = i.lower, upper = x,
-                  sigma=sigma, algorithm=algorithm, ...)
+                  sigma=sigma, algorithm=algorithm, keepAttr=keepAttr, ...)
       })
 }
 
@@ -110,15 +110,9 @@ dmvnorm <- function (x, mean, sigma, log=FALSE)
 
 
 
-printNormalCopula <- function(x, ...) {
-  printCopula(x, ...)
-  if (x@dimension > 2) cat("dispstr: ", x@dispstr, "\n")
-  invisible(x)
-}
-
 ## as long we think we need print.copula(), we also need this:
-print.normalCopula <- printNormalCopula
-setMethod("show", signature("normalCopula"), function(object) printNormalCopula(object))
+print.normalCopula <- printEllipCopula
+setMethod("show", signature("normalCopula"), function(object) printEllipCopula(object))
 
 
 lambdaNormalCopula <- function(copula) {

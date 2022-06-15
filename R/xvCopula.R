@@ -43,7 +43,7 @@ xvCopula <- function(copula, x, k=NULL, verbose = interactive(),
     stopifnot(k >= 2L, 
               (p <- n %/% k) >= 1L) # ideal size of blocks; blocks of size p+1 may exist
 
-    if(k < n) ## shuffle lines of x  if 2 <= k < n
+    if(k < n) ## shuffle rows of x  if 2 <= k < n
 	x <- x[sample.int(n), ]
 
     ## setup progress bar
@@ -55,15 +55,15 @@ xvCopula <- function(copula, x, k=NULL, verbose = interactive(),
     ## cross-validation
     xv <- 0
     m <- rep(p, k) # sizes of blocks initialised at p
-    r <- n - k * p # remaining number of lines
+    r <- n - k * p # remaining number of rows
     if (r > 0) m[seq_len(r)] <- p + 1L # size of first r blocks incremented if r > 0
     b <- c(0L, cumsum(m)) # 0 + ending line of each block
     v <- matrix(NA, p + 1, d) # points where copula density will be evaluated
 
     ## for each block
     for (i in seq_len(k)) {
-        sel <- (b[i] + 1):b[i+1] # m[i] lines of current block
-        ## estimate copula from all lines except those in sel
+        sel <- (b[i] + 1):b[i+1] # m[i] rows of current block
+        ## estimate copula from all rows except those in sel
         u <- pobs((x.not.s <- x[-sel, , drop=FALSE]), ties.method = ties.method)
         copula <- fitCopula(copula, u, #method = "mpl",
                             estimate.variance=FALSE, ...)@copula

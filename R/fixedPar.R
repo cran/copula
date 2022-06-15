@@ -21,7 +21,7 @@
 ##' @title Fix a Subset of a Parameter Vector --> ../man/fixedPar.Rd
 fixParam <- function(param, fixed = TRUE) {
     stopifnot(length(fixed) %in% c(1L, length(param)), is.logical(fixed))
-    if(identical(fixed, FALSE))
+    if(isFALSE(fixed))
 	attr(param, "fixed") <- NULL
     else {
 	stopifnot(isTRUE(fixed) || length(param) == length(fixed), is.logical(fixed))
@@ -37,7 +37,7 @@ fixParam <- function(param, fixed = TRUE) {
 isFreeP <- function(param) {
     stopifnot(is.numeric(param))# => error e.g. if passed a <copula>
     if (is.null(fixed <- attr(param, "fixed"))) rep(TRUE, length(param))
-    else if(identical(fixed, TRUE)) rep(FALSE, length(param))
+    else if(isTRUE(fixed)) rep(FALSE, length(param))
     else !fixed
 }
 
@@ -123,7 +123,7 @@ setMethod("fixedParam<-", signature("copula", "logical"), function(copula, value
     stopifnot(length(value) %in% c(1L, length(copula@parameters)))
     if (anyNA(copula@parameters[value])) stop("Fixed parameters cannot be NA.")
     attr(copula@parameters, "fixed") <-
-	if(identical(value, FALSE) || !any(value)) NULL else value
+	if(isFALSE(value) || !any(value)) NULL else value
     copula
 })
 

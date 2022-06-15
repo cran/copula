@@ -22,7 +22,8 @@ psiFrank <- function(copula, s) .psiFrank(s, copula@parameters[1])
 .psiFrank <- function(t, theta) {
   ## -1/theta * log(1 + exp(-t) * (exp(-theta) - 1))
   ## = -log(1-(1-exp(-theta))*exp(-t))/theta
-  ## = -log1p(expm1(-theta)*exp(0-t))/theta  # fails really small t, theta > 38
+  ## = -log1p(expm1(-theta)*exp(0-t))/theta  # fails for really small t, theta > 38
+  ##  ==> have to use log1mexp() and log1pexp() below !
   stopifnot(length(theta) == 1)
   if(theta > 0)
     -log1mexp(t-log1mexp(theta))/theta
@@ -42,10 +43,9 @@ iPsiFrank <- function(copula, u, log=FALSE)
     uth <- u*theta # (-> recycling args)
     if(!length(uth)) return(uth) # {just for numeric(0) ..hmm}
     et1 <- expm1(-theta) # e^{-theta} - 1 < 0
-    ## FIXME ifelse() is not quite efficient
     ## FIXME(2): the "> c* theta" is pi*Handgelenk
-    ## FIXME: use  delta = exp(-uth)*(1 - exp(uth-theta)/ (-et1) =
-    ##                   = exp(-uth)* expm1(uth-theta)/et1              (4)
+    ## FIXME(3): use delta = exp(-uth)*(1 - exp(uth-theta)/ (-et1) =
+    ##                     = exp(-uth)* expm1(uth-theta)/et1              (4)
     ##
     ## do small Rmpfr-study to find the best form -- (4) above and the three forms below
     ## Compare with ../vignettes/Frank-Rmpfr.Rnw

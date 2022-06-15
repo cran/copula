@@ -52,6 +52,41 @@ ellipCopula <- function(family = c("normal", "t"), param = NA_real_, dim = 2L,
          "t" =           tCopula(param, dim = dim, dispstr = dispstr, df = df, ...))
 }
 
+##' For "toep"litz dispersion structure, allow specifying permutation of 1:dim indicating
+##' after which permutation p[], the d-dim  (X[p[1]], X[p[2]], ..., X[p[d]])
+##' has a toeplitz correlation/covariance structure
+##' @return a string, possibly with "perm" attribute (so it is a valid <ellipCopula>@dispstr slot!)
+dispstrToep <- function(perm = NULL, check = TRUE) {
+    ans <- "toep"
+    if(!is.null(perm)) {
+        if(check)
+            stopifnot(is.numeric(perm), (d <- length(perm)) >= 2,
+                      perm == trunc(perm), range(perm) == c(1L, d))
+        attr(ans, "perm") <- as.integer(perm)
+    }
+    # return
+    ans
+}
+
+
+printEllipDisp <- function(x) {
+    if(x@dimension > 2)
+        cat("dispstr: ", x@dispstr,
+            if(!is.null(p <- attr(x@dispstr, "perm")))
+                paste0("(perm=(",paste(p, collapse=" "),"))"),
+            "\n")
+}
+
+printEllipCopula <- function(x, ...) {
+  printCopula(x, ...)
+  printEllipDisp(x)
+  invisible(x)
+}
+
+## traditionally still have  separate print()/show() methods for
+## "tCopula"      -> ./tCopula.R       and
+## "normalCopula" -> ./normalCopula.R
+
 setMethod(describeCop, c("ellipCopula", "character"), function(x, kind, prefix="", ...) {
     kind <- match.arg(kind)
     cl <- sub("Copula$", "", class(x)) # -> "t" / "normal"

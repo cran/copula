@@ -128,7 +128,7 @@ setMethod("dPsi", "acopula",
        })
 
 ## Methods for 'xcopula': extended copulas defined by mainly *one* copula slot
-setMethod("dim", signature("xcopula"), function(x) dim(x@copula))
+setMethod("dim", signature("Xcopula"), function(x) dim(x@copula))
 
 ## logical indicating which parameters are free
 setMethod("isFree", signature("rotCopula"), function(copula) isFree(copula@copula))

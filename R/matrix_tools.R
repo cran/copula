@@ -43,7 +43,7 @@ P2p <- function(P) P[lower.tri(P)]
 ##' @title Construct matrix Sigma from a given elliptical copula
 ##' @param copula copula
 ##' @return (d, d) matrix Sigma containing the parameter vector rho
-##' @author Marius Hofert
+##' @author Marius Hofert & Martin Maechler ("toep"+perm)
 getSigma <- function(copula)
 {
     stopifnot(is(copula, "ellipCopula"))
@@ -61,11 +61,10 @@ getSigma <- function(copula)
 	   "un" = {
 	       p2P(rho, d)
 	   },
-	   "toep" = {
-	       rho <- c(rho, 1)
-	       ind <- outer(1:d, 1:d, FUN=function(i, j) abs(i-j))
-	       diag(ind) <- length(rho)
-	       matrix(rho[ind], nrow=d, ncol=d)
+	   "toep" = { # now also work for "permuted toeplitz":
+               rh <- c(1, rho)
+               ip <- if(is.null(perm <- attr(copula@dispstr, "perm"))) 1:d else invPerm(perm)
+               matrix(rh[1 + abs(outer(ip, ip, `-`))], d,d)
 	   },
 	   stop("invalid 'dispstr'"))
 }
@@ -77,7 +76,7 @@ getSigma <- function(copula)
 ##' @param method A character string indicating the method to be used
 ##' @param use.names A logical indicating whether colnames(x) are to be
 ##'        used (if not NULL)
-##' @return A (n, 3)-matrix with the n largest/smallest/both
+##' @return (n x 3) data frame with the n largest/smallest/both
 ##'         values in the symmetric matrix x (3rd column) and the
 ##'         corresponding indices (1st and 2nd column)
 ##' @author Marius Hofert and Wayne Oldford

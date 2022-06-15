@@ -4,7 +4,7 @@
 \alias{describeCop-methods}
 \alias{describeCop,Copula,missing-method}
 \alias{describeCop,copula,character-method}
-\alias{describeCop,xcopula,ANY-method}
+\alias{describeCop,Xcopula,ANY-method}
 \alias{describeCop,archmCopula,character-method}
 \alias{describeCop,ellipCopula,character-method}
 \alias{describeCop,fgmCopula,character-method}

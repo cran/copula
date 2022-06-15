@@ -5,7 +5,7 @@
 \alias{getTheta,parCopula-method}
 \alias{getTheta,copula-method}
 \alias{getTheta,acopula-method}
-\alias{getTheta,xcopula-method}
+\alias{getTheta,Xcopula-method}
 \alias{getTheta,khoudrajiCopula-method}
 \alias{getTheta,mixCopula-method}
 \alias{getTheta,rotCopula-method}
@@ -36,7 +36,7 @@ getTheta(copula, freeOnly = TRUE, attr = FALSE, named = attr)
     \item{\code{signature(copula = "khoudrajiCopula")}}{ .. }
     \item{\code{signature(copula = "mixCopula")}}{ .. }
     \item{\code{signature(copula = "rotCopula")}}{ .. }
-    \item{\code{signature(copula = "xcopula")}}{ .. }
+    \item{\code{signature(copula = "Xcopula")}}{ .. }
   }
 }
 %% \details{

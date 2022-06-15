@@ -2,7 +2,7 @@
 \title{Tools to Work with Matrices}
 \alias{p2P}
 \alias{P2p}
-\alias{getSigma}
+\alias{getSigma}% TODO: part of "ellipCopula"-tools -- move there
 \alias{extremePairs}
 \description{
   \code{p2P()} creates a \code{\link{matrix}} from a given
@@ -30,15 +30,16 @@ extremePairs(x, n = 6, method = c("largest", "smallest", "both"),
 \arguments{
   \item{param}{a parameter vector.}
   \item{d}{dimension of the resulting \code{\link{matrix}}.  The default
-  is correct under the assumption (of \code{p2P()} in general!)  that
-  \code{param} is the lower-triangular part of a correlation matrix
-  \code{P} and hence corresponds to \code{\link{ellipCopula}(.., dispstr
-  = "un")}.}
+    is correct under the assumption (of \code{p2P()} in general!) that
+    \code{param} is the lower-triangular part of a correlation matrix
+    \code{P} and hence corresponds to \code{\link{ellipCopula}(.., dispstr
+      = "un")}.}
   \item{P}{a \code{\link{matrix}} which should be converted to a vector.}
 
   \item{copula}{an \bold{elliptical} copula, i.e., an object (extending)
     class \code{\linkS4class{ellipCopula}}; typically resulting from
     \code{\link{tCopula}()} or \code{\link{normalCopula}()}.}
+
   \item{x}{a symmetric \code{\link{matrix}}.}
   \item{n}{the number of pairs with smallest (or largest) values to be
     displayed.}
@@ -76,10 +77,9 @@ extremePairs(x, n = 6, method = c("largest", "smallest", "both"),
 }
 %\author{Marius Hofert and Martin M}
 \examples{
-## display the definitions
+## display the two simple definitions:
 p2P
 P2p
-extremePairs
 
 param <- (2:7)/10
 tC <- tCopula(param, dim = 4, dispstr = "un", df = 3)

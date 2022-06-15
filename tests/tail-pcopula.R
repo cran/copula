@@ -159,13 +159,13 @@ showSys.time(fL.9.2 <- fitLambda(U.9.2))              #  "
 showSys.time(fLt7.3 <- fitLambda(U.7.3, method="t"))  # 2.25 sec
 fL.7.3
 stopifnot(
-    all.equal(fL.7.3[1,2], 0.401369993)
+    all.equal(fL.7.3[1,2], 0.440453579986)
     ,
-    all.equal(fL.9.2[1,2], 0.89522363)
+    all.equal(fL.9.2[1,2], 0.838509809998)
     ,
     names(fLt7.3) == c("Lambda", "P", "Nu")
     ,
-    all.equal(fLt7.3$Lambda[1,2], 0.447410146)
+    all.equal(fLt7.3$Lambda[1,2], 0.447410146067)
 )
 (doExtras <- copula:::doExtras() && getRversion() >= "3.4") # so have withAutoprint(.)
 if(doExtras) withAutoprint({
@@ -176,3 +176,5 @@ if(doExtras) withAutoprint({
 
 
 cat('Time elapsed: ', proc.time(),'\n') # for ''statistical reasons''
+
+## Note: R CMD BATCH tail-pcopula.R => tail-pcopula.Rout => tail-pcopula.Rout.save

@@ -355,7 +355,6 @@ setMethod("rho", "mixCopula", function(copula, ...) # note: Kendall's tau non-tr
     c(vapply(copula@cops, rho, 1.1) %*% copula@w))
 
 setMethod("getIniParam", "mixCopula", function(copula, data, default=NULL, named=TRUE, ...) {
-    clc <- class(copula)
     if(is.null(default)) default <- rep(NA_real_, nParam(copula, freeOnly=TRUE))
     ## weights:  equal weights for all components
     ccops <- copula@cops@.Data # (or w/o '@.Data')

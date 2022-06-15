@@ -23,7 +23,7 @@
   For \eqn{s = 2}, \eqn{\mathrm{Li_2(z)}}{Li_2(z)} is also called
   \sQuote{dilogarithm} or \dQuote{Spence's function}.  The
   \code{"default"} method uses the \code{\link[gsl]{dilog}} or
-  \code{\link[gsl]{complex_dilog}} function from package \pkg{gsl},
+  \code{\link[gsl]{complex_dilog}} function from package \CRANpkg{gsl},
   respectively when \eqn{s = 2}.
 
   Also compute the Debye_n functions, for \eqn{n=1} and \eqn{n=2}, in a

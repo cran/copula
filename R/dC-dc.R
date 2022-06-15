@@ -154,7 +154,8 @@ setMethod("dCdu", signature("mixExplicitCopula"),       dCduExplicit)
 setMethod("dCdu", signature("rotExplicitCopula"),       dCduExplicit)
 
 ## For ellipCopula objects
-dCduEllipCopula <- function(copula, u, algorithm=NULL, ...) {
+dCduEllipCopula <- function(copula, u, algorithm=NULL,
+                            keepAttr=FALSE, checkCorr=FALSE, ...) {
     dim <- copula@dimension
     sigma <- getSigma(copula)
 
@@ -168,6 +169,7 @@ dCduEllipCopula <- function(copula, u, algorithm=NULL, ...) {
                 stop("not implemented for class ", class(copula)))
     n <- nrow(u)
     mat <- matrix(0,n,dim)
+    if(dim > 2) lower <- rep(-Inf, dim - 1L)
 
     for (j in 1:dim) {
 	s <- sigma[-j,-j] - sigma[-j,j,drop=FALSE] %*% sigma[j,-j,drop=FALSE]
@@ -182,10 +184,13 @@ dCduEllipCopula <- function(copula, u, algorithm=NULL, ...) {
 		       else
 			   for (i in 1:n) {
 			       x <- v[i,-j]
-			       if(is.null(algorithm)) algorithm <- pmvnormAlgo(dim, x)
-			       mat[i,j] <- pmvnorm(lower = rep(-Inf, dim - 1), upper = x,
+			       if(is.null(algorithm))
+				   algorithm <- pmvnormAlgo(dim, x, checkCorr=checkCorr)
+			       mat[i,j] <- pmvnorm(lower = lower, upper = x,
 						   mean = v[i,j] * sigma[-j,j],
-						   sigma = drop(s), algorithm=algorithm)
+						   sigma = drop(s)
+						 , algorithm=algorithm , keepAttr=keepAttr
+						   )
 			   }
 		   },
 	       "tCopula" =
@@ -201,8 +206,10 @@ dCduEllipCopula <- function(copula, u, algorithm=NULL, ...) {
 			   for (i in 1:n) {
 			       x <- drop(sqrt((df+1)/(df+v[i,j]^2)) * (v[i,-j] - v[i,j] * sigma[-j,j]))
 			       if(is.null(algorithm)) algorithm <- pmvtAlgo(dim, x)
-			       mat[i,j] <- pmvt(lower = rep(-Inf, dim - 1), upper = x,
-						sigma = s, df = df + 1, algorithm=algorithm)
+			       mat[i,j] <- pmvt(lower = lower, upper = x,
+						sigma = s, df = df + 1
+                                              , algorithm=algorithm , keepAttr=keepAttr
+                                                )
 			   }
 		       }
 		   })

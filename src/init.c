@@ -23,82 +23,82 @@
 #include "copula.h"
 #include "nacopula.h"
 
-#define CDEF(name)  {#name, (DL_FUNC) &name, sizeof(name ## _t)/sizeof(name ## _t[0]), name ##_t}
+#define CDEF(name)  {#name, (DL_FUNC) &name, sizeof(name ## _typ)/sizeof(name ## _typ[0]), name ##_typ}
 
 #define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
 
 
 // ./An.c ///////////////////////////////////////////////////////////////////
 
-static R_NativePrimitiveArgType biv_ACFG_t[7] = {
+static R_NativePrimitiveArgType biv_ACFG_typ[7] = {
     INTSXP, REALSXP, REALSXP, REALSXP, /* m: */ INTSXP, INTSXP, REALSXP
 };
-static R_NativePrimitiveArgType biv_AP_t[7] = {
+static R_NativePrimitiveArgType biv_AP_typ[7] = {
     INTSXP, REALSXP, REALSXP, REALSXP, /* m: */ INTSXP, INTSXP, REALSXP
 };
 
-static R_NativePrimitiveArgType mult_A_t[8] = {
+static R_NativePrimitiveArgType mult_A_typ[8] = {
     REALSXP, INTSXP, INTSXP, REALSXP, INTSXP, REALSXP, REALSXP, REALSXP
 };
 
 // ./empcop.c ///////////////////////////////////////////////////////////////////
-static R_NativePrimitiveArgType Cn_C_t[8] = {
+static R_NativePrimitiveArgType Cn_C_typ[8] = {
 	REALSXP, INTSXP, INTSXP, REALSXP, INTSXP, REALSXP, REALSXP, INTSXP
 };
 
 // ./fgm.c /////////////////////////////////////////////////////////////////////
 
-static R_NativePrimitiveArgType validity_fgm_t[3] = { INTSXP, REALSXP, INTSXP };
-static R_NativePrimitiveArgType rfgm_t[4] = { INTSXP, REALSXP, INTSXP, REALSXP };
+static R_NativePrimitiveArgType validity_fgm_typ[3] = { INTSXP, REALSXP, INTSXP };
+static R_NativePrimitiveArgType rfgm_typ[4] = { INTSXP, REALSXP, INTSXP, REALSXP };
 
 
 // ./set_utils.c ///////////////////////////////////////////////////////////////
 
-static R_NativePrimitiveArgType k_power_set_t[3] = { INTSXP, INTSXP, INTSXP };
-static R_NativePrimitiveArgType k_power_set_char_t[4] = {
+static R_NativePrimitiveArgType k_power_set_typ[3] = { INTSXP, INTSXP, INTSXP };
+static R_NativePrimitiveArgType k_power_set_char_typ[4] = {
     INTSXP, INTSXP, INTSXP, STRSXP };
 
 
 // ./gof.c & gof.h /////////////////////////////////////////////////////////////
 
-static R_NativePrimitiveArgType cramer_vonMises_t[5] = {
+static R_NativePrimitiveArgType cramer_vonMises_typ[5] = {
     INTSXP, INTSXP, REALSXP, REALSXP, REALSXP};
-static R_NativePrimitiveArgType cramer_vonMises_grid_t[7] = {
+static R_NativePrimitiveArgType cramer_vonMises_grid_typ[7] = {
     INTSXP, REALSXP, INTSXP, REALSXP, INTSXP, REALSXP, REALSXP };
-static R_NativePrimitiveArgType multiplier_t[11] = {
+static R_NativePrimitiveArgType multiplier_typ[11] = {
     INTSXP, REALSXP, INTSXP, REALSXP, INTSXP, REALSXP, REALSXP, REALSXP,
     INTSXP, REALSXP, INTSXP};
-static R_NativePrimitiveArgType cramer_vonMises_Pickands_t[6] = {
+static R_NativePrimitiveArgType cramer_vonMises_Pickands_typ[6] = {
     INTSXP, INTSXP, REALSXP, REALSXP, REALSXP, REALSXP };
-static R_NativePrimitiveArgType cramer_vonMises_CFG_t[6] = {
+static R_NativePrimitiveArgType cramer_vonMises_CFG_typ[6] = {
     INTSXP, INTSXP, REALSXP, REALSXP, REALSXP, REALSXP };
 // MM: FIXME *_Afun is superfluous
-static R_NativePrimitiveArgType cramer_vonMises_Afun_t[7] = {
+static R_NativePrimitiveArgType cramer_vonMises_Afun_typ[7] = {
     INTSXP, INTSXP, REALSXP, REALSXP, REALSXP, REALSXP, INTSXP };
 
 
 // ./logseries.c ///////////////////////////////////////////////////////////////
 
-static R_NativePrimitiveArgType rlogseries_R_t     [3] = { INTSXP, REALSXP, INTSXP };
-static R_NativePrimitiveArgType rlogseries_R_ln1p_t[3] = { INTSXP, REALSXP, REALSXP };
+static R_NativePrimitiveArgType rlogseries_R_typ     [3] = { INTSXP, REALSXP, INTSXP };
+static R_NativePrimitiveArgType rlogseries_R_ln1p_typ[3] = { INTSXP, REALSXP, REALSXP };
 
 
 // ./evtest.c //////////////////////////////////////////////////////////////////
 
-static R_NativePrimitiveArgType evtest_t[] = {
+static R_NativePrimitiveArgType evtest_typ[] = {
     REALSXP, INTSXP, INTSXP, REALSXP, INTSXP,
     INTSXP, REALSXP, INTSXP, REALSXP, INTSXP,
     REALSXP, REALSXP
 };
-static R_NativePrimitiveArgType evtestA_t[] = {REALSXP, REALSXP, INTSXP, REALSXP, REALSXP,
+static R_NativePrimitiveArgType evtestA_typ[] = {REALSXP, REALSXP, INTSXP, REALSXP, REALSXP,
 	     INTSXP, INTSXP, INTSXP, REALSXP};
 
-static R_NativePrimitiveArgType evtestA_derA_t[] = {
+static R_NativePrimitiveArgType evtestA_derA_typ[] = {
     REALSXP, REALSXP, INTSXP,
     REALSXP, REALSXP, INTSXP,
     INTSXP, INTSXP, REALSXP
 };
-static R_NativePrimitiveArgType evtestA_stat_t[] = {
+static R_NativePrimitiveArgType evtestA_stat_typ[] = {
     REALSXP, REALSXP, INTSXP,
     REALSXP, REALSXP, INTSXP,
     INTSXP, REALSXP, REALSXP
@@ -106,41 +106,41 @@ static R_NativePrimitiveArgType evtestA_stat_t[] = {
 
 // ./exchtest.c ////////////////////////////////////////////////////////////////
 
-static R_NativePrimitiveArgType evsymtest_t[] = {REALSXP, REALSXP, INTSXP, REALSXP, INTSXP,
+static R_NativePrimitiveArgType evsymtest_typ[] = {REALSXP, REALSXP, INTSXP, REALSXP, INTSXP,
 	       INTSXP, INTSXP, REALSXP};
 
-static R_NativePrimitiveArgType evsymtest_derA_t[] = {REALSXP, REALSXP, INTSXP, REALSXP, INTSXP,
+static R_NativePrimitiveArgType evsymtest_derA_typ[] = {REALSXP, REALSXP, INTSXP, REALSXP, INTSXP,
 		    INTSXP, INTSXP, REALSXP};
 
-static R_NativePrimitiveArgType evsymtest_stat_t[] = {REALSXP, REALSXP, INTSXP, REALSXP, INTSXP,
+static R_NativePrimitiveArgType evsymtest_stat_typ[] = {REALSXP, REALSXP, INTSXP, REALSXP, INTSXP,
 		    INTSXP, REALSXP};
 
-static R_NativePrimitiveArgType exchtestCn_t[] = {REALSXP, REALSXP, INTSXP, REALSXP, REALSXP,
+static R_NativePrimitiveArgType exchtestCn_typ[] = {REALSXP, REALSXP, INTSXP, REALSXP, REALSXP,
 		INTSXP, INTSXP, REALSXP};
 
-static R_NativePrimitiveArgType exchtestCn_stat_t[] = {REALSXP, REALSXP, INTSXP, REALSXP, REALSXP,
+static R_NativePrimitiveArgType exchtestCn_stat_typ[] = {REALSXP, REALSXP, INTSXP, REALSXP, REALSXP,
 		     INTSXP, REALSXP};
 
-static R_NativePrimitiveArgType radsymtestCn_stat_t[] = {REALSXP, INTSXP, INTSXP, REALSXP, INTSXP,
+static R_NativePrimitiveArgType radsymtestCn_stat_typ[] = {REALSXP, INTSXP, INTSXP, REALSXP, INTSXP,
 							 REALSXP};
 
 // ./multIndepTest.c ////////////////////////////////////////////////////////////
 
-static R_NativePrimitiveArgType bootstrap_MA_I_t[] = {INTSXP, INTSXP, INTSXP, INTSXP, REALSXP, INTSXP,
+static R_NativePrimitiveArgType bootstrap_MA_I_typ[] = {INTSXP, INTSXP, INTSXP, INTSXP, REALSXP, INTSXP,
 	       REALSXP, REALSXP, INTSXP, STRSXP,
 	       INTSXP};
-static R_NativePrimitiveArgType empirical_copula_test_rv_t[] = {REALSXP, INTSXP, INTSXP, INTSXP, INTSXP, REALSXP,
+static R_NativePrimitiveArgType empirical_copula_test_rv_typ[] = {REALSXP, INTSXP, INTSXP, INTSXP, INTSXP, REALSXP,
 			      REALSXP, INTSXP, INTSXP, REALSXP, REALSXP,
 			      REALSXP, REALSXP, REALSXP, REALSXP};
 
 
 // ./serialIndepTest.c ////////////////////////////////////////////////////////////
 
-static R_NativePrimitiveArgType simulate_empirical_copula_serial_t[] = {INTSXP, INTSXP, INTSXP, INTSXP,
+static R_NativePrimitiveArgType simulate_empirical_copula_serial_typ[] = {INTSXP, INTSXP, INTSXP, INTSXP,
 				      REALSXP, REALSXP, INTSXP,
 				      STRSXP, REALSXP,
 				      REALSXP, INTSXP};
-static R_NativePrimitiveArgType empirical_copula_test_serial_t[] = {REALSXP, INTSXP, INTSXP, INTSXP, REALSXP, REALSXP,
+static R_NativePrimitiveArgType empirical_copula_test_serial_typ[] = {REALSXP, INTSXP, INTSXP, INTSXP, REALSXP, REALSXP,
 				  INTSXP, INTSXP, REALSXP, REALSXP, REALSXP,
 				  REALSXP, REALSXP, REALSXP,
 				  REALSXP, REALSXP};
@@ -148,20 +148,20 @@ static R_NativePrimitiveArgType empirical_copula_test_serial_t[] = {REALSXP, INT
 
 // ./multSerialIndepTest.c ///////////////////////////////////////////////////////////
 
-static R_NativePrimitiveArgType bootstrap_serial_t[] = {INTSXP, INTSXP, INTSXP, INTSXP, REALSXP, INTSXP,
+static R_NativePrimitiveArgType bootstrap_serial_typ[] = {INTSXP, INTSXP, INTSXP, INTSXP, REALSXP, INTSXP,
 		      REALSXP, REALSXP, INTSXP, STRSXP,
 		      INTSXP};
-static R_NativePrimitiveArgType empirical_copula_test_rv_serial_t[] = {REALSXP, INTSXP, INTSXP, INTSXP, INTSXP, REALSXP,
+static R_NativePrimitiveArgType empirical_copula_test_rv_serial_typ[] = {REALSXP, INTSXP, INTSXP, INTSXP, INTSXP, REALSXP,
 				     REALSXP, INTSXP, INTSXP, REALSXP, REALSXP,
 				     REALSXP, REALSXP, REALSXP, REALSXP};
 
 
 // ./ecIndepTest.c ////////////////////////////////////////////////////////////
 
-static R_NativePrimitiveArgType simulate_empirical_copula_t[] = {INTSXP, INTSXP, INTSXP, INTSXP, REALSXP,
+static R_NativePrimitiveArgType simulate_empirical_copula_typ[] = {INTSXP, INTSXP, INTSXP, INTSXP, REALSXP,
 			       REALSXP, INTSXP, STRSXP,
 			       REALSXP, REALSXP, INTSXP};
-static R_NativePrimitiveArgType empirical_copula_test_t[] = {REALSXP, INTSXP, INTSXP, INTSXP, REALSXP, REALSXP,
+static R_NativePrimitiveArgType empirical_copula_test_typ[] = {REALSXP, INTSXP, INTSXP, INTSXP, REALSXP, REALSXP,
 			   INTSXP, INTSXP, REALSXP, REALSXP, REALSXP,
 			   REALSXP, REALSXP, REALSXP,
 			   REALSXP, REALSXP};
@@ -170,10 +170,10 @@ static R_NativePrimitiveArgType empirical_copula_test_t[] = {REALSXP, INTSXP, IN
 // ./R_debye.c /////////////////////////////////////////////////////////////////
 
 /* no longer needed; now using debye_1 from package gsl
-static R_NativePrimitiveArgType debye_1_C_t[5] = { REALSXP, INTSXP, REALSXP,REALSXP, INTSXP };
-static R_NativePrimitiveArgType debye_2_C_t[5] = { REALSXP, INTSXP, REALSXP,REALSXP, INTSXP };
-static R_NativePrimitiveArgType debye_3_t[5] = { REALSXP, INTSXP, REALSXP,REALSXP, INTSXP };
-static R_NativePrimitiveArgType debye_4_t[5] = { REALSXP, INTSXP, REALSXP,REALSXP, INTSXP };
+static R_NativePrimitiveArgType debye_1_C_typ[5] = { REALSXP, INTSXP, REALSXP,REALSXP, INTSXP };
+static R_NativePrimitiveArgType debye_2_C_typ[5] = { REALSXP, INTSXP, REALSXP,REALSXP, INTSXP };
+static R_NativePrimitiveArgType debye_3_typ[5] = { REALSXP, INTSXP, REALSXP,REALSXP, INTSXP };
+static R_NativePrimitiveArgType debye_4_typ[5] = { REALSXP, INTSXP, REALSXP,REALSXP, INTSXP };
 */
 
 static const R_CMethodDef CEntries[]  = {

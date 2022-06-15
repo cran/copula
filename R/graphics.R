@@ -425,11 +425,13 @@ pairs2 <- function(x, labels = NULL, labels.null.lab = "U", ...)
        stopifnot(length(labels.null.lab) == 1, is.character(labels.null.lab))
        colnms <- colnames(x)
        labels <-
-           if(sum(nzchar(colnms)) != d)
+           if(sum(nzchar(colnms)) != d) {
 	       as.expression(lapply(1:d, function(i)
 		   substitute(v[I], list(v = as.name(labels.null.lab), I = 0+i))))
-           else # 'x' has column names => parse them
-               parse(text = colnms)
+           } else { # 'x' has column names => parse them
+               txt <- gsub(" ", "~", colnms) # essentially colnms but blanks replaced by '~' (otherwise parse() fails)
+               parse(text = txt)
+           }
    }
    pairs(x, gap = 0, labels = labels, ...)
 }

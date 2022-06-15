@@ -21,6 +21,12 @@
 ##' @param ... additional arguments passed to rank()
 ##' @return (n, d)-matrix containing the Latin Hypercube sample
 ##' @author Marius Hofert
+##' @note See Cuberus et al. (2019, "Copulas checker-type approximations:
+##''      Application to quantiles estimation of sums of dependent random variables")
+##'       or Genest, Neslehova (2007, "A primer on copulas for count data")
+##'       The empirical checkerboard copula uses uniform mass in each
+##'       d-box \prod_{j=1}^d ((i_j-1)/N, i_j/N] for each (i_1,..,i_d)
+##'       in {1,...,N}^d. As such, this is equivalent to Latin Hypercube Sampling.
 rLatinHypercube <- function(u, ...)
 {
     stopifnot(0 <= u, u <= 1)

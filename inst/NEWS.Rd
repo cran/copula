@@ -2,7 +2,48 @@
 %  news(db = tools:::.build_news_db_from_package_NEWS_Rd("~/R/Pkgs/copula/inst/NEWS.Rd"))
 \name{NEWS}
 \title{News for \R Package \pkg{copula}}% MM: look into ../svn-log-from.all
-\newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+
+\section{Changes in version 1.1-0 (2022-06-14, svn r1875)}{
+  \subsection{New Features}{
+    \itemize{
+      \item \code{fitCopula(<mixCopula>)} now by default uses
+      \code{estimate.variance = TRUE} also with \emph{free} mixture
+      weights.
+
+      \item \code{fitLambda()} gets new method \code{"Schmidt.Stadtmueller"}.
+
+      \item \code{fitMvdc()} works in more cases, e.g. with a mixCopula.
+
+      \item \code{"mvdc"} class objects no longer inherit from \code{"xcopula"} (a
+      copula) but from new \code{"Xcopula"} (which just \emph{contains} a copula).
+
+      \item using \code{isTRUE()} and \code{isFALSE()} instead of
+      \code{identical(TRUE, .)} etc.
+
+      \item \code{fitCopula(.., method="mpl")} now also catches errors in
+      var-cov matrix computations.
+
+      \item New \code{loglikCopulaMany(pList, ..)} function for (more
+      efficiently) computing copula likelihoods for many parameter vectors / values.
+
+      \item For elliptic (t-, normal-) copulas, provide \dQuote{permuted
+      Toeplitz} dispersion via new \code{dispstrToep()} which allows to
+      specify a \emph{permutation} of the \eqn{d} variables / columns /
+      coordinates to have a Toeplitz correlation structure.
+      % This allows many more \dQuote{medium-size} parametrized elliptical
+      % copulas to be fit to data.
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item New arguments and defaults \code{keepAttr=FALSE} and \code{checkCorr=FALSE}
+      for \CRANpkg{mvtnorm}'s \code{Miwa()} should speed up
+      \code{pCopula()} for normal- and t- copulas.
+
+      \item Empirical copula computations tweaks, preventing some erronous computations.
+    }
+  }
+}
 
 \section{Changes in version 1.0-1 (2020-12-07, svn r1850)}{
   \subsection{New Features}{
@@ -28,6 +69,9 @@
 
       Similarly when the hessian inversion fails, the warning message is
       now returned with the \code{NA}-valued vcov matrix.
+
+      \item Smoothed \code{empCopula()} objects now have the right
+      sampling methods.
     }
   }
   \subsection{Bug Fixes}{

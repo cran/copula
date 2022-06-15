@@ -325,7 +325,7 @@ validMvdc <- function(object) {
     TRUE
 }## validMvdc()
 
-setClass("mvdc", contains = "xcopula", #-> slot "copula"; additionally :
+setClass("mvdc", contains = "Xcopula", #-> slot "copula"; additionally :
 	 slots = c(
                    margins = "character",
                    paramMargins = "list",
@@ -386,7 +386,6 @@ nobs.fittedMV <- function(object, ...) object@nsample
 
 vcov.fittedMV <- function(object, orig=TRUE, ...) {
     pNms <- paramNames(object)
-    cf <- object@estimate
     pT <- object@fitting.stats$paramTrafo
     if(length(pT)) {
         switch(pT$kind,

@@ -12,9 +12,9 @@ pobs(x, na.last = "keep",
   \item{x}{\eqn{n\times d}{n x d}-matrix (or \eqn{d}-vector) of random
     variates to be converted to pseudo-observations.}
   \item{na.last}{string passed to \code{\link{rank}}; see there.}
-  \item{ties.method}{string specifying how ranks should be computed if
-     there are ties in any of the coordinate samples of \code{x}; passed
-     to \code{\link{rank}}.}
+  \item{ties.method}{\code{\link{character}} string specifying how ranks
+    should be computed if there are ties in any of the coordinate
+    samples of \code{x}; passed to \code{\link{rank}}.}
   \item{lower.tail}{\code{\link{logical}} which, if \code{FALSE},
     returns the pseudo-observations when applying the
     empirical marginal survival functions.}
@@ -64,5 +64,3 @@ plot(u[,5],u[,10], xlab=quote(italic(U)[1]), ylab=quote(italic(U)[2]))
 pairs(u, gap=0, pch=".", labels =
       as.expression( lapply(1:d, function(j) bquote(italic(U[.(j)]))) ))
 }
-
-

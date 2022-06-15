@@ -19,9 +19,10 @@ setClass("Copula")#  'Virtual' automatically
 
 ##' Virtual class of copulas that can be fully parametrized or fitted, e.g. dim() must work
 setClass("parCopula", contains = c("Copula", "VIRTUAL"))
+##' Virtual class of copula extensions (e.g. mvdc) that *contain* one 'parCopula' slot
+setClass("Xcopula", contains = "VIRTUAL", slots = c(copula = "parCopula"))
 ##' Virtual class of "extended" copulas that *contain* one 'parCopula' slot
-setClass("xcopula", contains = c("parCopula", "VIRTUAL"),
-         slots = c(copula = "parCopula"))
+setClass("xcopula", contains = c("parCopula", "Xcopula", "VIRTUAL"))
 
 ##' Virtual class of copulas with explicit 'dimension':
 setClass("dimCopula", contains = c("Copula", "VIRTUAL"),

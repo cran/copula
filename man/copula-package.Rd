@@ -1,5 +1,3 @@
-\newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
-%%
 \name{copula-package}
 \alias{copula-package}
 \docType{package}

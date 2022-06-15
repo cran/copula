@@ -176,16 +176,16 @@ setMethod("fixedParam<-", signature("khoudrajiCopula", "logical"),
 function(copula, value) {
     stopifnot(length(value) %in% c(1L, nParam(copula)))
     ## JY: seems not needed?
-    ## if (identical(value, FALSE) || !any(value))
+    ## if (isFALSE(value) || !any(value))
     ##    copula
     if (anyNA(getTheta(copula, freeOnly = FALSE)[value])) stop("Fixed parameters cannot be NA.")
     n1 <- nParam(copula@copula1)
     n2 <- nParam(copula@copula2)
-    if (identical(value, FALSE) || !any(value)) {
+    if (isFALSE(value) || !any(value)) {
          if (n1 > 0L) fixedParam(copula@copula1) <- FALSE
          if (n2 > 0L) fixedParam(copula@copula2) <- FALSE
          attr(copula@shapes, "fixed") <- NULL
-    } else if (identical(value, TRUE) || all(value)) {
+    } else if (isTRUE(value) || all(value)) {
          if (n1 > 0L) fixedParam(copula@copula1) <- TRUE
          if (n2 > 0L) fixedParam(copula@copula2) <- TRUE
          attr(copula@shapes, "fixed") <- TRUE

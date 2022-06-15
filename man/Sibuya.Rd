@@ -112,7 +112,7 @@ dsumSibuya(x, n, alpha,
   \eqn{\alpha}{alpha} values (for example, \eqn{n \ge 10}{n >= 10}),
   and therefore should be used with care.  It may require high-precision
   arithmetic which can be accessed with \code{method="Rmpfr"} (and the
-  \pkg{Rmpfr} package).
+  \CRANpkg{Rmpfr} package).
 }
 \value{
   \describe{

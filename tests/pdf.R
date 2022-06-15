@@ -199,7 +199,7 @@ mku <- function(n, fr = 1/20, sd = 1/10) {
 ## This is from ./moments.R --- keep in sync! ---
 tau.s <- c(       -.1, 0, 0.05805, (1:2)/9, 0.3)
 names(tau.s) <- paste0("tau=", sub("0[.]", ".", formatC(tau.s)))
-suppressWarnings(
+suppressWarnings( # warnings about ... "tau must be >= 0.
     tTau <- sapply(tau.s, function(tau) vapply(copObs, iTau, numeric(1), tau = tau))
 ) # tTau is printed in moments.R
 
@@ -211,11 +211,12 @@ u.outside.01 <- function(u) apply(u, 1, function(x) any(x <= 0, 1 <= x))
 u.out <- u.outside.01(u) # has NAs
 u.ina <- apply(u, 1, anyNA)
 u.iNA <- is.na(u.out)
-table(u.ina, u.out, exclude={})
+(tuna <- table(u.ina, u.out, exclude={}))
 ##        u.out
 ## u.ina   FALSE TRUE <NA>
 ##   FALSE   384   67    0
 ##   TRUE      0    7   42
+stopifnot(identical(c(384L, 0L, 67L, 7L, 0L, 42L), c(tuna)))
 u.OUT <- u.out & !u.ina  # no  NAs
 ## NB:  f(u) = 0 if some u_j is outside (0,1) - even when another u_k is NA
 
@@ -224,6 +225,7 @@ copsT <- lapply(setNames(,names(copObs)), # so have *named* list
                      lapply(unique(tTau[cN,]), function(th) setPar(copObs[[cN]], th)))
 copsTh <- unlist(copsT, recursive=FALSE)
 ## --> a list of 72 parametrized copulas
+## ...  currently one of them not being "valid":
 okC <- lapply(copsTh, validObject, test=TRUE)
 (inOk <- which(notOk <- !sapply(okC, isTRUE)))
 ## joeCopula2
@@ -237,7 +239,8 @@ if(length(inOk)) { # maybe no longer in future
     copsTh[[inOk]]@parameters <- 1
     validObject(copsTh[[inOk]])
 }
-
+## Now, *all* are validObject :
+stopifnot( vapply(copsTh, validObject, logical(1), test=TRUE) )
 
 
 ## now using  ( u[], u.ina, u.OUT ):
