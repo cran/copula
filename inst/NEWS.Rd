@@ -3,6 +3,16 @@
 \name{NEWS}
 \title{News for \R Package \pkg{copula}}% MM: look into ../svn-log-from.all
 
+\section{Changes in version 1.1-1 (2022-11-17, svn r1879)}{
+  \subsection{Miscellaneous}{
+    \itemize{
+      \item Fix non-UTF-8 accents in C code {WARN on CRAN}.
+      \item Decrease the large \file{inst/doc/*.html} vignettes a bit more,
+      for a smaller package size (for CRAN).
+    }
+  }
+}
+
 \section{Changes in version 1.1-0 (2022-06-14, svn r1875)}{
   \subsection{New Features}{
     \itemize{

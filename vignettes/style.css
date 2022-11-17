@@ -1,5 +1,5 @@
 /* MH: This file is rmarkdown's ./rmarkdown/templates/html_vignette/resources/vignette.css
-       with modifications indicated by "MH: modified" */
+       with modifications indicated by "MH: .. */
 body {
   background-color: #fff;
   margin: 1em auto;
@@ -114,26 +114,26 @@ pre, code {
   background-color: #f7f7f7;
   border-radius: 3px;
   color: #333;
+  white-space: pre-wrap;    /* Wrap long lines */
 }
 pre {
-  overflow-x: auto; /* MH: modified */
-  /* MH: modified */
+  overflow-x: auto; /* MH: added line */
   border-radius: 3px;
   margin: 5px 0px 10px 0px;
   padding: 10px;
 }
 pre:not([class]) {
-  background-color: white; /* MH: modified */
-  border: #CCCCCC 1px solid; /* MH: modified */
+  background-color: white; /* MH: modified, was #f7f7f7 */
+  border: #CCCCCC 1px solid; /* MH: added line */
 }
-/* MH: modified (put in the following chunk) */
+/* MH: modified (added the following chunk) */
 pre:not([class]) code {
     color: #444;
     background-color: white;
 }
 code {
   font-family: Menlo, monospace; /* MH: modified */
-  font-size: 90%; /* MH: modified */
+  font-size: 90%; /* MH: modified, was 85% */
 }
 p > code, li > code {
   padding: 2px 0px;
@@ -142,15 +142,15 @@ p > code, li > code {
 div.figure {
   text-align: center;
 }
-img { /* MH: modified */
+img { 
   background-color: #FFFFFF;
   padding: 2px;
-  /* MH: modified */
-  border-radius: 3px;
   border: none; /* MH: modified */
+  border-radius: 3px;
+  /* MH: modified (had another border: .. )*/  
   margin: 0 5px;
-  max-width: 100%; /* MH: modified */
-  text-align: center; /* MH: modified */
+  max-width: 100%; /* MH: added */
+  text-align: center; /* MH: added */
 }
 
 h1 {
@@ -174,7 +174,7 @@ h3 {
 
 h4 {
   border-bottom: none; /* MH: modified */
-  margin-left: 4px; /* MH: modified */
+  margin-left: 4px; /* MH: modified from 8px */
   font-size: 105%;
 }
 

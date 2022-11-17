@@ -9,6 +9,10 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Exploring Empirical Copulas}
 ---
+
+```{r prelim, echo=FALSE}
+## lower resolution - less size  (default dpi = 72):
+knitr::opts_chunk$set(dpi = 48)
 ```{r, message=FALSE}
 library(copula)
 ```
@@ -17,7 +21,7 @@ library(copula)
 ## 1 Auxiliary functions
 
 The following is merely an auxiliary for computing a log-density later.
-```{r}
+```{r lsum}
 ##' @title Compute log(x_1 + .. + x_n) for given log(x_1),..,log(x_n)
 ##' @param lx n-vector containing log(x_1),..,log(x_n)
 ##' @author Marius Hofert
@@ -30,7 +34,7 @@ lsum <- function(lx) {
 The next function implements, in pure R, various empirical copula estimators.
 The code is rather of pedagogical nature than optimized for speed (and `copula`
 mostly uses C code for the evaluation).
-```{r}
+```{r emp_cop}
 ##' @title Evaluate Empirical Copulas
 ##' @param u evaluation points (in [0,1]^d)
 ##' @param U points (in [0,1]^d) based on which the empirical copula is built
@@ -107,7 +111,7 @@ empirical_copula <- function(u, U, smoothing = c("none", "pbeta", "dbeta", "chec
 
 Let us first generate some copula samples based on which we then compute the
 empirical copulas.
-```{r}
+```{r gener}
 ## Generate copula data based on which to build empirical copula
 n <- 1000 # sample size
 d <- 2 # dimension
@@ -117,7 +121,7 @@ U <- rCopula(n, copula = gumbelCopula(iTau(gumbelCopula(), tau = 0.5), dim = d))
 
 Next, consider a grid of evaluation points for the empirical copulas (and a density
 in one of the cases).
-```{r}
+```{r eval-pts}
 ## Evaluation points
 n.grid <- 26
 sq <- seq(0, 1, length.out = n.grid)
@@ -131,7 +135,7 @@ u. <- as.matrix(expand.grid("u[1]" = sq., "u[2]" = sq., KEEP.OUT.ATTRS = FALSE))
 Now let us evaluate the empirical copula, the empirical beta copula, its density
 and the empirical checkerboard copula at `u` (for the density of the empirical
 beta copula, we use `u.`).
-```{r}
+```{r eval-cops}
 ## Evaluate empirical copulas
 emp.cop.none   <- empirical_copula(u,  U = U)
 emp.cop.pbeta  <- empirical_copula(u,  U = U, smoothing = "pbeta")
@@ -151,11 +155,12 @@ and we construct two different mass distributions which lead to the same
 copula value in $(1-p_1,1-p_2)$.
 
 First, we generate dependent Bernoulli random variables.
-```{r}
+```{r gen-Bern}
 ## Generate some data with Bernoulli margins
 tau <- 0.5
 gc <- normalCopula(iTau(normalCopula(), tau = tau))
-n <- 1e4
+n <- 1e4  ## <-- use this  for scientific reason
+n <- 1000 # <<< prefer to decrease *.html and final package size
 set.seed(271)
 U <- rCopula(n, copula = gc)
 p <- c(1/2, 3/4) # marginal probabilities p_1, p_2 of being 1
@@ -168,7 +173,7 @@ We now proceed as in the (stochastic) proof of the first part of Sklar's
 Theorem and consider the generalized distributional transforms of the two
 margins. To this end, we implement the modified distribution function of
 a Bernoulli distribution:
-```{r}
+```{r fn-F}
 ## Define generalized distributional transform (for one margin)
 F <- function(X, Lambda, p)
 {
@@ -184,7 +189,7 @@ Based on, first, independent and, second, comonotone uniform random variables
 $\Lambda$ (as appearing in the generalized distributional transforms),
 we obtain two different mass distributions and thus copulas with equal
 values at $(1-p_1,1-p_2)$.
-```{r}
+```{r U.Pi.M}
 ## Compute U's for two different Lambda
 Lambda.Pi <- matrix(runif(n * 2), ncol = 2) # independence case for Lambda
 Lambda.M <- cbind(Lambda.Pi[,1], Lambda.Pi[,1]) # comonotone case for Lambda
@@ -194,7 +199,7 @@ U.M  <- sapply(1:2, function(j) F(X[,j], Lambda = Lambda.M [,j], p = p[j]))
 
 As a basic test, one could visually check whether the mass distributions
 have indeed standard uniform margins.
-```{r, fig.align = "center", fig.width = 6, fig.height = 6, fig.show = "hide"}
+```{r plot-margins, fig.align = "center", fig.width = 6, fig.height = 6, fig.show = "hide"}
 ## Check margins
 opar <- par(pty = "s")
 plot(U.Pi[,1], pch = ".", ylab = expression(U[1]~"under independent"~Lambda*"'s"))
@@ -206,7 +211,7 @@ par(opar)
 
 Now lets check whether they assign the same probabilities to the four
 regions defined by the marginal Bernoulli failure probabilities $1-p_1,1-p_2$.
-```{r}
+```{r check-mass}
 ## Check the mass distributions
 check <- function(U, p)
     c(mean(U[,1] <= 1-p[1] & U[,2] <= 1-p[2]), # P(U_1 <= 1-p_1, U_2 <= 1-p_2)
@@ -220,7 +225,7 @@ stopifnot(all.equal(sum(probs.Pi), 1), all.equal(probs.Pi, probs.M))
 
 Perhaps the most interesting plot is the one of the mass distributions themselves.
 To this end, consider the following plot function.
-```{r}
+```{r pl_mass-fn}
 ## Plot function for the mass distributions
 plot_mass <- function(U, probs, p, text)
 {
@@ -235,7 +240,7 @@ plot_mass <- function(U, probs, p, text)
 ```
 
 Now apply the function to the two mass distributions.
-```{r, fig.align = "center", fig.width = 6, fig.height = 6, fig.show = "hold"}
+```{r plot-mass, fig.align = "center", fig.width = 6, fig.height = 6, fig.show = "hold"}
 ## Plot the mass distributions with probabilities of falling in the four regions
 opar <- par(pty = "s")
 plot_mass(U.Pi, probs = probs.Pi, p = p, text = expression("Independent"~Lambda*"'s"))
@@ -247,7 +252,7 @@ And, lastly, we can plot the empirical copulas of these two (different) mass
 distributions. We see (also from the above plots) that the two copulas are
 different (yet both coincide in $(1-p_1,1-p_2)$, the only point where the
 copula is uniquely defined for two Bernoulli margins).
-```{r, fig.align = "center", fig.width = 6, fig.height = 6, fig.show = "hold"}
+```{r wireframes, fig.align = "center", fig.width = 6, fig.height = 6, fig.show = "hold"}
 ## Define and plot empirical copulas
 ec.Pi <- empCopula(U.Pi)
 ec.M  <- empCopula(U.M)

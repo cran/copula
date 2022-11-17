@@ -10,6 +10,10 @@ vignette: >
   %\VignetteIndexEntry{Hierarchical Archimax Copulas}
   %\VignetteEncoding{UTF-8}
 ---
+
+```{r prelim, echo=FALSE}
+## lower resolution - less size  (default dpi = 72):
+knitr::opts_chunk$set(dpi = 48)
 ```{r, message = FALSE}
 library(copula) # for hierarchical frailties, generators etc.
 library(mev) # for rmev()
@@ -23,10 +27,10 @@ The (frozen) parameters considered are as follows.
 d. <- c(2, 3) # copula sector dimensions
 d <- sum(d.) # copula dimension
 stopifnot(d >= 3) # for 3d plots
-n <- 1000 # sample size
+n <- 777 # sample size  (was 1000; save space for *.html)
 ```
 
-We also implement an auxiliary function to generated the hierarchical frailties
+We also implement an auxiliary function to generate the hierarchical frailties
 involved.
 ```{r}
 ##' @title Generated two hierarchical frailties (V0, V01, V02)

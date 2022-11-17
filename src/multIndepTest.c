@@ -74,7 +74,7 @@ void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
       n_ = (size_t)(*n);
   double J_size = ((double)n_) * n_ * (*p);
   if(J_size > max_size)
-      error(_("** bootstrap_MA_I(): n and/or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"), 
+      error(_("** bootstrap_MA_I(): n and/or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
   int *R = Calloc(n_ * (*p), int);
@@ -127,7 +127,7 @@ void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
       MA0[k + (*N) * (i - *p - 1)] =  M_A_n(*n, *p, J, K, L, subset[i]);
     /* global statistic */
     I0[k] = I_n(*n, *p, J, K, L);
-    
+
     if (*verbose)
       progressBar(k, *N, 70);
   }
@@ -154,8 +154,8 @@ void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
   between 2 and m in "natural" order
   MA: test statistics (size: sum.bin. - p - 1)
   pval: corresponding p-values (size = sum.bin. - p - 1)
-  fisher: pvalue à la Fisher
-  tippett: pvalue à la Tippett
+  fisher: pvalue Ã  la Fisher
+  tippett: pvalue Ã  la Tippett
 
 ******************************************************************************/
 
@@ -176,8 +176,8 @@ void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
  * @param MA test statistics (size: sum.bin. - p - 1)
  * @param I global test statistic
  * @param pval p-values corresponding to MA (size = sum.bin. - p - 1)
- * @param fisher pvalue à la Fisher
- * @param tippett pvalue à la Tippett
+ * @param fisher pvalue Ã  la Fisher
+ * @param tippett pvalue Ã  la Tippett
  * @param Ipval pvalue of I
  * @author Ivan Kojadinovic
  */
@@ -190,7 +190,7 @@ void empirical_copula_test_rv(double *U, int *n, int *p, int *b, int *m, double 
       n_ = (size_t)(*n);
   double J_size = ((double)n_) * n_ * (*p);
   if(J_size > max_size)
-      error(_("** empirical_copula.._rv(): n and/or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"), 
+      error(_("** empirical_copula.._rv(): n and/or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
   double *fisher0 = Calloc(*N, double);
@@ -207,7 +207,7 @@ void empirical_copula_test_rv(double *U, int *n, int *p, int *b, int *m, double 
     for (i=0;i<*n;i++)
       R[(*n) * j + i] = i;
 
-  /* compute W à la Fisher and à la Tippett from MA0*/
+  /* compute W Ã  la Fisher and Ã  la Tippett from MA0*/
   for (k=0;k<*N;k++) {
     fisher0[k] = 0.0;
     tippett0[k] = 1.0;

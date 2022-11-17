@@ -16,15 +16,20 @@ vignette: >
 This example implements the Swiss Alps copulas of Hofert, Vrins (2013, "Sibuya
 copulas").
 
+```{r prelim, echo=FALSE}
+## lower resolution - less size  (default dpi = 72):
+knitr::opts_chunk$set(dpi = 48)
+```
+
 ### Lambda and its inverse
-```{r}
+```{r Lambda}
 Lambda <- function(t) pmax(log(t), 0)
 LambdaInv <- function(t) (t != 0)*exp(t) ## <=>  ifelse(t == 0, 0, exp(t))
 ```
 
 ### M and its inverse (for $M_i, i=1,2$):
 <!--- MM FIXME: M2, M2Inv(): use `Vectorize()` - more elegant and faster! -->
-```{r}
+```{r M1-M2}
 M1 <- function(t) 0.01*t
 M1Inv <- function(t) t/0.01
 
@@ -45,7 +50,7 @@ M2Inv <- function(t) {
 ```
 
 ### S and its inverse (for $S_i, i=1,2$)
-```{r}
+```{r S1-S2}
 S1 <- function(t, H) exp(-(M1(t) + Lambda(t)*(1-exp(-H))))
 S1Inv <- function(u, H, upper=1e6) unlist(lapply(u, function(u.)
     uniroot(function(x) S1(x,H=H)-u., interval=c(0, upper))$root))
@@ -56,7 +61,7 @@ S2Inv <- function(u, H, upper=1e6) unlist(lapply(u, function(u.)
 
 ### Wrappers for $p_1$ and $p_2$ and their inverses:
 p and its inverse (for $p_i(t_k-)$ and $p_i(t_k), i = 1,2$):
-```{r, p1-p2}
+```{r p1-p2}
 p1 <- function(t, k, H) exp(-M1(t)-H*k)
 p1Inv <- function(u, k, H, upper=1e6) unlist(lapply(u, function(u.)
     uniroot(function(x) p1(x,k=k,H=H)-u., interval=c(0, upper))$root))
@@ -66,7 +71,7 @@ p2Inv <- function(u, k, H, upper=1e6) unlist(lapply(u, function(u.)
 ```
 
 and the wrappers, which work with `p1(), p2(), p1Inv(), p2Inv()` as arguments:
-```{r, p-pinv}
+```{r p-pinv}
 p <- function(t, k, H, I, p1, p2){
     if((lI <- length(I)) == 0){
         stop("error in p")
@@ -88,7 +93,7 @@ pInv <- function(u, k, H, I, p1Inv, p2Inv){
 ```
 
 ### Define the copula $C$
-```{r}
+```{r Copula}
 C <- function(u, H, Lambda, S1Inv, S2Inv) {
     if(all(u == 0)) 0 else
     u[1]*u[2] * exp(expm1(-H)^2 * Lambda(min(S1Inv(u[1],H), S2Inv(u[2],H))))
@@ -96,7 +101,7 @@ C <- function(u, H, Lambda, S1Inv, S2Inv) {
 ```
 Compute the singular component (given $u_1=$ `u1`, find $u_2=$ `u2` on the singular component)
 $u_2 = S2(S1^{-1}(u_1))$:
-```{r}
+```{r s.comp}
 s.comp <- function(u1, H, S1Inv, S2){
     if(u1 == 0) 0 else S2 (S1Inv(u1,H), H)
 }
@@ -155,7 +160,8 @@ rC <- function(n, H, LambdaInv, S1, S2, p1, p2, p1Inv, p2Inv){
 }
 
 ## Generate copula data
-n <- 2e4
+n <- 2e4  # <<< use for niceness
+n <- 4000 # (rather use to decrease *.html and final package size)
 H <- 10
 set.seed(271)
 U <- rC(n, H=H, LambdaInv=LambdaInv, S1=S1, S2=S2, p1=p1, p2=p2, p1Inv=p1Inv, p2Inv=p2Inv)
@@ -168,8 +174,8 @@ hist(U[,2], probability=TRUE, main="Histogram of the second component",
      xlab=expression(italic(U[2])))
 
 ## Plot U (copula sample)
-plot(U, cex=0.2, xlab=expression(italic(U[1])%~%~"U[0,1]"),
-                 ylab=expression(italic(U[2])%~%~"U[0,1]"))
+plot(U, pch=".", xlab=expression(italic(U[1])%~%~"U[0,1]"),
+               , ylab=expression(italic(U[2])%~%~"U[0,1]"))
 ```
 
 Wireframe plot to incorporate singular component :

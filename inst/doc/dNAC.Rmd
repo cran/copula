@@ -9,6 +9,9 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Densities of Two-Level Nested Archimedean Copulas}
 ---
+```{r prelim, echo=FALSE}
+## lower resolution - less size  (default dpi = 72):
+knitr::opts_chunk$set(dpi = 48)
 ```{r, message=FALSE}
 require(copula)
 require(grid)
@@ -23,7 +26,7 @@ Note that `nacLL()` will use package `partitions` and `polynom`.
 ### Example 1: ((1,2), (3,4,5))-Gumbel
 
 Consider the following setup.
-```{r}
+```{r ex1-G3}
 n <- 250
 family <- "Gumbel"
 tau <- c(0.2, 0.4, 0.6)
@@ -32,7 +35,7 @@ G3 <- onacopula(family, C(th[1], , list(C(th[2], 1:2), C(th[3], 3:5))))
 ```
 
 Sample and compute the log-likelihood.
-```{r}
+```{r ex1-LL}
 U <- rnacopula(n, G3)
 nacLL(G3, u=U) # log-likelihood at correct parameters
 ```
@@ -41,7 +44,7 @@ nacLL(G3, u=U) # log-likelihood at correct parameters
 ### Example 2: (1, (2,3), 4, (5,6,7))-Gumbel
 
 Consider the following setup.
-```{r}
+```{r ex2-G3}
 n <- 250
 family <- "Gumbel"
 cop. <- getAcop(family)
@@ -52,7 +55,7 @@ cop <- onacopula(family, C(th[1], c(1,4),
 ```
 
 Sample and compute the log-likelihood.
-```{r}
+```{r ex2-LL}
 U <- rnacopula(n, cop)
 nacLL(cop, u=U) # log-likelihood at correct parameters
 ```
@@ -61,7 +64,7 @@ nacLL(cop, u=U) # log-likelihood at correct parameters
 ### Example 3: (1, (2,3))-Gumbel
 
 Consider the following setup.
-```{r}
+```{r ex3-G}
 n <- 250
 family <- "Gumbel"
 tau <- c(0.25, 0.5)
@@ -70,7 +73,7 @@ copTrue <- onacopula(family, C(th[1], 1, C(th[2], 2:3)))
 ```
 
 Sample and compute the log-likelihood.
-```{r}
+```{r ex3-LL}
 U <- rnacopula(n, copTrue)
 nacLL(copTrue, u=U) # log-likelihood at correct parameters
 ```
@@ -81,7 +84,7 @@ nacLL(copTrue, u=U) # log-likelihood at correct parameters
 We consider a (1, (2,..,$d$))-structure structure here (we choose $d=3$ here but
 larger $d$ are of course possible; plotting can be done as long as we consider
 two parameters only).
-```{r}
+```{r G123}
 family <- "Gumbel" # choose "Clayton" or "Gumbel"
  compTr <- 1 # non-sectorial indices; *Tr stands for the true (nesting structure/model)
 scompTr <- 2:3 # sectorial indices (for plotting, need 2:d)
@@ -89,7 +92,7 @@ stopifnot(compTr==1) # otherwise, sub (for plotting, see below) is wrong
 ```
 
 We first define the negative log-likelihood.
-```{r}
+```{r nLL2}
 ##' Negative Log Likelihood for the two-parameter case
 ##' C_0({u_j}, C_1({u_k})) where j in 'comp';  k in 'scomp'
 nLL2 <- function(th, u, family, comp, scomp)
@@ -103,7 +106,7 @@ nLL2 <- function(th, u, family, comp, scomp)
 ```
 
 ### Determine the values of the negative log-likelihood on a grid
-```{r}
+```{r LL-grid}
 n <- 100
 cop. <- getAcop(family)
 tau <- c(0.25, 0.5)
@@ -124,7 +127,7 @@ val.grid <- apply(grid, 1, nLL2,
 
 First we determine some plot supplements including the optimum of the negative
 log-likelihood on the grid.
-```{r}
+```{r plot-supp}
 true.val <- c(th0=thTr[1], th1=thTr[2],
               nLL=nLL2(thTr, u=U, family=family, comp=compTr, scomp=scompTr)) # true value
 ind <- which.min(val.grid)
@@ -147,7 +150,7 @@ sTit <- list(c(expression(group("(",list(theta[0],theta[1]),")")^T),
 ```
 
 Now consider a wireframe and a level plot.
-```{r, fig.align="center", fig.width=6, fig.height=6}
+```{r wire+level, fig.align="center", fig.width=6, fig.height=6}
 wireframe(val.grid~grid[,1]*grid[,2], aspect=1, zoom=1.02, xlim=th0, ylim=th1,
           zlim= range(val.grid, as.numeric(pts[,3]), finite=TRUE),
           xlab=xlab, ylab=ylab, zlab=zlab, main=title, sub=sub, pts=pts,
@@ -192,12 +195,12 @@ levelplot(val.grid~grid[,1]*grid[,2], aspect=1, xlab=xlab, ylab=ylab,
 ### Computing the MLE (via optimization)
 
 For illustration purposes, we start not too closely to the optimum.
-```{r}
+```{r optim}
 ropt <- optim(c(1, 3), nLL2,
               u=U, family=family, comp=compTr, scomp=scompTr)
 ```
 
 Now compare the different results (true values, optimum on the grid, optimum via `optim()`).
-```{r}
+```{r comp-res}
 rbind(pts, optim=c(ropt$par, ropt$value))
 ```

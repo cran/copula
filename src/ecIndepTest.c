@@ -23,7 +23,7 @@
  *
  * @brief  Multivariate independence test based on the empirical
  *         copula process as proposed by Christian Genest and Bruno
- *         Rémillard (2004), Test 13:2, pages 335-369.
+ *         RÃ©millard (2004), Test 13:2, pages 335-369.
  *
  */
 
@@ -56,8 +56,8 @@ void J_u(int n, int p, const double R[], double *J)
  * @param subset subsets of {1,...,p} in binary notation (int) whose card. is
  *               between 2 and m in "natural" order
  * @param subset_char similar, for printing
- * @param fisher0 p-values à la Fisher
- * @param tippett0 p-values à la Tippett
+ * @param fisher0 p-values Ã  la Fisher
+ * @param tippett0 p-values Ã  la Tippett
  * @param verbose display progress bar if > 0
  * @author Ivan Kojadinovic
  */
@@ -70,7 +70,7 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
       n_ = (size_t)(*n);
   double J_size = ((double)n_) * n_ * (*p);
   if(J_size > max_size)
-      error(_("** simulate_empirical..(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"), 
+      error(_("** simulate_empirical..(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
   double *J = Calloc((size_t) J_size, double);
@@ -131,7 +131,7 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
 
   PutRNGstate();
 
-  /* compute W à la Fisher and à la Tippett from TA0 */
+  /* compute W Ã  la Fisher and Ã  la Tippett from TA0 */
   for (k=0; k<*N; k++)
     {
       fisher0[k] = 0.0;
@@ -169,8 +169,8 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
   between 2 and m in "natural" order
   TA: test statistics (size: sum.bin. - p - 1)
   pval: corresponding p-values (size = sum.bin. - p - 1)
-  fisher: pvalue à la Fisher
-  tippett: pvalue à la Tippett
+  fisher: pvalue Ã  la Fisher
+  tippett: pvalue Ã  la Tippett
 
 ******************************************************************************/
 
@@ -190,11 +190,11 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
  * @param TA test statistics (size: sum.bin. - p - 1)
  * @param G global statistic
  * @param pval p-values (size = sum.bin. - p - 1) for TA
- * @param fisher pvalue à la Fisher
- * @param tippett pvalue à la Tippett
+ * @param fisher pvalue Ã  la Fisher
+ * @param tippett pvalue Ã  la Tippett
  * @param globpval pvalue of In
- * @param fisher0 p-values à la Fisher under the null
- * @param tippett0 p-values à la Tippett under the null
+ * @param fisher0 p-values Ã  la Fisher under the null
+ * @param tippett0 p-values Ã  la Tippett under the null
  * @author Ivan Kojadinovic
  */
 void empirical_copula_test(double *R, int *n, int *p, int *m, double *TA0, double *G0,
@@ -207,7 +207,7 @@ void empirical_copula_test(double *R, int *n, int *p, int *m, double *TA0, doubl
       n_ = (size_t)(*n);
   double J_size = ((double)n_) * n_ * (*p);
   if(J_size > max_size)
-      error(_("** empirical_copula_test(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"), 
+      error(_("** empirical_copula_test(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
   double *J = Calloc((size_t) J_size, double);

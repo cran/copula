@@ -22,7 +22,7 @@
  *
  * @brief Serial independence test  based on the empirical
  *        copula process as proposed by Christian Genest and Bruno
- *        Rémillard (2004), Test 13:2, pages 335-369.
+ *        RÃ©millard (2004), Test 13:2, pages 335-369.
  *
  */
 
@@ -56,8 +56,8 @@ void J_s(int n, int p, const double U[], double *J)
  * @param subset subsets of {1,...,p} in binary notation (int) whose card. is
  *               between 2 and m in "natural" order and that contain 1
  * @param subset_char similar, for printing
- * @param fisher0 p-values à la Fisher
- * @param tippett0 p-values à la Tippett
+ * @param fisher0 p-values Ã  la Fisher
+ * @param tippett0 p-values Ã  la Tippett
  * @param verbose display progress bar if > 0
  * @author Ivan Kojadinovic
  */
@@ -71,7 +71,7 @@ void simulate_empirical_copula_serial(int *n, int *N, int *p, int *m,
       n_ = (size_t)(*n);
   double J_size = ((double)n_) * n_ * (*p);
   if(J_size > max_size)
-      error(_("** simulate_emp.cop.serial(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"), 
+      error(_("** simulate_emp.cop.serial(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
   double *U = Calloc(np, double);
@@ -133,7 +133,7 @@ void simulate_empirical_copula_serial(int *n, int *N, int *p, int *m,
 
   PutRNGstate();
 
-  /* compute W à la Fisher and à la Tippett from TA0*/
+  /* compute W Ã  la Fisher and Ã  la Tippett from TA0*/
   for (k=0;k<*N;k++) {
     fisher0[k] = 0.0;
     tippett0[k] = 1.0;
@@ -172,11 +172,11 @@ void simulate_empirical_copula_serial(int *n, int *N, int *p, int *m,
  * @param TA test statistics (size: sum.bin. - 1)
  * @param G global statistic
  * @param pval p-values corresponding to the TAs (size = sum.bin. - 1)
- * @param fisher pvalue à la Fisher
- * @param tippett pvalue à la Tippett
+ * @param fisher pvalue Ã  la Fisher
+ * @param tippett pvalue Ã  la Tippett
  * @param globpval pvalue of G
- * @param fisher0 pvalues à la Fisher under the null
- * @param tippett0 pvalues à la Tippett under the null
+ * @param fisher0 pvalues Ã  la Fisher under the null
+ * @param tippett0 pvalues Ã  la Tippett under the null
  * @author Ivan Kojadinovic
  */
 void empirical_copula_test_serial(double *U, int *n, int *p, int *m, double *TA0, double *G0,
@@ -189,7 +189,7 @@ void empirical_copula_test_serial(double *U, int *n, int *p, int *m, double *TA0
       n_ = (size_t)(*n);
   double J_size = ((double)n_) * n_ * (*p);
   if(J_size > max_size)
-      error(_("** emp.cop.test_serial(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"), 
+      error(_("** emp.cop.test_serial(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
   double *J = Calloc((size_t) J_size, double);

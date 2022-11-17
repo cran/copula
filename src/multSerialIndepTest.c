@@ -75,7 +75,7 @@ void bootstrap_serial(int *n, int *N, int *p, int *q, double *U, int *m,
       n_ = (size_t)(*n);
   double J_size = ((double)n_) * n_ * (*p);
   if(J_size > max_size)
-      error(_("** bootstrap_serial(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"), 
+      error(_("** bootstrap_serial(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
   int *B = Calloc(np, int);
@@ -162,8 +162,8 @@ void bootstrap_serial(int *n, int *N, int *p, int *q, double *U, int *m,
  * @param MA test statistics (size: sum.bin. - 1)
  * @param I global test statistic
  * @param pval p-values for the MA (size = sum.bin. - 1)
- * @param fisher pvalue à la Fisher
- * @param tippett pvalue à la Tippett
+ * @param fisher pvalue Ã  la Fisher
+ * @param tippett pvalue Ã  la Tippett
  * @param Ipval pvalue for I
  * @author Ivan Kojadinovic
  */
@@ -176,7 +176,7 @@ void empirical_copula_test_rv_serial(double *U, int *n, int *p, int *q, int *m, 
       n_ = (size_t)(*n);
   double J_size = ((double)n_) * n_ * (*p);
   if(J_size > max_size)
-      error(_("** empirical_copula_t.r.s(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"), 
+      error(_("** empirical_copula_t.r.s(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
   double *fisher0 = Calloc(*N, double);
@@ -191,7 +191,7 @@ void empirical_copula_test_rv_serial(double *U, int *n, int *p, int *q, int *m, 
   for (i=0;i<np;i++)
       B[i] = i;
 
-  /* compute W à la Fisher and à la Tippett from MA0*/
+  /* compute W Ã  la Fisher and Ã  la Tippett from MA0*/
   for (k=0;k<*N;k++)
     {
       fisher0[k] = 0.0;
