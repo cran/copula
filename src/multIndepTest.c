@@ -72,7 +72,7 @@ void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
   int i, j, k, sb[1];
   size_t max_size = (size_t)-1,// C99 has SIZE_MAX
       n_ = (size_t)(*n);
-  double J_size = ((double)n_) * n_ * (*p);
+  double J_size = ((double)n_) * ((double)n_) * (*p);
   if(J_size > max_size)
       error(_("** bootstrap_MA_I(): n and/or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
@@ -188,7 +188,7 @@ void empirical_copula_test_rv(double *U, int *n, int *p, int *b, int *m, double 
   int i, j, k, count, sb = (int)sum_binom(*p,*m);
   size_t max_size = (size_t)-1,// C99 has SIZE_MAX
       n_ = (size_t)(*n);
-  double J_size = ((double)n_) * n_ * (*p);
+  double J_size = ((double)n_) * ((double)n_) * (*p);
   if(J_size > max_size)
       error(_("** empirical_copula.._rv(): n and/or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);

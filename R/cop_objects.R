@@ -1024,7 +1024,7 @@ copJoe <-
 		  dV0 = function(x,theta,log = FALSE) {
 		      if(log) lchoose(1/theta,x) else abs(choose(1/theta,x))
 		  },
-		  V01 = function(V0, theta0, theta1, approx = 10000) {
+		  V01 = function(V0, theta0, theta1, approx = 10000L) {
 		      ## approx is the largest number of summands before asymptotics is used
 		      alpha <- theta0/theta1
 		      rF01Joe(V0, alpha, approx)

@@ -69,7 +69,7 @@ void simulate_empirical_copula_serial(int *n, int *N, int *p, int *m,
   int i, j, k, np = *n + *p - 1, p1[1], m1[1], sb[1], count, index;
   size_t max_size = (size_t)-1,// C99 has SIZE_MAX
       n_ = (size_t)(*n);
-  double J_size = ((double)n_) * n_ * (*p);
+  double J_size = ((double)n_) * ((double)n_) * (*p);
   if(J_size > max_size)
       error(_("** simulate_emp.cop.serial(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
@@ -187,7 +187,7 @@ void empirical_copula_test_serial(double *U, int *n, int *p, int *m, double *TA0
   int i, k, count, sb = (int)sum_binom(*p-1,*m-1);
   size_t max_size = (size_t)-1,// C99 has SIZE_MAX
       n_ = (size_t)(*n);
-  double J_size = ((double)n_) * n_ * (*p);
+  double J_size = ((double)n_) * ((double)n_) * (*p);
   if(J_size > max_size)
       error(_("** emp.cop.test_serial(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);

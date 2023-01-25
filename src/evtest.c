@@ -452,8 +452,8 @@ void evtestA_derA(double *U, double *V, int *n,
     int CFG       = CFG_tr__etc[0],
 	trace_lev = CFG_tr__etc[1],
 	report_err= CFG_tr__etc[2];
-  double  *influ  = Calloc((*n) * (*m), double), *influ2;
-  if(CFG) influ2 = Calloc((*n) * (*m), double);
+  double  *influ = Calloc((*n) * (*m), double), *influ2;
+  influ2 = CFG ? Calloc((*n) * (*m), double) : NULL;
   double *random = Calloc(*n, double);
 
   /* for numerical integration [Rdqags() <==> R's integrate()]: begin */

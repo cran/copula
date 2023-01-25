@@ -142,7 +142,7 @@ static void binary2subset(int n, int b, int *x) {
 void k_power_set_char(int *n, int *sb, int *k_power_set, char **subset) {
 
   subset[0] = (char *) R_alloc(3, sizeof(char));
-  sprintf(subset[0],"{}");
+  snprintf(subset[0], 3, "{}");
 
   for(int i=1; i<*sb; i++) {
     int j, x[32];
@@ -153,11 +153,11 @@ void k_power_set_char(int *n, int *sb, int *k_power_set, char **subset) {
     binary2subset(*n, k_power_set[i], x);
 
     subset[i] = (char *) R_alloc(SET_MAX * (*n), sizeof(char));
-    sprintf(subset[i],"{%d",x[0]+1);
+    snprintf(subset[i], SET_MAX * (*n), "{%d", x[0]+1);
 
     for(j=1; j < card(k_power_set[i]); j++) {
       char string[255];
-      sprintf(string,",%d", x[j]+1);
+      snprintf(string,255, ",%d", x[j]+1);
       strcat(subset[i],string);
     }
 

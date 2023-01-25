@@ -154,7 +154,7 @@ inline void progressBar(int k, int N, int w) {
 
     /// percentage done
     double percent = k / (double)N;
-    int c = percent * w;
+    int c = (int)(percent * w);
 
     /// display the bar
     Rprintf("  |");

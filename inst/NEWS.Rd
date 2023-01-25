@@ -3,7 +3,18 @@
 \name{NEWS}
 \title{News for \R Package \pkg{copula}}% MM: look into ../svn-log-from.all
 
-\section{Changes in version 1.1-1 (2022-11-17, svn r1879)}{
+\section{Changes in version 1.1-2 (2023-01-20, svn r1882)}{
+  \subsection{Miscellaneous}{
+    \itemize{
+      \item Avoid long lines in vignette R output.
+      \item Replace \code{sprintf()} by \code{snprintf()} as it is going to
+      be deprecated in upcoming C environments, e.g., on macOS 13.
+      \item Fix \emph{all} current compiler warnings
+    }
+  }
+}
+
+\section{Changes in version 1.1-1 (2022-11-17, svn r1880)}{
   \subsection{Miscellaneous}{
     \itemize{
       \item Fix non-UTF-8 accents in C code {WARN on CRAN}.

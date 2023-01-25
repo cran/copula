@@ -68,7 +68,7 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
   int i, j, k, index, sb[1];
   size_t max_size = (size_t)-1,// C99 has SIZE_MAX
       n_ = (size_t)(*n);
-  double J_size = ((double)n_) * n_ * (*p);
+  double J_size = ((double)n_) * ((double)n_) * (*p);
   if(J_size > max_size)
       error(_("** simulate_empirical..(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
@@ -205,7 +205,7 @@ void empirical_copula_test(double *R, int *n, int *p, int *m, double *TA0, doubl
   int k, count, sb = (int)sum_binom(*p,*m);
   size_t max_size = (size_t)-1,// C99 has SIZE_MAX
       n_ = (size_t)(*n);
-  double J_size = ((double)n_) * n_ * (*p);
+  double J_size = ((double)n_) * ((double)n_) * (*p);
   if(J_size > max_size)
       error(_("** empirical_copula_test(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);

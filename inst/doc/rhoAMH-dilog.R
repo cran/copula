@@ -329,21 +329,13 @@ toLatex(sessionInfo(), locale=FALSE)
 
 
 ###################################################
-### code chunk number 26: copula-version (eval = FALSE)
+### code chunk number 26: copula-version
 ###################################################
-## my.strsplit(  packageDescription("copula")[["Date"]]  )
+unlist(packageDescription("copula")[c("Package", "Version", "Date")])
 
 
 ###################################################
-### code chunk number 27: copula-version
-###################################################
-pd <- gsub("\\$", '', packageDescription("copula")[["Date"]])
-p2 <- strsplit(sub("^Date: +", '', pd),"\n")[[1]][2:1]
-cat(p2[1], "-- ", sub(" *, *$", '', p2[2]), "\n", sep="")
-
-
-###################################################
-### code chunk number 28: finalizing
+### code chunk number 27: finalizing
 ###################################################
 options(op.orig)
 

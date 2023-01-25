@@ -1153,16 +1153,8 @@ rbind(th0 =
 toLatex(sessionInfo())
 @
 %%
-%% packageDescription("copula")[c("Version", "LastChanged")]
-%% Now,  packageDescription("copula")[c("Date", "Revision")]  is too long,
-%% ----> we "cheat" as follows:
-<<copula-version, eval=FALSE>>=
-my.strsplit(  packageDescription("copula")[c("Date", "Revision")]  )
-@
-<<copula-version,echo=FALSE>>=
-pd <- lapply(packageDescription("copula")[c("Date", "Revision")],
-             function(ch) gsub("\\$",'', ch))
-cat(pd[["Revision"]], "-- ", sub("^Date: +", '', pd[["Date"]]), "\n", sep="")
+<<copula-version>>=
+unlist(packageDescription("copula")[c("Package", "Version", "Date")])
 <<finalizing, echo=FALSE>>=
 options(op.orig)
 @

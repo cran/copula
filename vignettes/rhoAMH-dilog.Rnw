@@ -619,21 +619,12 @@ stopifnot(all.equal(th/3, rhoAMH(th), tol=4e-16),
 <<sessionInfo, results=tex>>=
 toLatex(sessionInfo(), locale=FALSE)
 @
-%%
-%% packageDescription("copula")[c("Version", "LastChanged")]
-%% Now,  packageDescription("copula")[c("Date", "Revision")]  is too long,
-%% ----> we "cheat" as follows:
-<<copula-version, eval=FALSE>>=
-my.strsplit(  packageDescription("copula")[["Date"]]  )
-@
-<<copula-version,echo=FALSE>>=
-pd <- gsub("\\$", '', packageDescription("copula")[["Date"]])
-p2 <- strsplit(sub("^Date: +", '', pd),"\n")[[1]][2:1]
-cat(p2[1], "-- ", sub(" *, *$", '', p2[2]), "\n", sep="")
+
+<<copula-version>>=
+unlist(packageDescription("copula")[c("Package", "Version", "Date")])
 <<finalizing, echo=FALSE>>=
 options(op.orig)
 @
-
 
 \bibliography{nacopula}
 
