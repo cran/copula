@@ -67,7 +67,7 @@ void simulate_empirical_copula_serial(int *n, int *N, int *p, int *m,
 				      double *tippett0, int *verbose)
 {
   int i, j, k, np = *n + *p - 1, p1[1], m1[1], sb[1], count, index;
-  size_t max_size = (size_t)-1,// C99 has SIZE_MAX
+  size_t max_size = SIZE_MAX,
       n_ = (size_t)(*n);
   double J_size = ((double)n_) * ((double)n_) * (*p);
   if(J_size > max_size)
@@ -185,7 +185,7 @@ void empirical_copula_test_serial(double *U, int *n, int *p, int *m, double *TA0
 				  double *fisher0, double *tippett0)
 {
   int i, k, count, sb = (int)sum_binom(*p-1,*m-1);
-  size_t max_size = (size_t)-1,// C99 has SIZE_MAX
+  size_t max_size = SIZE_MAX,
       n_ = (size_t)(*n);
   double J_size = ((double)n_) * ((double)n_) * (*p);
   if(J_size > max_size)

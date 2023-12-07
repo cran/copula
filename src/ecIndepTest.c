@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
+  Copyright (C) 2012--2023 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 
   This program is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the Free Software
@@ -66,7 +66,7 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
 			       double *fisher0, double *tippett0, int *verbose)
 {
   int i, j, k, index, sb[1];
-  size_t max_size = (size_t)-1,// C99 has SIZE_MAX
+  size_t max_size = SIZE_MAX,
       n_ = (size_t)(*n);
   double J_size = ((double)n_) * ((double)n_) * (*p);
   if(J_size > max_size)
@@ -79,8 +79,8 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
   double *L = Calloc(*p, double);
 
   if (*verbose && J_size > 100000)
-      Rprintf("simulate_empirical() working with double array J of size %ld",
-	      (size_t) J_size);
+      Rprintf("simulate_empirical() working with double array J of size %lld",
+	      (long long) J_size);
   /* number of subsets */
   *sb = (int)sum_binom(*p,*m);
 
@@ -203,7 +203,7 @@ void empirical_copula_test(double *R, int *n, int *p, int *m, double *TA0, doubl
 			   double *fisher0, double *tippett0)
 {
   int k, count, sb = (int)sum_binom(*p,*m);
-  size_t max_size = (size_t)-1,// C99 has SIZE_MAX
+  size_t max_size = SIZE_MAX,
       n_ = (size_t)(*n);
   double J_size = ((double)n_) * ((double)n_) * (*p);
   if(J_size > max_size)

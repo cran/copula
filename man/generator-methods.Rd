@@ -117,9 +117,10 @@ dAdu(copula, w)
 %\author{Marius Hofert, Ivan Kojadinovic, Martin Maechler and Jun Yan}
 \references{
   Gudendorf, G. and Segers, J. (2010).
-  {Extreme-value copulas}. In \emph{Copula theory and its applications},
-  {Jaworski, P., Durante, F., H\enc{ä}{a}rdle, W. and Rychlik, W., Eds}.
-  {Springer-Verlag}, {Lecture Notes in Statistics}, {127--146},
+  Extreme-value copulas. In \emph{Copula theory and its applications},
+  Jaworski, P., Durante, F., H\enc{ä}{a}rdle, W. and Rychlik, W., Eds.
+  Springer-Verlag, Lecture Notes in Statistics, 127--146,
+  \doi{10.1007/978-3-642-12465-5}; preprint at
   \url{https://arxiv.org/abs/0911.1015}.
 }
 \seealso{

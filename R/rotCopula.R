@@ -211,27 +211,27 @@ setMethod("rCopula", signature("numeric", "rotCopula"),
 
 ##' sign() of a bivariate rotated copula
 ##' @return -1 : if the two 'flip' differ;  +1 : if they are (T,T) or (F,F)
-sign.rot2C <- function(flip)
+sign_rot2c <- function(flip)
     if(length(flip) == 1L || flip[1L] == flip[2L]) +1 else -1
 
 ## rho
 setMethod("rho", signature("rotCopula"), function(copula) {
     stopifnot(dim(copula@copula) == 2)
-    sign.rot2C(copula@flip) * rho(copula@copula)
+    sign_rot2c(copula@flip) * rho(copula@copula)
 })
 
 ## iRho
 setMethod("iRho", signature("rotCopula"), function(copula, rho)
-    iRho(copula@copula, sign.rot2C(copula@flip) * rho))
+    iRho(copula@copula, sign_rot2c(copula@flip) * rho))
 
 ## tau
 setMethod("tau", signature("rotCopula"), function(copula) {
-    sign.rot2C(copula@flip) * tau(copula@copula)
+    sign_rot2c(copula@flip) * tau(copula@copula)
 })
 
 ## iTau
 setMethod("iTau", signature("rotCopula"), function(copula, tau) {
-    iTau(copula@copula, sign.rot2C(copula@flip) * tau)
+    iTau(copula@copula, sign_rot2c(copula@flip) * tau)
 })
 
 ## lambda
@@ -270,7 +270,7 @@ setMethod("dCdtheta", signature("rotCopula"),
           function(copula, u, ...) {
     if (dim(copula) > 2)
         stop("method 'dCdtheta' not implemented for 'rotCopula' objects in dimension higher than two")
-    sign.rot2C(copula@flip) * dCdtheta(copula@copula, apply.flip(u, copula@flip))
+    sign_rot2c(copula@flip) * dCdtheta(copula@copula, apply.flip(u, copula@flip))
 })
 
 ## fitCopula

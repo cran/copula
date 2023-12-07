@@ -10,7 +10,7 @@
   (\code{"\linkS4class{mvdc}"}) to multivariate data,
   estimating both the marginal and the copula parameters.
 
-  If you assume {non parametric} margins, in other words, take the
+  If you assume (non parametric) margins, in other words, take the
   empirical distributions for all margins, you can use
   \code{\link{fitCopula}(*, \link{pobs}(x))} instead.
 }

@@ -50,7 +50,7 @@ setClass("mixCopula", contains = "parCopula",
 
 ##' A Mixture of Explicit Copulas
 setClass("mixExplicitCopula", contains = "mixCopula",
-         slot = c("exprdist" = "expression")
+         slots = c("exprdist" = "expression")
          )
 
 

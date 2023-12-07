@@ -33,8 +33,8 @@ Eulerian.all (n)
   ascents (or exactly \eqn{k} descents).
 
   Stirling numbers of the first kind:\cr
-  s(n,k) = (-1)^{n-k} times
-  the number of permutations of 1,2,\dots,n with exactly k cycles.
+  \eqn{s(n,k) = (-1)^{n-k}} times
+  the number of permutations of 1,2,\dots,n with exactly \eqn{k} cycles.
 
   Stirling numbers of the second kind:\cr
   \eqn{S^{(k)}_n}{S(n,k)} is the number of ways of partitioning a set

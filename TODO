@@ -1,5 +1,8 @@
 ##-*- org -*-->  Emacs .. [Tab] key + [Org] menu; C-c C-o to follow links
-* Very Short Term (before 1.0.0):
+** TODO for CRAN: Package check time is '> 10 min' notably on Windows *even* w/o vignettes
+*** now have nice  ~/bin/R-pkg-timings  to extract timings from  copula.Rcheck*/
+*** also  Misc/timing_vignettes.R  {we *can* save time; but its total is only 1m40s}
+* Very Short Term:
 ** TODO [MM] fitCopula(<mixCopula>) should (allow to) estimate weights too.
 * Short Term (before 1.1.0 and before MM gets retired ;-)):
 ** TODO [MM] Export lsum()  and lssum() ... slightly simplified versions of them have help pages now in CRAN pkg 'DPQ'.

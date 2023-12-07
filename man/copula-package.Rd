@@ -59,7 +59,7 @@
   Further information is available in the following \link{vignettes}:
   \tabular{ll}{
     \code{nacopula-pkg} \tab Nested Archimedean Copulas Meet R (\url{../doc/nacopula-pkg.pdf})\cr
-    \code{Frank-Rmpfr}  \tab {Numerically Stable Frank via Multiprecision in R} (\url{../doc/Frank-Rmpfr})\cr
+    \code{Frank-Rmpfr}  \tab Numerically Stable Frank via Multiprecision in R (\url{../doc/Frank-Rmpfr})\cr
   }
 
   For a list of exported functions, use \code{help(package = "copula")}.

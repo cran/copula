@@ -70,7 +70,7 @@ void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
 		    int *verbose)
 {
   int i, j, k, sb[1];
-  size_t max_size = (size_t)-1,// C99 has SIZE_MAX
+  size_t max_size = SIZE_MAX,
       n_ = (size_t)(*n);
   double J_size = ((double)n_) * ((double)n_) * (*p);
   if(J_size > max_size)
@@ -186,7 +186,7 @@ void empirical_copula_test_rv(double *U, int *n, int *p, int *b, int *m, double 
 			      double *pval, double *fisher, double *tippett, double *Ipval)
 {
   int i, j, k, count, sb = (int)sum_binom(*p,*m);
-  size_t max_size = (size_t)-1,// C99 has SIZE_MAX
+  size_t max_size = SIZE_MAX,
       n_ = (size_t)(*n);
   double J_size = ((double)n_) * ((double)n_) * (*p);
   if(J_size > max_size)

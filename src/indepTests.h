@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
+  Copyright (C) 2012--2023 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 
   This program is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,8 @@
 #ifndef INDEPTESTS_H
 #define INDEPTESTS_H
 
+
+#include <stdint.h>
 #include "copula_int.h"
 
 // indepTest_utils.c  --- temporary arrays -------------------------------------
@@ -44,7 +46,7 @@ void J_s (int n, int p,                const double U[],                double *
 void J_sm(int n, int p, int q, const double U[], const int B[], double *J);
 void J_u (int n, int p,        const double R[],                double *J);
 
-// utility function: text progress bar 
+// utility function: text progress bar
 void progressBar(int k, int N, int w);
 
 // multIndepTest.c  --- Independence test among random vectors ------------------

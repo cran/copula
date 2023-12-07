@@ -71,7 +71,7 @@ void bootstrap_serial(int *n, int *N, int *p, int *q, double *U, int *m,
 		      int *verbose)
 {
   int i, k, np = *n + *p - 1, p1[1], m1[1], sb[1];
-  size_t max_size = (size_t)-1,// C99 has SIZE_MAX
+  size_t max_size = SIZE_MAX,
       n_ = (size_t)(*n);
   double J_size = ((double)n_) * ((double)n_) * (*p);
   if(J_size > max_size)

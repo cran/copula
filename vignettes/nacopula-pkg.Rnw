@@ -14,6 +14,7 @@
 \Plaintitle{Nested Archimedean Copulas Meet R---The nacopula Package} %% without formatting
 % \Shorttitle{}
 %
+% The index entry makes it into  build/vignette.rds :
 %\VignetteIndexEntry{Nested Archimedean Copulas Meet R}% << shown on CRAN page!
 %\VignetteDepends{copula}
 %\VignetteDepends{lattice}
@@ -60,7 +61,7 @@
 	8092 Zurich, Switzerland\\
 	E-mail: \email{marius.hofert@math.ethz.ch}\\
 	URL: \url{http://www.math.ethz.ch/~hofertj/}
-	\par\bigskip
+ \par\bigskip
 	Martin M\"achler\\
 	Seminar f\"ur Statistik, HG G~16\\
 	ETH Zurich\\
@@ -79,22 +80,22 @@
 
 %% Marius' packages
 \usepackage[american]{babel}%for American English
-\usepackage{microtype}%for character protrusion and font expansion (only with pdflatex)
+%\usepackage{microtype}%for character protrusion and font expansion (only with pdflatex)
 \usepackage{amsmath}%sophisticated mathematical formulas with amstex (includes \text{})
 \usepackage{mathtools}%fix amsmath deficiencies
 \usepackage{amssymb}%sophisticated mathematical symbols with amstex (includes \mathbb{})
 \usepackage{amsthm}%theorem environments
 \usepackage{bm}%for bold math symbols: \bm (= bold math)
 %NON-STANDARD:\RequirePackage{bbm}%only for indicator functions
-\usepackage{enumitem}%for automatic numbering of new enumerate environments
-\usepackage[
-  format=hang,
-  % NOT for JSS: labelsep=space,
-  justification=justified,
-  singlelinecheck=false%,
-  % NOT for JSS: labelfont=bf
-]{caption}%for captions
-\usepackage{tikz}%sophisticated graphics package
+% \usepackage{enumitem}%for automatic numbering of new enumerate environments
+% \usepackage[
+%   format=hang,
+%   % NOT for JSS: labelsep=space,
+%   justification=justified,
+%   singlelinecheck=false%,
+%   % NOT for JSS: labelfont=bf
+% ]{caption}%for captions
+\usepackage{tikz}%sophisticated graphics package (used !)
 \usepackage{tabularx}%for special table environment (tabularx-table)
 \usepackage{booktabs}%for table layout
 
@@ -107,12 +108,12 @@
 %%
 
 %% Marius' settings
-\newcolumntype{d}[2]{D{.}{.}{#1.#2}}%aligns the entry at "." of a column if "d" is used as column type
+% \newcolumntype{d}[2]{D{.}{.}{#1.#2}}%aligns the entry at "." of a column if "d" is used as column type
 %where the arguments specify the number of digits to the left and right for which space is kept in a column
 %(always set to the maximal numbers that appear in the whole table)
-\setlength{\heavyrulewidth}{0.4pt}%sets width of toprule and bottomrule in booktabs-tables
-\setlength{\lightrulewidth}{0.4pt}%sets width of midrule in booktabs-tables
-\setlength{\cmidrulewidth}{0.4pt}%sets width of cmidrule in booktabs-tables
+% \setlength{\heavyrulewidth}{0.4pt}%sets width of toprule and bottomrule in booktabs-tables
+% \setlength{\lightrulewidth}{0.4pt}%sets width of midrule in booktabs-tables
+% \setlength{\cmidrulewidth}{0.4pt}%sets width of cmidrule in booktabs-tables
 
 %% Marius' environments
 \newtheoremstyle{mythmstyle}%
@@ -124,38 +125,39 @@
 	{}%punctuation after head
 	{\newline}%space after head
 	{\thmname{#1}\ \thmnumber{#2}\ \thmnote{(#3)}}%head spec
-% \newcommand*{\myskip}{~\vspace{-1.2em}}%skip and space when environment begins with enumerate
+\newcommand*{\myskip}{~\vspace{-1.2em}}%skip and space when environment begins with enumerate
 \newcommand*{\myskipalgo}{~\vspace{-2.6em}}%skip and space when algorithm begins with tabbing
 \newcommand*{\myskipalgotext}{~\par\vspace{-1.2em}}%skip and space when algorithm begins with text
 \theoremstyle{mythmstyle}
 \newtheorem{definition}{Definition}[section]%number all environments in a sequence (for every section)
-\newtheorem{proposition}[definition]{Proposition}
-\newtheorem{lemma}[definition]{Lemma}
-\newtheorem{theorem}[definition]{Theorem}
-\newtheorem{corollary}[definition]{Corollary}
-\newtheorem{remark}[definition]{Remark}
-\newtheorem{example}[definition]{Example}
+% \newtheorem{proposition}[definition]{Proposition}
+% \newtheorem{lemma}[definition]{Lemma}
+% \newtheorem{theorem}[definition]{Theorem}
+% \newtheorem{corollary}[definition]{Corollary}
+% \newtheorem{remark}[definition]{Remark}
+% \newtheorem{example}[definition]{Example}
 \newtheorem{algorithm}[definition]{Algorithm}
-\renewcommand*\proofname{Proof}
-\makeatletter%correct qed adjustment
-\renewenvironment{proof}[1][\proofname]{\par
-  \pushQED{\qed}%
-  \normalfont\topsep2\p@\@plus2\p@\relax
-  \trivlist
-  \item[\hskip\labelsep
-     \sffamily\bfseries #1]~\newline\ignorespaces
-}{%
-  \popQED\endtrivlist\@endpefalse
-}
-\makeatother
+% \renewcommand*\proofname{Proof}
+% \makeatletter%correct qed adjustment
+% \renewenvironment{proof}[1][\proofname]{\par
+%   \pushQED{\qed}%
+%   \normalfont\topsep2\p@\@plus2\p@\relax
+%   \trivlist
+%   \item[\hskip\labelsep
+%      \sffamily\bfseries #1]~\newline\ignorespaces
+% }{%
+%   \popQED\endtrivlist\@endpefalse
+% }
+% \makeatother
 
-\long\def\symbolfootnote[#1]#2{\begingroup%
-  \def\thefootnote{\fnsymbol{footnote}}\footnote[#1]{#2}\endgroup}
+% \long\def\symbolfootnote[#1]#2{\begingroup%
+%   \def\thefootnote{\fnsymbol{footnote}}\footnote[#1]{#2}\endgroup}
 %% and \symbolfootnote[1]{footnote} to get an * , 2: dagger, 3: double dagger...
 %
 \newcommand*{\R}{\proglang{R}}%{\textsf{R}}
 %% Marius' commands
 \newcommand*{\eps}{\varepsilon}
+\newcommand*{\CRANpkg}[1]{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 %NON-STANDARD{bbm}:\newcommand*{\I}{\mathbbm{1}}
 \newcommand*{\I}{\mathbf{1}}
 \newcommand*{\IN}{\mathbb{N}}
@@ -164,15 +166,15 @@
 \newcommand*{\IC}{\mathbb{C}}
 \newcommand*{\IP}{\Prob}
 \newcommand*{\IE}{\E}
-\newcommand*{\abs}{\operatorname*{abs}}
-\renewcommand*{\S}{\operatorname*{S}}
+% \newcommand*{\abs}{\operatorname*{abs}}
+% \renewcommand*{\S}{\operatorname*{S}}
 \newcommand*{\tS}{\operatorname*{\tilde{S}}}
-\newcommand*{\ran}{\operatorname*{ran}}
+% \newcommand*{\ran}{\operatorname*{ran}}
 \newcommand*{\sgn}{\operatorname*{sgn}}
 \newcommand*{\sign}{\operatorname*{sign}}
-\newcommand*{\vp}{\varphi}
-\newcommand*{\vpi}{{\varphi^{-1}}}
-\newcommand*{\vppi}{{\varphi^{[-1]}}}
+% \newcommand*{\vp}{\varphi}
+% \newcommand*{\vpi}{{\varphi^{-1}}}
+% \newcommand*{\vppi}{{\varphi^{[-1]}}}
 \newcommand*{\psiD}{\psi^\prime}
 \newcommand*{\psii}{{\psi^{-1}}}
 \newcommand*{\psiis}[1]{{\psi_{#1}^{-1}}}

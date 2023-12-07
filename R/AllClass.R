@@ -1,4 +1,4 @@
-## Copyright (C) 2012 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
+## Copyright (C) 2012--2023 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
 ## This program is free software; you can redistribute it and/or modify it under
 ## the terms of the GNU General Public License as published by the Free Software
@@ -91,7 +91,7 @@ setClass("acopula",
 		     ## test that the function can be called with NULL
 		     r0 <- tryCatch(if(nArgs == 2) f(NULL, theta = th) else f(NULL),
                                     error = function(e) e)
-		     if(is(r0, "error"))
+		     if(inherits(r0, "error"))
 			 sprintf("calling %s(NULL%s fails: %s", sName,
 				 if(nArgs == 2) sprintf(", %g)", th) else ")",
 				 r0$message)
@@ -107,8 +107,8 @@ setClass("acopula",
              if(!isTRUE(tt <- checkFun("psi", 2)))	return(tt)
              if(!isTRUE(tt <- checkFun("iPsi", 2)))	return(tt)
              if(!isTRUE(tt <- checkFun("tau", 1)))	return(tt)
-             if(!isTRUE(tt <- checkFun("paraConstr", 2, chkVect=FALSE))) return(tt)
-             if(!isTRUE(tt <- checkFun("nestConstr", 2, chkVect=FALSE))) return(tt)
+             if(!isTRUE(tt <- checkFun("paraConstr", 2, chkVectorizing=FALSE))) return(tt)
+             if(!isTRUE(tt <- checkFun("nestConstr", 2, chkVectorizing=FALSE))) return(tt)
 
              ## ...
              ## ... TODO
