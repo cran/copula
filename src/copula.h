@@ -19,6 +19,7 @@
 #ifndef COPULA_DEFS_H
 #define COPULA_DEFS_H
 
+#define STRICT_R_HEADERS
 #include <R.h>
 
 #include "An.h"

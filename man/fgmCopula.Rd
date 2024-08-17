@@ -17,6 +17,8 @@ fgmCopula(param, dim = 2)
   \code{"\linkS4class{fgmCopula}"}.
 }
 \note{
+  Note that a \eqn{d}-dimensional \code{fgmCopula} must have
+  \code{npar}\eqn{= 2^d - d - 1} parameters.
   The verification of the validity of the parameter values is of high
   complexity and may not work for high dimensional copulas.
 
@@ -32,6 +34,11 @@ fgmCopula(param, dim = 2)
   \code{\link{fitCopula}}.
 }
 \examples{
+## length(param) = #{parameters}  for  d-dimensional  FGM copula:
+d <- 2:10; rbind(d, npar = 2^d - d - 1)
+## d       2    3    4    5    6    7    8    9   10
+## npar    1    4   11   26   57  120  247  502 1013
+
 ## a bivariate example
 fgm.cop <- fgmCopula(1)
 x <- rCopula(1000, fgm.cop)

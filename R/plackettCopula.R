@@ -161,7 +161,7 @@ setMethod("tau", signature("plackettCopula"),
 
 setMethod("rho", signature("plackettCopula"), rhoPlackettCopula)
 
-setMethod("iTau", signature("plackettCopula"), iTauPlackettCopula)
+setMethod("iTau", signature("plackettCopula"), function(copula, tau, ...) iTauPlackettCopula(copula, tau))
 setMethod("iRho", signature("plackettCopula"), iRhoCopula)
 
 setMethod("dTau", signature("plackettCopula"),

@@ -173,6 +173,8 @@ claytondRho <- function(alpha) {
 rhoClaytonCopula <- function(copula) claytonRhoFun(copula@parameters[1])
 
 iRhoClaytonCopula <- function(copula, rho) {
+  ## linear interpolation from pspline :: sm.spline() interpolation results (x, ysmth)
+  ## --> ../inst/docs/tauRho/trpsrho.R
   claytonRhoInvNeg <- approxfun(x = .claytonRhoNeg$assoMeasFun$fm$ysmth,
                                 y = .claytonRhoNeg$assoMeasFun$fm$x)
 
@@ -228,7 +230,8 @@ dMatClayton <- function (u, copula, log = FALSE, checkPar=TRUE, ...) {
     copClayton@dacopula(u, theta=th, log=log, checkPar=checkPar, ...)
 }
 
-setMethod("rCopula", signature("numeric", "claytonCopula"), rclaytonCopula)
+setMethod("rCopula", signature("numeric", "claytonCopula"),
+          function(n, copula, ...) rclaytonCopula(n,copula))
 setMethod("pCopula", signature("matrix", "claytonCopula"),
           function(u, copula, ...) {
               if(is.na(th <- copula@parameters[1])) stop("parameter is NA")
@@ -238,7 +241,7 @@ setMethod("dCopula", signature("matrix", "claytonCopula"), dMatClayton)
 ## pCopula() and dCopula() *generic* already deal with non-matrix case!
 
 setMethod("iPsi", signature("claytonCopula"),
-          function(copula, u) .iPsiClayton(u, copula@parameters[1]))
+          function(copula, u, ...) .iPsiClayton(u, copula@parameters[1]))
 setMethod("psi",  signature("claytonCopula"),
           function(copula, s) .psiClayton(s, copula@parameters[1]))
 
@@ -252,13 +255,14 @@ setMethod("diPsi", signature("claytonCopula"),
 
 
 setMethod("tau", signature("claytonCopula"),
-          function(copula) copClayton@tau(copula@parameters))
+          function(copula, ...) copClayton@tau(copula@parameters))
 setMethod("rho", signature("claytonCopula"), rhoClaytonCopula)
 setMethod("lambda", signature("claytonCopula"), lambdaClaytonCopula)
 
 setMethod("iTau", signature("claytonCopula"),
-          function(copula, tau) copClayton@iTau(tau))
-setMethod("iRho", signature("claytonCopula"), iRhoClaytonCopula)
+          function(copula, tau, ...) copClayton@iTau(tau))
+setMethod("iRho", signature("claytonCopula"),
+          function(copula, rho, ...) iRhoClaytonCopula(copula, rho))
 
 setMethod("dTau", signature("claytonCopula"), dTauClaytonCopula)
 setMethod("dRho", signature("claytonCopula"), dRhoClaytonCopula)

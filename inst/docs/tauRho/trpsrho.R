@@ -96,12 +96,9 @@ save(.t4Rho, t4RhoFun, t4dRho,
 ## try with clayton
 ## deal with positive and negative alpha separately
 ########################################################
-claytonTrFuns <- list(forwardTransf = function(x, ss)
-                      ifelse(x <= 0, x, tanh(x / ss)),
-                      backwardTransf = function(x, ss)
-                      ifelse(x <= 0, x, ss * atanh(x)),
-                      forwardDer = function(x, ss)
-                      ifelse(x <= 0, 1, (1 - tanh(x / ss)^2) / ss)
+claytonTrFuns <- list(forwardTransf  = function(x, ss) ifelse(x <= 0, x, tanh(x / ss)),
+                      backwardTransf = function(x, ss) ifelse(x <= 0, x, ss * atanh(x)),
+                      forwardDer     = function(x, ss) ifelse(x <= 0, 1, (1 - tanh(x / ss)^2) / ss)
                       )
 
 ## negative alpha
@@ -141,9 +138,9 @@ save(.claytonRhoNeg, .claytonRhoPos, claytonRhoFun, claytondRho,
 ########################################################
 n <- 10000
 
-gumbelTrFuns <- list(forwardTransf = function(x, ss) tanh((x - 1) / ss),
+gumbelTrFuns <- list(forwardTransf   = function(x, ss) tanh((x - 1) / ss),
                       backwardTransf = function(x, ss) ss * atanh(x) + 1,
-                      forwardDer = function(x, ss) (1 - tanh( (x - 1)/ ss)^2) / ss
+                      forwardDer     = function(x, ss) (1 - tanh( (x - 1)/ ss)^2) / ss
                       )
 
 ## negative alpha

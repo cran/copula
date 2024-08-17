@@ -88,7 +88,7 @@ stopifnot(identical(C3, C3.))
 
 ## An exercise: assume you got the copula specs as character string:
 na3spec <- "C(theta0, 1, C(theta1, c(2,3)))"
-na3call <- parse(text = na3spec)[[1]]
+na3call <- str2lang(na3spec) # == parse(text = na3spec)[[1]]
 C3.s <- onacopula("Gumbel", na3call)
 stopifnot(identical(C3, C3.s))
 

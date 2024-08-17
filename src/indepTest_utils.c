@@ -25,9 +25,9 @@
  *         on the empirical copula process
  *
  */
+#include "indepTests.h"
 
 #include <R.h>
-#include "indepTests.h"
 
 
 /// Temporary array K

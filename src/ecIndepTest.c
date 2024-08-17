@@ -27,11 +27,11 @@
  *
  */
 
+#include "indepTests.h"
+#include "set_utils.h"
+
 #include <R.h>
 #include <Rmath.h>
-#include "set_utils.h"
-#include "copula_int.h"
-#include "indepTests.h"
 
 /// Temporary array J
 void J_u(int n, int p, const double R[], double *J)
@@ -73,10 +73,10 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
       error(_("** simulate_empirical..(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
-  double *J = Calloc((size_t) J_size, double);
-  double *R = Calloc(n_ * (*p), double);
-  double *K = Calloc(n_ * (*p), double);
-  double *L = Calloc(*p, double);
+  double *J = R_Calloc((size_t) J_size, double);
+  double *R = R_Calloc(n_ * (*p), double);
+  double *K = R_Calloc(n_ * (*p), double);
+  double *L = R_Calloc(*p, double);
 
   if (*verbose && J_size > 100000)
       Rprintf("simulate_empirical() working with double array J of size %lld",
@@ -149,11 +149,11 @@ void simulate_empirical_copula(int *n, int *N, int *p, int *m, double *TA0,
 	}
     }
 
-  Free(R);
+  R_Free(R);
 
-  Free(J);
-  Free(K);
-  Free(L);
+  R_Free(J);
+  R_Free(K);
+  R_Free(L);
 }
 
 /*****************************************************************************
@@ -210,9 +210,9 @@ void empirical_copula_test(double *R, int *n, int *p, int *m, double *TA0, doubl
       error(_("** empirical_copula_test(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
-  double *J = Calloc((size_t) J_size, double);
-  double *K = Calloc(n_ * (*p), double);
-  double *L = Calloc(*p, double);
+  double *J = R_Calloc((size_t) J_size, double);
+  double *K = R_Calloc(n_ * (*p), double);
+  double *L = R_Calloc(*p, double);
 
   /* compute arrays J, K, L */
   J_u    (*n, *p, R, J);
@@ -262,9 +262,9 @@ void empirical_copula_test(double *R, int *n, int *p, int *m, double *TA0, doubl
       count ++;
   *globpval = (double)(count + 0.5)/(*N + 1.0);
 
-  Free(J);
-  Free(K);
-  Free(L);
+  R_Free(J);
+  R_Free(K);
+  R_Free(L);
 }
 
 

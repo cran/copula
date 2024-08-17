@@ -19,6 +19,7 @@
 #ifndef NACOPULA_DEFS_H
 #define NACOPULA_DEFS_H
 
+#define STRICT_R_HEADERS
 #include <R.h>
 #include <Rinternals.h>
 #include "copula_int.h"

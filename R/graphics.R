@@ -560,7 +560,7 @@ setMethod("contourplot2", signature(x = "mvdc"),       contourplot2Mvdc)
 ##' @param scales See ?wireframe
 ##' @param par.settings Additional arguments passed to 'par.settings' (some are set)
 ##' @param draw.4.pCoplines logical indicating whether the four boundary
-##'        lines are displayed
+##'        lines are displayed; caller sets this TRUE for pCopula
 ##' @param ... Further arguments passed to wireframe()
 ##' @return A wireframe() object
 ##' @author Marius Hofert

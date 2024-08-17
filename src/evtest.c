@@ -24,11 +24,12 @@
  *
  */
 
+#include "copula.h"
+
 #include <R.h>
 #include <Rmath.h>
 #include <R_ext/Applic.h>
 #include <R_ext/Utils.h>
-#include "copula.h"
 #include "empcop.h"
 
 /**
@@ -52,15 +53,15 @@ void evtest(double *U, int *n, int *p, double *g, int *m,
 	    int *N, double *tg,  int *nt, double *s0, int *der2n,
 	    double *o, double *stat)
 {
-  double *influ = Calloc((*n) * (*m) * (*nt), double);
-  double *random = Calloc(*n, double);
+  double *influ = R_Calloc((*n) * (*m) * (*nt), double);
+  double *random = R_Calloc(*n, double);
 
-  double *u = Calloc(*p, double);
-  double *v = Calloc(*p, double);
-  double *ut = Calloc(*p, double);
-  double *vt = Calloc(*p, double);
-  double *der = Calloc(*p, double);
-  double *dert = Calloc(*p, double);
+  double *u  = R_Calloc(*p, double);
+  double *v  = R_Calloc(*p, double);
+  double *ut = R_Calloc(*p, double);
+  double *vt = R_Calloc(*p, double);
+  double *der  = R_Calloc(*p, double);
+  double *dert = R_Calloc(*p, double);
 
   double t, ecterm, process, mean, ind, indt, d, dt, denom,
     invsqrtn = 1./sqrt(*n), tmpu, tmpv, diff, ecut, ecu;
@@ -226,14 +227,14 @@ void evtest(double *U, int *n, int *p, double *g, int *m,
       stat[c] = stat[c] * (*n) / (*m);
     }
 
-  Free(influ);
-  Free(random);
-  Free(u);
-  Free(v);
-  Free(ut);
-  Free(vt);
-  Free(der);
-  Free(dert);
+  R_Free(influ);
+  R_Free(random);
+  R_Free(u);
+  R_Free(v);
+  R_Free(ut);
+  R_Free(vt);
+  R_Free(der);
+  R_Free(dert);
 }
 
 /**
@@ -254,16 +255,16 @@ void evtest(double *U, int *n, int *p, double *g, int *m,
 void evtestA(double *U, double *V, int *n, double *u, double *v,
 	     int *m, int *CFG, int *N, double *s0)
 {
-  double *influ = Calloc((*n) * (*m), double);
+  double *influ = R_Calloc((*n) * (*m), double);
 
-  double *S = Calloc(*n, double);
-  double *Sp = Calloc(*n, double);
-  double *Sm = Calloc(*n, double);
-  double *T = Calloc(*n, double);
-  double *Tp = Calloc(*n, double);
-  double *Tm = Calloc(*n, double);
+  double *S  = R_Calloc(*n, double);
+  double *Sp = R_Calloc(*n, double);
+  double *Sm = R_Calloc(*n, double);
+  double *T  = R_Calloc(*n, double);
+  double *Tp = R_Calloc(*n, double);
+  double *Tm = R_Calloc(*n, double);
 
-  double *random = Calloc(*n, double);
+  double *random = R_Calloc(*n, double);
 
   double pu, pv, sum, d1, d2,  process,
     mean, invsqrtn = 1. / sqrt(*n), minTkSi,  minSkTi,
@@ -385,15 +386,15 @@ void evtestA(double *U, double *V, int *n, double *u, double *v,
   PutRNGstate();
 
 
-  Free(influ);
-  Free(random);
+  R_Free(influ);
+  R_Free(random);
 
-  Free(S);
-  Free(T);
-  Free(Sp);
-  Free(Tp);
-  Free(Sm);
-  Free(Tm);
+  R_Free(S);
+  R_Free(T);
+  R_Free(Sp);
+  R_Free(Tp);
+  R_Free(Sm);
+  R_Free(Tm);
 }
 
 /* FIXME ?? -- as the integrand uses indicators and hence is discontinuous, the numerical integrator gives tons
@@ -452,17 +453,17 @@ void evtestA_derA(double *U, double *V, int *n,
     int CFG       = CFG_tr__etc[0],
 	trace_lev = CFG_tr__etc[1],
 	report_err= CFG_tr__etc[2];
-  double  *influ = Calloc((*n) * (*m), double), *influ2;
-  influ2 = CFG ? Calloc((*n) * (*m), double) : NULL;
-  double *random = Calloc(*n, double);
+  double *influ =       R_Calloc((*n) * (*m), double),
+        *influ2 = CFG ? R_Calloc((*n) * (*m), double) : NULL;
+  double *random = R_Calloc(*n, double);
 
   /* for numerical integration [Rdqags() <==> R's integrate()]: begin */
   double result, abserr;
   int last, neval, ier;
   double reltol=0.0001;
   double abstol=0.0001;
-  int limit=100;         int   *iwork = Calloc(limit, int);
-  int lenw = 4 * limit;  double *work = Calloc(lenw,  double);
+  int limit=100;         int   *iwork = R_Calloc(limit, int);
+  int lenw = 4 * limit;  double *work = R_Calloc(lenw,  double);
   double ex[8],
       lower = 0., // = 1. / (*n + 1.)
       upper = 1.; // = *n / (*n + 1.)
@@ -470,8 +471,8 @@ void evtestA_derA(double *U, double *V, int *n,
   /* for numerical integration: end */
 
   double // temporary arrays  S[], T[] :
-      *S = Calloc(*n, double),
-      *T = Calloc(*n, double);
+      *S = R_Calloc(*n, double),
+      *T = R_Calloc(*n, double);
   for (int i = 0; i < *n; i++)
     {
       S[i] = - log(U[i]);
@@ -645,12 +646,12 @@ void evtestA_derA(double *U, double *V, int *n,
   PutRNGstate();
 
 
-  Free(influ);
-  if(CFG) Free(influ2);
-  Free(random);
+  R_Free(influ);
+  if(CFG) R_Free(influ2);
+  R_Free(random);
 
-  Free(S);
-  Free(T);
+  R_Free(S);
+  R_Free(T);
 }
 
 /***********************************************************************
@@ -677,12 +678,11 @@ void evtestA_derA(double *U, double *V, int *n,
 void evtestA_stat(double *U, double *V, int *n, double *u, double *v, int *m,
 		  int *CFG, double *stat, double *offset)
 {
-  int i, j;
   double s = 0., diff, cA0, cA1, Aj, t, loguv;
-  double *S = Calloc(*n, double);
-  double *T = Calloc(*n, double);
+  double *S = R_Calloc(*n, double);
+  double *T = R_Calloc(*n, double);
 
-  for (i = 0; i < *n; i++)
+  for (int i = 0; i < *n; i++)
     {
       S[i] = - log(U[i]);
       T[i] = - log(V[i]);
@@ -700,7 +700,7 @@ void evtestA_stat(double *U, double *V, int *n, double *u, double *v, int *m,
       cA1 = biv_invAP(*n, S, T, 1.);
     }
 
-  for (j = 0; j < *m; j++)
+  for (int j = 0; j < *m; j++)
     {
       loguv = log(u[j] *v[j]);
       t = log(v[j]) / loguv;
@@ -723,6 +723,6 @@ void evtestA_stat(double *U, double *V, int *n, double *u, double *v, int *m,
 
   *stat = s * (*n) / *m;
 
-  Free(S);
-  Free(T);
+  R_Free(S);
+  R_Free(T);
 }

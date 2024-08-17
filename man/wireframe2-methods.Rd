@@ -1,5 +1,5 @@
 \name{wireframe2-methods}
-\title{Perspective Plots - 'wireframe2' in Package 'copula'}
+\title{Perspective Plots via 'wireframe2'}
 \alias{wireframe2}
 \alias{wireframe2-methods}
 \alias{wireframe2,matrix-method}
@@ -41,10 +41,8 @@
     a \code{"\linkS4class{mvdc}"} object.}
   \item{xlim, ylim, zlim}{the x-, y- and z-axis limits.}
   \item{xlab, ylab, zlab}{the x-, y- and z-axis labels.}
-  \item{alpha.regions}{see \code{\link{wireframe}()}.}
   \item{scales}{a \code{\link{list}} determining how the axes are drawn;
-    see \code{\link{wireframe}()}.}
-  \item{par.settings}{See \code{\link{wireframe}()}.}
+    see \code{\link[lattice]{wireframe}()}.}
   \item{FUN}{the \code{\link{function}} to be plotted; for a "copula", typically
     \code{\link{dCopula}} or \code{\link{pCopula}}; for an "mvdc",
     rather \code{\link{dMvdc}}, etc.  In general of the form
@@ -62,11 +60,10 @@
     \code{col.4 = "#668b5580"}, \code{lwd.4 = 5}, and \code{lty.4 = "82"}
     which you can modify (via the \code{\dots} below).  Applies only
     when you do \emph{not} set \code{panel.3d.wireframe} (via the \code{\dots}).}
-  \item{\dots}{additional arguments passed to the underlying \code{\link{wireframe}()},
-    such as \code{shade}, \code{drape}, \code{aspect}, etc., or (if you
-    do not specify \code{panel.3d.wireframe} differently), to the
-    function \code{\link{panel.3dwire}} from the \CRANpkg{lattice}
-    package.}
+  \item{alpha.regions, par.settings, \dots}{additional arguments passed to
+    the underlying \code{\link[lattice]{wireframe}()} from package \CRANpkg{lattice};
+    includes \code{shade}, \code{drape}, \code{aspect}, etc., or (if you do
+    not specify \code{panel.3d.wireframe} differently), to the package.}
 }
 \section{Methods}{
   Wireframe plots for objects of class \code{"\linkS4class{matrix}"} ,
@@ -95,23 +92,31 @@ x.M <- cbind(grid, "M(u[1],u[2])" = M(grid)) # evaluate M on 'grid'
 wireframe2(x.W)
 wireframe2(x.W, shade = TRUE) # plot of W
 wireframe2(x.M, drape = TRUE) # plot of M
+## use with custom colors:
+myPalette <- colorRampPalette(c("white","darkgreen", "gold", "red"))
+myPar <- lattice::standard.theme(region = myPalette(16))
+wireframe2(x.W, shade = TRUE, par.settings = myPar)
 
 ## For 'Copula' objects
 cop <- frankCopula(-4)
 wireframe2(cop, pCopula) # the copula
-wireframe2(cop, pCopula, shade = TRUE) # ditto, "shaded"
-wireframe2(cop, pCopula, shade = TRUE, col = "gray60") # ditto, "shaded"+grid
+wireframe2(cop, pCopula, shade = TRUE) # ditto, "shaded" (but color=FALSE)
+wireframe2(cop, pCopula, shade = TRUE, par.settings=list()) # use lattice default colors
+wireframe2(cop, pCopula, shade = TRUE, col.4 = "gray60") # ditto, "shaded"+grid
 wireframe2(cop, pCopula, drape = TRUE, xlab = quote(x[1])) # adjusting an axis label
 wireframe2(cop, dCopula, delta=0.01) # the density
+wireframe2(cop, dCopula, shade = TRUE, par.settings=list()) # use lattice default colors
 wireframe2(cop, dCopula) # => the density is set to 0 on the margins
 wireframe2(cop, function(u, copula) dCopula(u, copula, log=TRUE),
+           shade = TRUE, par.settings = myPar,
            zlab = list(quote(log(c(u[1],u[2]))), rot=90), main = "dCopula(.., log=TRUE)")
-
+% to do: use better 'aspect = *' -%
 
 ## For 'mvdc' objects
 mvNN <- mvdc(gumbelCopula(3), c("norm", "norm"),
              list(list(mean = 0, sd = 1), list(mean = 1)))
 wireframe2(mvNN, dMvdc, xlim=c(-2, 2), ylim=c(-1, 3))
+wireframe2(mvNN, dMvdc, xlim=c(-2, 2), ylim=c(-1, 3), shade=TRUE, par.settings=list())
 }
 \keyword{methods}
 \keyword{hplot}

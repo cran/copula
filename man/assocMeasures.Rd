@@ -167,6 +167,7 @@ iRho (copula, rho, \dots)
   Comparison of three semiparametric methods for estimating dependence
   parameters in copula models.
   \emph{Insurance: Mathematics and Economics} \bold{47}, 52--63.
+  \doi{10.1016/j.insmatheco.2010.03.008}
 }
 \seealso{
   The \code{\linkS4class{acopula}} class objects have slots,

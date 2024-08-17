@@ -65,7 +65,7 @@ MM: (2016-05-03):
 ** TODO Improve error message: tCopula(c(rep(0.5, 3), 4), dim = 3, dispstr = "un", df = 4)
  => should rather say that the *length* of 'param' is not correct (in case one accidentally adds the d.o.f. parameter there as so often)
 ** TODO [JY]: once 'fixed' stuff added, rewrite/adapt tCopula, tevCopula (so that the 'df.fixed' stuff uses the new 'fixed' stuff) ?
-** TODO [MM]: bug? library(copula); pCopula(0.4, copula = normalCopula(param = 0.5, dim = 3)) is *random* !??!!
+** DONE [MM]: copula 1.0-1 (2022-12) fixed; pCopula(0.4, copula = normalCopula(param = 0.5, dim = 3)) is *random* !??!!
 ** DONE [MM]  need a "getTheta" analogously to "setTheta"
  which extracts the parameter (vector) from any copula object
 *** DONE partly: we have  getParam() but not exported; should think of name(s)
@@ -80,7 +80,7 @@ MM: (2016-05-03):
 ** TODO Figure out and document somewhere how much objects of class archmCopula already use the good old nacopula stuff
 - fitCopula() -> loglikCopula() always uses the nacopula slots [all of the 5 AC families in R/fitCopula.R]
 ** TODO Make more archmCopula stuff use acopula stuff (e.g., pK() doesn't work for archmCopulas!
- => should really have all functionality of acopulas used by archmCopulas! so much 'overhead')
+ => should really have all functionality of acopulas used by archmCopulas! so much 'overhead'
 ** TODO [MM + MH] implement fitting of NACs with fixed structure (how is it done in the R package 'HAC'?)
 ** TODO [MM + MH] function(outer_nacopula) -> matrix of 'comp' (in {1:d})
 which corresponds to the different sectors.
@@ -128,7 +128,7 @@ advantage outweighs the drawbacks... What do you think?
 ** DONE make print(fitCopula()) nicer by omitting the (theoretical meaningless) p-values
 ** TODO [MM] pCopula(u,..) and dCopula(u,..) should work for u outside [0,1]^d  & NA/NaN
 *** TODO both should keep NA & NaN. Maybe keep them different, as  pnorm(c(2,NA,NaN));
-however relax, as  NA+NaN or NaN+NA  differ, too.
+  however relax, as  NA+NaN or NaN+NA  differ, too.
 *** DONE for pCopula(): using  u[] <- pmax(0, pmin(1, u))  {subtlety!}
 *** DONE dCopula() = 0 {log = -Inf} for u "outside"
 ** TODO [MM] why does onacopulaL("Clayton", *) work, but onacopulaL("clayton",*) does not?
@@ -157,9 +157,7 @@ these are *one* of the things where IJ-archmCopula' are better
 *** TODO dAduGalambos() and similar: Use  list() instead of data.frame() as return value  (?)
 *** TODO dCdthetaEvCopula() cannot work (as dAdtheta() has no methods) and is used nowhere
 ** TODO Exporting/Documenting of "internal" functions:
-*** DONE => C.n(). JY: Ivan, I think we should export an empCopula function. I always
-thought it was unnecessary because it can be obtained with R package mecdf.
-But people have asked for it.
+*** DONE => C.n(). JY: Ivan, I think we should export an empCopula function. ....
 *** Also, look at ./man/copula-internal.Rd :
 *** no longer TODO: schlatherCopula:  JY: The implementation of schlatherCopula is not ready for release.
 More ev copulas will come from max-stable processes.
@@ -236,11 +234,7 @@ Possible problem (for now): negative concordance case for AMH, Clayton, and Fran
 ** DONE (MH) LICENCE etc
 CLOSED: [2012-07-17 Tue 11:25]
 MM: Einstein's rule: Keep it as simple as possible (but not simpler)
-All the Copyright headers in R/*.R  src/*.c etc need to be streamlined;
-typically containing all 4 names.
-MH: I can do that (once Ivan and Jun agree)
-JY: I agree
-IK: Me too
+All the Copyright headers in R/*.R  src/*.c etc need to be streamlined; ...
 => MH: done on 2012-03-25 (for simplicity, I used "2012" everywhere)
 ** DONE show(<mvdc>) method needed; otherwise printing mvdc(.) looks ugly.
 ** DONE MM: former nacopula  c_longNames etc  --> rename to .ac_longNames *and* export

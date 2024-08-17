@@ -254,8 +254,8 @@ setMethod("dAdu", signature("tevCopula"), dAduTev)
 setMethod("tau", signature("tevCopula"), tauTevCopula)
 setMethod("rho", signature("tevCopula"), rhoTevCopula)
 
-setMethod("iTau", signature("tevCopula"), iTauTevCopula)
-setMethod("iRho", signature("tevCopula"), iRhoTevCopula)
+setMethod("iTau", signature("tevCopula"), function(copula, tau, ...) iTauTevCopula(copula, tau))
+setMethod("iRho", signature("tevCopula"), function(copula, rho, ...) iRhoTevCopula(copula, rho))
 
 setMethod("dTau", signature("tevCopula"), dTauTevCopula)
 setMethod("dRho", signature("tevCopula"), dRhoTevCopula)

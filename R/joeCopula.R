@@ -85,7 +85,7 @@ setMethod("lambda", signature("joeCopula"),
 			     upper=copJoe@lambdaU(theta=copula@parameters)))
 
 setMethod("iTau", signature("joeCopula"), # now that tauJoe() is accurate
-	  function(copula, tau, tol = 1e-7) {
+	  function(copula, tau, tol = 1e-7, ...) {
     if (any(tau < 0)) warning("For the Joe copula, tau must be >= 0. Replacing negative values by 0.")
     copJoe@iTau(tau, tol=tol)
 })

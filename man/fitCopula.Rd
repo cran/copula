@@ -75,7 +75,7 @@ optimMeth(copula, method, dim)
       \item{"irho"}{As \code{"itau"} just with Spearman's rho instead of
 	Kendall's tau.}
       \item{"itau.mpl"}{This is the estimator of \eqn{t} copula
-	parameters suggested by Mashal and Zeevi (2002) based on the
+	parameters suggested by Zeevi and Mashal (2002) based on the
 	idea of inverting Kendall's tau for estimating the correlation
 	matrix as introduced in a RiskLab report in 2001 later published
 	as Embrechts et al. (2003); see also
@@ -236,9 +236,9 @@ optimMeth(copula, method, dim)
   method for copula-based models.
   \emph{Journal of Multivariate Analysis} \bold{94}, 401--419.
 
-  Mashal, R. and Zeevi, A. (2002). Beyond Correlation: Extreme Co-movements Between
-  Financial Assets.
-  \url{https://www0.gsb.columbia.edu/faculty/azeevi/PAPERS/BeyondCorrelation.pdf} (2016-04-05)
+  Zeevi, Assaf and Mashal, Roy (2002) 
+  \emph{Beyond Correlation: Extreme Co-Movements between Financial Assets}.
+  \doi{10.2139/ssrn.317122}
 
   Demarta, S. and McNeil, A. J. (2005). The t copula and related copulas.
   \emph{International Statistical Review} \bold{73}, 111--129.

@@ -20,9 +20,10 @@ fgmCopula <- function(param = NA_real_, dim = 2L) {
     if (!is.numeric(dim) || (dim <- as.integer(dim)) < 2)
         stop("dim should be an integer of at least 2")
     npar <- 2^dim - dim - 1 # >= 1
+    if(!is.finite(npar)) stop("invalid dimension dim=",dim)
     if(length(param) == 1L && is.na(param))
 	param <- rep_len(param, npar)
-    else if (!is.numeric(param) && length(param) != npar)
+    else if (!is.numeric(param) || length(param) != npar)
         stop("wrong parameters")
 
     ## power set of {1,...,dim} in integer notation
@@ -199,13 +200,13 @@ iRhoFgmCopula <- function(copula, rho) {
 
 ################################################################################
 
-setMethod("rCopula", signature("numeric", "fgmCopula"), rfgmCopula)
+setMethod("rCopula", signature("numeric", "fgmCopula"), function(n, copula, ...) rfgmCopula(n, copula))
 
-setMethod("pCopula", signature("matrix", "fgmCopula"), pfgmCopula)
+setMethod("pCopula", signature("matrix", "fgmCopula"), function(u, copula, ...) pfgmCopula(u, copula))
 setMethod("dCopula", signature("matrix", "fgmCopula"), dfgmCopula)
 ## pCopula() and dCopula() *generic* already deal with non-matrix case!
 
-setMethod("tau", signature("fgmCopula"), tauFgmCopula)
-setMethod("rho", signature("fgmCopula"), rhoFgmCopula)
-setMethod("iTau", signature("fgmCopula"), iTauFgmCopula)
-setMethod("iRho", signature("fgmCopula"), iRhoFgmCopula)
+setMethod("tau", signature("fgmCopula"), function(copula, ...) tauFgmCopula(copula))
+setMethod("rho", signature("fgmCopula"), function(copula, ...) rhoFgmCopula(copula))
+setMethod("iTau", signature("fgmCopula"),function(copula, tau, ...) iTauFgmCopula(copula, tau))
+setMethod("iRho", signature("fgmCopula"),function(copula, rho, ...) iRhoFgmCopula(copula, rho))

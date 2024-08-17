@@ -173,8 +173,8 @@ setMethod("dAdu", signature("tawnCopula"), dAduTawn)
 setMethod("tau", signature("tawnCopula"), tauTawnCopula)
 setMethod("rho", signature("tawnCopula"), rhoTawnCopula)
 
-setMethod("iTau", signature("tawnCopula"), iTauTawnCopula)
-setMethod("iRho", signature("tawnCopula"), iRhoTawnCopula)
+setMethod("iTau", signature("tawnCopula"), function(copula, tau, ...) iTauTawnCopula(copula, tau))
+setMethod("iRho", signature("tawnCopula"), function(copula, rho, ...) iRhoTawnCopula(copula, rho))
 
 setMethod("dTau", signature("tawnCopula"), dTauTawnCopula)
 setMethod("dRho", signature("tawnCopula"), dRhoTawnCopula)

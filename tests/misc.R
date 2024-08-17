@@ -51,6 +51,10 @@ stopifnot(Akg[c(1,9)] == 1,
 	      c(1, 0.88987, 0.85893, 0.87634, 0.90023, 0.92504, 0.95, 0.975, 1))
     )
 
+## has returned an "invalid" object in {copula} versions <= 1.1-3 :
+tools::assertError(verbose = TRUE, fgC <- fgmCopula(c(-1:1)))
+
+
 if(!copula:::doExtras())
     q("no")
 

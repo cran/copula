@@ -53,7 +53,7 @@
   for dimensions higher than 2.
 }
 \seealso{
-  \code{\link{copula-class}}, \code{\link{fgmCopula-class}}; to create such
+  \code{\link{copula-class}}; to create such
   objects, use \code{\link{fgmCopula}()}; see there, also for examples.
 }
 \keyword{classes}

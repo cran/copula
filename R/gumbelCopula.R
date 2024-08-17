@@ -222,10 +222,8 @@ setMethod("rho", "gumbelCopula", function(copula) gumbelRhoFun(copula@parameters
 setMethod("lambda", signature("gumbelCopula"), function(copula, ...)
     c(lower = 0, upper = 2 - 2^(1/copula@parameters)))
 
-
-setMethod("iTau", signature("gumbelCopula"), iTauGumbelCopula)
-setMethod("iRho", signature("gumbelCopula"), iRhoGumbelCopula)
-
+setMethod("iTau", signature("gumbelCopula"), function(copula, tau, ...) iTauGumbelCopula(copula, tau))
+setMethod("iRho", signature("gumbelCopula"), function(copula, rho, ...) iRhoGumbelCopula(copula, rho))
 
 setMethod("dRho", "gumbelCopula", function(copula) gumbeldRho(copula@parameters))
 

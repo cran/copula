@@ -42,7 +42,7 @@
   \item{\dots}{additional arguments passed to the underlying
     \code{\link[lattice]{splom}()}.}
 }
-\value{From \code{\link{splom}()}, an \R object of class \code{"trellis"}.
+\value{From \code{\link[lattice]{splom}()}, an \R object of class \code{"trellis"}.
 }
 %\author{Marius Hofert and Martin Maechler, with a hints from Deepayan Sarkar.}
 \seealso{

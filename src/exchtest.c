@@ -15,10 +15,11 @@
   this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "copula.h"
+
 #include <R.h>
 #include <Rmath.h>
 #include <R_ext/Applic.h>
-#include "copula.h"
 
 /**
  * @file   exchtest.c
@@ -48,15 +49,15 @@
 void evsymtest(double *U, double *V, int *n, double *t, int *m,
 	       int *CFG, int *N, double *s0)
 {
-  double *influ = Calloc((*n) * (*m), double);
-  double *random = Calloc(*n, double);
+  double *influ = R_Calloc((*n) * (*m), double);
+  double *random = R_Calloc(*n, double);
 
-  double *S = Calloc(*n, double);
-  double *T = Calloc(*n, double);
-  double *Sp = Calloc(*n, double);
-  double *Tp = Calloc(*n, double);
-  double *Sm = Calloc(*n, double);
-  double *Tm = Calloc(*n, double);
+  double *S = R_Calloc(*n, double);
+  double *T = R_Calloc(*n, double);
+  double *Sp = R_Calloc(*n, double);
+  double *Tp = R_Calloc(*n, double);
+  double *Sm = R_Calloc(*n, double);
+  double *Tm = R_Calloc(*n, double);
 
   double sumt, sum1t, At, A1t, process, mean,
     invsqrtn = 1.0/sqrt(*n), minTkSi, minSkTi,
@@ -188,14 +189,14 @@ void evsymtest(double *U, double *V, int *n, double *t, int *m,
   PutRNGstate();
 
 
-  Free(influ);
-  Free(random);
-  Free(S);
-  Free(T);
-  Free(Sp);
-  Free(Tp);
-  Free(Sm);
-  Free(Tm);
+  R_Free(influ);
+  R_Free(random);
+  R_Free(S);
+  R_Free(T);
+  R_Free(Sp);
+  R_Free(Tp);
+  R_Free(Sm);
+  R_Free(Tm);
 }
 
 
@@ -249,12 +250,12 @@ void vec_intgrd(double *x, int n, void *ex)
 void evsymtest_derA(double *U, double *V, int *n, double *t, int *m,
 		    int *CFG, int *N, double *s0)
 {
-  double *influ = Calloc((*n) * (*m), double);
-  double *influ2 = Calloc((*n) * (*m), double);
-  double *random = Calloc(*n, double);
+  double *influ  = R_Calloc((*n) * (*m), double);
+  double *influ2 = R_Calloc((*n) * (*m), double);
+  double *random = R_Calloc(*n, double);
 
-  double *S = Calloc(*n, double);
-  double *T = Calloc(*n, double);
+  double *S = R_Calloc(*n, double);
+  double *T = R_Calloc(*n, double);
 
   double At, A1t, Atm, Atp, A1tm, A1tp, dAt, dA1t,
     tj, tjp, tjm, termUt, termVt, termU1t, termV1t,
@@ -270,8 +271,8 @@ void evsymtest_derA(double *U, double *V, int *n, double *t, int *m,
   double reltol=0.0001;
   double abstol=0.0001;
   int lenw = 4 * limit;
-  int *iwork = Calloc(limit, int);
-  double *work = Calloc(lenw, double);
+  int *iwork = R_Calloc(limit, int);
+  double *work = R_Calloc(lenw, double);
   double ex[14], lower = 0.0, upper = 1.0;
   /* lower = 1.0 / (*n + 1), upper = *n / (*n + 1.0); */
   /* for numerical integration: end */
@@ -465,13 +466,13 @@ void evsymtest_derA(double *U, double *V, int *n, double *t, int *m,
   PutRNGstate();
 
 
-  Free(influ);
-  Free(influ2);
-  Free(random);
-  Free(S);
-  Free(T);
-  Free(iwork);
-  Free(work);
+  R_Free(influ);
+  R_Free(influ2);
+  R_Free(random);
+  R_Free(S);
+  R_Free(T);
+  R_Free(iwork);
+  R_Free(work);
 }
 
 /**
@@ -585,8 +586,8 @@ double der2Cn(double *U, double *V, int n, double u, double v)
 void exchtestCn(double *U, double *V, int *n, double *u, double *v,
 		int *m, int *N, double *s0)
 {
-  double *influ = Calloc((*n) * (*m), double);
-  double *random = Calloc(*n, double);
+  double *influ = R_Calloc((*n) * (*m), double);
+  double *random = R_Calloc(*n, double);
 
   double d1uv, d2uv, d1vu, d2vu, process, mean;
 
@@ -642,8 +643,8 @@ void exchtestCn(double *U, double *V, int *n, double *u, double *v,
   PutRNGstate();
 
 
-  Free(influ);
-  Free(random);
+  R_Free(influ);
+  R_Free(random);
 }
 
 /**

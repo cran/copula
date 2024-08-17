@@ -294,7 +294,7 @@ setMethod("rCopula", signature("numeric", "empCopula"),
                          R <- apply(x, 2, rank, na.last = "keep", ties.method = "average") # (n.x, d)-matrix of ranks
                          U.sort <- apply(matrix(runif(n.x * d), ncol = d), 2, sort) # (n.x, d)-matrix of sorted U's
                          U <- vapply(seq_len(d),
-                                     function(j) U.sort[R[,j],j], numeric(n.x)) # sort U. according to ranks R
+                                     function(j) U.sort[R[,j],j], numeric(n.x)) # sort U.sort according to ranks R
                          I <- sample(1:n.x, size = n, replace = TRUE) # n-vector of random indices
                          U[I,] # randomly index
                      },

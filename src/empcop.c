@@ -15,6 +15,7 @@
   this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
+#define STRICT_R_HEADERS
 
 #include <Rmath.h>
 

@@ -7,6 +7,8 @@
  *        which might be translated { -> gettext() }
  */
 
+#define STRICT_R_HEADERS
+
 #ifdef ENABLE_NLS
 #include <libintl.h>
 #define _(String) dgettext ("copula", String)

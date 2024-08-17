@@ -9,7 +9,7 @@
 \title{Cloud Plot Methods ('cloud2') in Package 'copula'}
 \description{
   Function and Methods \code{cloud2()} to draw (\CRANpkg{lattice})
-  \code{\link{cloud}} plots of two-dimensional distributions from
+  \code{\link[lattice]{cloud}} plots of two-dimensional distributions from
   package \pkg{copula}.
 }
 \usage{
@@ -41,12 +41,12 @@
   \item{xlim, ylim, zlim}{the x-, y- and z-axis limits.}
   \item{xlab, ylab, zlab}{the x-, y- and z-axis labels.}
   \item{scales}{a \code{\link{list}} determining how the axes are drawn;
-    see \code{\link{cloud}()}.}
-  \item{par.settings}{see \code{\link{cloud}()}.}
+    see \code{\link[lattice]{cloud}()}.}
+  \item{par.settings}{see \code{\link[lattice]{cloud}()}.}
   \item{n}{when \code{x} is not matrix-like: The sample size of the
     random sample drawn from \code{x}.}
   \item{\dots}{additional arguments passed to the underlying
-    \code{\link{cloud}()}.}
+    \code{\link[lattice]{cloud}()}.}
 }
 \section{Methods}{
   Cloud plots for objects of class \code{"\linkS4class{matrix}"} ,

@@ -245,8 +245,8 @@ setMethod("dAdu", signature("galambosCopula"), dAduGalambos)
 setMethod("tau", signature("galambosCopula"), tauGalambosCopula)
 setMethod("rho", signature("galambosCopula"), rhoGalambosCopula)
 
-setMethod("iTau", signature("galambosCopula"), iTauGalambosCopula)
-setMethod("iRho", signature("galambosCopula"), iRhoGalambosCopula)
+setMethod("iTau", signature("galambosCopula"), function(copula, tau, ...) iTauGalambosCopula(copula, tau))
+setMethod("iRho", signature("galambosCopula"), function(copula, rho, ...) iRhoGalambosCopula(copula, rho))
 
 setMethod("dTau", signature("galambosCopula"), dTauGalambosCopula)
 setMethod("dRho", signature("galambosCopula"), dRhoGalambosCopula)

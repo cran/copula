@@ -78,10 +78,10 @@ void bootstrap_serial(int *n, int *N, int *p, int *q, double *U, int *m,
       error(_("** bootstrap_serial(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
-  int *B = Calloc(np, int);
-  double *J = Calloc((size_t) J_size, double);
-  double *K = Calloc(n_ * (*p), double);
-  double *L = Calloc(*p, double);
+  int *B = R_Calloc(np, int);
+  double *J = R_Calloc((size_t) J_size, double);
+  double *K = R_Calloc(n_ * (*p), double);
+  double *L = R_Calloc(*p, double);
 
   /* for the random permutation */
   int t1, t2;
@@ -138,11 +138,11 @@ void bootstrap_serial(int *n, int *N, int *p, int *q, double *U, int *m,
   }
   PutRNGstate();
 
-  Free(B);
+  R_Free(B);
 
-  Free(J);
-  Free(K);
-  Free(L);
+  R_Free(J);
+  R_Free(K);
+  R_Free(L);
 }
 
 /**
@@ -179,12 +179,12 @@ void empirical_copula_test_rv_serial(double *U, int *n, int *p, int *q, int *m, 
       error(_("** empirical_copula_t.r.s(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
-  double *fisher0 = Calloc(*N, double);
-  double *tippett0 = Calloc(*N, double);
-  double *J = Calloc((size_t) J_size, double);
-  double *K = Calloc(n_ * (*p), double);
-  double *L = Calloc(*p, double);
-  int *B = Calloc(np, int);
+  double *fisher0 = R_Calloc(*N, double);
+  double *tippett0 = R_Calloc(*N, double);
+  double *J = R_Calloc((size_t) J_size, double);
+  double *K = R_Calloc(n_ * (*p), double);
+  double *L = R_Calloc(*p, double);
+  int *B = R_Calloc(np, int);
   double pvalue;
 
   /* identity row selection */
@@ -255,12 +255,12 @@ void empirical_copula_test_rv_serial(double *U, int *n, int *p, int *q, int *m, 
       count ++;
   *Ipval = (double)(count + 0.5)/(*N + 1.0);
 
-  Free(fisher0);
-  Free(tippett0);
-  Free(J);
-  Free(K);
-  Free(L);
-  Free(B);
+  R_Free(fisher0);
+  R_Free(tippett0);
+  R_Free(J);
+  R_Free(K);
+  R_Free(L);
+  R_Free(B);
 }
 
 

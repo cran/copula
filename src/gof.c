@@ -27,6 +27,7 @@
  *
  */
 
+#include "nacopula.h"
 
 #include <R.h>
 #include <Rmath.h>
@@ -35,7 +36,6 @@
 #include "gof.h"
 #include "empcop.h"
 #include "indepTests.h" // for progress bar
-#include "nacopula.h"
 
 
 /**
@@ -164,9 +164,9 @@ void multiplier(int *p, double *U, int *n, double *G, int *g, double *b,
 {
   int i, j, k, l, ind;
   double invsqrtn = 1.0/sqrt(*n);
-  double *influ_mat = Calloc((*n) * (*g), double),
-    *v1  = Calloc(*p, double), *v2 = Calloc(*p, double),
-    *der = Calloc(*p, double);
+  double *influ_mat = R_Calloc((*n) * (*g), double),
+    *v1  = R_Calloc(*p, double), *v2 = R_Calloc(*p, double),
+    *der = R_Calloc(*p, double);
 
   /* influence matrix */
   for (j = 0; j < *g; j++) /* loop over the grid points */
@@ -200,11 +200,11 @@ void multiplier(int *p, double *U, int *n, double *G, int *g, double *b,
 	  influ_mat[i + j * (*n)] *= invsqrtn;
 	}
     }
-  Free(v1);
-  Free(v2);
-  Free(der);
+  R_Free(v1);
+  R_Free(v2);
+  R_Free(der);
 
-  double *random = Calloc(*n, double);
+  double *random = R_Calloc(*n, double);
 
   GetRNGstate();
   /* generate N approximate realizations */
@@ -238,8 +238,8 @@ void multiplier(int *p, double *U, int *n, double *G, int *g, double *b,
 
   PutRNGstate();
 
-  Free(influ_mat);
-  Free(random);
+  R_Free(influ_mat);
+  R_Free(random);
 }
 
 /// Goodness-of-fit tests for extreme-value copulas

@@ -26,6 +26,7 @@
  *
  */
 
+#define STRICT_R_HEADERS
 #include <R.h>
 #include <Rmath.h>
 
@@ -219,8 +220,8 @@ double logACFG(const double xw[], int n) {
 void mult_A(double *U, int *n, int *d, double *w, int *m,
 	    double *AP, double *ACFG, double *AHT) {
 
-  double *xw = Calloc(*n, double);
-  double *xw0 = Calloc(*n, double);
+  double *xw = R_Calloc(*n, double);
+  double *xw0 = R_Calloc(*n, double);
 
   /// for corrections
   for (int i = 0; i < *n; i++)
@@ -241,6 +242,6 @@ void mult_A(double *U, int *n, int *d, double *w, int *m,
     ACFG[i] = exp( logACFG(xw, *n) - logACFG(xw0, *n));
   }
 
-  Free(xw);
-  Free(xw0);
+  R_Free(xw);
+  R_Free(xw0);
 }

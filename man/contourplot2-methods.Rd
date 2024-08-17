@@ -38,21 +38,21 @@
   \item{xlab, ylab}{the x- and y-axis labels. If at least one is
     \code{NULL}, useful \code{xlab} and \code{ylab} are determined
     automatically; the behavior depends on the class of \code{x}.}
-  \item{cuts}{the number of levels; see \code{\link{contourplot}()}.
+  \item{cuts}{the number of levels; see \code{\link[lattice]{contourplot}()}.
       Note that specifying \code{useRaster = TRUE} is often considerably
       more efficient notably for larger values of \code{cuts}.}
   \item{labels, pretty}{\code{\link{logical}}s indicating whether the contour
     lines are labeled and whether pretty labels are enforced; in
       \pkg{copula} versions before \code{0.999-18}, implicitly
       \code{pretty = TRUE} was used (giving \bold{un}equal z-cut
-      spacing), see \code{\link{contourplot}()}.}
+      spacing), see \code{\link[lattice]{contourplot}()}.}
   \item{scales}{a \code{\link{list}} determining how the axes are drawn;
-    see \code{\link{contourplot}()}.}
+    see \code{\link[lattice]{contourplot}()}.}
   \item{region}{a \code{\link{logical}} indicating whether regions
     between contour lines should be filled as in a level plot; see
-    \code{\link{contourplot}()}.}
+    \code{contourplot()}.}
   \item{col.regions}{the colors of the regions if \code{region = TRUE};
-    see \code{\link{contourplot}()}.}
+    see \code{contourplot()}.}
   \item{FUN}{the \code{\link{function}} to be plotted; typically
     \code{\link{dCopula}} or \code{\link{pCopula}}.}
   \item{n.grid}{the number of grid points used in each dimension.  This
@@ -63,7 +63,7 @@
     influencing the evaluation boundaries. The x- and y- vectors will
     have the range \code{[0+delta, 1-delta]}, the default being \code{[0,1]}.}
   \item{\dots}{additional arguments passed to the underlying
-    \code{\link{contourplot}()}.}
+    \code{\link[lattice]{contourplot}()}.}
 }
 \section{Methods}{
   Contourplot plots for objects of class \code{"\linkS4class{matrix}"} ,
@@ -77,7 +77,8 @@
 \seealso{
   The \code{\link{contour-methods}} for drawing perspective plots via base graphics.
 
-  The \pkg{lattice}-based \code{\link{wireframe2-methods}} for functions,
+  The \pkg{lattice}-based \code{\link{wireframe2-methods}} to get
+  perspective plots for functions,
   and \code{\link{cloud2-methods}} and \code{\link{splom2-methods}} for data.
 }
 \examples{

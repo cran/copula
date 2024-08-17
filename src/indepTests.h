@@ -28,7 +28,6 @@
 #ifndef INDEPTESTS_H
 #define INDEPTESTS_H
 
-
 #include <stdint.h>
 #include "copula_int.h"
 

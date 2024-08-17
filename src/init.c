@@ -15,13 +15,12 @@
   this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "copula.h"
+#include "nacopula.h"
 
 #include <R.h>
 #include <Rinternals.h>
 #include <R_ext/Rdynload.h>
-
-#include "copula.h"
-#include "nacopula.h"
 
 #define CDEF(name)  {#name, (DL_FUNC) &name, sizeof(name ## _typ)/sizeof(name ## _typ[0]), name ##_typ}
 

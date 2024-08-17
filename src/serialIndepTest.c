@@ -74,10 +74,10 @@ void simulate_empirical_copula_serial(int *n, int *N, int *p, int *m,
       error(_("** simulate_emp.cop.serial(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
-  double *U = Calloc(np, double);
-  double *J = Calloc((size_t) J_size, double);
-  double *K = Calloc(n_ * (*p), double);
-  double *L = Calloc(*p, double);
+  double *U = R_Calloc(np, double);
+  double *J = R_Calloc((size_t) J_size, double);
+  double *K = R_Calloc(n_ * (*p), double);
+  double *L = R_Calloc(*p, double);
   double pvalue, u;
 
   /* number of subsets 2^{p-1}-1 */
@@ -149,11 +149,11 @@ void simulate_empirical_copula_serial(int *n, int *N, int *p, int *m,
     }
   }
 
-  Free(U);
+  R_Free(U);
 
-  Free(J);
-  Free(K);
-  Free(L);
+  R_Free(J);
+  R_Free(K);
+  R_Free(L);
 }
 
 /**
@@ -192,9 +192,9 @@ void empirical_copula_test_serial(double *U, int *n, int *p, int *m, double *TA0
       error(_("** emp.cop.test_serial(): n or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
-  double *J = Calloc((size_t) J_size, double);
-  double *K = Calloc(n_ * (*p), double);
-  double *L = Calloc(*p, double);
+  double *J = R_Calloc((size_t) J_size, double);
+  double *K = R_Calloc(n_ * (*p), double);
+  double *L = R_Calloc(*p, double);
 
   /* compute W and T from the current data */
   *fisher = 0.0;
@@ -242,7 +242,7 @@ void empirical_copula_test_serial(double *U, int *n, int *p, int *m, double *TA0
       count ++;
   *globpval = (double)(count + 0.5)/(*N + 1.0);
 
-  Free(J);
-  Free(K);
-  Free(L);
+  R_Free(J);
+  R_Free(K);
+  R_Free(L);
 }

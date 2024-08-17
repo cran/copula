@@ -25,10 +25,10 @@
  *
  */
 
+#include "copula.h"
+
 #include <R.h>
 #include <Rmath.h>
-
-#include "copula.h"
 
 /**
  * Verify that the pdf of the FGM is positive at each vertex of [0,1]^p
@@ -42,8 +42,8 @@
 void validity_fgm(int *p, double *alpha, int *valid) {
   int i, j, k;
   double prod, val;
-  double *alpha_bin = Calloc(1<<*p, double);
-  int *subset = Calloc(1<<*p, int);
+  double *alpha_bin = R_Calloc(1<<*p, double);
+  int *subset = R_Calloc(1<<*p, int);
 
   k_power_set(p, p, subset);
   natural2binary(p, alpha, subset, alpha_bin);
@@ -66,8 +66,8 @@ void validity_fgm(int *p, double *alpha, int *valid) {
   }
   *valid = 1;
 
-  Free(alpha_bin);
-  Free(subset);
+  R_Free(alpha_bin);
+  R_Free(subset);
 }
 
 /**
@@ -139,8 +139,8 @@ double A(double *u, int p, int S, int m, double *alpha) {
 void rfgm(int *p, double *alpha, int *n, double *x) {
   int i,j,S;
   double a,b;
-  double *alpha_bin = Calloc(1<<*p, double);
-  int *subset = Calloc(1<<*p, int);
+  double *alpha_bin = R_Calloc(1<<*p, double);
+  int *subset = R_Calloc(1<<*p, int);
 
   k_power_set(p, p, subset);
   natural2binary(p, alpha, subset, alpha_bin);
@@ -164,8 +164,8 @@ void rfgm(int *p, double *alpha, int *n, double *x) {
 
   PutRNGstate();
 
-  Free(alpha_bin);
-  Free(subset);
+  R_Free(alpha_bin);
+  R_Free(subset);
 }
 
 

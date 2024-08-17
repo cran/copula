@@ -216,8 +216,9 @@ setMethod("tau", signature("huslerReissCopula"), function(copula)
 setMethod("rho", signature("huslerReissCopula"), function(copula)
 	  huslerReissRhoFun(copula@parameters[1]))
 
-setMethod("iTau", signature("huslerReissCopula"), iTauHuslerReissCopula)
-setMethod("iRho", signature("huslerReissCopula"), iRhoHuslerReissCopula)
+setMethod("iTau", signature("huslerReissCopula"), function(copula, tau, ...) iTauHuslerReissCopula(copula, tau))
+setMethod("iRho", signature("huslerReissCopula"), function(copula, rho, ...) iRhoHuslerReissCopula(copula, rho))
+
 
 setMethod("dTau", signature("huslerReissCopula"), function(copula)
 	  huslerReissdTau(copula@parameters[1]))

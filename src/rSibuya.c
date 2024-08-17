@@ -15,6 +15,7 @@
   this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <float.h>
 
 #include <Rmath.h>
 

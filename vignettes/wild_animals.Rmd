@@ -311,7 +311,7 @@ plot(U, pch=".", xlab = quote(italic(U[1]) %~% ~ "U[0,1]"),
 ## 3 Sierpinski tetrahedron ####################################################
 
 This is an implementation of Example 2.3 in
-[https://arxiv.org/pdf/0906.4853.pdf](https://arxiv.org/pdf/0906.4853.pdf)
+[https://arxiv.org/pdf/0906.4853](https://arxiv.org/pdf/0906.4853)
 
 ```{r}
 library(abind) # for merging arrays via abind()

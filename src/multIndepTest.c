@@ -25,6 +25,7 @@
  *
  */
 
+#define STRICT_R_HEADERS
 #include <R.h>
 #include <Rmath.h>
 #include "set_utils.h"
@@ -77,10 +78,10 @@ void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
       error(_("** bootstrap_MA_I(): n and/or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
-  int *R = Calloc(n_ * (*p), int);
-  double *J = Calloc((size_t) J_size, double);
-  double *K = Calloc(n_ * (*p), double);
-  double *L = Calloc(*p, double);
+  int *R = R_Calloc(n_ * (*p), int);
+  double *J = R_Calloc((size_t) J_size, double);
+  double *K = R_Calloc(n_ * (*p), double);
+  double *L = R_Calloc(*p, double);
 
   /* number of subsets */
   *sb = (int)sum_binom(*p,*m);
@@ -133,11 +134,11 @@ void bootstrap_MA_I(int *n, int *N, int *p, int *b, double *U, int *m,
   }
   PutRNGstate();
 
-  Free(R);
+  R_Free(R);
 
-  Free(J);
-  Free(K);
-  Free(L);
+  R_Free(J);
+  R_Free(K);
+  R_Free(L);
 }
 
 /*****************************************************************************
@@ -193,12 +194,12 @@ void empirical_copula_test_rv(double *U, int *n, int *p, int *b, int *m, double 
       error(_("** empirical_copula.._rv(): n and/or p too large: n^2*p = %12.0g > %12.0g = max(size_t)\n"),
 	    J_size, (double)max_size);
 
-  double *fisher0 = Calloc(*N, double);
-  double *tippett0 = Calloc(*N, double);
-  double *J = Calloc((size_t) J_size, double);
-  double *K = Calloc(n_ * (*p), double);
-  double *L = Calloc(*p, double);
-  int *R = Calloc(n_ * (*p), int);
+  double *fisher0  = R_Calloc(*N, double);
+  double *tippett0 = R_Calloc(*N, double);
+  double *J = R_Calloc((size_t) J_size, double);
+  double *K = R_Calloc(n_ * (*p), double);
+  double *L = R_Calloc(*p, double);
+  int *R = R_Calloc(n_ * (*p), int);
   double pvalue;
 
   /* generate identity selection within the blocks */
@@ -269,12 +270,12 @@ void empirical_copula_test_rv(double *U, int *n, int *p, int *b, int *m, double 
       count ++;
   *Ipval = (double)(count + 0.5)/(*N + 1.0);
 
-  Free(fisher0);
-  Free(tippett0);
-  Free(J);
-  Free(K);
-  Free(L);
-  Free(R);
+  R_Free(fisher0);
+  R_Free(tippett0);
+  R_Free(J);
+  R_Free(K);
+  R_Free(L);
+  R_Free(R);
 }
 
 
