@@ -101,7 +101,7 @@
 }
 \examples{
 ## Some of the more important functions (and their examples) are
-\donttest{
+\donttest{% these take time!	%
 example(fitCopula)## fitting Copulas
 example(fitMvdc)  ## fitting multivariate distributions via Copulas
 example(nacopula) ## nested Archimedean Copulas
@@ -109,6 +109,6 @@ example(nacopula) ## nested Archimedean Copulas
 ## Independence Tests:  These also draw a 'Dependogram':
 example(indepTest)       ## Testing for Independence
 example(serialIndepTest) ## Testing for Serial Independence
-}% not in R CMD check
+}% dont
 }
 \keyword{package}

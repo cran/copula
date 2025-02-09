@@ -94,7 +94,7 @@ y[,3] <- y[,4]/2 + sqrt(3)/2*y[,3]
 y[,5] <- y[,6]/2 + sqrt(3)/2*y[,5]
 
 nc <- normalCopula(0.3,dim=3)
-x <- cbind(y,rCopula(n, nc),rCopula(n, nc))
+x <- cbind(y,rCopula(n, nc), rCopula(n, nc))
 
 x[,1] <- abs(x[,1]) * sign(x[,3] * x[,5])
 x[,2] <- abs(x[,2]) * sign(x[,3] * x[,5])
@@ -106,10 +106,11 @@ x[,9] <- x[,9] + x[,12]
 d <- c(2,2,2,3,3)
 
 ## Run the test
-test <- multIndepTest(x,d)
+(Xtras <- copula:::doExtras()) # or set  'N = ...' manually
+test <- multIndepTest(x, d, N = if(Xtras) 1000 else 150)
 test
 
 ## Display the dependogram
-dependogram(test,print=TRUE)
+dependogram(test, print=TRUE)
 }
 \keyword{htest}

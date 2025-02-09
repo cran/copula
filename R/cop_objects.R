@@ -290,7 +290,8 @@ copClayton <-
                           ## auxiliary results
                           u. <- u[n01,, drop=FALSE]
                           lu <- rowSums(log(u.))
-                          t <- rowSums(.iPsiClayton(u., theta))
+                          t <- rowSums(.iPsiClayton(u., theta)) # gives 'Inf' for small |u| & theta "large"(~ 70)
+                          ## t := sum(.iPsiCl(u, th)) :=  sign(th) * rowSums(u^(-th) - 1)  ==> use inf.t below
                           ## main part
                           if(n.MC > 0) { # Monte Carlo
                               ## FIXME for negative theta .. should not be hard(?)
@@ -306,14 +307,33 @@ copClayton <-
                               ##       (3) theta is large
                               res[n01] <- lsum(lx)
                           } else if(theta < 0) { ## ==> d = 2
-                              posT <- t < 1 ## <==> T := (u1^-th + u2^-th -1) > 0
+                              posT <- t < 1 ## <==> t = - rowSums(u^(-th) - 1) = -(u1^-th + u2^-th -2) < 1
+                                            ## <==>  u1^-th + u2^-th > 1  <==> log1p(-t) is finite
                               i01 <- which(n01)
                               res[i01[ posT]] <-
                                   log1p(theta) - (1+theta) * lu[posT] - (d+1/theta) * log1p(-t[posT])
-                              res[i01[!posT]] <- -Inf # density == 0 "outside circle"
-                          } else { # theta > 0 (as theta == 0 has been treated above)
+                              res[i01[!posT]] <- -Inf # density == 0 "outside L_{th} circle"
+                          } else { # theta > 0 (as theta == 0 has been treated above): sign(th) = +1
+                              lg1p.t <- log1p(t) # and fix overflow (small u, "large" theta):
+                              if(length(i.inf <- which(is.infinite(t)))) { # better numeric:
+                                  ## log1p(t)= log(1+t) = log(1 + rowSums(u^(-th) - 1)) =
+                                  ##         = log(u1^-th + u2^-th + .. u_d^-th - (d-1))
+                                  ## assume u1 is smallest (< 1) <==>  u1^(-th) is dominant
+                                  ## = log(u1^-th  * (1 + (u2/u1)^-th + .. + (u_d/u1)^-th- (d-1)/(u1^-th)))
+                                  ## = -th*log(u1) + log(1 + (u2/u1)^-th + .. + (u_d/u1)^-th- (d-1)/(u1^-th)))
+                                  ## = -th*log(u1) + log1p(sum_{j != 1}^d (u_j/u1)^-th + (d-1)/(u1^-th))
+                                  u. <- u.[i.inf, , drop=FALSE]
+                                  j.umin <- apply(u., 1L, which.min)
+                                  umin <- u.[cbind(seq_along(j.umin), j.umin)]
+                                  lg1p.t[i.inf] <- -theta * log(umin) +
+                                      ## higher order term; typically numerically neglectable:
+                                      log1p(colSums(cbind( # cbind: for d=2, vapply(..) drops dim
+                                          vapply(seq_along(j.umin),
+                                                 function(i) u.[i, -j.umin[i], drop=FALSE], u.[1L,-1L]) /
+                                                    umin)^-theta + (d-1)/umin^-theta))
+                              }
                               res[n01] <- sum(log1p(theta*seq_len(d-1))) - (1+theta)*lu -
-                                  (d+1/theta)*log1p(t)
+                                  (d+1/theta)*lg1p.t
                           }
                       }
 		      if(log) res else exp(res)

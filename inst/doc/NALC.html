@@ -12,7 +12,7 @@
 
 <meta name="author" content="Marius Hofert" />
 
-<meta name="date" content="2024-08-12" />
+<meta name="date" content="2025-02-09" />
 
 <title>Nested Archimedean Lévy Copulas</title>
 
@@ -351,7 +351,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Nested Archimedean Lévy Copulas</h1>
 <h4 class="author">Marius Hofert</h4>
-<h4 class="date">2024-08-12</h4>
+<h4 class="date">2025-02-09</h4>
 
 
 
@@ -545,7 +545,7 @@ sense, we only simulate the largest jumps; see below for more details.
 <span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="fu">system.time</span>(Gamma <span class="ot">&lt;-</span> <span class="fu">Gamma_Clayton_Levy</span>(d, <span class="at">theta=</span>theta, <span class="at">Gamma.star=</span>Gamma.star,</span>
 <span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>                                        <span class="at">burn.in=</span>burn.in))</span></code></pre></div>
 <pre><code>##    user  system elapsed 
-##   0.149   0.000   0.150</code></pre>
+##   0.160   0.000   0.161</code></pre>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">plot_Gamma</span>(Gamma, <span class="at">Gamma.star=</span>Gamma.star,</span>
 <span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>           <span class="at">file=</span><span class="cf">if</span>(doPDF) <span class="st">&quot;fig_Gamma_positive_Clayton_Levy_copula.pdf&quot;</span> <span class="cf">else</span> <span class="cn">NULL</span>,</span>
 <span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>           <span class="at">main=</span><span class="fu">expression</span>(<span class="fu">bold</span>(<span class="fu">group</span>(<span class="st">&quot;(&quot;</span>,Gamma[k],<span class="st">&quot;)&quot;</span>)<span class="sc">~</span></span>
@@ -565,7 +565,7 @@ sense, we only simulate the largest jumps; see below for more details.
 <span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a><span class="fu">system.time</span>(Gamma <span class="ot">&lt;-</span> <span class="fu">Gamma_nested_Clayton_Levy</span>(theta, <span class="at">Gamma.star=</span>Gamma.star,</span>
 <span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>                                               <span class="at">burn.in=</span>burn.in))</span></code></pre></div>
 <pre><code>##    user  system elapsed 
-##   5.642   0.010   5.676</code></pre>
+##   5.934   0.006   5.967</code></pre>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="do">## 15 seconds on 2015-fast platform</span></span>
 <span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="fu">plot_Gamma</span>(Gamma, <span class="at">Gamma.star=</span>Gamma.star,</span>
 <span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>           <span class="at">file=</span><span class="cf">if</span>(doPDF) <span class="st">&quot;fig_Gamma_positive_nested_Clayton_Levy_copula.pdf&quot;</span> <span class="cf">else</span> <span class="cn">NULL</span>,</span>

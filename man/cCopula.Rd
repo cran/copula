@@ -89,6 +89,8 @@ cacopula(u, cop, n.MC = 0, log = FALSE)
   \code{\link{htrafo}}; \code{\link{acopula-families}}.
 }
 \examples{
+(Xtras <- copula:::doExtras()) # determine whether examples will be extra (long)
+
 ## 1) Sampling from a conditional distribution of a Clayton copula given u_1
 
 ## Define the copula
@@ -96,7 +98,7 @@ tau <- 0.5
 theta <- iTau(claytonCopula(), tau = tau)
 d <- 2
 cc <- claytonCopula(theta, dim = d)
-n <- 1000
+n <- if(Xtras) 1000 else 250
 set.seed(271)
 
 ## A small u_1
@@ -118,7 +120,7 @@ plot(U[,2], ylab = quote(U[2]))
 ## Define the copula
 tau <- 0.5
 theta <- iTau(gumbelCopula(), tau = tau)
-d <- 5
+d <- if(Xtras) 6 else 3
 gc <- gumbelCopula(theta, dim = d)
 n <- 200
 set.seed(271)
@@ -141,7 +143,7 @@ theta <- iTau(claytonCopula(), tau = tau)
 d <- 5
 cc <- claytonCopula(theta, dim = d)
 set.seed(271)
-n <- 1000
+n <- if(Xtras) 1000 else 400
 U <- rCopula(n, copula = cc)
 X <- qnorm(U) # X now follows a meta-Clayton model with N(0,1) marginals
 U <- pobs(X) # build pseudo-observations

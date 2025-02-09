@@ -53,11 +53,14 @@ ls.str(copula:::.nacopEnv)
 
 showSys.time(s1c <- Stirling1(100,10))
 s1c
+## no longer check the timings by default (s1 .. s4)
 (s1 <- system.time(for(i in 1:20) S. <- Stirling1(100, 10))[[1]])
-stopifnot(identical(S., s1c), !isLinux || s1 <= 0.020)
+stopifnot(identical(S., s1c))
+if(doExtras && isLinux) stopifnot(s1 <= 0.020) # fails on valgrind / gctorture ..
 showSys.time(s2c <- Stirling1(200,190)); s2c
 (s2 <- system.time(for(i in 1:20) S. <- Stirling1(200,190))[[1]])
-stopifnot(identical(S., s2c), !isLinux || s2 <= 0.020)
+stopifnot(identical(S., s2c))
+if(doExtras && isLinux) stopifnot(s2 <= 0.020)
 ## 0.010 occasionally barely fails (prints "0.010") on Martin's X201
 
 
@@ -80,14 +83,15 @@ rbind(C.direct = system.time(Sd <- Stirling2(100,10, method="direct")),
       C.lookup = system.time(Sl <- Stirling2(100,10, method="lookup")))
 ## should be equal; and lookup time should be "zero" when called again:
 (s3 <- system.time(for(i in 1:20) S. <- Stirling2(100, 10))[[1]])
-stopifnot(all.equal(Sd, Sl, tolerance = 1e-15), !isLinux || s3 <= 0.020)
+stopifnot(all.equal(Sd, Sl, tolerance = 1e-15))
+if(doExtras && isLinux) stopifnot(s3 <= 0.020)
 ## 0.010 fails on good ole' Solaris when that is busy..
 ## Here, the direct method already overflows, but the "lookup" still works
 rbind(C.direct = system.time(Sd <- Stirling2(200,190, method="direct")),
       C.lookup = system.time(Sl <- Stirling2(200,190, method="lookup")))
 Sd ; Sl
 (s4 <- system.time(for(i in 1:20) S. <- Stirling2(200,190))[[1]])
-stopifnot(!isLinux || s4 <= 0.025)
+if(doExtras && isLinux) stopifnot(s4 <= 0.025)
 # 0.010 occasionally barely fails (prints "0.010") on Martin's X201
 
 

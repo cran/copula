@@ -1,7 +1,7 @@
 Package: copula
-Version: 1.1-4
-VersionNote: Last CRAN: 1.1-3 on 2023-12-07
-Date: 2024-08-12
+Version: 1.1-5
+VersionNote: Last CRAN: 1.1-4 on 2024-08-12, 1.1-3 on 2023-12-07
+Date: 2025-02-09
 Title: Multivariate Dependence with Copulas
 Authors@R: c(person("Marius", "Hofert", role = "aut", email = "marius.hofert@uwaterloo.ca",       comment = c(ORCID = "0000-0001-8009-4665"))
 	   , person("Ivan", "Kojadinovic", role = "aut", email = "ivan.kojadinovic@univ-pau.fr",  comment = c(ORCID = "0000-0002-2903-1543"))
@@ -15,11 +15,11 @@ Imports: stats, graphics, methods, stats4, Matrix (>= 1.5-0), lattice,
         colorspace, gsl, ADGofTest, stabledist (>= 0.6-4), mvtnorm,
         pcaPP, pspline, numDeriv
 Suggests: MASS, KernSmooth, sfsmisc, scatterplot3d, Rmpfr, bbmle,
-        knitr, rmarkdown, abind, crop, gridExtra, lcopula, mev,
-        mvnormtest, parallel, partitions, polynom, qrng, randtoolbox,
-        rugarch, Runuran, tseries, VGAM, VineCopula, zoo
-SuggestsNote: packages {abind, ..., zoo} (last lines above) are only
-        used in vignettes, demos and a few tests.
+        knitr, rmarkdown, animation, abind, crop, gridExtra, HAC,
+        lcopula, mev, mvnormtest, parallel, partitions, polynom, qrng,
+        randtoolbox, rugarch, Runuran, tseries, VGAM, VineCopula, zoo
+SuggestsNote: packages {animation, ..., zoo} (last lines above) are
+        only used in vignettes, demos and a few tests.
 VignetteBuilder: knitr
 Enhances: nor1mix, copulaData
 SystemRequirements: pdfcrop (part of TexLive) is required to rebuild
@@ -60,7 +60,7 @@ URL: https://copula.r-forge.r-project.org/,
         https://CRAN.r-project.org/package=copula
 BugReports: https://r-forge.r-project.org/tracker/?func=add&group_id=2140&atid=5417
 NeedsCompilation: yes
-Packaged: 2024-08-12 15:00:36 UTC; maechler
+Packaged: 2025-02-09 20:28:14 UTC; maechler
 Author: Marius Hofert [aut] (<https://orcid.org/0000-0001-8009-4665>),
   Ivan Kojadinovic [aut] (<https://orcid.org/0000-0002-2903-1543>),
   Martin Maechler [aut, cre] (<https://orcid.org/0000-0002-8685-9910>),
@@ -71,4 +71,4 @@ Author: Marius Hofert [aut] (<https://orcid.org/0000-0001-8009-4665>),
     parameters)
 Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
 Repository: CRAN
-Date/Publication: 2024-08-17 04:40:03 UTC
+Date/Publication: 2025-02-09 22:40:02 UTC

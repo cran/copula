@@ -18,7 +18,7 @@ loglikCopula(param = getTheta(copula), u, copula,
 
 loglikCopulaMany(pList, u, copula)
 
-## Generic [and "rotCopula" method] : %- ../R/fitCopula.R
+## Generic [and "parCopula" method] : %- ../R/fitCopula.R
 fitCopula(copula, data, \dots)
 \S4method{fitCopula}{parCopula}(copula, data,
           method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
@@ -115,7 +115,7 @@ optimMeth(copula, method, dim)
     \code{\link{TRUE}}, suppresses warnings from the involved
     likelihood maximization (typically when the likelihood is
     evaluated at invalid parameter values).}
-  \item{\dots}{additional arguments passed to \code{method} specific auxiliary
+  \item{\dots}{additional arguments passed to \code{method}-specific auxiliary
     functions, e.g., \code{traceOpt = TRUE} (or \code{traceOpt = 10}) for tracing
     \code{\link{optimize}} (every 10-th function evaluation) for method
     \code{"itau.mpl"}, and for \dQuote{manual} tracing with method
@@ -272,7 +272,7 @@ u <- pobs(x)                # pseudo-observations
 ## Inverting Kendall's tau
 fit.tau <- fitCopula(gumbelCopula(), u, method="itau")
 fit.tau
-confint(fit.tau) # work fine !
+confint(fit.tau) # works fine !
 confint(fit.tau, level = 0.98)
 summary(fit.tau) # a bit more, notably "Std. Error"s
 coef(fit.tau)# named vector
@@ -302,14 +302,17 @@ u <- pobs(x)                # pseudo-observations
 ## Inverting Kendall's tau
 fit.tau <- fitCopula(normalCopula(dim=3, dispstr="un"), u, method="itau")
 fit.tau
-## Inverting Spearman's rho
-fit.rho <- fitCopula(normalCopula(dim=3, dispstr="un"), u, method="irho")
-fit.rho
-## Maximum pseudo-likelihood
-fit.mpl <- fitCopula(normalCopula(dim=3, dispstr="un"), u, method="mpl")
-summary(fit.mpl)
-coef(fit.mpl) # named vector
-coef(fit.mpl, SE = TRUE) # the matrix, with SE
+
+if(Xtras) withAutoprint({ ## needs time
+  ## Inverting Spearman's rho
+  fit.rho <- fitCopula(normalCopula(dim=3, dispstr="un"), u, method="irho")
+  fit.rho
+  ## Maximum pseudo-likelihood
+  fit.mpl <- fitCopula(normalCopula(dim=3, dispstr="un"), u, method="mpl")
+  summary(fit.mpl)
+  coef(fit.mpl) # named vector
+  coef(fit.mpl, SE = TRUE) # the matrix, with SE
+}) #
 ## Maximum likelihood (use 'x', not 'u' !)
 fit.ml <- fitCopula(normalCopula(dim=3, dispstr="un"), x, method="ml", traceOpt=TRUE)
 summary(fit.ml)

@@ -44,7 +44,7 @@ dependogram(test, pvalues = FALSE, print = FALSE)
 %% dependogram():
   \item{test}{object of class \code{"indepTest"} as returned by \code{indepTest()}.}
   \item{pvalues}{ logical indicating whether the dependogram should be
-    drew from test statistics or the corresponding p-values.}
+    drawn from test statistics or the corresponding p-values.}
   \item{print}{ logical indicating whether details should be printed.}
 }
 \details{

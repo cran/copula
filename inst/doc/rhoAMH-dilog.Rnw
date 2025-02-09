@@ -180,14 +180,14 @@ uniform univariate margins. Standard references for an introduction
 are \citet{joe1997} or \citet{nelsen2007}.
 
 \citet{sklar1959} shows that for any multivariate
-distribution function $H$ with margins $F_j$, $j\in\{1,\dots,d\}$, there exists
+distribution function $H$ with margins $F_j$, $j\in\{1,\ldots,d\}$, there exists
 a copula $C$ such that
 \begin{align}
   H(x_1,\dots,x_d)=C(F_1(x_1),\dots,F_d(x_d)),\ \bm{x}\in\IR^d.\label{sklar}
 \end{align}
 Conversely, given a copula $C$ and arbitrary univariate distribution functions $F_j$,
-$j\in\{1,\dots,d\}$, $H$ defined by (\ref{sklar}) is a distribution function
-with marginals $F_j$, $j\in\{1,\dots,d\}$.
+$j\in\{1,\ldots,d\}$, $H$ defined by (\ref{sklar}) is a distribution function
+with marginals $F_j$, $j\in\{1,\ldots,d\}$.
 
 \section{Archimedean copulas}
 An \textit{Archimedean generator}, or simply \textit{generator}, is a

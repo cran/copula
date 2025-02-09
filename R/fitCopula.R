@@ -672,7 +672,10 @@ fitCopula.ml <- function(copula, u, method=c("mpl", "ml"), start, lower, upper,
     method <- match.arg(method)
 
     ## Determine optim() inputs
-    control <- c(as.list(optim.control), fnscale = -1) # fnscale < 0 => maximization
+    control <- c(as.list(optim.control), fnscale = -1 # fnscale < 0  <==> maximization
+               , if(optim.method == "Nelder-Mead") # as the warning is misleading here
+                     list(warn.1d.NelderMead = FALSE)
+                 )
     ## unneeded, possibly wrong (why not keep a 'special = NULL' ?):
     ## control <- control[!vapply(control, is.null, NA)]
     meth.has.bounds <- optim.method %in% c("Brent","L-BFGS-B")
@@ -885,9 +888,9 @@ fitCopula.ml <- function(copula, u, method=c("mpl", "ml"), start, lower, upper,
 
 ### Wrapper ####################################################################
 
-## see setMethod("fitCopula", .., fitCopula_dflt)   below !
+## -->  setMethod("fitCopula", "parCopula", fitCopula_dflt)   below !
 
-##' @title Default fitCopula() Method -- *THE* user fitting function
+##' @title Default (actually "parCopula") fitCopula() Method -- *THE* user fitting function
 ##' @param copula The copula to be fitted
 ##' @param data The data in [0,1]^d for "mpl", "ml", "itau.mpl";
 ##'        for "itau", "irho", it can be in [0,1]^d or IR^d
@@ -897,6 +900,7 @@ fitCopula.ml <- function(copula, u, method=c("mpl", "ml"), start, lower, upper,
 ##' @param start The initial value for optim()
 ##' @param lower The vector of lower bounds for optim()
 ##' @param upper The vector of upper bounds for optim()
+##--@param traceOpt logical or positive integer indicating if the object function should be traced during minimization
 ##' @param optim.method The optimization method for optim()
 ##' @param optim.control optim()'s control parameter
 ##' @param estimate.variance A logical indicating whether the estimator's
@@ -909,6 +913,7 @@ fitCopula_dflt <- function(copula, data,
                            method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
                            posDef = is(copula, "ellipCopula"),
                            start=NULL, lower=NULL, upper=NULL,
+                           ## traceOpt = FALSE,
                            optim.method = optimMeth(copula, method, dim = d),
                            optim.control = list(maxit=1000),
                            estimate.variance = NA, hideWarnings = FALSE, ...)
@@ -923,7 +928,10 @@ fitCopula_dflt <- function(copula, data,
     cl <- match.call()
     if(cl[[1]] == quote(.local)) { ## fix it up:
 	p <- sys.parent()
+	if(p <= 3)
 	cl <- match.call(sys.function(p), call = sys.call(p), expand.dots=FALSE)
+	else  # seems better when called from function *calling* fitCopula()
+	cl <- sys.call(p)
     }
     d <- ncol(data)
     if(method == "mpl" || method == "ml") { # "mpl" or "ml"

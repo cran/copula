@@ -12,7 +12,7 @@
 
 <meta name="author" content="Original demo from Roeger Koenker; by Marius Hofert, Ivan Kojadinovic, Martin Mächler, Jun Yan" />
 
-<meta name="date" content="2024-08-12" />
+<meta name="date" content="2025-02-09" />
 
 <title>MLE and Quantile Evaluation for a Clayton AR(1) Model with Student Marginals</title>
 
@@ -353,7 +353,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 AR(1) Model with Student Marginals</h1>
 <h4 class="author">Original demo from Roeger Koenker; by Marius Hofert,
 Ivan Kojadinovic, Martin Mächler, Jun Yan</h4>
-<h4 class="date">2024-08-12</h4>
+<h4 class="date">2025-02-09</h4>
 
 
 
@@ -388,8 +388,8 @@ distributions.</p>
 <p>We now estimate the parameters under known marginals</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">fitCopula</span>(<span class="fu">claytonCopula</span>(<span class="at">dim=</span><span class="dv">2</span>),</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>          <span class="fu">cbind</span>(<span class="fu">ptls</span>(x,df,mu,sigma), <span class="fu">ptls</span>(y,df,mu,sigma)))</span></code></pre></div>
-<pre><code>## Call: fitCopula(claytonCopula(dim = 2), data = cbind(ptls(x, df, mu, 
-##     sigma), ptls(y, df, mu, sigma)))
+<pre><code>## Call: fitCopula(claytonCopula(dim = 2), cbind(ptls(x, df, mu, sigma), 
+##     ptls(y, df, mu, sigma)))
 ## Fit based on &quot;maximum pseudo-likelihood&quot; and 199 2-dimensional observations.
 ## Copula: claytonCopula 
 ## alpha 

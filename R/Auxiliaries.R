@@ -115,7 +115,7 @@ corKendall <- function(x, checkNA = TRUE,
 formatCall <- function(cal, className, sep = "\n", collapse = "\n") {
     if(cal[[1L]] == as.symbol(".local"))
 	cal[[1L]] <- as.symbol(className)
-    if(names(cal[2L]) == "copula")
+    if(length(n2 <- names(cal[2L])) && n2 == "copula")
 	names(cal)[2L] <- ""
     paste(deparse(cal), sep=sep, collapse=collapse)
 }
