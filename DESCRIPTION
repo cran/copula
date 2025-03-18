@@ -1,7 +1,8 @@
 Package: copula
-Version: 1.1-5
-VersionNote: Last CRAN: 1.1-4 on 2024-08-12, 1.1-3 on 2023-12-07
-Date: 2025-02-09
+Version: 1.1-6
+VersionNote: Last CRAN: 1.1-5 on 2025-02-09, 1.1-4 on 2024-08-12, 1.1-3
+        on 2023-12-07
+Date: 2025-03-05
 Title: Multivariate Dependence with Copulas
 Authors@R: c(person("Marius", "Hofert", role = "aut", email = "marius.hofert@uwaterloo.ca",       comment = c(ORCID = "0000-0001-8009-4665"))
 	   , person("Ivan", "Kojadinovic", role = "aut", email = "ivan.kojadinovic@univ-pau.fr",  comment = c(ORCID = "0000-0002-2903-1543"))
@@ -60,7 +61,7 @@ URL: https://copula.r-forge.r-project.org/,
         https://CRAN.r-project.org/package=copula
 BugReports: https://r-forge.r-project.org/tracker/?func=add&group_id=2140&atid=5417
 NeedsCompilation: yes
-Packaged: 2025-02-09 20:28:14 UTC; maechler
+Packaged: 2025-03-18 09:43:59 UTC; maechler
 Author: Marius Hofert [aut] (<https://orcid.org/0000-0001-8009-4665>),
   Ivan Kojadinovic [aut] (<https://orcid.org/0000-0002-2903-1543>),
   Martin Maechler [aut, cre] (<https://orcid.org/0000-0002-8685-9910>),
@@ -71,4 +72,4 @@ Author: Marius Hofert [aut] (<https://orcid.org/0000-0001-8009-4665>),
     parameters)
 Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
 Repository: CRAN
-Date/Publication: 2025-02-09 22:40:02 UTC
+Date/Publication: 2025-03-18 13:30:06 UTC

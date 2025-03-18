@@ -3,6 +3,15 @@
 \name{NEWS}
 \title{News for \R Package \pkg{copula}}% MM: look into ../svn-log-from.all
 
+\section{Changes in version 1.1-6 (2025-03-05, svn r1903)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item Validity checking of \code{"acopula"}-classed objects no longer requires
+      \eqn{\psi(0, \theta = 1/2) = 1}, but only approximate equality.
+    }
+  }
+}
+
 \section{Changes in version 1.1-5 (2025-02-09, svn r1902)}{
   \subsection{New Features}{
     \itemize{

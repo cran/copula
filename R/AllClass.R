@@ -1,4 +1,4 @@
-## Copyright (C) 2012--2023 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
+## Copyright (C) 2012--2025 Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
 ##
 ## This program is free software; you can redistribute it and/or modify it under
 ## the terms of the GNU General Public License as published by the Free Software
@@ -114,8 +114,8 @@ setClass("acopula",
              ## ... TODO
 
              ## Check more :
-	     if (object@psi(0, theta= 1/2) != 1)
-		 return("psi(0, theta=1/2) != 1 -- seems an invalid generator")
+	     if (abs(object@psi(0, theta= 1/2) - 1) > 4 * .Machine$double.eps)
+		 return("psi(0, theta=1/2) != 1 {+/- eps} -- psi() too inaccurate as generator")
 
              ## ....
              ## ....
