@@ -15,9 +15,10 @@
   \code{\link{fitCopula}(*, \link{pobs}(x))} instead.
 }
 \usage{
-loglikMvdc(param, x, mvdc)
+loglikMvdc(param, x, mvdc, checkPar = TRUE, warnErr = TRUE)
+
 fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
-        lower = -Inf, upper = Inf,
+        lower = -Inf, upper = Inf, warnLLerr = TRUE,
         estimate.variance = fit$convergence == 0, hideWarnings = TRUE)
 
 \S3method{coef}{fittedMV}(object, SE = FALSE, orig = TRUE, \dots)
@@ -30,12 +31,18 @@ fitMvdc(data, mvdc, start, optim.control = list(), method = "BFGS",
     marginals first and the copula parameters last.  When the
     \code{mvdc} object has \code{marginsIdentical = TRUE}, only the
     parameters of one marginal must be specified.}
-  \item{x}{a data matrix.}
+  \item{x, data}{a data matrix.}
   \item{mvdc}{a \code{"\linkS4class{mvdc}"} object. }
-  \item{data}{a data matrix.}
-  \item{start}{a vector of starting value for \code{"param"}.  See
-    \code{"param"} above for ordering of this vector.}
-  \item{optim.control}{a list of controls to be passed to \code{\link{optim}}.}
+  \item{checkPar}{logical indicating if parameter setting should be checked; the
+      default is true, but in \code{fitMvdc()} \code{FALSE} is used for speed.}
+  \item{warnErr, warnLLerr}{\code{\link{logical}} indicating if a
+    \code{\link{warning}} should be signalled when the log density
+    (\code{\link{dMvdc}(*, log=TRUE)}) evaluation leads to an error
+    (\code{\link{stop}}).}
+  \item{start}{numeric vector of starting values for \code{param}.  See
+    \code{param} (above) for ordering of this vector.}
+  \item{optim.control}{a \code{\link{list}} of controls to be passed to
+    \code{\link{optim}}.}
   \item{method}{the method for \code{\link{optim}}.}
   \item{lower, upper}{bounds on each parameter, passed to
     \code{\link{optim}}, typically \dQuote{box constraints} for

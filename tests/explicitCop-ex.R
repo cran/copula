@@ -78,12 +78,14 @@ if(doExtras) {
           quote=FALSE)
     ## very bad from [5] on ..
     showProc.time()
-}
 
-## benchmark
-## library(microbenchmark)
-## microbenchmark(dCopula(u, mC), copula:::dExplicitCopula.algr(u, mC))
-## microbenchmark(pCopula(u, mC), copula:::pExplicitCopula.algr(u, mC))
+    rq <- require # don't want to 'suggest' ..
+    if(rq("microbenchmark")) withAutoprint({
+        (mb1 <- microbenchmark(dCopula(u, mC), copula:::dExplicitCopula.algr(u, mC)))
+        (mb2 <- microbenchmark(pCopula(u, mC), copula:::pExplicitCopula.algr(u, mC)))
+        showProc.time()
+    })
+}
 
 dCd <- copula:::dCdu(mC, u12)
 if(dev.interactive(orNone=TRUE)) {
@@ -128,9 +130,9 @@ stopifnot(all.equal(Cuu, c(0:3,5:8)/8, tol = 1e-15))
 ## NOTE(MM): From the above result I think the finite-sample definition of C.n()
 ## ----      "sucks": It is not equidistant when u[] is.
 
-
 ## cdf versus C.n
 stopifnot(max(abs(pCopula(u, k.mC.g) - C.n(u, U))) < 0.002)
+showProc.time()
 
 ## pdf versus kde2d
 require(MASS)
@@ -140,8 +142,8 @@ showProc.time()
 
 ## derivatives
 derE.k <- exprDerivs(k.mC.g, u)
-showProc.time()
 
+showProc.time()
 if(doExtras) {
     derN.k <- numeDerivs(k.mC.g, u)
     print(cbind(sapply(1:ncol(derE.k),

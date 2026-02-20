@@ -21,6 +21,10 @@
 
 #include <R.h>
 
+double GaussMixKernel(double *x, double *y, int d, double *bandwidth2, int K);
+void gofMMDtest_c(double *x, double *y, int *n, int *d, int *N, double *bandwidth2,
+		  int *K, double *MMD2, double *MMD2H0);
+
 void cramer_vonMises(int *n, int *p, double *U, double *Ctheta,
 		     double *stat);
 void cramer_vonMises_grid(int *p, double *U, int *n, double *V, int *m,

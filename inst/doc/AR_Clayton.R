@@ -30,13 +30,14 @@ x <- u[-1]
 
 ## -----------------------------------------------------------------------------
 fitCopula(claytonCopula(dim=2),
-          cbind(ptls(x,df,mu,sigma), ptls(y,df,mu,sigma)))
+          cbind(ptls(x,df,mu,sigma), ptls(y,df,mu,sigma))) -> fmN
+summary(fmN) # alpha 11.08 (0.858)
 
 ## -----------------------------------------------------------------------------
 ## Identical margins
 M2tlsI <- mvdc(claytonCopula(dim=2), c("tls","tls"),
                rep(list(list(df=NA, mu=NA, sigma=NA)), 2), marginsIdentical= TRUE)
-(fit.id.mar <- fitMvdc(cbind(x,y), M2tlsI, start=c(3,1,1, 10)))
+(fit.id.mar <- fitMvdc(cbind(x,y), M2tlsI, start=c(3,1,1, 10), optim.control = list(trace=TRUE)))
 
 ## Not necessarily identical margins
 M2tls <- mvdc(claytonCopula(dim=2), c("tls","tls"),

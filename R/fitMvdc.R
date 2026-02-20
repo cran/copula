@@ -98,15 +98,15 @@ setMethod("show", signature("fitMvdc"), function(object) print.fitMvdc(object))
 
 ##' @title Set / Update the free (non-fixed) parameters of an MVDC
 ##' @param mvdc an \code{mvdc} object
-##' @param param numeric vector of free parameters
+##' @param param numeric vector of free parameters: c(<marginal-pars>, <copula-pars>)
 ##' @return modified \code{mvdc} object
 setMvdcPar <- function(mvdc, param, noCheck = FALSE) {
     marNpar <- lengths(mvdc@paramMargins)# or  vapply(mvdc@paramMargins, nFree, 1L)
-    idx2 <- cumsum(marNpar)
-    idx1 <- idx2 - marNpar + 1
+    idx2 <- as.integer(cumsum(marNpar))
+    idx1 <- idx2 - marNpar + 1L ## <==> length(idx1:idx2) == idx2-idx1+1 == marNpar
     margid <- mvdc@marginsIdentical
     d <- dim(mvdc@copula)
-
+    ## FIXME (high-dim speed):  if(margid)  -- no 1:d loop  {work with *one* margin instead of d !!}
     for (i in 1:d) {
         if (marNpar[i] > 0) {
             ## parnames <- mvdc@paramMargins[[i]]
@@ -126,20 +126,20 @@ setMvdcPar <- function(mvdc, param, noCheck = FALSE) {
     mvdc
 }
 
-loglikMvdc <- function(param, x, mvdc) {
-  mvdc <- setMvdcPar(mvdc, param, noCheck=TRUE)
+loglikMvdc <- function(param, x, mvdc, checkPar = TRUE, warnErr = TRUE) {
+  mvdc <- setMvdcPar(mvdc, param, noCheck = !checkPar)
   tryCatch(
       ## log likelihood :
-      sum(log(dMvdc(x, mvdc))),
+      sum(dMvdc(x, mvdc, log = TRUE)),
       error = function(e) {
-	  warning("error in loglik computation: ", conditionMessage(e))
+	  if(warnErr) warning("error in sum(dMvdc(.., log=TRUE)): ", conditionMessage(e))
 	  (-Inf) # was NaN
       })
 }
 
 fitMvdc <- function(data, mvdc, start,
                     optim.control=list(), method="BFGS",
-                    lower = -Inf, upper = Inf,
+                    lower = -Inf, upper = Inf, warnLLerr = TRUE,
                     estimate.variance = fit$convergence == 0, hideWarnings=TRUE)
 {
     copula <- mvdc@copula
@@ -159,7 +159,7 @@ fitMvdc <- function(data, mvdc, start,
     (if(hideWarnings) suppressWarnings else identity)(
     fit <- optim(start, loglikMvdc,
 		 ## loglikMvdc args:
-		 mvdc=mvdc, x=data,
+		 mvdc=mvdc, x=data, checkPar = FALSE, warnErr = warnLLerr,
 		 ## optim args:
 		 method=method, control=control, lower=lower, upper=upper)
     )
@@ -173,7 +173,7 @@ fitMvdc <- function(data, mvdc, start,
     var.est <- if (estimate.variance) {
 	fit.last <- optim(param, loglikMvdc,
 			  ## loglikMvdc args :
-			  mvdc=mvdc, x=data,
+			  mvdc=mvdc, x=data, checkPar = TRUE, warnErr = warnLLerr,
 			  ## optim args:
 			  method = method, ## one final step, computing Hessian :
 			  control=c(control, maxit = 1), hessian=TRUE)

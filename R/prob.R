@@ -14,12 +14,29 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-### Computing probabilities of falling in hyperrectangles
+##' Computing probabilities of falling in hyperrectangles
+volume.function <- function(object, lower, upper, ...) {
+    d <- length(upper)
+    stopifnot(is.numeric(lower), is.numeric(upper),
+              length(lower) == d) # could even be called with lower > upper
+    D <- 2^d
+    m <- 0:(D - 1)
+    ## digitsBase() from package 'sfsmisc' {slightly simplified} :
+    ## Purpose: Use binary representation of 0:N
+    ## Author: Martin Maechler, Date: Dec 4, 1991
+    II <- matrix(0, nrow = D, ncol = d)
+    for(i in d:1L) {
+        II[,i] <- m %% 2L + 1L
+        if (i > 1) m <- m %/% 2L
+    }
+    Sign <- c(1,-1)[1L + (- rowSums(II)) %% 2] # signs for checkerboard system;
+                                        # the ("upper",...,"upper") case has +1; = c(2,2,...,2)
+    x <- array(cbind(lower, upper)[cbind(c(col(II)), c(II))], dim = dim(II)) # evaluation points
+    ## Computing the volume
+    sum(Sign * object(x, ...))
+}
 
-### prob() --- Generic and all Methods here
-### ======
-
-##' @title Compute the probability P[l < U <= u]  where U ~ copula x
+##' @title Compute the probability P[l < U <= u] where U ~ copula x
 ##' @param x copula object
 ##' @param l d-vector of lower "integration" limits
 ##' @param u d-vector of upper "integration" limits
@@ -28,26 +45,13 @@
 ##' @author Marius Hofert, Martin Maechler
 setGeneric("prob", function(x, l, u) standardGeneric("prob"))
 
-setMethod("prob", signature(x ="Copula"),
-          function(x, l,u) {
+setMethod("prob", signature(x = "Copula"),
+          function(x, l, u) {
               d <- dim(x)
               stopifnot(is.numeric(l), is.numeric(u),
                         length(u) == d, d == length(l),
                         0 <= l, l <= u, u <= 1)
-              if(d > 30)
-		  stop("prob() for copula dimensions > 30 are not supported (yet)")
-              D <- 2^d
-              m <- 0:(D - 1)
-              ## digitsBase() from package 'sfsmisc' {slightly simplified} :
-              ## Purpose: Use binary representation of 0:N
-              ## Author: Martin Maechler, Date:  Wed Dec  4 14:10:27 1991
-              II <- matrix(0, nrow = D, ncol = d)
-              for (i in d:1L) {
-                  II[,i] <- m %% 2L + 1L
-                  if (i > 1) m <- m %/% 2L
-              }
-              ## Sign: the ("u","u",...,"u") case has +1; = c(2,2,...,2)
-              Sign <- c(1,-1)[1L + (- rowSums(II)) %% 2]
-              U <- array(cbind(l,u)[cbind(c(col(II)), c(II))], dim = dim(II))
-              sum(Sign * pCopula(U, x))
+              ## if(d > 30)
+	      ##     stop("prob() for copula dimensions > 30 are not supported (yet)")
+              volume(function(z) pCopula(z, copula = x), lower = l, upper = u)
           })

@@ -104,13 +104,13 @@ stopifnot(cor(P, cU[lower.tri(cU)]) > 0.99)
 ## Fitting a t-copula with "itau.mpl" with disp="un"
 (fm4u <- fitCopula(uc4, U., method="itau.mpl", traceOpt = TRUE))
 ## Fitting  t-copulas  .............  with disp = "ex" and "ar" :
-uc4.ex <- tCopula(dim=d, df=nu, disp = "ex", df.fixed=FALSE)
+uc4.ex <- tCopula(dim=d, df=nu, disp = "ex",  df.fixed=FALSE)
 uc4.ar <- tCopula(dim=d, df=nu, disp = "ar1", df.fixed=FALSE)
 validObject(uc4p.ex <- setTheta(uc4.ex, value = c(0.75, df=nu)))
 validObject(uc4p.ar <- setTheta(uc4.ar, value = c(0.75, df=nu)))
 U.ex <- pobs(rCopula(n=1000, copula=uc4p.ex))
 U.ar <- pobs(rCopula(n=1000, copula=uc4p.ar))
-if(FALSE) { # The following are not available (yet); see ~/R/fitCopula.R
+if(FALSE) { # The following are not available (yet); see ../R/fitCopula.R
     ## Fitting a t-copula with "itau.mpl" with disp="ex"
     (fm4e <- fitCopula(uc4.ex, U.ex, method="itau.mpl"))
     ## Fitting a t-copula with "itau.mpl" with disp="ar"
@@ -194,7 +194,7 @@ stopifnot(identical(gMvGam@paramMargins,
                     list(list(shape = 2, rate = 3),
                          list(shape = 4, rate = 1))))
 X <- rMvdc(16000, gMvGam)
-smoothScatter(X, main = "rMvdc(1600, gMvGam)")
+smoothScatter(X, main = paste0("rMvdc(",nrow(X),", gMvGam)"))
 
 persp  (gMvGam, dMvdc, xlim = c(0,4), ylim=c(0,8)) ## almost discrete ????
 contour(gMvGam, dMvdc, xlim = c(0,2), ylim=c(0,8))
@@ -213,18 +213,18 @@ if(doExtras) {
 
 pFoo <- function(x, lower.tail=TRUE, log.p=FALSE)
      pnorm((x - 5)/20, lower.tail=lower.tail, log.p=log.p)
-dFoo <- function(x, lower.tail=TRUE, log.p=FALSE)
-     1/20* dnorm((x - 5)/20, lower.tail=lower.tail, log.p=log.p)
+dFoo <- function(x, lower.tail=TRUE, log = FALSE)
+     1/20* dnorm((x - 5)/20, lower.tail=lower.tail, log=log)
 qFoo <- qunif # must exist; not used for fitting
 
 ## 'Foo' distribution has *no* parameters:
-mv1 <- mvdc(gumbelC, c("gamma","Foo"), param= list(list(3,1), list()))
+mv1 <- mvdc(gumbelC, c("gamma","Foo"), paramMargins = list(list(3,1), list()))
 validObject(mv1)
 stopifnot(nrow(R <- rMvdc(3, mv1)) == 3, ncol(R) == 2)
 ## a wrong way:
-assertError(
-  mvW <- mvdc(gumbelC, c("gamma","Foo"), param= list(list(3,1), list(NULL)))
-, verbose=TRUE)
+assertError(verbose = TRUE,
+  mvW <- mvdc(gumbelC, c("gamma","Foo"), paramMargins = list(list(3,1), list(NULL)))
+)
 ## >> invalid class “mvdc” object: 'paramMargins[[2]]' must be named properly
 
 
@@ -239,11 +239,14 @@ u <- cbind(runif(10),runif(10))
 cor(u[,1], u[,2], method="kendall")
 ## [1] -0.02222222 -- slightly negative
 ## this now gives an error:
-try(fgu <- fitCopula(gumbel, u, method = "ml"))
-## Error in optim(start, loglikCopula, lower = lower, upper = upper, method = method,  :
-##   non-finite finite-difference value [1]
-## In addition: Warning message:
-## In .local(copula, tau, ...) : tau is out of the range [0, 1]
+fgu <- fitCopula(gumbel, u, method = "ml")
+## now warnings:
+## 1: In iTauGumbelCopula(copula, tau) :  For the Gumbel copula, tau must be >= 0. Replacing negative values by 0.
+## 2: In fitCopula.ml(copula, u = .....:  optim(*, hessian=TRUE) failed: non-finite finite-difference value [1]
+summary(fgu)
+stopifnot(inherits(fgu, "fitCopula"),
+          all.equal(coef(fgu), c(alpha = 1)),
+          identical(fgu@fitting.stats$convergence, 0L))
 copGumbel@paraInterval # -> [1, Inf) = exp([0, Inf))
 length(par <- 2^c((0:32)/16, 2+(1:10)/8)) # 43
 (t1 <- system.time(
@@ -422,6 +425,15 @@ if(FALSE)
 stopifnot(
     all.equal(c(Estimate = 3.686, `Std. Error` = 0.31),
               drop(coef(fjcM, SE=TRUE)), tol = 0.0002) # seen 0.000158
+)
+
+## From Rolf Turner, July 2015 (added almost 10 years later):
+nC <- normalCopula(0.5, dim = 2, dispstr="un")
+assertWarning(verbose=TRUE,
+ mv <- mvdc(nC, margins = c("gamma", "gamma"),
+               ## list of *named* c(.) -- not correct: evt interpreted as  shape = c(3, 2), etc
+               paramMargins=list(c(shape=3, scale=2),
+                              list(shape=2, scale=3)))
 )
 
 

@@ -23,14 +23,17 @@ df <- 3
 alpha <- 10
 ```
 
-For the marginals, we will use location scale transformed
-Student distributions.
+For the marginals, we will use location- and scale- transformed
+Student distributions (only `dtls` and `ptls` are necessary for fitting).
 ```{r}
 rtls <- function(n, df, mu, sigma) sigma * rt(n,df) + mu
 ptls <- function(x, df, mu, sigma) pt((x - mu)/sigma,df)
 qtls <- function(u, df, mu, sigma) sigma * qt(u,df) + mu
 dtls <- function(u, df, mu, sigma) dt((x - mu)/sigma,df)/sigma
 ```
+<!-- TODO: provide dtls() with arg. log = T/F ==> faster *and* more accurate!
+  -- ----  However once you do, add the above non-log case to
+  ===> ../tests/fitting-ex.R  <=== !!!! -->
 
 ## Generating the data
 
@@ -53,7 +56,8 @@ x <- u[-1]
 We now estimate the parameters under known marginals
 ```{r}
 fitCopula(claytonCopula(dim=2),
-          cbind(ptls(x,df,mu,sigma), ptls(y,df,mu,sigma)))
+          cbind(ptls(x,df,mu,sigma), ptls(y,df,mu,sigma))) -> fmN
+summary(fmN) # alpha 11.08 (0.858)
 ```
 
 ## Estimation under unknown marginal parameters
@@ -62,7 +66,7 @@ fitCopula(claytonCopula(dim=2),
 ## Identical margins
 M2tlsI <- mvdc(claytonCopula(dim=2), c("tls","tls"),
                rep(list(list(df=NA, mu=NA, sigma=NA)), 2), marginsIdentical= TRUE)
-(fit.id.mar <- fitMvdc(cbind(x,y), M2tlsI, start=c(3,1,1, 10)))
+(fit.id.mar <- fitMvdc(cbind(x,y), M2tlsI, start=c(3,1,1, 10), optim.control = list(trace=TRUE)))
 
 ## Not necessarily identical margins
 M2tls <- mvdc(claytonCopula(dim=2), c("tls","tls"),

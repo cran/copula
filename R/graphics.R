@@ -567,6 +567,7 @@ setMethod("contourplot2", signature(x = "mvdc"),       contourplot2Mvdc)
 ##' @note - axis.line makes the outer box disappear
 ##'       - 'col = "black"' in scales is required to make the ticks visible again
 ##'       - 'clip' is set to off to avoid axis labels being clipped
+##'       - '*lab' can be list(<label>, rot = 90)
 wireframe2Matrix <- function(x,
                              xlim = range(x[,1], finite = TRUE),
                              ylim = range(x[,2], finite = TRUE),

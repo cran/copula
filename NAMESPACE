@@ -65,6 +65,10 @@ importFrom("lattice", trellis.par.get, trellis.par.set,
 importFrom("Matrix", nearPD, invPerm)
 ## NB: "Dangerous" to not also depend on Matrix; as 'methods' for Matrixclasses are not seen.
 
+importFrom("cluster", volume)
+
+## --- now the non-{base | Recommended} packages :
+
 importFrom("gsl", debye_1, debye_2, dilog, complex_dilog)
 
 importFrom("ADGofTest", ad.test)# really would want the ad.test.statistic() but that's hidden
@@ -247,6 +251,7 @@ S3method(nobs, fittedMV)
 S3method(vcov, fittedMV)
 S3method(logLik, fittedMV)
 
+S3method(volume, "function")
 ##_TESTING_
 ## export(dCdtheta, dcdtheta, dTau, dRho)
 ## export(dCdu)
@@ -277,7 +282,7 @@ export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        ,"debye1", "debye2" # <- since we extend the gsl ones
        ,"ebeta", "etau", "emde", "dDiag", "edmle", "emle", "enacopula"
        ## goodness-of-fit
-       ,"gofT2stat" ,"gofTstat", "htrafo"
+       ,"gofMMDtest", "gofT2stat" ,"gofTstat", "htrafo"
        ## distribution of the radial part for Archimedean copulas
        ,"pacR", "qacR"
        ## Kendall distribution
@@ -288,6 +293,7 @@ export("copAMH", "copClayton", "copFrank", "copGumbel", "copJoe"
        ,"printNacopula"
        ,"interval"
        ,"opower"
+       ,"volume" # re-export the cluster generic one
        ,"prob"
        ,"nacFrail.time"
        ## Should we provide these in a separate (very small) R package ?

@@ -17,7 +17,7 @@
 }
 \usage{
 mvdc(copula, margins, paramMargins, marginsIdentical = FALSE,
-     check = TRUE, fixupNames = TRUE)
+     check = TRUE, fixupNames = TRUE, warnMore = TRUE)
 dMvdc(x, mvdc, log=FALSE)
 pMvdc(x, mvdc)
 rMvdc(n, mvdc)
@@ -35,6 +35,9 @@ rMvdc(n, mvdc)
     \code{margins} \dQuote{p*} and \dQuote{d*} functions.}
   \item{fixupNames}{logical indicating if the parameters of the margins
     should get automatic names (from \code{\link{formals}(p<mar_i>)}).}
+  \item{warnMore}{should a \code{\link{warning}} be signalled about
+    possible mismatch of parameter vectors (length) of
+    \code{paraMargins[[i]]} and the related \code{margins[[i]]}.}
   \item{mvdc}{a \code{"\linkS4class{mvdc}"} object. }
   \item{x}{a numeric vector of length the copula dimension, say \eqn{d},
     or a matrix with the number of columns being \eqn{d}, giving the

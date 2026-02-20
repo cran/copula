@@ -105,18 +105,17 @@ enacopula(u, cop,
 \examples{
 tau <- 0.25
 (theta <- copGumbel@iTau(tau)) # 4/3
-d <- 12
+(Xtras <- copula:::doExtras())
+d <- if(Xtras)  12  else  5
 (cop <- onacopulaL("Gumbel", list(theta,1:d)))
-
+n <- if(Xtras) 500 else 50
 set.seed(1)
-n <- 100
 U <- rnacopula(n, cop)
-
 meths <- eval(formals(enacopula)$method)
-\dontshow{meths <- meths[meths != "smle"]}% as that is slow..
+if(!Xtras) meths <- meths[meths != "smle"] # as "smle" is slow..
 fun <- function(meth, u, cop, theta) {
-	run.time <- system.time(val <- enacopula(u, cop=cop, method=meth))
-	list(value=val, error=val-theta, utime.ms=1000*run.time[[1]])
+    run.time <- system.time(val <- enacopula(u, cop=cop, method=meth))[["user.self"]]
+    list(value= val, error= val-theta, utime.ms= 1000*run.time)
 }
 t(res <- sapply(meths, fun, u=U, cop=cop, theta=theta))
 }

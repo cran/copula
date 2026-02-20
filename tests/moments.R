@@ -135,5 +135,3 @@ stopifnot(max(abs(errRho)) <= 0.00369,
           max(abs(errRho[,rho.s <= 0.9])) <= 0.0002)# ok for IJ-rhos
 
 showProc.time()
-
-

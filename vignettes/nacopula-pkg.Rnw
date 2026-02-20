@@ -8,7 +8,7 @@
  Martin M\"achler \\ ETH Zurich}
 \title{Nested Archimedean Copulas Meet \R --- The \pkg{nacopula} Package}
 \def\mythanks{a version of this paper, for \pkg{nacopula} 0.4\_4, has been published
-    in JSS, \url{http://www.jstatsoft.org/v39/i09}.}
+    in JSS, \url{https://www.jstatsoft.org/v39/i09}.}
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Marius Hofert, Martin M\"achler} %% comma-separated
 \Plaintitle{Nested Archimedean Copulas Meet R---The nacopula Package} %% without formatting
@@ -60,20 +60,15 @@
 	ETH Zurich\\
 	8092 Zurich, Switzerland\\
 	E-mail: \email{marius.hofert@math.ethz.ch}\\
-	URL: \url{http://www.math.ethz.ch/~hofertj/}
+	Url \emph{was} \texttt{https://people.math.ethz.ch/\~{}hofertj/}
  \par\bigskip
 	Martin M\"achler\\
-	Seminar f\"ur Statistik, HG G~16\\
+	Seminar f\"ur Statistik, HG G~14.2\\
 	ETH Zurich\\
 	8092 Zurich, Switzerland\\
 	E-mail: \email{maechler@stat.math.ethz.ch}\\
-	URL: \url{http://stat.ethz.ch/people/maechler}
+	URL: \url{https://people.math.ethz.ch/~maechler/}
 }
-%% It is also possible to add a telephone and fax number
-%% before the e-mail in the following format:
-%% Telephone: +43/1/31336-5053
-%% Fax: +43/1/31336-734
-
 %% for those who use Sweave please include the following line (with % symbols):
 %% MM: this is "substituted" by  jss.cls:
 %% need no \usepackage{Sweave.sty}
@@ -157,7 +152,7 @@
 \newcommand*{\R}{\proglang{R}}%{\textsf{R}}
 %% Marius' commands
 \newcommand*{\eps}{\varepsilon}
-\newcommand*{\CRANpkg}[1]{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\newcommand*{\CRANpkg}[1]{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 %NON-STANDARD{bbm}:\newcommand*{\I}{\mathbbm{1}}
 \newcommand*{\I}{\mathbf{1}}
 \newcommand*{\IN}{\mathbb{N}}
@@ -408,7 +403,7 @@ where
 			-2\log(\lvert t\rvert)/\pi,&\alpha=1,
 		\end{cases}
 \end{align*}
-see, e.g., \citet[p.\ 8]{nolan2009} for this ``1-parameterization''. For
+see, e.g., \citet[p.\ 6]{nolan2020} for this ``1-parameterization''. For
 sampling from $S(.)$, we provide
 \code{rstable1(., }$\alpha$\code{, }$\beta$\code{, }$\gamma$\code{, }$\delta$\code{, 1)},
 having implemented an algorithm for sampling stable distributions according

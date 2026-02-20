@@ -120,9 +120,9 @@ plot(U[,2], ylab = quote(U[2]))
 ## Define the copula
 tau <- 0.5
 theta <- iTau(gumbelCopula(), tau = tau)
-d <- if(Xtras) 6 else 3
+d <- if(Xtras)  6  else  3
+n <- if(Xtras) 500 else 100
 gc <- gumbelCopula(theta, dim = d)
-n <- 200
 set.seed(271)
 U. <- matrix(runif(n*d), ncol = d) # U(0,1)^d
 
@@ -140,10 +140,10 @@ splom2(U.) # U(0,1)^d again
 
 tau <- 0.5
 theta <- iTau(claytonCopula(), tau = tau)
-d <- 5
+d <- if(Xtras)  7  else  3
 cc <- claytonCopula(theta, dim = d)
 set.seed(271)
-n <- if(Xtras) 1000 else 400
+n <- if(Xtras) 1000 else 200
 U <- rCopula(n, copula = cc)
 X <- qnorm(U) # X now follows a meta-Clayton model with N(0,1) marginals
 U <- pobs(X) # build pseudo-observations

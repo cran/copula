@@ -3,6 +3,38 @@
 \name{NEWS}
 \title{News for \R Package \pkg{copula}}% MM: look into ../svn-log-from.all
 
+\section{Changes in version 1.1-7 (2026-02-19, svn r1913)}{
+  \subsection{New Features}{
+    \itemize{
+      \item New experimental \code{gofMMDtest()}, multiplier bootstrap, based
+      on the squared MMD.
+
+      \item Add \code{volume()} as an auxiliary for \code{prob()}, as an S3
+      method for the \code{volume()} generic from \CRANpkg{cluster}.
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{mvdc()} more carefully checks \code{paramMargins},
+      and now warns when it contains named vectors instead of \code{list}s,
+      thanks to Rolf Turner's e-mail (in 2015).
+
+      \item \code{loglikMvdc()} now calls \code{dMvdc(.., log=TRUE)}
+      instead of \code{log(dMvdc(..))}.  It and \code{fitMvdc()} get new
+      options for (not) signalling warnings.
+
+      \item \code{fitMvdc()} consequently works on the log scale instead of
+      taking logs; this is typically faster and more accurate, but notably even
+      necessary for \dQuote{large} \eqn{n} or large \code{dim}\eqn{= d}.
+
+      \item Fix the \emph{relative} link to the \sQuote{Frank-Rmpfr}
+      vignette in \code{help(copula-package)}.
+
+      \item Update URLs in the vignettes.
+    }
+  }
+}
+
 \section{Changes in version 1.1-6 (2025-03-05, svn r1903)}{
   \subsection{Bug Fixes}{
     \itemize{

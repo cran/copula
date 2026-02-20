@@ -28,33 +28,45 @@ mvdCheckM <- function(margins, prefix = "p") {
 }
 
 mvdc <- function(copula, margins, paramMargins, marginsIdentical = FALSE,
-		 check = TRUE, fixupNames = TRUE)
+		 check = TRUE, fixupNames = TRUE, warnMore = TRUE)
 {
-    if (marginsIdentical) {
-        dim <- dim(copula)
-	if(length(margins) == 1)
-	    margins <- rep(margins, dim)
-	if(length(paramMargins) == 1)
-	    paramMargins <- rep(paramMargins, dim)
-    }
     if(check) {
 	mvdCheckM(margins, "p")
 	mvdCheckM(margins, "d")
     }
-    if(fixupNames && all(mvd.has.marF(margins, "p"))) {
+    ## marginsIdentical check at end ==> can be fast with just length-1 margins here
+    if((fixupNames || check) && all(mvd.has.marF(margins, "p"))) {
 	for(i in seq_along(margins)) {
 	    n.i <- names(p.i <- paramMargins[[i]])
-	    if(is.null(n.i) || any(!nzchar(n.i))) { # get names of formal args
-		nnms <- names(formals(get(paste0("p",margins[[i]])))[-1])
-		## but not the typical "non-parameter" arguments:
-		nnms <- nnms[is.na(match(nnms, c("lower.tail", "log.p")))]
-		if(length(nnms) > length(p.i)) length(nnms) <- length(p.i)
+            ## names of formal args:
+            nnms <- names(formals(get(cdfN <- paste0("p",margins[[i]])))[-1])
+            ## but not the typical "non-parameter" arguments:
+            nnms <- nnms[is.na(match(nnms, c("lower.tail", "log.p")))]
+            if(!is.list(p.i) && !is.null(n.i))
+                 warning(gettextf("paramMargins[[%d]] is not a list() but named", i), domain = NA)
+	    if(fixupNames && (is.null(n.i) || !all(nzchar(n.i)))) {
+		if(length(nnms) > (lpi <- length(p.i))) {
+                    if(warnMore && (length(nnms) - lpi > 1 || !(cdfN == "pgamma" || "ncp" %in% nnms)))
+                        warning(gettextf("%s() has more parameter arguments than length(paramMargins[[%d]]) == %d",
+                                         cdfN, i, lpi), domain = NA)
+                    length(nnms) <- lpi
+                }
 		if(length(nnms) > 0 &&
 		   (is.null(n.i) || length(nnms) == length(n.i))) # careful ..
 		   names(paramMargins[[i]]) <- nnms
 	    }
 	}
     }
+    if (marginsIdentical) {
+        dim <- dim(copula)
+	if(length(margins) == 1)
+	    margins <- rep(margins, dim)
+        else if(length(margins) != dim) stop("marginsIdentical requires 1 or <d> identical margins")
+	if(length(paramMargins) == 1)
+	    paramMargins <- rep(paramMargins, dim)
+        else if(length(paramMargins) != dim) stop("marginsIdentical requires 1 or <d> identical paramMargins")
+    }
+    ## validMvdc() called here:
     new("mvdc", copula = copula, margins = margins, paramMargins = paramMargins,
 	marginsIdentical = marginsIdentical)
 }
@@ -67,10 +79,11 @@ mvdc <- function(copula, margins, paramMargins, marginsIdentical = FALSE,
 ##' @author Martin Maechler
 margpnames <- function(mv) {
     nMar <- lengths(mv@paramMargins) # or vapply(mv@paramMargins, nFree, 1L)
+    if(sum(nMar) == 0L) return(character())
+    ## else
     p <- dim(mv@copula)
     pnms <- unlist(lapply(mv@paramMargins, names)) # maybe NULL
-    if (sum(nMar) == 0) character()
-    else if(mv@marginsIdentical) ## all the same ==> names only of *first* margin
+    if(mv@marginsIdentical) ## all the same ==> names only of *first* margin
 	paste(paste("m", pnms[seq_len(nMar[1])], sep="."))
     else
 	paste(paste0("m", rep.int(1:p, nMar)), pnms, sep=".")
@@ -91,7 +104,7 @@ asCall <- function(fun, param)
 	    quote(FUN(x))
 	else if(is.list(param)) {
 	    as.call(c(quote(FUN), c(quote(x), as.expression(param))))
-	} else { ## assume that [dpq]<distrib>(x, param) will work
+	} else { ## assume that [dpq]<distrib>(x, param) will work *correctly*
 	    as.call(c(quote(FUN), c(quote(x), substitute(param))))
 	}
     cc[[1]] <- as.name(fun)
@@ -103,14 +116,23 @@ dMvdc <- function(x, mvdc, log=FALSE) {
   densmarg <- if(log) 0 else 1
   if (is.vector(x)) x <- matrix(x, nrow = 1)
   u <- x
+  ## FIXME for large 'dim'  and  mvdc@marginsIdentical TRUE  can use *same* expr{ession}s for all i
   for (i in 1:dim) {
     cdf.expr <- asCall(paste0("p", mvdc@margins[i]), mvdc@paramMargins[[i]])
-    pdf.expr <- asCall(paste0("d", mvdc@margins[i]), mvdc@paramMargins[[i]])
+    dFnam <- paste0("d", mvdc@margins[[i]])
+    pdfE <- asCall(dFnam, mvdc@paramMargins[[i]])
+    pdf.expr <-
+      if(log) { ## use d<distr>(x, <par>, log = TRUE) if possible  <==>  if(has.log)
+        dFargNms <- names(formals(get(dFnam))[-1])
+        has.log <- any("log" == dFargNms)
+        pdf.expr <- if(has.log)
+                        as.call(c(as.list(pdfE), list(log = TRUE)))
+                    else substitute(log(PDF), list(PDF = pdfE))
+      } else pdfE
     u[,i] <- eval(cdf.expr, list(x = x[,i]))
     densmarg <-
 	if(log)
-	    ## FIXME: user should be able to give density which has a log argument
-	    densmarg + log(eval(pdf.expr, list(x = x[,i])))
+	    densmarg + eval(pdf.expr, list(x = x[,i]))
 	else
 	    densmarg * eval(pdf.expr, list(x = x[,i]))
   }

@@ -39,6 +39,96 @@
 
 
 /**
+ * @title Gaussian mixture kernel
+ * @param x see gofMMDtest_c()
+ * @param y see gofMMDtest_c()
+ * @param d see gofMMDtest_c()
+ * @param bandwidth2 see gofMMDtest_c()
+ * @param K see gofMMDtest_c()
+ * @return Gaussian mixture kernel
+ * @author Marius Hofert and Ivan Kojadinovic
+ */
+double GaussMixKernel(double *x, double *y, int d, double *bandwidth2, int K) {
+    int i;
+    double diff = 0.0;
+    double res = 0.0;
+    for (i = 0; i < d; i++)
+	diff += R_pow(x[i] - y[i], 2);
+    diff /= (double)d; /* average norm */
+    for (i = 0; i < K; i++)
+	res += exp(diff / (-2.0 * bandwidth2[i]));
+    return(res / (double)K); /* mean over all Gaussian kernels */
+}
+
+/**
+ * @title MMD aggregated two-sample test of Schrab et al. (2024), a multiplier
+ *        unbiased-MMD^2 based two-sample bootstrap test
+ * @param x (d, n)-matrix of observations (typically from a copula)
+ * @param y (d, n)-matrix of observations (typically from a copula)
+ * @param n sample size (of both x and y)
+ * @param d dimension
+ * @param N number of bootstrap replications
+ * @param bandwidth2 squared bandwidths of the Gaussian mixture kernel
+ * @param K length(bandwidth2)
+ * @param MMD2 unbiased MMD^2 (the one which removes the diagonal in
+ *        each of the three double-sums, so the 2n-diagonal of K and both
+ *        n-diagonals of the (2,1) and (1,2) submatrices of the (2n, 2n) kernel
+ *        matrix)
+ * @param MMD2H0 bootstrapped test statistics
+ * @author Marius Hofert and Ivan Kojadinovic
+ */
+void gofMMDtest_c(double *x, double *y, int *n, int *d, int *N, double *bandwidth2,
+		  int *K, double *MMD2, double *MMD2H0)
+{
+    int i, l, b;
+    double *h = R_Calloc((*n) * (*n), double);
+    double *eps = R_Calloc((*n), double);
+    double s = 0.0;
+    double nn1 = (*n) * (*n - 1);
+
+    /* Compute h and the realized test statistic using the symmetry of the kernel */
+    for (i = 0; i < *n; i++)
+	for (l = 0; l < i; l++) {
+	    h[i + (*n) * l] =
+		  GaussMixKernel(&x[(*d) * i], &x[(*d) * l], *d, bandwidth2, *K)
+		+ GaussMixKernel(&y[(*d) * i], &y[(*d) * l], *d, bandwidth2, *K)
+		- GaussMixKernel(&x[(*d) * i], &y[(*d) * l], *d, bandwidth2, *K)
+		- GaussMixKernel(&x[(*d) * l], &y[(*d) * i], *d, bandwidth2, *K);
+	    h[l + (*n) * i] = h[i + (*n) * l];
+	    s += 2.0 * h[i + (*n) * l];
+	}
+    *MMD2 = s / nn1;
+
+    GetRNGstate();
+
+    /* Generate N realizations under the null */
+    /* *p.value = 0.0; => we do that in R */
+    for (b = 0; b < *N; b++) {
+	/* Generate n iid random variates from U({-1,1}) */
+	for (i = 0; i < *n; i++)
+	    eps[i] = (unif_rand() < 0.5) ? -1.0 : 1.0 ;
+
+	/* Realization number b: see Gretton et al. (2024, (11)) */
+	/* Below we exploit the symmetry of h */
+	MMD2H0[b] = 0.0;
+	for (i = 0; i < *n; i++)
+	    for (l = 0; l < i; l++)
+		if (i != l)
+		    MMD2H0[b] += 2.0 * eps[i] * eps[l] * h[i + (*n) * l];
+	MMD2H0[b] /= nn1;
+
+	/* /\* Update p-value *\/ => we do that in R */
+	/* *p.value += (MMD2H0[b] >= *MMD2); */
+    }
+    /* *p.value /= (double)(*N); => we do that in R */
+
+    PutRNGstate();
+
+    R_Free(h);
+    R_Free(eps);
+}
+
+/**
  * @title Two-sample goodness-of-fit test statistic of Remillard, Scaillet (2009)
  * @param u1_ (n1, d) matrix of copula observations
  * @param u2_ (n2, d) matrix of copula observations
@@ -103,8 +193,7 @@ SEXP gofT2stat_c(SEXP u1_, SEXP u2_) {
 }
 
 /**
- * Cramer-von Mises test statistic
- *
+ * @title Cramer-von Mises test statistic
  * @param n sample size
  * @param p dimension
  * @param U pseudo-observations
@@ -123,8 +212,7 @@ void cramer_vonMises(int *n, int *p, double *U, double *Ctheta,
 }
 
 /**
- * Cramer-von Mises test statistic (grid version)
- *
+ * @title Cramer-von Mises test statistic (grid version)
  * @param p dimension
  * @param U pseudo-observations
  * @param n sample size
@@ -145,8 +233,7 @@ void cramer_vonMises_grid(int *p, double *U, int *n, double *V, int *m,
 }
 
 /**
- * Multiplier bootstrap for the GoF testing: R's  gofCopula(*, simulation="mult")
- *
+ * @title Multiplier bootstrap for the GoF testing: R's  gofCopula(*, simulation="mult")
  * @param p dimension
  * @param U pseudo-observations (n x p)
  * @param n sample size
@@ -245,10 +332,9 @@ void multiplier(int *p, double *U, int *n, double *G, int *g, double *b,
 /// Goodness-of-fit tests for extreme-value copulas
 
 /**
- * Cramer-von Mises test statistic based on the Pickands estimator
- * used in the GOF for EV copulas
- * stat = n/m \sum_{i=0}^{m-1} [An(i/m) - A_{theta_n}(i/m)]^2
- *
+ * @title Cramer-von Mises test statistic based on the Pickands estimator
+ *        used in the GOF for EV copulas
+ *        stat = n/m \sum_{i=0}^{m-1} [An(i/m) - A_{theta_n}(i/m)]^2
  * @param n sample size
  * @param m grid size
  * @param S unit Fréchet pseudo-observations
@@ -278,10 +364,9 @@ void cramer_vonMises_Pickands(int n, int m, double *S,
 }
 
 /**
- * Cramer-von Mises test statistic based on the CFG estimator
- * used in the GOF for EV copulas
- * stat = n/m \sum_{i=0}^{m-1} [An(i/m) - A_{theta_n}(i/m)]^2
- *
+ * @title Cramer-von Mises test statistic based on the CFG estimator
+ *        used in the GOF for EV copulas
+ *        stat = n/m \sum_{i=0}^{m-1} [An(i/m) - A_{theta_n}(i/m)]^2
  * @param n sample size
  * @param m grid size
  * @param S unit Fréchet pseudo-observations
@@ -311,10 +396,9 @@ void cramer_vonMises_CFG(int n, int m, double *S,
 }
 
 /**
- * Wrapper for the Cramer-von Mises test statistics
- * used in the GOF for EV copulas
- * stat = n/m \sum_{i=0}^{m-1} [An(i/m) - A_{theta_n}(i/m)]^2
- *
+ * @title Wrapper for the Cramer-von Mises test statistics
+ *        used in the GOF for EV copulas
+ *        stat = n/m \sum_{i=0}^{m-1} [An(i/m) - A_{theta_n}(i/m)]^2
  * @param n sample size
  * @param m grid size
  * @param S unit Fréchet pseudo-observations

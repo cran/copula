@@ -13,12 +13,16 @@
 ## You should have received a copy of the GNU General Public License along with
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
-## Khoudraji Copula
+### --- Khoudraji Copula -----------------------
 
 library(copula)
-isExplicit <- copula:::isExplicit
+
+source(system.file("Rsource", "utils.R", package="copula", mustWork=TRUE))
+## tryCatch.W.E() etc
+
 (doExtras <- copula:::doExtras())
 
+isExplicit <- copula:::isExplicit
 ## if(!dev.interactive(orNone=TRUE)) pdf("khoudraji-ex.pdf")
 
 ################################################################################
@@ -39,8 +43,10 @@ set.seed(123)
 u <- rCopula(20, kcf)
 
 ## cdf/pdf from explicit expression versus from algorithmic implementation
-max(abs(pCopula(u, kcf) - copula:::pKhoudrajiCopula(u, kcf)))
-max(abs(dCopula(u, kcf) - copula:::dKhoudrajiBivCopula(u, kcf)))
+summary(rD  <- pCopula(u, kcf) - copula:::pKhoudrajiCopula(u, kcf))
+summary(rD. <- dCopula(u, kcf) - copula:::dKhoudrajiBivCopula(u, kcf))
+stopifnot(max(abs(rD)) < 1e-12, max(abs(rD.)) < 1e-12)
+showProc.time()
 
 ################################################################################
 ## A nested Khoudraji copula from kcf and a gumbelCopula, still explicit
@@ -59,10 +65,13 @@ U <- rCopula(100000, k_kcf_g)
 require(MASS)
 u <- as.matrix(expand.grid((1:9)/10, (1:9)/10))
 ## cdf versus C.n
-max(abs(pCopula(u, k_kcf_g) - C.n(u, U))) ## < 0.0001)
+summary(dp <- pCopula(u, k_kcf_g) - C.n(u, U)) ## |.| <= 9.8e-4)
+stopifnot(max(abs(dp)) < 3e-3)
 ## pdf versus kde2d
 kde <- kde2d(U[,1], U[,2], n = 9, lims = c(0.1, 0.9, 0.1, 0.9))
-max(abs(dCopula(u, k_kcf_g) / c(kde$z) - 1)) ## relative difference < 0.13
+summary(rD <- dCopula(u, k_kcf_g) / c(kde$z) - 1) ## |relative difference| <= 0.123..
+stopifnot(max(abs(rD)) < 0.13)
+showProc.time()
 
 ################################################################################
 ## one more nesting: kcf and k_kcf_g
@@ -78,10 +87,12 @@ stopifnot(identical(th.m, th.mA[isFree(monster)]))
 set.seed(488)
 U <- rCopula(100000, monster)
 ## cdf versus C.n
-max(abs(pCopula(u, monster) - C.n(u, U))) ## < 0.002)
+summary(dp <- pCopula(u, monster) - C.n(u, U)) ## -0.0083 ... 0.00131..
 ## pdf versus kde2d
 kde <- kde2d(U[,1], U[,2], n = 9, lims = c(0.1, 0.9, 0.1, 0.9))
-max(abs(dCopula(u, monster) / c(kde$z) - 1)) ## relative difference < 0.09
+summary(rdC <- dCopula(u, monster) / c(kde$z) - 1) ## relative difference < 0.09
+stopifnot(abs(dp) < 0.01, abs(rdC) < 0.09)
+showProc.time()
 
 ################################################################################
 ## khoudrajiExplicitCopula with dim 3
@@ -89,21 +100,22 @@ kcd3 <- khoudrajiCopula(copula1 = indepCopula(dim=3),
                         copula2 = claytonCopula(6, dim=3),
                         shapes = c(0.4, 0.95, 0.95))
 kcd3
-stopifnot(isExplicit(kcd3),
-          inherits(kcd3, "khoudrajiExplicitCopula"))
 
 set.seed(1712)
 U <- rCopula(100000, kcd3)
 u <- matrix(runif(15), 5, 3)
 ## cdf versus C.n
-max(abs(pCopula(u, kcd3) - C.n(u, U))) # < 0.00007
+summary(dP <- pCopula(u, kcd3) - C.n(u, U)) # < 0.00007
 ## don't know how to check pdf
 (f.v <- dCopula(u, kcd3))
-stopifnot(
-    all.equal(f.v,
-              c(1.1116773, 1.6661734, 0.1719080, 0.4981574, 9.8964415),
-              tol = 1e-7)
-)
+stopifnot(expr = {
+    isExplicit(kcd3)
+    inherits(kcd3, "khoudrajiExplicitCopula")
+    all.equal(f.v,   tolerance = 1e-7,
+              c(1.1116773, 1.6661734, 0.1719080, 0.4981574, 9.8964415))
+    abs(dP) < 8e-4
+})
+showProc.time()
 
 kcg <- khoudrajiCopula(claytonCopula(2, dim=3), gumbelCopula(3, dim=3), c(0.2,  0.2, .8))
 kcg
@@ -122,16 +134,14 @@ kcgcd3
 u <- rCopula(10, kcgcd3)
 dCopula(u, kcgcd3)
 
-##--- or use comparederiv() from  ../inst/Rsource/utils.R   via source(..)
-## dCdu
-all.equal(copula:::dCdu(kcgcd3, u), copula:::dCduNumer(kcgcd3, u, may.warn=FALSE))
-## dCdtheta
-all.equal(copula:::dCdtheta(kcgcd3, u), copula:::dCdthetaNumer(kcgcd3, u, may.warn=FALSE))
-## dlogcdu
-all.equal(copula:::dlogcdu(kcgcd3, u), copula:::dlogcduNumer(kcgcd3, u, may.warn=FALSE))
-## dlogcdtheta
-all.equal(copula:::dlogcdtheta(kcgcd3, u), copula:::dlogcdthetaNumer(kcgcd3, u, may.warn=FALSE))
-
+showProc.time()
+if(doExtras) {
+ print(compD <- comparederiv(kcgcd3, u), digits = 4)
+ ##         dCdu     dCdtheta      dlogcdu  dlogcdtheta
+ ## 4.387280e-03 9.791440e-04 3.009563e-08 7.572446e-09
+ stopifnot(compD < c(0.01, 3e-3, 1e-7, 8e-8))
+ showProc.time()
+}
 #############################################################################
 ## fitting checking
 

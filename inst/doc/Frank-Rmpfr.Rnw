@@ -8,7 +8,7 @@
 \title{Numerically Stable Frank Copula Functions via Multiprecision:
   \proglang{R} Package \pkg{Rmpfr}}
 % \def\mythanks{a version of this paper, for \pkg{copula} 0.4\_4, has been published
-%     in JSS, \url{http://www.jstatsoft.org/v39/i09}.}
+%     in JSS, \url{https://www.jstatsoft.org/v39/i09/}.}
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Martin M\"achler} %% comma-separated
 \Plaintitle{Numerically Stable Frank Copula Functions via Multiprecision:
@@ -54,11 +54,11 @@
 %% in the following format:
 \Address{
 	Martin M\"achler\\
-	Seminar f\"ur Statistik, HG G~16\\
+	Seminar f\"ur Statistik, HG G~14.2\\
 	ETH Zurich\\
 	8092 Zurich, Switzerland\\
 	E-mail: \email{maechler@stat.math.ethz.ch}\\
-	URL: \url{http://stat.ethz.ch/people/maechler}
+	URL: \url{https://people.math.ethz.ch/~maechler/}
 }
 %% It is also possible to add a telephone and fax number
 %% before the e-mail in the following format:
@@ -469,7 +469,7 @@ Further investigation shows that the culprit is really the use of
 large theta, and hence should be replaced by the generally accurate
 \code{log1mexp()}, see \citet{maechler2012}.
 %%   M\"achler, M. (2012) Accurately Computing $\log(1-\exp(-\lvert a\rvert))$,
-%%  https://cran.r-project.org/web/packages/Rmpfr/vignettes/log1mexp-note.pdf
+%%  https://CRAN.R-project.org/package=Rmpfr/vignettes/log1mexp-note.pdf
 %% (MM: ~/R/Pkgs/Rmpfr/inst/doc/log1mexp-note.Rnw + ~/R/MM/NUMERICS/log1-exp.R)
 <<log1mexp>>=
 log1mexp <- function(a) # accurately compute log(1-exp(-a))

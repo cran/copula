@@ -60,6 +60,8 @@ static R_NativePrimitiveArgType k_power_set_char_typ[4] = {
 
 // ./gof.c & gof.h /////////////////////////////////////////////////////////////
 
+static R_NativePrimitiveArgType gofMMDtest_c_typ[9] = {
+    REALSXP, REALSXP, INTSXP, INTSXP, INTSXP, REALSXP, INTSXP, REALSXP, REALSXP};
 static R_NativePrimitiveArgType cramer_vonMises_typ[5] = {
     INTSXP, INTSXP, REALSXP, REALSXP, REALSXP};
 static R_NativePrimitiveArgType cramer_vonMises_grid_typ[7] = {
@@ -215,6 +217,8 @@ static const R_CMethodDef CEntries[]  = {
     CDEF(empirical_copula_test_rv_serial),
     CDEF(simulate_empirical_copula),
     CDEF(empirical_copula_test),
+
+    CDEF(gofMMDtest_c),
     /*
     CDEF(debye_1_C),
     CDEF(debye_2_C),

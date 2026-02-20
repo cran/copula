@@ -51,7 +51,7 @@ nacFrail.time(n, family, taus, digits = 3, verbose = FALSE)
 nacFrail.time(10000, "Gumbel", taus=  c(0.05,(1:9)/10, 0.95))
 }%dont
 system.time(
-print( nacFrail.time(1000,  "Gumbel", taus = c(0.5,1,6,9)/10) )
-)% 0.84 sec
+print( nacFrail.time( 100,  "Gumbel", taus = c(1, 6)/10) )
+)% 0.31 sec
 }
 \keyword{utilities}

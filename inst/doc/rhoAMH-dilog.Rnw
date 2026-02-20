@@ -47,11 +47,11 @@
 %% in the following format:
 \Address{
 	Martin M\"achler\\
-	Seminar f\"ur Statistik, HG G~16\\
+	Seminar f\"ur Statistik, HG G~14.2\\
 	ETH Zurich\\
 	8092 Zurich, Switzerland\\
 	E-mail: \email{maechler@stat.math.ethz.ch}\\
-	URL: \url{http://stat.ethz.ch/people/maechler}
+	URL: \url{https://people.math.ethz.ch/~maechler/}
 }
 %% It is also possible to add a telephone and fax number
 %% before the e-mail in the following format:

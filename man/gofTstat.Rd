@@ -72,15 +72,15 @@ gofT2stat(u1, u2, useR = FALSE)
 }
 %\author{Marius Hofert and Martin Maechler}
 \references{
-  Genest, C., R\enc{é}{e}millard, B., and Beaudoin, D. (2009),
+  Genest, C., R\enc{é}{e}millard, B., and Beaudoin, D. (2009).
   Goodness-of-fit tests for copulas: A review and a power study
   \emph{Insurance: Mathematics and Economics} \bold{44}, 199--213.
 
-  Rosenblatt, M. (1952),
+  Rosenblatt, M. (1952).
   Remarks on a Multivariate Transformation,
   \emph{The Annals of Mathematical Statistics} \bold{23}, 3, 470--472.
 
-  Hering, C. and Hofert, M. (2014),
+  Hering, C. and Hofert, M. (2014).
   Goodness-of-fit tests for Archimedean copulas in high dimensions,
   \emph{Innovations in Quantitative Risk Management}.
 
@@ -96,15 +96,16 @@ gofT2stat(u1, u2, useR = FALSE)
 }
 \seealso{
   \code{\link{gofCopula}()} for goodness-of-fit tests where (some of)
-  the test statistics of \code{gofTstat()} are used.
+  the test statistics of \code{gofTstat()} are
+  used. \code{\link{gofMMDtest}()} for another two-sample test.
 }
 \examples{
-## generate data
+## Generate data
 cop <- archmCopula("Gumbel", param=iTau(gumbelCopula(), 0.5), dim=5)
 set.seed(1)
 U <- rCopula(1000, cop)
 
-## compute Sn (as is done in a parametric bootstrap, for example)
+## Compute Sn (as is done in a parametric bootstrap, for example)
 Uhat <- pobs(U) # pseudo-observations
 u <- cCopula(Uhat, copula = cop) # Rosenblatt transformed data (with correct copula)
 gofTstat(u, method = "Sn", copula = cop) # compute test statistic Sn; requires copula argument

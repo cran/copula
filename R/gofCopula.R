@@ -16,13 +16,47 @@
 
 ### Various goodness-of-fit test statistics and tests ##########################
 
+### MMD aggregated two-sample test of Schrab et al. (2024) #####################
+
+##' @title MMD Aggregated Two-Sample Test
+##' @param x (n, d)-matrix of observations (for the default bandwidths typically
+##'        copula observations)
+##' @param y (n, d)-matrix of observations (for the default bandwidths typically
+##'        copula observations)
+##' @param N number of bootstrap replications
+##' @param bandwidth2 squared bandwidths of the underlying Gaussian mixture kernel
+##'        based on the average norm (norm scaled by 1/d)
+##' @return Object of class 'htest'
+##' @author Marius Hofert and Ivan Kojadinovic
+gofMMDtest <- function(x, y, N = 1000, bandwidth2 = 10^c(-4, -3, -2, -3/2, -5/4, -9/8)) {
+    n <- nrow(x)
+    d <- ncol(x)
+    stopifnot(dim(y) == c(n, d))
+    res <- .C(gofMMDtest_c,
+              as.double(t(x)),
+              as.double(t(y)),
+              as.integer(n),
+              as.integer(d),
+              as.integer(N),
+              as.double(bandwidth2),
+              as.integer(length(bandwidth2)),
+              MMD2 = double(1),
+              MMD2H0 = double(N))
+    structure(class = "htest",
+              list(method = "Two-sample unbiased-MMD^2 based test of equality of two distributions",
+                   statistic = c(statistic = res$MMD2),
+                   statistics.H0 = c(statistics.H0 = res$MMD2H0),
+                   p.value = (sum(res$MMD2H0 >= res$MMD2) + 0.5) / (N + 1),
+                   data.name = paste0(c(deparse(substitute(x)), deparse(substitute(y))), collapse = ", ")))
+}
+
 
 ### Two-sample test statistic of Remillard, Scaillet (2009) ####################
 
 ##' @title Test Statistic of Remillard, Scaillet (2009, "Testing for equality
 ##'        between two copulas")
-##' @param u1 (n1, d)-sample of copula observations (in [0,1]^d)
-##' @param u2 (n2, d)-sample of copula observations (in [0,1]^d)
+##' @param u1 (n1, d)-matrix of copula observations (in [0,1]^d)
+##' @param u2 (n2, d)-matrix of copula observations (in [0,1]^d)
 ##' @param useR logical indicating whether R or C implementations are used
 ##' @return value of the test statistic
 ##' @author Marius Hofert
@@ -541,18 +575,18 @@ gofMB <- function(copula, x, N, method = c("Sn", "Rn"),
 ### Wrapper ####################################################################
 
 ##' @title Goodness-of-fit test wrapper function
-##' @param copula An object of type 'copula' representing the H_0 copula
-##' @param x An (n, d)-matrix containing the data
-##' @param N The number of bootstrap (parametric or multiplier) replications
-##' @param method A goodness-of-fit test statistic to be used
-##' @param estim.method An estimation method for the unknown parameter vector
-##' @param simulation The parametric ('pb') or multiplier ('mult') bootstrap
-##' @param verbose A logical indicating whether a progress bar is shown
+##' @param copula object of type 'copula' representing the H_0 copula
+##' @param x (n, d)-matrix containing the data
+##' @param N number of bootstrap (parametric or multiplier) replications
+##' @param method goodness-of-fit test statistic to be used
+##' @param estim.method estimation method for the unknown parameter vector
+##' @param simulation parametric ('pb') or multiplier ('mult') bootstrap
+##' @param verbose logical indicating whether a progress bar is shown
 ##' @param ties.method passed to pobs (not for fitting)
 ##' @param fit.ties.meth passed to pobs (fitting only)
 ##' @param ... Additional arguments passed to the internal auxiliary functions
 ##'        gofPB() and gofMB()
-##' @return An object of class 'htest'
+##' @return Object of class 'htest'
 ##' @author Ivan Kojadinovic, Marius Hofert
 gofCopulaCopula <- function(copula, x, N=1000, method = c("Sn", "SnB", "SnC", "Rn"),
                             estim.method = c("mpl", "ml", "itau", "irho", "itau.mpl"),
